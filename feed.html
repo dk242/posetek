@@ -1,0 +1,813 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoseTek Feed</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-light);
+            background-color: var(--primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .feed-header {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .feed-title {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .feed-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .feed-container {
+            display: flex;
+            flex-direction: column;
+            gap: 2rem;
+        }
+
+        .post-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+        }
+
+        .post-card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+
+        .post-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-right: 1rem;
+        }
+
+        .post-user-info {
+            flex: 1;
+        }
+
+        .user-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .post-time {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .post-type {
+            background-color: var(--accent);
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 500;
+        }
+
+        .post-content {
+            margin-bottom: 1.5rem;
+        }
+
+        .post-title {
+            font-size: 1.4rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+
+        .post-description {
+            color: var(--text-muted);
+            margin-bottom: 1.5rem;
+        }
+
+        .post-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .stat-item {
+            text-align: center;
+            padding: 1rem;
+            background-color: rgba(0, 0, 0, 0.1);
+            border-radius: 12px;
+        }
+
+        .stat-value {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 0.3rem;
+        }
+
+        .stat-label {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+        }
+
+        .post-media {
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            position: relative;
+            aspect-ratio: 16/9;
+            background-color: rgba(0, 0, 0, 0.3);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .post-media img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .post-media-placeholder {
+            color: var(--text-muted);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .post-actions {
+            display: flex;
+            gap: 1rem;
+            border-top: 1px solid var(--card-border);
+            padding-top: 1.5rem;
+        }
+
+        .action-btn {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.9rem;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0.5rem 1rem;
+            border-radius: 8px;
+        }
+
+        .action-btn:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+        }
+
+        .action-btn.active {
+            color: var(--accent);
+        }
+
+        .action-btn.active svg {
+            fill: var(--accent);
+        }
+
+        .comments-section {
+            margin-top: 1.5rem;
+            border-top: 1px solid var(--card-border);
+            padding-top: 1.5rem;
+            display: none;
+        }
+
+        .comments-section.expanded {
+            display: block;
+        }
+
+        .comment-form {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+        }
+
+        .comment-input {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid var(--card-border);
+            background-color: rgba(255, 255, 255, 0.05);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+        }
+
+        .comment-input:focus {
+            outline: none;
+            border-color: var(--accent);
+        }
+
+        .comment-submit {
+            padding: 0.8rem 1.5rem;
+            background-color: var(--accent);
+            color: var(--text-light);
+            border: none;
+            border-radius: 8px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .comment-submit:hover {
+            background-color: #56a07a;
+        }
+
+        .comment-list {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .comment-item {
+            display: flex;
+            gap: 1rem;
+            padding: 1rem;
+            background-color: rgba(255, 255, 255, 0.05);
+            border-radius: 8px;
+        }
+
+        .comment-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--secondary);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1rem;
+            flex-shrink: 0;
+        }
+
+        .comment-content {
+            flex: 1;
+        }
+
+        .comment-author {
+            font-weight: 600;
+            margin-bottom: 0.3rem;
+        }
+
+        .comment-text {
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .comment-action {
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            font-size: 0.8rem;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .comment-action:hover {
+            color: var(--accent);
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--text-muted);
+        }
+
+        .empty-state h3 {
+            margin-bottom: 1rem;
+            font-weight: 600;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .post-stats {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .post-actions {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <div class="logo">PoseTek</div>
+        <nav class="nav-links">
+            <a href="#">Feed</a>
+            <a href="#">Sessions</a>
+            <a href="#">Profile</a>
+            <a href="#">Leaderboards</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="feed-header">
+            <h1 class="feed-title">PoseTek Feed</h1>
+            <p class="feed-subtitle">See what players are working on and achieving</p>
+        </div>
+
+        <div class="feed-container" id="feedContainer">
+            <!-- Feed content will be dynamically generated -->
+        </div>
+    </div>
+
+    <script>
+        // Mock data for the feed
+        const mockFeedData = [
+            {
+                id: 1,
+                user: {
+                    name: "Alex Johnson",
+                    initials: "AJ",
+                    team: "United FC"
+                },
+                timestamp: "2 hours ago",
+                type: "Free Kicks",
+                title: "New personal best on free kicks!",
+                description: "Finally broke through the 60 mph barrier with my instep technique. The new approach angle really made a difference.",
+                stats: {
+                    speed: "62",
+                    accuracy: "78",
+                    power: "87",
+                    sessions: "12"
+                },
+                mediaType: "video",
+                likes: 24,
+                comments: 8,
+                liked: false,
+                commentsData: [
+                    {
+                        user: "Coach Williams",
+                        text: "Great progress Alex! Your plant foot positioning has improved significantly.",
+                        timestamp: "1 hour ago",
+                        likes: 3
+                    },
+                    {
+                        user: "Jamie Rivera",
+                        text: "That's amazing! What was the biggest change you made?",
+                        timestamp: "45 minutes ago",
+                        likes: 1
+                    }
+                ]
+            },
+            {
+                id: 2,
+                user: {
+                    name: "Maria Rodriguez",
+                    initials: "MR",
+                    team: "Strikers Academy"
+                },
+                timestamp: "5 hours ago",
+                type: "Shot Analysis",
+                title: "Breaking down my shooting technique",
+                description: "Working on reducing my approach angle to generate more power. The data shows I'm getting closer to optimal biomechanics.",
+                stats: {
+                    speed: "58",
+                    accuracy: "82",
+                    power: "79",
+                    sessions: "8"
+                },
+                mediaType: "pose",
+                likes: 32,
+                comments: 12,
+                liked: true,
+                commentsData: [
+                    {
+                        user: "Coach Thompson",
+                        text: "Excellent work on the follow-through Maria. Notice how your plant foot stabilizes at contact.",
+                        timestamp: "3 hours ago",
+                        likes: 5
+                    }
+                ]
+            },
+            {
+                id: 3,
+                user: {
+                    name: "David Chen",
+                    initials: "DC",
+                    team: "City SC"
+                },
+                timestamp: "1 day ago",
+                type: "Passing Drill",
+                title: "Long ball accuracy improving",
+                description: "Focused on weight distribution and follow-through. Seeing consistent improvement in both accuracy and distance.",
+                stats: {
+                    speed: "45",
+                    accuracy: "91",
+                    power: "72",
+                    sessions: "15"
+                },
+                mediaType: "analysis",
+                likes: 18,
+                comments: 5,
+                liked: false,
+                commentsData: []
+            },
+            {
+                id: 4,
+                user: {
+                    name: "Sarah Williams",
+                    initials: "SW",
+                    team: "Rovers FC"
+                },
+                timestamp: "2 days ago",
+                type: "Session Recap",
+                title: "Completed 100-shot challenge",
+                description: "Finished my first 100-shot challenge focusing on instep drive technique. The data shows my consistency improved throughout the session.",
+                stats: {
+                    speed: "59",
+                    accuracy: "85",
+                    power: "83",
+                    sessions: "23"
+                },
+                mediaType: "video",
+                likes: 42,
+                comments: 15,
+                liked: false,
+                commentsData: [
+                    {
+                        user: "Coach Martinez",
+                        text: "Impressive dedication Sarah! The consistency charts show real improvement.",
+                        timestamp: "1 day ago",
+                        likes: 7
+                    },
+                    {
+                        user: "Tom Wilson",
+                        text: "That's some serious volume! How did you manage fatigue toward the end?",
+                        timestamp: "20 hours ago",
+                        likes: 2
+                    }
+                ]
+            }
+        ];
+
+        // Function to generate feed content
+        function generateFeed() {
+            const feedContainer = document.getElementById('feedContainer');
+            
+            if (mockFeedData.length === 0) {
+                feedContainer.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No activities yet</h3>
+                        <p>When players share their sessions and achievements, they'll appear here.</p>
+                    </div>
+                `;
+                return;
+            }
+            
+            feedContainer.innerHTML = '';
+            
+            mockFeedData.forEach(post => {
+                const postElement = document.createElement('div');
+                postElement.className = 'post-card';
+                postElement.innerHTML = `
+                    <div class="post-header">
+                        <div class="avatar">${post.user.initials}</div>
+                        <div class="post-user-info">
+                            <div class="user-name">${post.user.name}</div>
+                            <div class="post-time">${post.timestamp} • ${post.user.team}</div>
+                        </div>
+                        <div class="post-type">${post.type}</div>
+                    </div>
+                    
+                    <div class="post-content">
+                        <h3 class="post-title">${post.title}</h3>
+                        <p class="post-description">${post.description}</p>
+                        
+                        <div class="post-stats">
+                            <div class="stat-item">
+                                <div class="stat-value">${post.stats.speed}</div>
+                                <div class="stat-label">Speed (mph)</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${post.stats.accuracy}%</div>
+                                <div class="stat-label">Accuracy</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${post.stats.power}</div>
+                                <div class="stat-label">Power</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-value">${post.stats.sessions}</div>
+                                <div class="stat-label">Sessions</div>
+                            </div>
+                        </div>
+                        
+                        <div class="post-media">
+                            ${getMediaPlaceholder(post.mediaType)}
+                        </div>
+                    </div>
+                    
+                    <div class="post-actions">
+                        <button class="action-btn ${post.liked ? 'active' : ''}" data-post-id="${post.id}" data-action="like">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="${post.liked ? '#4c8c6a' : 'none'}" stroke="currentColor" stroke-width="2">
+                                <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"></path>
+                            </svg>
+                            <span>${post.likes}</span>
+                        </button>
+                        <button class="action-btn" data-post-id="${post.id}" data-action="comment">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                            </svg>
+                            <span>${post.comments}</span>
+                        </button>
+                        <button class="action-btn" data-post-id="${post.id}" data-action="share">
+                            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"></path>
+                                <polyline points="16 6 12 2 8 6"></polyline>
+                                <line x1="12" y1="2" x2="12" y2="15"></line>
+                            </svg>
+                            <span>Share</span>
+                        </button>
+                    </div>
+                    
+                    <div class="comments-section" id="comments-${post.id}">
+                        <div class="comment-form">
+                            <input type="text" class="comment-input" placeholder="Add a comment...">
+                            <button class="comment-submit">Post</button>
+                        </div>
+                        <div class="comment-list">
+                            ${generateComments(post.commentsData)}
+                        </div>
+                    </div>
+                `;
+                
+                feedContainer.appendChild(postElement);
+            });
+            
+            // Add event listeners
+            attachEventListeners();
+        }
+        
+        function getMediaPlaceholder(type) {
+            switch(type) {
+                case 'video':
+                    return `
+                        <div class="post-media-placeholder">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <polygon points="5 3 19 12 5 21 5 3"></polygon>
+                            </svg>
+                            <p>Video analysis available</p>
+                        </div>
+                    `;
+                case 'pose':
+                    return `
+                        <div class="post-media-placeholder">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <circle cx="12" cy="8" r="7"></circle>
+                                <polyline points="8.21 13.89 7 23 12 20 17 23 15.79 13.88"></polyline>
+                            </svg>
+                            <p>Pose visualization available</p>
+                        </div>
+                    `;
+                case 'analysis':
+                    return `
+                        <div class="post-media-placeholder">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <path d="M3 3v18h18"></path>
+                                <path d="M18 17V9"></path>
+                                <path d="M13 17V5"></path>
+                                <path d="M8 17v-3"></path>
+                            </svg>
+                            <p>Performance analysis available</p>
+                        </div>
+                    `;
+                default:
+                    return `
+                        <div class="post-media-placeholder">
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                                <polyline points="21 15 16 10 5 21"></polyline>
+                            </svg>
+                            <p>Session media available</p>
+                        </div>
+                    `;
+            }
+        }
+        
+        function generateComments(comments) {
+            if (comments.length === 0) {
+                return '<p style="text-align: center; color: var(--text-muted); padding: 1rem;">No comments yet</p>';
+            }
+            
+            return comments.map(comment => `
+                <div class="comment-item">
+                    <div class="comment-avatar">${comment.user.charAt(0)}</div>
+                    <div class="comment-content">
+                        <div class="comment-author">${comment.user}</div>
+                        <p class="comment-text">${comment.text}</p>
+                        <div class="comment-actions">
+                            <button class="comment-action">Like (${comment.likes})</button>
+                            <span class="post-time">${comment.timestamp}</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+        }
+        
+        function attachEventListeners() {
+            // Like buttons
+            document.querySelectorAll('[data-action="like"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const postId = this.getAttribute('data-post-id');
+                    const likeCount = this.querySelector('span');
+                    const isActive = this.classList.contains('active');
+                    
+                    if (isActive) {
+                        this.classList.remove('active');
+                        likeCount.textContent = parseInt(likeCount.textContent) - 1;
+                        this.querySelector('svg').setAttribute('fill', 'none');
+                    } else {
+                        this.classList.add('active');
+                        likeCount.textContent = parseInt(likeCount.textContent) + 1;
+                        this.querySelector('svg').setAttribute('fill', '#4c8c6a');
+                    }
+                });
+            });
+            
+            // Comment buttons
+            document.querySelectorAll('[data-action="comment"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    const postId = this.getAttribute('data-post-id');
+                    const commentsSection = document.getElementById(`comments-${postId}`);
+                    
+                    // Toggle comments section
+                    commentsSection.classList.toggle('expanded');
+                    
+                    // Scroll to comments if expanding
+                    if (commentsSection.classList.contains('expanded')) {
+                        commentsSection.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                    }
+                });
+            });
+            
+            // Comment submission
+            document.querySelectorAll('.comment-submit').forEach(button => {
+                button.addEventListener('click', function() {
+                    const commentInput = this.previousElementSibling;
+                    const commentText = commentInput.value.trim();
+                    
+                    if (commentText) {
+                        const commentList = this.closest('.comments-section').querySelector('.comment-list');
+                        
+                        // Create new comment
+                        const newComment = document.createElement('div');
+                        newComment.className = 'comment-item';
+                        newComment.innerHTML = `
+                            <div class="comment-avatar">Y</div>
+                            <div class="comment-content">
+                                <div class="comment-author">You</div>
+                                <p class="comment-text">${commentText}</p>
+                                <div class="comment-actions">
+                                    <button class="comment-action">Like (0)</button>
+                                    <span class="post-time">Just now</span>
+                                </div>
+                            </div>
+                        `;
+                        
+                        // Add to top of comments
+                        if (commentList.firstChild && commentList.firstChild.classList.contains('comment-item')) {
+                            commentList.insertBefore(newComment, commentList.firstChild);
+                        } else {
+                            commentList.appendChild(newComment);
+                        }
+                        
+                        // Clear input
+                        commentInput.value = '';
+                        
+                        // Update comment count in action button
+                        const postId = this.closest('.post-card').querySelector('[data-action="comment"]').getAttribute('data-post-id');
+                        const commentButton = document.querySelector(`[data-post-id="${postId}"][data-action="comment"]`);
+                        const commentCount = commentButton.querySelector('span');
+                        commentCount.textContent = parseInt(commentCount.textContent) + 1;
+                    }
+                });
+            });
+            
+            // Share buttons
+            document.querySelectorAll('[data-action="share"]').forEach(button => {
+                button.addEventListener('click', function() {
+                    alert('Share functionality would be implemented here!');
+                });
+            });
+        }
+        
+        // Initialize the feed
+        document.addEventListener('DOMContentLoaded', generateFeed);
+    </script>
+</body>
+</html>

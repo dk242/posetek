@@ -1,0 +1,1575 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Coach Dashboard | PoseTek</title>
+    <!-- Use Inter for body and Poppins for headings for a more professional, punchy look -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --accent-light: #5ea87e;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --text-dark: #121212;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* Improve touch scrolling on mobile */
+            -webkit-tap-highlight-color: rgba(76, 140, 106, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-light);
+            background-color: var(--primary);
+            line-height: 1.6;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            /* Smooth scrolling for mobile */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(76, 140, 106, 0.08), transparent),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(76, 140, 106, 0.05), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(15, 31, 27, 0.85);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo {
+            font-family: 'Poppins', 'SF Pro Display', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links { display: none !important; }
+
+        .nav-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        .nav-toggle:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-1px); }
+
+        .home-btn-style {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .home-btn-style:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-1px); }
+
+        .header-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.85rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+        .header-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-light);
+            transform: translateY(-1px);
+        }
+        .header-nav-btn .material-symbols-outlined { font-size: 1.05rem; }
+
+        /* Side nav */
+        .side-nav {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(15,38,33,0.98), rgba(12,34,30,0.98));
+            box-shadow: 6px 0 30px rgba(0,0,0,0.45);
+            z-index: 1200;
+            padding: 2rem 1.25rem;
+            transition: left 0.32s cubic-bezier(.2,.9,.2,1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .side-nav.open { left: 0; }
+
+        .side-nav .close-side {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.25rem;
+            cursor: pointer;
+            opacity: 0.85;
+            min-width: 44px;
+            min-height: 44px;
+        }
+        .side-nav .close-side:active { transform: scale(0.9); }
+
+        .side-nav .side-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 0.85rem;
+            border-radius: 10px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            /* Mobile touch improvements */
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            min-height: 44px;
+        }
+
+        .side-nav .side-link:hover { background: rgba(255,255,255,0.03); transform: translateX(4px); }
+
+        .side-nav .side-link:active { transform: scale(0.98); }
+
+        .side-nav .side-divider { height: 1px; background: var(--card-border); margin: 0.75rem 0; }
+
+                /* mobile: full-screen overlay */
+                @media (max-width: 720px) {
+                    .side-nav { width: 100%; left: -100%; }
+                    .side-nav.open { left: 0; }
+                    header { padding-left: 0.75rem; padding-right: 0.75rem; }
+                    .nav-toggle { width:40px; height:40px; }
+                }
+
+                /* link entrance animation */
+                .side-link { opacity: 0; transform: translateX(-8px); transition: opacity 260ms ease, transform 260ms ease; }
+                .side-nav.open .side-link { opacity: 1; transform: translateX(0); }
+
+            /* overlay backdrop when side nav opens */
+            .side-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1100; opacity: 0; visibility: hidden; transition: opacity 200ms ease; }
+            .side-backdrop.open { opacity: 1; visibility: visible; }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+       
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .dashboard-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .dashboard-title {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.6px;
+        }
+
+        .dashboard-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-light);
+            opacity: 0.9;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 1rem;
+        }
+
+        .action-btn {
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);
+            border: none;
+            border-radius: 50px;
+            color: var(--text-light);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 44px;
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .action-btn:hover { transform: translateY(-2px); }
+
+        .action-btn.secondary {
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .player-card {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            padding: 1rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+            cursor: pointer;
+            /* Mobile touch improvements */
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .player-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--accent);
+        }
+
+        .player-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .player-name {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 0.4rem;
+            color: var(--text-light);
+        }
+
+        .player-code {
+            display: inline-block;
+            padding: 0.25rem 0.6rem;
+            background-color: var(--secondary);
+            border-radius: 50px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            margin-bottom: 0.75rem;
+        }
+
+        .player-status {
+            font-size: 0.7rem;
+            color: var(--text-muted);
+            margin-top: 0.4rem;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+            margin-top: 1rem;
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--text-light);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        /* Modal styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26, 58, 46, 0.95), rgba(45, 94, 74, 0.95));
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .modal-content {
+            background: linear-gradient(145deg, rgba(26, 58, 46, 0.95), rgba(45, 94, 74, 0.9));
+            padding: 2rem;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            max-height: 90vh;
+            overflow-y: auto;
+            /* Smooth scrolling on mobile */
+            -webkit-overflow-scrolling: touch;
+            transform: scale(0.95) translateY(20px);
+            transition: var(--transition);
+            border: 1px solid rgba(76, 140, 106, 0.2);
+        }
+
+        .modal-overlay.active .modal-content {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Custom scrollbar for modal */
+        .modal-content::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb {
+            background: rgba(76, 140, 106, 0.5);
+            border-radius: 10px;
+        }
+
+        .modal-content::-webkit-scrollbar-thumb:hover {
+            background: rgba(76, 140, 106, 0.7);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #4c8c6a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close-btn {
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            color: var(--text-light);
+            font-size: 1.3rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            /* Mobile touch improvements */
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+            border-color: var(--accent);
+        }
+
+        .close-btn:active {
+            transform: rotate(90deg) scale(0.95);
+        }
+
+        /* Tab styles */
+        .tab-container {
+            display: flex;
+            margin-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .tab {
+            padding: 0.75rem 1.5rem;
+            cursor: pointer;
+            font-weight: 500;
+            transition: var(--transition);
+            border-bottom: 3px solid transparent;
+            /* Mobile touch improvements */
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .tab:active {
+            transform: scale(0.97);
+        }
+
+        .tab.active {
+            border-bottom-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.15),
+                        0 4px 12px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .name-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffffff, #e8f5e9);
+            color: var(--primary);
+            border: none;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15),
+                        0 0 0 1px rgba(76, 140, 106, 0.2);
+            /* Mobile touch improvements */
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #f5f5f5, #c8e6c9);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25),
+                        0 0 0 1px rgba(76, 140, 106, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .spinner {
+            display: none;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(26, 58, 46, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+            animation: shake 0.5s ease;
+        }
+
+        .success-message {
+            color: #4c8c6a;
+            background: rgba(76, 140, 106, 0.15);
+            border: 1px solid rgba(76, 140, 106, 0.4);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        /* Responsive adjustments */
+        /* Tablet and smaller */
+        @media (max-width: 768px) {
+            header {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .logo {
+                font-size: 1.6rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+                margin-bottom: 2rem;
+            }
+
+            .dashboard-title {
+                font-size: 2rem;
+            }
+
+            .dashboard-subtitle {
+                font-size: 1rem;
+            }
+
+            .action-buttons {
+                width: 100%;
+                flex-wrap: wrap;
+            }
+
+            .action-btn {
+                flex: 1;
+                min-width: 140px;
+                padding: 0.7rem 1rem;
+                font-size: 0.95rem;
+                min-height: 44px; /* Better touch target */
+            }
+
+            .players-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 0.9rem;
+            }
+
+            .player-card {
+                padding: 0.95rem;
+            }
+
+            .player-name {
+                font-size: 1.3rem;
+            }
+
+            .name-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .form-group input {
+                padding: 0.85rem 1rem;
+                font-size: 16px; /* Prevent iOS zoom - minimum 16px */
+                min-height: 44px; /* Better touch target */
+            }
+
+            .submit-btn {
+                padding: 1rem;
+                font-size: 1rem;
+                min-height: 48px; /* Better touch target */
+            }
+
+            .tab {
+                padding: 0.8rem 1rem;
+                font-size: 0.9rem;
+                min-height: 44px;
+            }
+
+            .modal-content {
+                margin: 0 1rem;
+                padding: 1.75rem;
+                max-width: 95%;
+                max-height: 85vh;
+                border-radius: 20px;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .close-btn {
+                width: 32px;
+                height: 32px;
+                font-size: 1.2rem;
+            }
+        }
+
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            header {
+                padding: 1rem 1.25rem;
+            }
+
+            .logo {
+                font-size: 1.4rem;
+            }
+
+            .container {
+                padding: 1.25rem;
+            }
+
+            .dashboard-header {
+                margin-bottom: 1.5rem;
+                padding-bottom: 1rem;
+            }
+
+            .dashboard-title {
+                font-size: 1.75rem;
+            }
+
+            .dashboard-subtitle {
+                font-size: 0.95rem;
+            }
+
+            .action-buttons {
+                flex-direction: column;
+                gap: 0.75rem;
+            }
+
+            .action-btn {
+                width: 100%;
+                min-width: auto;
+            }
+
+            .players-grid {
+                grid-template-columns: 1fr;
+                gap: 0.75rem;
+            }
+
+            .player-card {
+                padding: 0.85rem;
+                border-radius: 10px;
+            }
+
+            .player-name {
+                font-size: 1.2rem;
+            }
+
+            .player-code {
+                font-size: 0.75rem;
+                padding: 0.25rem 0.65rem;
+            }
+
+            .form-group {
+                margin-bottom: 1.25rem;
+            }
+
+            .form-group label {
+                font-size: 0.9rem;
+            }
+
+            .form-group input {
+                padding: 0.8rem 0.9rem;
+                font-size: 16px; /* Prevent iOS zoom */
+                border-radius: 8px;
+            }
+
+            .submit-btn {
+                padding: 0.95rem;
+                font-size: 0.95rem;
+            }
+
+            .tab {
+                padding: 0.7rem 0.75rem;
+                font-size: 0.85rem;
+            }
+
+            .tab-container {
+                margin-bottom: 1.25rem;
+            }
+
+            .error-message,
+            .success-message {
+                font-size: 0.85rem;
+            }
+
+            .modal-content {
+                margin: 0 0.75rem;
+                padding: 1.5rem;
+                max-width: 96%;
+                max-height: 90vh;
+                border-radius: 16px;
+            }
+
+            .modal-title {
+                font-size: 1.35rem;
+            }
+
+            .close-btn {
+                width: 30px;
+                height: 30px;
+                font-size: 1.1rem;
+            }
+
+            .modal-header {
+                margin-bottom: 1.25rem;
+            }
+        }
+
+        /* Very small phones */
+        @media (max-width: 375px) {
+            .logo {
+                font-size: 1.3rem;
+            }
+
+            .container {
+                padding: 1rem;
+            }
+
+            .dashboard-title {
+                font-size: 1.6rem;
+            }
+
+            .dashboard-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .player-name {
+                font-size: 1.1rem;
+            }
+
+            .form-group input {
+                font-size: 16px; /* Maintain minimum for iOS */
+                padding: 0.75rem 0.85rem;
+            }
+
+            .tab {
+                padding: 0.65rem 0.6rem;
+                font-size: 0.8rem;
+            }
+
+            .modal-content {
+                margin: 0 0.5rem;
+                padding: 1.25rem;
+            }
+
+            .modal-title {
+                font-size: 1.2rem;
+            }
+        }
+
+        .players-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .name-fields {
+            grid-template-columns: 1fr;
+        }
+    </style>
+</head>
+<body>
+     <header>
+                <div style="display:flex;align-items:center;gap:0.75rem;">
+                    <button id="navToggle" class="nav-toggle" aria-label="Open navigation">&#9776;</button>
+                    <div class="logo">PoseTek</div>
+                </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <a id="leaderboardBtn" href="leaderboard.html?userType=coach" class="header-nav-btn" title="Leaderboards">
+                <span class="material-symbols-outlined">leaderboard</span>
+                <span>Leaderboard</span>
+            </a>
+        </div>
+        </header>
+
+        <!-- Side navigation panel -->
+        <aside id="sideNav" class="side-nav" aria-hidden="true">
+            <div style="display:flex;align-items:center;gap:0.5rem;">
+                <div style="font-weight:700;font-size:1.25rem;">Menu</div>
+                <button class="close-side" id="closeSide">✕</button>
+            </div>
+            <div class="side-divider"></div>
+            <!-- Compact profile area (will be populated from auth) -->
+            <div id="sideProfile" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+                <div id="profileAvatar" style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem">C</div>
+                <div style="display:flex;flex-direction:column;">
+                    <div id="profileName" style="font-weight:700">Coach</div>
+                    <div id="profileEmail" style="font-size:0.85rem;opacity:0.85">email@example.com</div>
+                </div>
+            </div>
+            <div class="side-divider"></div>
+            <!-- Links will be cloned here from header nav -->
+            <div id="sideLinks" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+            <div class="side-divider"></div>
+            <div style="margin-top:auto">
+                <button class="action-btn" id="sideLogout">Logout</button>
+            </div>
+        </aside>
+    <div id="sideBackdrop" class="side-backdrop" tabindex="-1"></div>
+
+    <div class="container">
+        <div class="dashboard-header">
+            <div>
+                <h1 class="dashboard-title">Player Roster</h1>
+                <p class="dashboard-subtitle" id="orgName">Organization: Loading...</p>
+            </div>
+            <div class="action-buttons">
+                <button class="action-btn" id="addPlayerBtn">Add Player</button>
+                <button class="action-btn secondary" id="refreshBtn">Refresh</button>
+            </div>
+        </div>
+
+        <div class="players-grid" id="playersGrid">
+            <div class="empty-state">
+                <h3>Loading players...</h3>
+                <p>Please wait while we load your team data</p>
+            </div>
+        </div>
+    </div>
+
+    <!-- Add Player Modal -->
+    <div class="modal-overlay" id="addPlayerModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Add Player</h3>
+                <button class="close-btn" id="closeModal">&times;</button>
+            </div>
+            
+            <div class="tab-container">
+                <div class="tab active" data-tab="existing">Existing Player</div>
+                <div class="tab" data-tab="new">New Player</div>
+            </div>
+            
+            <!-- Existing Player Tab -->
+            <div class="tab-content active" id="existingPlayerTab">
+                <form id="addExistingPlayerForm">
+                    <div class="form-group">
+                        <label for="playerCode">Player Code</label>
+                        <input type="text" id="playerCode" placeholder="Enter player's unique code (e.g. PLR123)" required>
+                    </div>
+                    <div class="error-message" id="addPlayerError"></div>
+                    <div class="success-message" id="addPlayerSuccess"></div>
+                    <button type="submit" class="submit-btn" id="addExistingPlayerSubmit">
+                        <span>Add Player</span>
+                        <span class="spinner" id="existingPlayerSpinner"></span>
+                    </button>
+                </form>
+            </div>
+            
+            <!-- New Player Tab -->
+            <div class="tab-content" id="newPlayerTab">
+                <form id="addNewPlayerForm">
+                    <div class="name-fields">
+                        <div class="form-group">
+                            <label for="firstName">First Name</label>
+                            <input type="text" id="firstName" placeholder="First name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="lastName">Last Name</label>
+                            <input type="text" id="lastName" placeholder="Last name" required>
+                        </div>
+                    </div>
+                    <div class="error-message" id="addNewPlayerError"></div>
+                    <div class="success-message" id="addNewPlayerSuccess"></div>
+                    <button type="submit" class="submit-btn" id="addNewPlayerSubmit">
+                        <span>Create Player</span>
+                        <span class="spinner" id="newPlayerSpinner"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // DOM elements
+        const playersGrid = document.getElementById('playersGrid');
+        const orgNameElement = document.getElementById('orgName');
+        const addPlayerBtn = document.getElementById('addPlayerBtn');
+        const refreshBtn = document.getElementById('refreshBtn');
+        const addPlayerModal = document.getElementById('addPlayerModal');
+        const closeModal = document.getElementById('closeModal');
+        
+        // Tab elements
+        const tabs = document.querySelectorAll('.tab');
+        const tabContents = document.querySelectorAll('.tab-content');
+        
+        // Existing player form elements
+        const addExistingPlayerForm = document.getElementById('addExistingPlayerForm');
+        const playerCodeInput = document.getElementById('playerCode');
+        const addPlayerError = document.getElementById('addPlayerError');
+        const addPlayerSuccess = document.getElementById('addPlayerSuccess');
+        const addExistingPlayerSubmit = document.getElementById('addExistingPlayerSubmit');
+        const existingPlayerSpinner = document.getElementById('existingPlayerSpinner');
+        
+        // New player form elements
+        const addNewPlayerForm = document.getElementById('addNewPlayerForm');
+        const firstNameInput = document.getElementById('firstName');
+        const lastNameInput = document.getElementById('lastName');
+        const addNewPlayerError = document.getElementById('addNewPlayerError');
+        const addNewPlayerSuccess = document.getElementById('addNewPlayerSuccess');
+        const addNewPlayerSubmit = document.getElementById('addNewPlayerSubmit');
+        const newPlayerSpinner = document.getElementById('newPlayerSpinner');
+
+        // Tab switching functionality
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                // Remove active class from all tabs and contents
+                tabs.forEach(t => t.classList.remove('active'));
+                tabContents.forEach(c => c.classList.remove('active'));
+                
+                // Add active class to clicked tab and corresponding content
+                tab.classList.add('active');
+                const tabId = tab.dataset.tab + 'PlayerTab';
+                document.getElementById(tabId).classList.add('active');
+                
+                // Clear all messages when switching tabs
+                addPlayerError.style.display = 'none';
+                addPlayerSuccess.style.display = 'none';
+                addNewPlayerError.style.display = 'none';
+                addNewPlayerSuccess.style.display = 'none';
+            });
+        });
+
+        // Modal functions
+        function showModal(modal) {
+            document.body.style.overflow = 'hidden';
+            modal.classList.add('active');
+        }
+
+        function hideModal(modal) {
+            document.body.style.overflow = 'auto';
+            modal.classList.remove('active');
+        }
+
+        // Show loading state
+        function showLoading(button, spinner) {
+            button.disabled = true;
+            button.querySelector('span:first-child').style.opacity = '0.5';
+            spinner.style.display = 'block';
+        }
+
+        // Hide loading state
+        function hideLoading(button, spinner) {
+            button.disabled = false;
+            button.querySelector('span:first-child').style.opacity = '1';
+            spinner.style.display = 'none';
+        }
+
+        // Generate a random alphanumeric code
+        function generateCode(prefix = 'PLR', length = 3) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789'; // Exclude confusing characters
+            let result = prefix;
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // Load organization and players data
+        async function loadOrganizationAndPlayers() {
+            try {
+                const user = auth.currentUser;
+                if (!user) {
+                    window.location.href = 'kickai.html';
+                    return;
+                }
+
+                // Get coach document
+                const coachQuery = await db.collection('coaches')
+                    .where('userUID', '==', user.uid)
+                    .limit(1)
+                    .get();
+
+                const coachDocSnap = coachQuery.docs[0];             // QueryDocumentSnapshot
+                const coachData    = coachDocSnap.data(); 
+
+                // Set organization name if coach has one
+                if (coachData.org) {
+                    const orgDoc = await coachData.org.get();
+                    if (orgDoc.exists) {
+                        orgNameElement.textContent = `Organization: ${orgDoc.data().name}`;
+                    }
+                } else {
+                    orgNameElement.textContent = `Independent Coach`;
+                }
+
+                // Load players from the coach's members array
+                const players = [];
+                if (coachData.members && coachData.members.length > 0) {
+                    // Firestore 'in' queries have a limit of 10 items per query
+                    // So we need to batch requests for coaches with more than 10 players
+                    const batchSize = 10;
+                    const memberBatches = [];
+                    
+                    for (let i = 0; i < coachData.members.length; i += batchSize) {
+                        memberBatches.push(coachData.members.slice(i, i + batchSize));
+                    }
+                    
+                    // Execute all batched queries
+                    for (const batch of memberBatches) {
+                        const playerDocs = await db.collection('players')
+                            .where(firebase.firestore.FieldPath.documentId(), 'in', batch)
+                            .get();
+
+                        playerDocs.forEach(doc => {
+                            const playerData = doc.data();
+                            players.push({
+                                id: doc.id,
+                                name: `${playerData.firstName} ${playerData.lastName}`,
+                                firstName: playerData.firstName,
+                                lastName: playerData.lastName,
+                                code: playerData.code || 'Unknown',
+                                hasAccount: !!playerData.userUID, // Has account if userUID exists
+                                isTemporary: false
+                            });
+                        });
+                    }
+                }
+
+                // Render players
+                renderPlayers(players);
+            } catch (error) {
+                console.error("Error loading organization and players:", error);
+                playersGrid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Error loading players</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render players to the grid
+        function renderPlayers(players) {
+            if (players.length === 0) {
+                playersGrid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>No players found</h3>
+                        <p>Add players to your organization to get started</p>
+                    </div>
+                `;
+                return;
+            }
+
+            playersGrid.innerHTML = '';
+            
+            players.forEach(player => {
+                const playerCard = document.createElement('div');
+                playerCard.className = 'player-card';
+                
+                playerCard.innerHTML = `
+                    <h3 class="player-name">${player.name}</h3>
+                    <span class="player-code">${player.code}</span>
+                    <p class="player-status">${player.hasAccount ? 'Full account' : player.isTemporary ? 'Temporary profile' : 'Needs registration'}</p>
+                `;
+                
+                playerCard.addEventListener('click', () => {
+                    window.location.href = `profile.html?player=${player.id}&userType=coach`;
+                });
+                
+                playersGrid.appendChild(playerCard);
+            });
+        }
+
+        // Add existing player by code
+        async function addPlayerByCode(playerCode, coachId) {
+            try {
+                // Find player by code
+                const playersQuery = await db.collection('players')
+                    .where('code', '==', playerCode.toUpperCase())
+                    .limit(1)
+                    .get();
+
+                if (playersQuery.empty) {
+                    throw new Error('Player not found. Please check the code.');
+                }
+
+                const playerDoc = playersQuery.docs[0];
+                const playerData = playerDoc.data();
+                const playerId = playerDoc.id;
+
+                // Get coach document
+                const coachDoc = await db.collection('coaches').doc(coachId).get();
+                const coachData = coachDoc.data();
+
+                // Check if player is already in members array
+                if (coachData.members && coachData.members.includes(playerId)) {
+                    throw new Error('This player is already in your team');
+                }
+
+                // Check if player has an organization
+                if (playerData.org) {
+                    const playerOrg = await playerData.org.get();
+                    if (playerOrg.exists) {
+                        const playerOrgData = playerOrg.data();
+                        if (!playerOrgData.coaches.includes(coachId)) {
+                            throw new Error('This player belongs to another organization');
+                        }
+                    }
+                }
+
+                // Start batch write for multiple operations
+                const batch = db.batch();
+
+                // 1. Add player to coach's members array
+                const coachRef = db.collection('coaches').doc(coachId);
+                batch.update(coachRef, {
+                    members: firebase.firestore.FieldValue.arrayUnion(playerId)
+                });
+
+                // 2. Update player's coachUID if not already set
+                const playerRef = db.collection('players').doc(playerId);
+                if (!playerData.coachUID || playerData.coachUID !== coachId) {
+                    batch.update(playerRef, {
+                        coachUID: coachId
+                    });
+                }
+
+                // 3. If coach has an organization, add player to organization
+                if (coachData.org) {
+                    const orgRef = coachData.org;
+                    batch.update(orgRef, {
+                        players: firebase.firestore.FieldValue.arrayUnion(playerId)
+                    });
+
+                    // Also update player's org reference if not set
+                    if (!playerData.org || !playerData.org.isEqual(orgRef)) {
+                        batch.update(playerRef, {
+                            org: orgRef
+                        });
+                    }
+                }
+
+                // Commit all changes
+                await batch.commit();
+
+                return {
+                    id: playerId,
+                    name: `${playerData.firstName} ${playerData.lastName}`,
+                    code: playerData.code,
+                    hasAccount: !!playerData.userUID
+                };
+            } catch (error) {
+                console.error("Error adding player:", error);
+                throw error;
+            }
+        }
+
+        // Create new temporary player profile
+        async function createNewPlayer(firstName, lastName, coachId) {
+            try {
+                // Validate inputs
+                if (!firstName || !lastName) {
+                    throw new Error('Please enter both first and last name');
+                }
+
+                const fullName = `${firstName.trim()} ${lastName.trim()}`;
+                const playerCode = generateCode();
+
+                // Get coach document
+                const coachDoc = await db.collection('coaches').doc(coachId).get();
+                const coachData = coachDoc.data();
+
+                // Create player document
+                const playerRef = db.collection('players').doc();
+                const playerData = {
+                    firstName: firstName.trim(),
+                    lastName: lastName.trim(),
+                    code: playerCode,
+                    coachUID: coachId,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                // If coach has an organization, add organization reference
+                if (coachData.org) {
+                    playerData.org = coachData.org;
+                }
+
+                // Start batch write for multiple operations
+                const batch = db.batch();
+
+                // 1. Create player document
+                batch.set(playerRef, playerData);
+
+                // 2. Add player to coach's members array
+                const coachRef = db.collection('coaches').doc(coachId);
+                batch.update(coachRef, {
+                    members: firebase.firestore.FieldValue.arrayUnion(playerRef.id)
+                });
+
+                // 3. If coach has an organization, add player to organization
+                if (coachData.org) {
+                    batch.update(coachData.org, {
+                        players: firebase.firestore.FieldValue.arrayUnion(playerRef.id)
+                    });
+                }
+
+                // Commit all changes
+                await batch.commit();
+
+                return {
+                    id: playerRef.id,
+                    name: fullName,
+                    code: playerCode,
+                    hasAccount: false,
+                    isTemporary: true
+                };
+            } catch (error) {
+                console.error("Error creating new player:", error);
+                throw error;
+            }
+        }
+
+        // Event listeners
+        // Attach logout to the side nav logout button (single logout entry)
+        const sideLogoutBtn = document.getElementById('sideLogout');
+        if (sideLogoutBtn) sideLogoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                window.location.href = 'kickai.html';
+            });
+        });
+
+        addPlayerBtn.addEventListener('click', () => {
+            showModal(addPlayerModal);
+            playerCodeInput.value = '';
+            firstNameInput.value = '';
+            lastNameInput.value = '';
+            addPlayerError.style.display = 'none';
+            addPlayerSuccess.style.display = 'none';
+            addNewPlayerError.style.display = 'none';
+            addNewPlayerSuccess.style.display = 'none';
+            
+            // Reset to existing player tab
+            tabs.forEach(t => t.classList.remove('active'));
+            tabContents.forEach(c => c.classList.remove('active'));
+            document.querySelector('.tab[data-tab="existing"]').classList.add('active');
+            document.getElementById('existingPlayerTab').classList.add('active');
+        });
+
+        closeModal.addEventListener('click', () => {
+            hideModal(addPlayerModal);
+        });
+
+        refreshBtn.addEventListener('click', () => {
+            loadOrganizationAndPlayers();
+        });
+
+        // Add existing player form submission
+        addExistingPlayerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const playerCode = playerCodeInput.value.trim();
+            const user = auth.currentUser;
+
+            if (!playerCode || !user) return;
+
+            addPlayerError.style.display = 'none';
+            addPlayerSuccess.style.display = 'none';
+            showLoading(addExistingPlayerSubmit, existingPlayerSpinner);
+
+            try {
+                const player = await addPlayerByCode(playerCode, user.uid);
+                
+                // Show success message
+                addPlayerSuccess.textContent = `Successfully added ${player.name} (${player.code}) to your team!`;
+                addPlayerSuccess.style.display = 'block';
+                
+                // Clear form
+                playerCodeInput.value = '';
+                
+                // Reload the players list after a short delay
+                setTimeout(() => {
+                    loadOrganizationAndPlayers();
+                }, 1500);
+            } catch (error) {
+                addPlayerError.textContent = error.message;
+                addPlayerError.style.display = 'block';
+            } finally {
+                hideLoading(addExistingPlayerSubmit, existingPlayerSpinner);
+            }
+        });
+
+        // Add new player form submission
+        addNewPlayerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const firstName = firstNameInput.value.trim();
+            const lastName = lastNameInput.value.trim();
+            const user = auth.currentUser;
+
+            if (!firstName || !lastName || !user) return;
+
+            addNewPlayerError.style.display = 'none';
+            addNewPlayerSuccess.style.display = 'none';
+            showLoading(addNewPlayerSubmit, newPlayerSpinner);
+
+            try {
+                const player = await createNewPlayer(firstName, lastName, user.uid);
+                
+                // Show success message
+                addNewPlayerSuccess.textContent = `Successfully created ${player.name} (${player.code}). 
+                    They can register later using this code.`;
+                addNewPlayerSuccess.style.display = 'block';
+                
+                // Clear form
+                firstNameInput.value = '';
+                lastNameInput.value = '';
+                
+                // Reload the players list after a short delay
+                setTimeout(() => {
+                    loadOrganizationAndPlayers();
+                }, 1500);
+            } catch (error) {
+                addNewPlayerError.textContent = error.message;
+                addNewPlayerError.style.display = 'block';
+            } finally {
+                hideLoading(addNewPlayerSubmit, newPlayerSpinner);
+            }
+        });
+
+        // Close modal when clicking outside
+        addPlayerModal.addEventListener('click', (e) => {
+            if (e.target === addPlayerModal) {
+                hideModal(addPlayerModal);
+            }
+        });
+
+                // --- Side nav wiring ---
+                const navToggle = document.getElementById('navToggle');
+                const sideNav = document.getElementById('sideNav');
+                const closeSide = document.getElementById('closeSide');
+                const sideLinks = document.getElementById('sideLinks');
+                const sideLogout = document.getElementById('sideLogout');
+
+                const sideBackdrop = document.getElementById('sideBackdrop');
+                function openSide() { sideNav.classList.add('open'); sideNav.setAttribute('aria-hidden','false'); if(sideBackdrop) sideBackdrop.classList.add('open'); }
+                function closeSideNav() { sideNav.classList.remove('open'); sideNav.setAttribute('aria-hidden','true'); if(sideBackdrop) sideBackdrop.classList.remove('open'); }
+
+                if (navToggle) navToggle.addEventListener('click', (e)=>{ e.preventDefault(); openSide(); });
+                if (closeSide) closeSide.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+                if (sideBackdrop) sideBackdrop.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+
+                // Close side nav on overlay click or escape
+                document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeSideNav(); });
+
+                // Clone navigation links from header into side nav for compact menu
+                (function populateSideLinks(){
+                    const defaults = [
+                        { href: 'profile.html?userType=coach', text: 'My Profile', icon: 'person' },
+                        { href: 'drillList.html?userType=coach', text: 'Assigned Drills', icon: 'assignment' },
+                        { href: 'leaderboard.html?userType=coach', text: 'Leaderboard', icon: 'leaderboard' }
+                    ];
+
+                    defaults.forEach((a, idx) => {
+                        const link = document.createElement('a');
+                        link.href = a.href;
+                        link.className = 'side-link';
+                        const icon = document.createElement('span');
+                        icon.className = 'material-symbols-outlined';
+                        icon.style.fontSize = '20px';
+                        icon.textContent = a.icon;
+                        const spanText = document.createElement('span'); spanText.textContent = a.text;
+                        link.appendChild(icon);
+                        link.appendChild(spanText);
+                        link.style.transitionDelay = (idx * 40) + 'ms';
+                        link.addEventListener('click', ()=> closeSideNav());
+                        sideLinks.appendChild(link);
+                    });
+
+                    const lbBtn = document.getElementById('leaderboardBtn');
+                    if (lbBtn) lbBtn.href = 'leaderboard.html?userType=coach';
+                })();
+
+                // sideLogout wired directly in the main event listener block above
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape' && addPlayerModal.classList.contains('active')) {
+                hideModal(addPlayerModal);
+            }
+        });
+
+        // Check auth state
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                const urlUserType = new URLSearchParams(window.location.search).get('userType');
+                console.log('[coachesview.html] userType from URL:', urlUserType || 'not provided');
+                console.log('[coachesview.html] Resolved user type: coach');
+                loadOrganizationAndPlayers();
+            } else {
+                window.location.href = 'kickai.html';
+            }
+        });
+    </script>
+    <!-- Reusable user badge (reads email from Firestore users/{uid}) -->
+    <script src="user-badge.js"></script>
+</body>
+</html>

@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoseTek - Soccer Performance Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #ffffff;
+            --off-white: #f7f8f6;
+            --green-dark: #1a3a2e;
+            --green-mid: #2d5e4a;
+            --green-accent: #4c8c6a;
+            --green-light: #e8f3ee;
+            --text-dark: #111111;
+            --text-mid: #444444;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 5%;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition);
+            top: 0;
+            left: 0;
+            border-bottom: 1px solid rgba(26, 58, 46, 0.08);
+        }
+
+        .nav-hidden {
+            opacity: 0;
+            transform: translateY(-20px);
+            pointer-events: none;
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            letter-spacing: -0.5px;
+        }
+
+        .logo span {
+            color: var(--green-accent);
+        }
+
+        .tagline {
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 3px 10px;
+            border: 1px solid var(--green-accent);
+            border-radius: 50px;
+            opacity: 0.9;
+        }
+
+        .nav-cta {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--white);
+            background-color: var(--green-dark);
+            padding: 0.55rem 1.4rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-cta:hover {
+            background-color: var(--green-mid);
+            transform: translateY(-1px);
+        }
+
+        .hero-container {
+            display: flex;
+            min-height: 100vh;
+            position: relative;
+            padding-top: 70px;
+            align-items: center;
+            overflow: hidden;
+            background-color: var(--white);
+        }
+
+        .hero-inner {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            padding: 4rem 7%;
+            gap: 4rem;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 560px;
+        }
+
+        .hero-eyebrow {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-title {
+            font-size: 3.6rem;
+            font-weight: 700;
+            line-height: 1.08;
+            color: var(--text-dark);
+            margin-bottom: 1.4rem;
+            letter-spacing: -1.5px;
+        }
+
+        .hero-title em {
+            font-style: normal;
+            color: var(--green-dark);
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: var(--text-mid);
+            line-height: 1.75;
+            margin-bottom: 2.5rem;
+            max-width: 460px;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+        }
+
+        .btn-primary {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--white);
+            background-color: var(--green-dark);
+            padding: 0.85rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(26, 58, 46, 0.3);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--green-mid);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(26, 58, 46, 0.4);
+        }
+
+        .btn-secondary {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--green-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .btn-secondary:hover {
+            color: var(--green-mid);
+            gap: 10px;
+        }
+
+        /* ── Animated hero CTA ── */
+        @keyframes ring-pulse {
+            0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.55; }
+            100% { transform: translate(-50%, -50%) scale(1.85); opacity: 0; }
+        }
+
+        @keyframes arrow-bounce {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(5px); }
+        }
+
+        .btn-hilight {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--white);
+            background-color: var(--green-dark);
+            padding: 0.85rem 2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(26, 58, 46, 0.3);
+            overflow: visible;
+        }
+
+        .btn-hilight::before,
+        .btn-hilight::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 100%;
+            height: 100%;
+            border-radius: 50px;
+            border: 2px solid rgba(76, 140, 106, 0.7);
+            animation: ring-pulse 3.6s ease-out infinite;
+            pointer-events: none;
+        }
+
+        .btn-hilight::after {
+            animation-delay: 1.8s;
+        }
+
+        .btn-hilight:hover {
+            background-color: var(--green-mid);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(26, 58, 46, 0.4);
+        }
+
+        .btn-hilight:hover::before,
+        .btn-hilight:hover::after {
+            animation-play-state: paused;
+        }
+
+        .btn-arrow {
+            display: inline-block;
+            animation: arrow-bounce 1.2s ease-in-out infinite;
+        }
+
+        .sport-card {
+            flex: 1;
+            max-width: 580px;
+            position: relative;
+            overflow: visible;
+            transition: var(--transition);
+            will-change: transform;
+            display: flex;
+            flex-direction: column;
+            gap: 0.85rem;
+        }
+
+        .image-container {
+            width: 100%;
+            height: 480px;
+            border-radius: 28px;
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(26, 58, 46, 0.35), 0 8px 24px rgba(0, 0, 0, 0.2);
+            transition: var(--transition);
+            border: 1px solid rgba(76, 140, 106, 0.2);
+            position: relative;
+            background-color: #1a3a2e;
+        }
+
+        .image-container::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 26px;
+            box-shadow: inset 0 0 0 1px rgba(76, 140, 106, 0.12);
+            pointer-events: none;
+        }
+
+        .image-container:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 44px 88px rgba(26, 58, 46, 0.45), 0 12px 32px rgba(0, 0, 0, 0.25);
+        }
+
+        .sport-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 1.5rem;
+            background: radial-gradient(ellipse at 60% 40%, rgba(45, 94, 74, 0.45), rgba(26, 58, 46, 0.0));
+        }
+
+        .slide.active {
+            opacity: 1;
+        }
+
+        .slide-card {
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 14px 40px rgba(0, 0, 0, 0.4), 0 2px 10px rgba(0, 0, 0, 0.25);
+            border: 1px solid rgba(76, 140, 106, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 100%;
+            max-height: 100%;
+        }
+
+        .slide-card img {
+            display: block;
+            width: 100%;
+            height: auto;
+            max-height: 400px;
+            object-fit: contain;
+            border-radius: 18px;
+        }
+
+        .hero-badge {
+            position: absolute;
+            bottom: -18px;
+            left: 30px;
+            background: var(--white);
+            border: 1px solid var(--green-light);
+            border-radius: 14px;
+            padding: 0.9rem 1.4rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hero-badge-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--green-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+        }
+
+        .hero-badge-text {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        .hero-badge-text span {
+            display: block;
+            font-weight: 400;
+            color: var(--text-mid);
+            font-size: 0.72rem;
+        }
+
+        /* ── Features Strip ── */
+        .features-strip {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            padding: 0.25rem 0;
+        }
+
+        .feature-pill {
+            display: flex;
+            align-items: center;
+            gap: 7px;
+            color: var(--text-mid);
+            font-size: 0.82rem;
+            font-weight: 500;
+            padding: 5px 13px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.35s ease;
+            border: 1px solid var(--green-light);
+            background: var(--white);
+            user-select: none;
+            white-space: nowrap;
+            min-width: max-content;
+        }
+
+        .feature-pill.active {
+            color: var(--green-dark);
+            font-weight: 700;
+            background: var(--green-light);
+            border-color: var(--green-accent);
+        }
+
+        /* Reserve bold width so layout doesn't shift on active */
+        .feature-pill::after {
+            content: attr(data-label);
+            display: block;
+            font-weight: 700;
+            height: 0;
+            overflow: hidden;
+            visibility: hidden;
+        }
+
+        .feature-pill.active .feature-pill-dot {
+            background: var(--green-dark);
+            transform: scale(1.3);
+        }
+
+        .feature-pill-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: var(--green-accent);
+            flex-shrink: 0;
+            transition: all 0.35s ease;
+        }
+
+        /* ── Feature Sections ── */
+        .tripod-section,
+        .postestimation-section,
+        .team-section {
+            display: flex;
+            min-height: 85vh;
+            align-items: center;
+            padding: 7% 7%;
+            position: relative;
+            overflow: hidden;
+            opacity: 0;
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .tripod-section {
+            transform: translateY(80px);
+            background-color: var(--white);
+        }
+
+        .postestimation-section {
+            transform: translateY(80px);
+            background-color: var(--off-white);
+        }
+
+        .team-section {
+            flex-direction: column;
+            transform: scale(0.95);
+            background-color: var(--white);
+        }
+
+        .tripod-image,
+        .postestimation-image {
+            width: 50%;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            border-radius: 22px;
+            transform: translateX(-80px);
+            opacity: 0;
+            transition: all 0.8s ease 0.2s;
+        }
+
+        .tripod-image {
+            height: 65vh;
+        }
+
+        .postestimation-image {
+            transform: translateX(80px);
+            background-color: transparent;
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 2%;
+        }
+
+        .postestimation-image-card {
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 16px 48px rgba(26, 58, 46, 0.14), 0 2px 8px rgba(26, 58, 46, 0.08);
+            border: 1px solid rgba(26, 58, 46, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            max-width: 92%;
+        }
+
+        .postestimation-image-card img {
+            display: block;
+            width: 100%;
+            height: auto;
+            border-radius: 18px;
+        }
+
+        .tripod-content,
+        .postestimation-content {
+            width: 50%;
+            padding-left: 6%;
+            transform: translateX(80px);
+            opacity: 0;
+            transition: all 0.8s ease;
+        }
+
+        .postestimation-content {
+            transform: translateX(-80px);
+            padding-left: 0;
+            padding-right: 6%;
+        }
+
+        .section-number {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 1rem;
+        }
+
+        .tripod-content h2,
+        .postestimation-content h2 {
+            font-size: 2.6rem;
+            font-weight: 700;
+            line-height: 1.15;
+            color: var(--text-dark);
+            letter-spacing: -1px;
+            margin-bottom: 1.2rem;
+        }
+
+        .tripod-content h2 em,
+        .postestimation-content h2 em {
+            font-style: normal;
+            color: var(--green-dark);
+        }
+
+        .tripod-content p,
+        .postestimation-content p {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-mid);
+        }
+
+        .section-visible {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        .section-visible .tripod-image,
+        .section-visible .postestimation-image,
+        .section-visible .tripod-content,
+        .section-visible .postestimation-content {
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        /* ── Team Section ── */
+        .team-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .team-eyebrow {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 1rem;
+        }
+
+        .team-title {
+            font-size: 3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            letter-spacing: -1.2px;
+            margin-bottom: 0;
+        }
+
+        .team-title em {
+            font-style: normal;
+            color: var(--green-dark);
+        }
+
+        .team-grid {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 40px;
+            max-width: 1000px;
+        }
+
+        .team-member {
+            position: relative;
+            width: 300px;
+            text-align: center;
+            transition: var(--transition);
+        }
+
+        .member-image-container {
+            width: 210px;
+            height: 210px;
+            margin: 0 auto 1.4rem;
+            border-radius: 50%;
+            overflow: hidden;
+            border: 3px solid var(--green-light);
+            box-shadow: 0 12px 35px rgba(26, 58, 46, 0.15);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .member-image {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            transition: var(--transition);
+        }
+
+        .member-bio {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(145deg, var(--green-dark), var(--green-mid));
+            color: rgba(255,255,255,0.95);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 28px;
+            opacity: 0;
+            transform: scale(0.85);
+            transition: var(--transition);
+            pointer-events: none;
+            font-size: 0.88rem;
+            line-height: 1.55;
+        }
+
+        .member-name {
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .member-title {
+            font-size: 0.9rem;
+            color: var(--green-accent);
+            font-weight: 500;
+        }
+
+        .team-member:hover .member-image-container {
+            transform: scale(1.05);
+            border-color: var(--green-accent);
+            box-shadow: 0 20px 45px rgba(26, 58, 46, 0.25);
+        }
+
+        .team-member:hover .member-bio {
+            opacity: 1;
+            transform: scale(1);
+        }
+
+        /* ── Footer ── */
+        footer {
+            background-color: var(--green-dark);
+            color: rgba(255,255,255,0.65);
+            text-align: center;
+            padding: 2.5rem 5%;
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--green-accent);
+            text-decoration: none;
+        }
+
+        /* ── Scroll Indicators ── */
+        .scroll-nav {
+            position: fixed;
+            right: 2rem;
+            top: 50%;
+            transform: translateY(-50%);
+            display: flex;
+            flex-direction: column;
+            gap: 0.6rem;
+            z-index: 90;
+        }
+
+        .scroll-btn {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.88);
+            border: 1.5px solid rgba(76, 140, 106, 0.28);
+            box-shadow: 0 4px 14px rgba(26, 58, 46, 0.13);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+        }
+
+        .scroll-btn.visible {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .scroll-btn:hover {
+            background: var(--green-light);
+            border-color: var(--green-accent);
+            box-shadow: 0 6px 20px rgba(26, 58, 46, 0.2);
+            transform: scale(1.1);
+        }
+
+        .scroll-btn svg {
+            width: 15px;
+            height: 15px;
+            stroke: var(--green-dark);
+            stroke-width: 2.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        @keyframes nudge-up {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(-4px); }
+        }
+
+        @keyframes nudge-down {
+            0%, 100% { transform: translateY(0); }
+            50%       { transform: translateY(4px); }
+        }
+
+        @keyframes soft-pulse {
+            0%, 100% { box-shadow: 0 4px 14px rgba(26, 58, 46, 0.13); }
+            50%       { box-shadow: 0 4px 20px rgba(76, 140, 106, 0.35); }
+        }
+
+        @keyframes gloss-sweep {
+            0%        { background-position: -120% center; opacity: 0; }
+            5%        { opacity: 1; }
+            30%       { background-position: 160% center; opacity: 0; }
+            100%      { background-position: 160% center; opacity: 0; }
+        }
+
+        .scroll-btn::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 50%;
+            background: linear-gradient(
+                105deg,
+                transparent 30%,
+                rgba(76, 140, 106, 0.55) 50%,
+                rgba(180, 230, 200, 0.35) 58%,
+                transparent 70%
+            );
+            background-size: 250% 100%;
+            background-position: -120% center;
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        #scrollUp.visible::before,
+        #scrollDown.visible::before { animation: gloss-sweep 5s ease-in-out infinite; }
+        #scrollDown.visible::before { animation-delay: 1.9s; }
+
+        #scrollUp.visible svg   { animation: nudge-up   1.6s ease-in-out infinite; }
+        #scrollDown.visible svg { animation: nudge-down 1.6s ease-in-out infinite; }
+        #scrollUp.visible,
+        #scrollDown.visible     { animation: soft-pulse 1.6s ease-in-out infinite; position: relative; overflow: hidden; }
+
+        @media (max-width: 900px) {
+            .scroll-nav { display: none; }
+
+            .hero-inner {
+                flex-direction: column;
+                padding: 3rem 5%;
+                gap: 3rem;
+                text-align: center;
+            }
+
+            .hero-text {
+                max-width: 100%;
+            }
+
+            .hero-subtitle {
+                max-width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-actions {
+                justify-content: center;
+            }
+
+            .hero-title {
+                font-size: 2.6rem;
+            }
+
+            .sport-card {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .image-container {
+                height: 50vw;
+                min-height: 280px;
+            }
+
+            .features-strip {
+                gap: 0.4rem;
+                justify-content: flex-start;
+            }
+
+            .tagline {
+                display: none;
+            }
+
+            .tripod-section,
+            .postestimation-section,
+            .team-section {
+                flex-direction: column;
+                padding: 10% 6%;
+            }
+
+            .tripod-image {
+                width: 100%;
+                height: 45vw;
+                min-height: 250px;
+                margin-bottom: 2rem;
+                transform: translateX(0);
+            }
+
+            .postestimation-image {
+                width: 100%;
+                height: auto;
+                min-height: 0;
+                margin-bottom: 2rem;
+                transform: translateX(0);
+                justify-content: center;
+                padding-right: 0;
+            }
+
+            .postestimation-image-card {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .tripod-content,
+            .postestimation-content {
+                width: 100%;
+                padding-left: 0;
+                padding-right: 0;
+                transform: translateX(0);
+            }
+
+            .tripod-content h2,
+            .postestimation-content h2 {
+                font-size: 2rem;
+            }
+
+            .team-grid {
+                flex-direction: column;
+                align-items: center;
+            }
+
+            .team-member {
+                width: 100%;
+                max-width: 280px;
+            }
+
+            .team-title {
+                font-size: 2.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav id="mainNav">
+            <div class="brand-container">
+                <div class="logo">Pose<span>Tek</span></div>
+            </div>
+            <a href="kickai.html" class="nav-cta">Launch PoseTek →</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- Hero -->
+        <div class="hero-container">
+            <div class="hero-inner">
+                <div class="hero-text">
+                    <h1 class="hero-title">A New Form of <em>Deliberate Practice</em></h1>
+                    <p class="hero-subtitle">Professional-grade biomechanical analysis that helps athletes and coaches understand movement, track development, and unlock performance.</p>
+                    <div class="hero-actions">
+                        <a href="#how-it-works" class="btn-hilight">See How It Works <span class="btn-arrow">↓</span></a>
+                    </div>
+                </div>
+                <div class="sport-card">
+                    <div class="image-container">
+                        <div class="slide active" data-index="0">
+                            <div class="slide-card"><img src="images/postestimation.png" alt="Pose Estimation"></div>
+                        </div>
+                        <div class="slide" data-index="1">
+                            <div class="slide-card"><img src="images/kickanalysis.png" alt="Kick Analysis"></div>
+                        </div>
+                        <div class="slide" data-index="2">
+                            <div class="slide-card"><img src="images/sprinting.PNG" alt="Sprint Tracking"></div>
+                        </div>
+                        <div class="slide" data-index="3">
+                            <div class="slide-card"><img src="images/profilepose.PNG" alt="Coach Dashboard"></div>
+                        </div>
+                        <div class="slide" data-index="4">
+                            <div class="slide-card"><img src="images/graphpose.PNG" alt="Progress Over Time"></div>
+                        </div>
+                    </div>
+                    <div class="features-strip">
+                        <div class="feature-pill active" data-index="0" data-label="Pose Estimation"><div class="feature-pill-dot"></div>Pose Estimation</div>
+                        <div class="feature-pill" data-index="1" data-label="Kick Analysis"><div class="feature-pill-dot"></div>Kick Analysis</div>
+                        <div class="feature-pill" data-index="2" data-label="Sprint Tracking"><div class="feature-pill-dot"></div>Sprint Tracking</div>
+                        <div class="feature-pill" data-index="3" data-label="Coach Dashboard"><div class="feature-pill-dot"></div>Coach Dashboard</div>
+                        <div class="feature-pill" data-index="4" data-label="Progress Over Time"><div class="feature-pill-dot"></div>Progress Over Time</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- How it works -->
+        <section id="how-it-works" class="tripod-section">
+            <div class="tripod-image" style="background-image: url('images/tripod.png')"></div>
+            <div class="tripod-content">
+                <span class="section-number">Step 01</span>
+                <h2>Set Up Your <em>Tripod</em></h2>
+                <p>Position your camera and start the session. Our proprietary technology automatically clips out the relevant actions for you to analyze — no manual editing required.</p>
+            </div>
+        </section>
+
+        <section class="postestimation-section">
+            <div class="postestimation-image">
+                <div class="postestimation-image-card">
+                    <img src="images/analysiskick.PNG" alt="Kick Analysis">
+                </div>
+            </div>
+            <div class="postestimation-content">
+                <span class="section-number">Step 02</span>
+                <h2><em>Biomechanical</em> Insights</h2>
+                <p>Our app delivers instant biomechanical feedback, tools to guide your players, and statistical models to track individual development over time.</p>
+            </div>
+        </section>
+
+        <section class="team-section">
+            <div class="team-header">
+                <span class="team-eyebrow">The People Behind It</span>
+                <h2 class="team-title">Meet the <em>Team</em></h2>
+            </div>
+            <div class="team-grid">
+                <div class="team-member">
+                    <div class="member-image-container">
+                        <img src="images/Nolan.png" class="member-image" alt="Nolan Jetter">
+                        <div class="member-bio">
+                            <p>CEO & Founder with former Div I soccer experience at Lehigh University</p>
+                        </div>
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">Nolan Jetter</h3>
+                        <p class="member-title">Chief Executive Officer</p>
+                    </div>
+                </div>
+
+                <div class="team-member">
+                    <div class="member-image-container">
+                        <img src="images/Dylan.png" class="member-image" alt="Dylan Keller">
+                        <div class="member-bio">
+                            <p>Former Div I soccer player at University of Memphis specializing in market insight</p>
+                        </div>
+                    </div>
+                    <div class="member-info">
+                        <h3 class="member-name">Dylan Keller</h3>
+                        <p class="member-title">Chief Marketing Officer</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Scroll Navigation -->
+    <div class="scroll-nav" id="scrollNav">
+        <button class="scroll-btn" id="scrollUp" title="Scroll up">
+            <svg viewBox="0 0 24 24"><polyline points="18 15 12 9 6 15"></polyline></svg>
+        </button>
+        <button class="scroll-btn" id="scrollDown" title="Scroll down">
+            <svg viewBox="0 0 24 24"><polyline points="6 9 12 15 18 9"></polyline></svg>
+        </button>
+    </div>
+
+    <footer>
+        <p>© 2026 PoseTek · <a href="kickai.html">Launch App</a> · <a href="privacy.html">Privacy Policy</a></p>
+    </footer>
+
+    <script>
+        // Scroll Handler
+        let isScrolling;
+        window.addEventListener('scroll', () => {
+            window.clearTimeout(isScrolling);
+            isScrolling = setTimeout(() => {
+                const nav = document.getElementById('mainNav');
+                nav.classList.toggle('nav-hidden', window.scrollY > 300);
+            }, 100);
+        });
+
+        // Feature Carousel
+        const slides = document.querySelectorAll('.slide');
+        const pills = document.querySelectorAll('.feature-pill');
+        let currentIndex = 0;
+
+        function goToSlide(index) {
+            slides[currentIndex].classList.remove('active');
+            pills[currentIndex].classList.remove('active');
+            currentIndex = index;
+            slides[currentIndex].classList.add('active');
+            pills[currentIndex].classList.add('active');
+        }
+
+        pills.forEach(pill => {
+            pill.addEventListener('click', () => {
+                clearInterval(carouselInterval);
+                goToSlide(parseInt(pill.dataset.index));
+                carouselInterval = setInterval(() => goToSlide((currentIndex + 1) % slides.length), 3000);
+            });
+        });
+
+        let carouselInterval = setInterval(() => goToSlide((currentIndex + 1) % slides.length), 3000);
+
+        // Section Transition Observer
+        const sectionObserver = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if(entry.isIntersecting) {
+                    entry.target.classList.add('section-visible');
+                } else {
+                    entry.target.classList.remove('section-visible');
+                }
+            });
+        }, { 
+            threshold: 0.25,
+            rootMargin: '0px 0px -100px 0px'
+        });
+
+        document.querySelectorAll('.tripod-section, .postestimation-section, .team-section').forEach(section => {
+            sectionObserver.observe(section);
+        });
+
+        // Scroll Indicators
+        const snapSections = [
+            document.querySelector('.hero-container'),
+            document.querySelector('#how-it-works'),
+            document.querySelector('.postestimation-section'),
+            document.querySelector('.team-section')
+        ];
+        const scrollUpBtn = document.getElementById('scrollUp');
+        const scrollDownBtn = document.getElementById('scrollDown');
+
+        function updateScrollIndicators() {
+            const scrollY = window.scrollY;
+            const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+            const heroH = document.querySelector('.hero-container').offsetHeight;
+            const pastHero = scrollY > heroH * 0.45;
+
+            scrollUpBtn.classList.toggle('visible', pastHero);
+            scrollDownBtn.classList.toggle('visible', pastHero && scrollY < maxScroll - 80);
+        }
+
+        scrollUpBtn.addEventListener('click', () => {
+            const scrollY = window.scrollY;
+            const prev = [...snapSections].reverse().find(s => s.offsetTop < scrollY - 80);
+            if (prev) prev.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        scrollDownBtn.addEventListener('click', () => {
+            const scrollY = window.scrollY;
+            const next = snapSections.find(s => s.offsetTop > scrollY + 80);
+            if (next) next.scrollIntoView({ behavior: 'smooth' });
+        });
+
+        window.addEventListener('scroll', updateScrollIndicators, { passive: true });
+        updateScrollIndicators();
+
+        // Mobile initialization
+        function handleResize() {
+            if(window.innerWidth <= 768) {
+                document.querySelectorAll('.tripod-section, .postestimation-section, .team-section').forEach(section => {
+                    section.classList.add('section-visible');
+                });
+            }
+        }
+        window.addEventListener('resize', handleResize);
+        handleResize();
+    </script>
+</body>
+</html>

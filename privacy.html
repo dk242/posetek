@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Privacy Policy | PoseTek</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --text-light: #ffffff;
+            --text-muted: rgba(255,255,255,0.7);
+            --card-bg: rgba(255,255,255,0.07);
+            --card-border: rgba(255,255,255,0.1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background-color: var(--primary);
+            color: var(--text-light);
+            line-height: 1.8;
+            -webkit-font-smoothing: antialiased;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(76,140,106,0.07), transparent),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(76,140,106,0.05), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(15,31,27,0.9);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span { color: var(--accent); }
+
+        .back-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.5rem 1rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 10px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+        }
+
+        .back-btn:hover {
+            background: rgba(255,255,255,0.12);
+            border-color: var(--accent);
+        }
+
+        main {
+            position: relative;
+            z-index: 1;
+            max-width: 820px;
+            margin: 0 auto;
+            padding: 3rem 1.5rem 5rem;
+        }
+
+        .page-header {
+            margin-bottom: 2.5rem;
+            padding-bottom: 2rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .eyebrow {
+            font-size: 0.8rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.75rem;
+        }
+
+        h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            letter-spacing: -0.5px;
+        }
+
+        .last-updated {
+            color: var(--text-muted);
+            font-size: 0.875rem;
+        }
+
+        section {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-bottom: 1.25rem;
+            backdrop-filter: blur(10px);
+        }
+
+        h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-light);
+            margin-bottom: 1rem;
+            display: flex;
+            align-items: center;
+            gap: 0.6rem;
+        }
+
+        h2 .section-num {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 1.8rem;
+            height: 1.8rem;
+            background: rgba(76,140,106,0.2);
+            border: 1px solid rgba(76,140,106,0.35);
+            border-radius: 50%;
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            margin-bottom: 0.75rem;
+        }
+
+        p:last-child { margin-bottom: 0; }
+
+        ul {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            padding-left: 1.5rem;
+            margin-top: 0.5rem;
+        }
+
+        ul li { margin-bottom: 0.4rem; }
+
+        a { color: var(--accent); text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        .contact-box {
+            background: rgba(76,140,106,0.1);
+            border: 1px solid rgba(76,140,106,0.3);
+            border-radius: 12px;
+            padding: 1.25rem 1.5rem;
+            margin-top: 1rem;
+            font-size: 0.95rem;
+            color: var(--text-muted);
+        }
+
+        .contact-box strong { color: var(--text-light); }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            font-size: 0.85rem;
+            border-top: 1px solid var(--card-border);
+        }
+
+        footer a { color: var(--accent); }
+
+        @media (max-width: 600px) {
+            h1 { font-size: 1.75rem; }
+            section { padding: 1.5rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="index.html" class="logo">Pose<span>Tek</span></a>
+        <a href="index.html" class="back-btn">← Home</a>
+    </header>
+
+    <main>
+        <div class="page-header">
+            <div class="eyebrow">Legal</div>
+            <h1>Privacy Policy</h1>
+            <p class="last-updated">Last updated: March 4, 2026</p>
+        </div>
+
+        <section>
+            <h2><span class="section-num">1</span> Overview</h2>
+            <p>PoseTek ("we", "us", or "our") is committed to protecting your privacy. This Privacy Policy explains how we collect, use, and safeguard your personal information when you use our website and services at <a href="https://kickai-69dd0.web.app">kickai-69dd0.web.app</a>.</p>
+            <p>By using PoseTek, you agree to the collection and use of information as described in this policy.</p>
+        </section>
+
+        <section>
+            <h2><span class="section-num">2</span> Information We Collect</h2>
+            <p>We collect the following types of information:</p>
+            <ul>
+                <li><strong>Account information</strong> — your name, email address, and password (stored securely via Firebase Authentication)</li>
+                <li><strong>Player profile data</strong> — field position, organization/team affiliation, and player codes used during signup</li>
+                <li><strong>Performance data</strong> — session recordings, biomechanical metrics, rep data, and AI-generated analysis results</li>
+                <li><strong>Payment information</strong> — for Premium purchases, payment is processed entirely by Stripe. PoseTek does not store your card number or banking details</li>
+                <li><strong>Interest signup data</strong> — name, email, and position submitted through our Player Interest Signup form</li>
+                <li><strong>Usage data</strong> — pages visited, features used, and general interaction data collected through Firebase Analytics</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2><span class="section-num">3</span> How We Use Your Information</h2>
+            <p>We use the information we collect to:</p>
+            <ul>
+                <li>Create and manage your account</li>
+                <li>Deliver performance analysis and personalized coaching feedback</li>
+                <li>Send email communications related to your analysis results and account activity</li>
+                <li>Process Premium payments securely through Stripe</li>
+                <li>Improve our platform and features based on usage patterns</li>
+                <li>Respond to support inquiries</li>
+            </ul>
+            <p>We do not sell your personal information to third parties.</p>
+        </section>
+
+        <section>
+            <h2><span class="section-num">4</span> Third-Party Services</h2>
+            <p>PoseTek uses the following third-party services to operate:</p>
+            <ul>
+                <li><strong>Firebase (Google)</strong> — authentication, database storage, file storage, and hosting. Subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>.</li>
+                <li><strong>Stripe</strong> — payment processing for Premium access. Subject to <a href="https://stripe.com/privacy" target="_blank" rel="noopener">Stripe's Privacy Policy</a>. PoseTek never sees or stores your full payment card details.</li>
+                <li><strong>Google Fonts</strong> — font delivery. Subject to <a href="https://policies.google.com/privacy" target="_blank" rel="noopener">Google's Privacy Policy</a>.</li>
+            </ul>
+        </section>
+
+        <section>
+            <h2><span class="section-num">5</span> Data Retention</h2>
+            <p>We retain your account and performance data for as long as your account is active or as needed to provide our services. You may request deletion of your account and associated data at any time by contacting us.</p>
+            <p>Payment records are retained as required for financial and legal compliance purposes.</p>
+        </section>
+
+        <section>
+            <h2><span class="section-num">6</span> Data Security</h2>
+            <p>We take reasonable technical measures to protect your data, including:</p>
+            <ul>
+                <li>Passwords are hashed and managed by Firebase Authentication — we never store plain-text passwords</li>
+                <li>All data in transit is encrypted via HTTPS/TLS</li>
+                <li>Firebase Security Rules restrict database access to authenticated users only</li>
+            </ul>
+            <p>No method of transmission over the internet is 100% secure. We strive to use commercially acceptable means to protect your information but cannot guarantee absolute security.</p>
+        </section>
+
+        <section>
+            <h2><span class="section-num">7</span> Children's Privacy</h2>
+            <p>PoseTek is intended for use by athletes and coaches. If a user is under the age of 13, their account must be created and managed by a parent or guardian. We do not knowingly collect personal information from children under 13 without parental consent.</p>
+            <p>If you believe we have inadvertently collected data from a child under 13 without consent, please contact us immediately so we can delete it.</p>
+        </section>
+
+        <section>
+            <h2><span class="section-num">8</span> Your Rights</h2>
+            <p>You have the right to:</p>
+            <ul>
+                <li>Access the personal information we hold about you</li>
+                <li>Request correction of inaccurate data</li>
+                <li>Request deletion of your account and data</li>
+                <li>Opt out of non-essential communications</li>
+            </ul>
+            <p>To exercise any of these rights, contact us using the details below.</p>
+        </section>
+
+        <section>
+            <h2><span class="section-num">9</span> Changes to This Policy</h2>
+            <p>We may update this Privacy Policy from time to time. When we do, we will update the "Last updated" date at the top of this page. Continued use of PoseTek after changes constitutes acceptance of the revised policy.</p>
+        </section>
+
+        <section>
+            <h2><span class="section-num">10</span> Contact Us</h2>
+            <p>If you have questions or concerns about this Privacy Policy or your data, please reach out:</p>
+            <div class="contact-box">
+                <strong>PoseTek</strong><br>
+                Email: <a href="mailto:support@posetek.app">support@posetek.app</a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>© 2026 PoseTek · <a href="index.html">Home</a> · <a href="privacy.html">Privacy Policy</a></p>
+    </footer>
+</body>
+</html>

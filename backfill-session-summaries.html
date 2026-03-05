@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Backfill session summaries | PoseTek</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet">
+  <style>
+    :root{ --primary:#1a3a2e; --secondary:#2d5e4a; --accent:#4c8c6a; --text:#fff; --muted:rgba(255,255,255,.8); --card:rgba(255,255,255,.08); --border:rgba(255,255,255,.12); }
+    body{margin:0;font-family:Inter,system-ui,Segoe UI,Arial,sans-serif;background:var(--primary);color:var(--text)}
+    .container{max-width:1040px;margin:0 auto;padding:2rem}
+    h1{font-family:Poppins,Inter,sans-serif;margin:.25rem 0 0;font-size:2rem}
+    p{color:var(--muted)}
+    .card{background:linear-gradient(135deg,rgba(255,255,255,.1),rgba(255,255,255,.05));border:1px solid var(--border);border-radius:14px;padding:1rem 1.25rem;margin:1rem 0;backdrop-filter:blur(10px);box-shadow:0 4px 12px rgba(0,0,0,.12)}
+    .row{display:flex;gap:1rem;flex-wrap:wrap}
+    .btn{display:inline-flex;align-items:center;gap:.5rem;padding:.7rem 1.3rem;border-radius:10px;border:1px solid var(--border);cursor:pointer;background:linear-gradient(135deg,var(--accent),#56a07a);color:#fff;font-weight:700}
+    .btn:disabled{opacity:.6;cursor:not-allowed}
+    label{display:flex;align-items:center;gap:.5rem}
+    .mono{font-family:ui-monospace, Menlo, Consolas, monospace; font-size:.95rem}
+    .progress{height:10px;background:rgba(255,255,255,.12);border-radius:999px;overflow:hidden}
+    .progress > div{height:100%;background:#56a07a;width:0%}
+    .pill{display:inline-flex;align-items:center;padding:.25rem .6rem;border:1px solid var(--border);border-radius:999px;background:rgba(255,255,255,.06);gap:.35rem}
+    .log{max-height:340px;overflow:auto;background:rgba(0,0,0,.25);border:1px solid var(--border);border-radius:8px;padding:.75rem}
+    .ok{color:#6ee7b7} .warn{color:#fde68a} .err{color:#fca5a5}
+    code{font-family:ui-monospace, Menlo, Consolas, monospace}
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div style="display:flex;align-items:center;gap:.75rem">
+      <div class="pill"><span>Tool</span><strong>Session Summaries Backfill</strong></div>
+      <div class="pill"><span>Collection</span><strong>sessions</strong></div>
+      <div class="pill"><span>Source</span><strong>sessions/{id}/reps</strong></div>
+    </div>
+    <h1>Backfill per-session summary metrics</h1>
+    <p>Computes and writes summary fields on session docs using rep data. Coach account required. Safe to re-run.</p>
+
+    <div class="card">
+      <div class="row" style="align-items:center;justify-content:space-between">
+        <div>
+          <div>Signed in as: <span id="userEmail" class="mono">(not signed in)</span></div>
+          <div>Status: <span id="status" class="mono warn">Waiting</span></div>
+        </div>
+        <div class="row" style="align-items:center">
+          <button id="signIn" class="btn">Sign in</button>
+          <button id="signOut" class="btn" style="background:rgba(255,255,255,.08)" disabled>Sign out</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="row" style="align-items:center;gap:1.25rem">
+        <label><input type="checkbox" id="scopeDeadball" checked /> Dead Ball</label>
+        <label><input type="checkbox" id="scopeFreeRecord" /> Free Record</label>
+        <label><input type="checkbox" id="scopeLongball" /> Long Ball</label>
+        <label><input type="checkbox" id="scopeInstep" /> Instep</label>
+        <label><input type="checkbox" id="scopeSprint" checked /> Sprint Work</label>
+        <label><input type="checkbox" id="scopeJump" checked /> Jump</label>
+      </div>
+      <div class="row" style="align-items:center;gap:1.25rem;margin-top:.5rem">
+        <label><input type="checkbox" id="forceRecompute" /> Force recompute even if fields exist</label>
+        <label><input type="checkbox" id="normalizeReps" checked /> Normalize rep fields (index/speeds/contact_frame)</label>
+        <label><input type="checkbox" id="createRepsIfMissing" checked /> Create reps from Storage if missing</label>
+      </div>
+      <div class="row" style="align-items:center;gap:1rem;margin-top:1rem">
+        <button id="scan" class="btn" disabled>Scan sessions</button>
+        <button id="run" class="btn" disabled>Run backfill</button>
+        <div class="mono">Found: <strong id="found">0</strong> • To update: <strong id="toUpdate">0</strong></div>
+      </div>
+      <div class="progress" style="margin:.6rem 0 0 0"><div id="bar"></div></div>
+    </div>
+
+    <div class="card">
+      <div style="font-weight:700;margin-bottom:.5rem">Log</div>
+      <div id="log" class="log mono"></div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+  <script>
+    const cfg = {
+      apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+      authDomain: "kickai-69dd0.firebaseapp.com",
+      projectId: "kickai-69dd0",
+      storageBucket: "kickai-69dd0.firebasestorage.app",
+      messagingSenderId: "839600313930",
+      appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+      measurementId: "G-RX99K62ZEH"
+    };
+  firebase.initializeApp(cfg);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+  const storage = firebase.storage();
+
+    const els = {
+      email: document.getElementById('userEmail'),
+      status: document.getElementById('status'),
+      signIn: document.getElementById('signIn'),
+      signOut: document.getElementById('signOut'),
+      scan: document.getElementById('scan'),
+      run: document.getElementById('run'),
+      found: document.getElementById('found'),
+      toUpdate: document.getElementById('toUpdate'),
+      bar: document.getElementById('bar'),
+      log: document.getElementById('log'),
+      scopes: {
+        deadball: document.getElementById('scopeDeadball'),
+        freeRecord: document.getElementById('scopeFreeRecord'),
+        longball: document.getElementById('scopeLongball'),
+        instep: document.getElementById('scopeInstep'),
+        sprint: document.getElementById('scopeSprint'),
+        jump: document.getElementById('scopeJump'),
+      },
+      force: document.getElementById('forceRecompute')
+    };
+
+    function log(msg, cls){ const p=document.createElement('div'); p.textContent=msg; if(cls) p.className=cls; els.log.appendChild(p); els.log.scrollTop=els.log.scrollHeight; }
+    function isCoachUser(uid){ return db.collection('coaches').where('userUID','==',uid).limit(1).get().then(q=>!q.empty); }
+
+    // --- helpers to extract values from rep docs ---
+    const MPH_PER_MS = 2.23694; const IN_PER_M = 39.3701;
+    function speedMphFromRep(r){
+      if (isFinite(r.ball_speed_mph)) return Number(r.ball_speed_mph);
+      if (isFinite(r.ball_speed_ms)) return Number(r.ball_speed_ms)*MPH_PER_MS;
+      if (isFinite(r.max_speed_mph)) return Number(r.max_speed_mph);
+      if (isFinite(r.max_speed_ms)) return Number(r.max_speed_ms)*MPH_PER_MS;
+      if (isFinite(r.top_speed_mph)) return Number(r.top_speed_mph);
+      if (isFinite(r.top_speed_ms)) return Number(r.top_speed_ms)*MPH_PER_MS;
+      return null;
+    }
+    function launchAngleFromRep(r){ if (isFinite(r.launch_angle)) return Number(r.launch_angle); return null; }
+    function accelFromRep(r){
+      if (isFinite(r.max_accel_mps2)) return Number(r.max_accel_mps2);
+      if (isFinite(r.accel_mps2)) return Number(r.accel_mps2);
+      if (isFinite(r.acceleration_mps2)) return Number(r.acceleration_mps2);
+      return null;
+    }
+    function jumpInchesFromRep(r){
+      if (isFinite(r.jump_height_in)) return Number(r.jump_height_in);
+      if (isFinite(r.jump_height_inches)) return Number(r.jump_height_inches);
+      if (isFinite(r.jump_height_m)) return Number(r.jump_height_m)*IN_PER_M;
+      if (isFinite(r.jump_height_meters)) return Number(r.jump_height_meters)*IN_PER_M;
+      return null;
+    }
+
+    function mean(arr){ if(!arr.length) return null; return arr.reduce((s,n)=>s+n,0)/arr.length; }
+    function maxOrNull(arr){ if(!arr.length) return null; return Math.max(...arr); }
+
+    // --- storage-backed reps creation helpers ---
+    function naturalSortByNumericSuffix(names){
+      return names.slice().sort((a,b)=>{
+        const na = parseInt(String(a).replace(/\D+/g,'')||'0',10);
+        const nb = parseInt(String(b).replace(/\D+/g,'')||'0',10);
+        if (na !== nb) return na - nb;
+        return String(a).localeCompare(String(b));
+      });
+    }
+
+    function storagePathForSession(playerUID, drillType, sessionId){
+      if (!playerUID || !drillType || !sessionId) return null;
+      return `${playerUID}/${drillType}/${sessionId}`;
+    }
+
+    async function listRepFolders(playerUID, drillType, sessionId){
+      const base = storagePathForSession(playerUID, drillType, sessionId);
+      if (!base) return [];
+      try {
+        const res = await storage.ref(base + '/').listAll();
+        const names = (res.prefixes||[]).map(p=>p.name);
+        // Only take folders that look like kick reps (kick1, kick2, ...)
+        const kickNames = names.filter(n => /^kick\d*$/i.test(String(n)) || /^kick/i.test(String(n)));
+        return naturalSortByNumericSuffix(kickNames);
+      } catch (e){
+        log(`[reps:create] listAll failed at ${base}/: ${e?.message||e}`, 'warn');
+        return [];
+      }
+    }
+
+    async function fetchJSONIfExists(path){
+      try {
+        const url = await storage.ref(path).getDownloadURL();
+        const res = await fetch(url, { cache: 'no-store' });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return await res.json();
+      } catch(e){ return null; }
+    }
+
+    async function deriveRepPayloadFromStorage(drillType, playerUID, sessionId, repFolderName){
+      // Prioritize ball_information.json for deadball + freeRecord; others may not exist
+      const base = storagePathForSession(playerUID, drillType, sessionId);
+      const repPath = `${base}/${repFolderName}`;
+      const info = await fetchJSONIfExists(`${repPath}/ball_information.json`) || await fetchJSONIfExists(`${base}/ball_information.json`);
+      const contact = await fetchJSONIfExists(`${repPath}/contact_frame.json`) || await fetchJSONIfExists(`${repPath}/contact.json`);
+      const payload = {};
+      if (info && typeof info === 'object'){
+        if (isFinite(info.ball_speed_mph)) payload.ball_speed_mph = Number(info.ball_speed_mph);
+        if (isFinite(info.ball_speed_ms)) payload.ball_speed_ms = Number(info.ball_speed_ms);
+        if (isFinite(info.launch_angle)) payload.launch_angle = Number(info.launch_angle);
+        if (isFinite(info.contact_frame)) payload.contact_frame = Number(info.contact_frame);
+      }
+      // contact_frame fallback file
+      if (payload.contact_frame == null && contact != null){
+        if (typeof contact === 'number' && isFinite(contact)) payload.contact_frame = contact;
+        else if (typeof contact === 'object'){
+          if (isFinite(contact.contact_frame)) payload.contact_frame = Number(contact.contact_frame);
+          else if (isFinite(contact.contactFrame)) payload.contact_frame = Number(contact.contactFrame);
+          else if (isFinite(contact.frame)) payload.contact_frame = Number(contact.frame);
+        }
+      }
+      // If orig_ball.json happens to include speeds/angle, pick them up too
+      if (!isFinite(payload.ball_speed_mph) && !isFinite(payload.ball_speed_ms)){
+        const ob = await fetchJSONIfExists(`${repPath}/orig_ball.json`);
+        if (ob && typeof ob === 'object'){
+          if (isFinite(ob.ball_speed_mph)) payload.ball_speed_mph = Number(ob.ball_speed_mph);
+          if (isFinite(ob.ball_speed_ms)) payload.ball_speed_ms = Number(ob.ball_speed_ms);
+          if (isFinite(ob.launch_angle)) payload.launch_angle = Number(ob.launch_angle);
+        }
+      }
+      // If speeds are missing but one unit is present, mirror the other unit
+      const mph = isFinite(payload.ball_speed_mph) ? payload.ball_speed_mph : (isFinite(payload.ball_speed_ms) ? payload.ball_speed_ms*MPH_PER_MS : null);
+      const ms  = isFinite(payload.ball_speed_ms)  ? payload.ball_speed_ms  : (isFinite(payload.ball_speed_mph) ? payload.ball_speed_mph/MPH_PER_MS : null);
+      if (isFinite(mph)) payload.ball_speed_mph = Math.round(mph*10)/10;
+      if (isFinite(ms))  payload.ball_speed_ms  = Math.round(ms*100)/100;
+      return payload;
+    }
+
+    // Map Firestore session doc -> Storage session folder when names differ (e.g., session1, session2,…)
+    function parseLegacyDateTime(dateStr, timeStr){
+      // Expects formats like 'YYYY-MM-DD' and 'HH:MM:SS' (24h). Returns ms since epoch or null.
+      try{
+        if (!dateStr && !timeStr) return null;
+        let d = null;
+        if (dateStr){
+          const [y,m,da] = String(dateStr).split(/[-/]/).map(n=>parseInt(n,10));
+          if (Number.isFinite(y)&&Number.isFinite(m)&&Number.isFinite(da)){
+            d = new Date(y, (m-1), da, 0, 0, 0, 0);
+          }
+        }
+        if (timeStr){
+          const [hh,mm,ss] = String(timeStr).split(':').map(n=>parseInt(n,10));
+          if (!d) d = new Date();
+          if (Number.isFinite(hh)) d.setHours(hh);
+          if (Number.isFinite(mm)) d.setMinutes(mm);
+          if (Number.isFinite(ss)) d.setSeconds(ss);
+          d.setMilliseconds(0);
+        }
+        return d ? d.getTime() : null;
+      } catch { return null; }
+    }
+
+    function getSessionTimestampMs(data){
+      try{
+        if (data.createdAt && typeof data.createdAt.toMillis === 'function') return data.createdAt.toMillis();
+      } catch{}
+      const ms = parseLegacyDateTime(data.currentDate, data.currentTime);
+      return Number.isFinite(ms) ? ms : null;
+    }
+
+    async function mapDocToStorageSessionFolder(root, drillType, currentSessionId, playerUID){
+      // Load all sessions for this player/type to compute chronological index
+      let docs = [];
+      try{
+        if (playerUID){
+          const q = await db.collection('sessions')
+            .where('playerUID','==', playerUID)
+            .where('drillType','==', drillType)
+            .get();
+          docs = q.docs.map(d=>({ id:d.id, ...d.data()}));
+        }
+        // If nothing found, try to interpret root as a players/{docId} and get its userUID
+        if (!docs.length && root){
+          const pdoc = await db.collection('players').doc(root).get();
+          const u = pdoc.exists ? pdoc.data()?.userUID : null;
+          if (u){
+            const q2 = await db.collection('sessions')
+              .where('playerUID','==', u)
+              .where('drillType','==', drillType)
+              .get();
+            docs = q2.docs.map(d=>({ id:d.id, ...d.data()}));
+          }
+        }
+      } catch(e){
+        log(`[map] Failed to query sessions for root=${root} uid=${playerUID} type=${drillType}: ${e?.message||e}`, 'warn');
+        return null;
+      }
+      if (!docs.length) return null;
+      // Sort by createdAt ascending (oldest first). Fallback to legacy date/time.
+      docs.sort((a,b)=>{
+        const ta = getSessionTimestampMs(a) ?? 0;
+        const tb = getSessionTimestampMs(b) ?? 0;
+        return ta - tb;
+      });
+      const idx = docs.findIndex(d=>d.id===currentSessionId);
+      if (idx < 0) return null;
+      // List storage session folders under root/type and map by index
+      try{
+        const base = `${root}/${drillType}/`;
+        const res = await storage.ref(base).listAll();
+        const folderNames = (res.prefixes||[]).map(p=>p.name).filter(n=>/^session\d+$/i.test(n)).sort((a,b)=>{
+          const na=parseInt(String(a).replace(/\D+/g,''))||0; const nb=parseInt(String(b).replace(/\D+/g,''))||0; return na-nb || String(a).localeCompare(String(b));
+        });
+        if (!folderNames.length) return null;
+        if (idx >= folderNames.length) return null;
+        return folderNames[idx];
+      } catch(e){
+        log(`[map] listAll failed when mapping storage sessions: ${e?.message||e}`, 'warn');
+        return null;
+      }
+    }
+
+  async function createRepsFromStorageIfMissing(sessionId, drillType, playerUID){
+      // Check what reps already exist (by repIndex) so we only create missing ones
+      let existingCount = 0; const existingIndices = new Set();
+      try {
+        const existingSnap = await db.collection('sessions').doc(sessionId).collection('reps').get();
+        existingCount = existingSnap.size;
+        existingSnap.forEach(doc=>{
+          const r = doc.data()||{};
+          const idx = Number(r.repIndex);
+          if (Number.isFinite(idx)) existingIndices.add(idx);
+        });
+      } catch{}
+
+      // Resolve candidate storage roots: some projects use Auth UID, others use players/{docId}
+      const candidates = new Set();
+      if (playerUID && typeof playerUID === 'string') candidates.add(playerUID);
+      try {
+        const sessSnap = await db.collection('sessions').doc(sessionId).get();
+        const sd = sessSnap.exists ? (sessSnap.data()||{}) : {};
+        ['playerDocId','playerDoc','playerStorageId','playerId','player_id','playerDocID'].forEach(k=>{
+          if (sd && typeof sd[k] === 'string' && sd[k]) candidates.add(sd[k]);
+        });
+        // If still only have UID, try to find player doc by userUID mapping
+        const uid = sd.playerUID || sd.userUID || sd.ownerUID || playerUID;
+        if (uid && typeof uid === 'string'){
+          const q = await db.collection('players').where('userUID','==',uid).limit(1).get();
+          if (!q.empty){
+            candidates.add(q.docs[0].id);
+          }
+        }
+      } catch {}
+
+      // Try each candidate until kick folders are found
+      let repFolders = [];
+      let chosenRoot = null;
+      let storageFolderId = sessionId; // keep Firestore doc id separate from storage folder id
+      for (const root of candidates){
+        log(`[reps:create] Trying storage root: ${root} with folder: ${drillType}/${storageFolderId}`);
+        repFolders = await listRepFolders(root, drillType, storageFolderId);
+        if (repFolders.length){ chosenRoot = root; break; }
+        // Fallback: storage uses sessionN folder names; try to map doc to storage session index
+        const mappedFolder = await mapDocToStorageSessionFolder(root, drillType, sessionId, Array.from(candidates)[0] || playerUID);
+        if (mappedFolder){
+          log(`[map] Mapped Firestore session ${sessionId} -> storage folder ${mappedFolder}`);
+          storageFolderId = mappedFolder;
+          repFolders = await listRepFolders(root, drillType, storageFolderId);
+          if (repFolders.length){ chosenRoot = root; break; }
+        }
+      }
+      if (!repFolders.length){
+        const tried = Array.from(candidates).join(' | ') || '(none)';
+        log(`[reps:create] No rep folders found. Tried roots: ${tried} • Path format: {root}/${drillType}/${sessionId}/kick1`, 'warn');
+        return 0;
+      }
+
+      // If we already have as many reps as folders, skip creation
+      if (existingCount >= repFolders.length){
+        log(`[reps:create] Found ${existingCount} existing rep doc(s), which is >= storage rep folders (${repFolders.length}). Skipping creation.`, 'warn');
+        return 0;
+      }
+
+      // Create only missing indices based on repFolders length and existingIndices
+      const missingIndices = [];
+      for (let i=1;i<=repFolders.length;i++){ if (!existingIndices.has(i)) missingIndices.push(i); }
+      let created = 0;
+      log(`[reps:create] Using root ${chosenRoot} and storage folder ${drillType}/${storageFolderId} • rep folders: [${repFolders.join(', ')}] • existing=${existingCount} • creating missing indices [${missingIndices.join(', ')}]`);
+      for (const repIndex of missingIndices){
+        const name = repFolders[repIndex-1];
+        const payload = await deriveRepPayloadFromStorage(drillType, chosenRoot, storageFolderId, name);
+        payload.repIndex = repIndex; // 1-based
+        try {
+          await db.collection('sessions').doc(sessionId).collection('reps').add(payload);
+          created++;
+        } catch(e){
+          log(`[reps:create] Failed to create rep ${repIndex} for ${sessionId}: ${e?.message||e}`, 'err');
+        }
+      }
+      if (created>0) log(`[reps:create] Created ${created} rep doc(s) from Storage for Firestore session ${sessionId} under root ${chosenRoot} (${drillType}/${storageFolderId})`, 'ok');
+      return created;
+    }
+
+    function shouldProcessSession(data, force){
+      const type = data.drillType;
+      if (force) return true;
+      if (type === 'deadballShot' || type === 'freeRecord' || type === 'longballPass' || type === 'instepPass') {
+        return (data.avgVelocity == null || data.maxVelocity == null || (data.avgLaunchAngle == null && data.avglaunchAngle == null) || data.numberReps == null);
+      }
+      if (type === 'sprintWork') {
+        return (data.maxSpeedMph == null || data.avgMaxSpeedMph == null || data.bestAccelMps2 == null || data.numberReps == null);
+      }
+      if (type === 'jump') {
+        return (data.bestJumpInches == null || data.avgJumpInches == null || data.numberReps == null);
+      }
+      return false;
+    }
+
+    async function fetchReps(sessionId){
+      const repsSnap = await db.collection('sessions').doc(sessionId).collection('reps').orderBy('repIndex','asc').get();
+      return repsSnap.docs.map(d=>({id:d.id, ...d.data()}));
+    }
+
+    function computeSummaries(drillType, reps){
+      const speeds = []; const angles = []; const accels = []; const jumps = [];
+      for (const r of reps){
+        const v = speedMphFromRep(r); if (isFinite(v)) speeds.push(v);
+        const a = launchAngleFromRep(r); if (isFinite(a)) angles.push(a);
+        const ac = accelFromRep(r); if (isFinite(ac)) accels.push(ac);
+        const j = jumpInchesFromRep(r); if (isFinite(j)) jumps.push(j);
+      }
+      const numberReps = reps.length;
+      const out = { numberReps };
+      if (drillType === 'sprintWork'){
+        out.maxSpeedMph = maxOrNull(speeds);
+        out.avgMaxSpeedMph = mean(speeds);
+        out.bestAccelMps2 = maxOrNull(accels);
+        return out;
+      }
+      if (drillType === 'jump'){
+        out.bestJumpInches = maxOrNull(jumps);
+        out.avgJumpInches = mean(jumps);
+        return out;
+      }
+      // Kicking types default (deadball, freeRecord, longball, instep)
+      out.avgVelocity = mean(speeds);
+      out.maxVelocity = maxOrNull(speeds);
+      out.avgLaunchAngle = mean(angles);
+      return out;
+    }
+
+    async function normalizeRepsForSession(sessionId){
+      const repsSnap = await db.collection('sessions').doc(sessionId).collection('reps').orderBy('repIndex','asc').get().catch(()=>null);
+      const reps = repsSnap && !repsSnap.empty ? repsSnap.docs.map(d=>({id:d.id, ...d.data()})) : [];
+      if (!reps.length) return 0;
+      let updates = 0;
+      for (let i=0;i<reps.length;i++){
+        const r = reps[i];
+        const desiredIndex = i+1; // 1-based indexing
+        const mph = speedMphFromRep(r);
+        const ms = isFinite(mph) ? (mph/MPH_PER_MS) : (isFinite(r.ball_speed_ms) ? Number(r.ball_speed_ms) : null);
+        const payload = {};
+        if (r.repIndex !== desiredIndex) payload.repIndex = desiredIndex;
+        if (isFinite(mph) && r.ball_speed_mph !== Math.round(mph*10)/10) payload.ball_speed_mph = Math.round(mph*10)/10;
+        if (isFinite(ms) && r.ball_speed_ms !== Math.round(ms*100)/100) payload.ball_speed_ms = Math.round(ms*100)/100;
+        // fix typo field contanct_frame -> contact_frame
+        if (r.contact_frame == null && r.contanct_frame != null) payload.contact_frame = r.contanct_frame;
+        if (r.contanct_frame != null) payload.contanct_frame = firebase.firestore.FieldValue.delete();
+        if (Object.keys(payload).length){
+          await db.collection('sessions').doc(sessionId).collection('reps').doc(r.id).set(payload, { merge: true });
+          updates++;
+        }
+      }
+      return updates;
+    }
+
+  async function scanSessions(scopes, force){
+      els.scan.disabled = true; els.run.disabled = true; els.status.textContent = 'Scanning…'; log('Scanning sessions for missing summaries…');
+      const enabledTypes = new Set();
+      if(scopes.deadball.checked) enabledTypes.add('deadballShot');
+      if(scopes.freeRecord.checked) enabledTypes.add('freeRecord');
+      if(scopes.longball.checked) enabledTypes.add('longballPass');
+      if(scopes.instep.checked) enabledTypes.add('instepPass');
+      if(scopes.sprint.checked) enabledTypes.add('sprintWork');
+      if(scopes.jump.checked) enabledTypes.add('jump');
+
+      const FieldPath = firebase.firestore.FieldPath; let lastId=null; const pageSize=200;
+      let total=0; const needing=[];
+      while(true){
+        let q = db.collection('sessions').orderBy(FieldPath.documentId()).limit(pageSize);
+        if(lastId) q = q.startAfter(lastId);
+        const snap = await q.get();
+        if (snap.empty) break;
+        for (const doc of snap.docs){
+          total++;
+          const data = doc.data()||{};
+          if (!enabledTypes.has(data.drillType)) continue;
+          if (shouldProcessSession(data, force)) needing.push({ id: doc.id, drillType: data.drillType, playerUID: data.playerUID || data.userUID || data.ownerUID || data.playerId || data.userId || null });
+        }
+        lastId = snap.docs[snap.docs.length-1].id;
+        if (snap.size < pageSize) break;
+      }
+      els.found.textContent = String(total);
+      els.toUpdate.textContent = String(needing.length);
+      els.status.textContent = 'Scan complete';
+      log(`Found ${total} session(s); ${needing.length} to update.`, 'ok');
+      els.run.disabled = needing.length===0;
+      return needing;
+    }
+
+  async function runBackfill(needing){
+      if(!needing || !needing.length){ log('Nothing to update.','warn'); return; }
+      els.status.textContent = 'Backfilling…'; els.run.disabled = true; els.scan.disabled = true;
+      let done=0; const total=needing.length; const BAR=els.bar;
+
+      // Process in chunks with batch updates
+      const chunk = (arr, size)=>Array.from({length: Math.ceil(arr.length/size)}, (_,i)=>arr.slice(i*size,(i+1)*size));
+      for (const group of chunk(needing, 120)){
+        const batch = db.batch();
+        for (const item of group){
+          let reps = await fetchReps(item.id);
+          if (!reps.length){
+            if (document.getElementById('createRepsIfMissing').checked){
+              if (!item.playerUID){ log(`Skip ${item.id}: missing playerUID, cannot create reps from Storage`, 'warn'); continue; }
+              const made = await createRepsFromStorageIfMissing(item.id, item.drillType, item.playerUID);
+              if (made<=0){ log(`Skip ${item.id}: no reps and none created from Storage`, 'warn'); continue; }
+              reps = await fetchReps(item.id);
+            } else {
+              log(`Skip ${item.id}: no reps subcollection`, 'warn');
+              continue;
+            }
+          }
+          if (document.getElementById('normalizeReps').checked){
+            const changed = await normalizeRepsForSession(item.id);
+            if (changed>0) log(`Normalized ${changed} rep(s) for ${item.id}`,'ok');
+            reps = await fetchReps(item.id); // re-fetch after normalization
+          }
+          const summary = computeSummaries(item.drillType, reps);
+          // Round some values for UI niceness
+          const round1 = v => v==null? v : Math.round(v*10)/10;
+          const round2 = v => v==null? v : Math.round(v*100)/100;
+          if (summary.avgVelocity!=null) summary.avgVelocity = round1(summary.avgVelocity);
+          if (summary.maxVelocity!=null) summary.maxVelocity = round1(summary.maxVelocity);
+          if (summary.avgLaunchAngle!=null) summary.avgLaunchAngle = round1(summary.avgLaunchAngle);
+          if (summary.maxSpeedMph!=null) summary.maxSpeedMph = round1(summary.maxSpeedMph);
+          if (summary.avgMaxSpeedMph!=null) summary.avgMaxSpeedMph = round1(summary.avgMaxSpeedMph);
+          if (summary.bestAccelMps2!=null) summary.bestAccelMps2 = round2(summary.bestAccelMps2);
+          if (summary.bestJumpInches!=null) summary.bestJumpInches = round1(summary.bestJumpInches);
+          if (summary.avgJumpInches!=null) summary.avgJumpInches = round1(summary.avgJumpInches);
+
+          log(`[summary] ${item.id} • reps=${reps.length} • numberReps=${summary.numberReps ?? 'null'}`);
+
+          const ref = db.collection('sessions').doc(item.id);
+          batch.set(ref, summary, { merge: true });
+        }
+        await batch.commit();
+        done += group.length; const pct = Math.round((done/total)*100);
+        BAR.style.width = pct + '%';
+        log(`Committed ${done}/${total} (${pct}%)`, 'ok');
+      }
+      els.status.textContent='Backfill complete'; log('Backfill complete. Re-scan to verify.','ok');
+      els.scan.disabled=false; els.run.disabled=false;
+    }
+
+    // Auth wiring
+    auth.onAuthStateChanged(async (user)=>{
+      els.email.textContent = user ? (user.email||user.uid) : '(not signed in)';
+      els.signOut.disabled = !user; els.signIn.disabled = !!user;
+      if(!user){ els.scan.disabled=true; els.run.disabled=true; els.status.textContent='Waiting'; return; }
+      els.status.textContent='Checking permissions…';
+      const ok = await isCoachUser(user.uid);
+      if(!ok){ els.status.textContent='Insufficient permissions (coach required)'; log('This tool requires a coach account.','err'); els.scan.disabled=true; els.run.disabled=true; return; }
+      els.status.textContent='Ready'; els.scan.disabled=false; els.run.disabled=true;
+    });
+
+    els.signIn.addEventListener('click', async ()=>{ try{ await auth.signInWithPopup(new firebase.auth.GoogleAuthProvider()); }catch(e){ log('Sign-in failed: '+e.message,'err'); } });
+    els.signOut.addEventListener('click', async ()=>{ try{ await auth.signOut(); }catch(e){ log('Sign-out failed: '+e.message,'err'); } });
+
+    let cached=[];
+    els.scan.addEventListener('click', async ()=>{ cached = await scanSessions(els.scopes, els.force.checked); els.run.disabled = cached.length===0; });
+    els.run.addEventListener('click', async ()=>{ await runBackfill(cached); });
+  </script>
+</body>
+</html>

@@ -1,0 +1,1463 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>Training Sessions | PoseTek</title>
+    <!-- Use Inter for body and Poppins for headings to match site style -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --accent-passing: #4c6a8c;
+            --accent-longballs: #8c6a4c;
+            --accent-instep: #6a4c8c;
+            --accent-sprint: #6a8c4c;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --text-dark: #121212;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(76, 140, 106, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-light);
+            background-color: var(--primary);
+            line-height: 1.6;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.15));
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(15px);
+            border-bottom: 1px solid var(--card-border);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+
+        .logo {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-size: 1.9rem;
+            font-weight: 700;
+            letter-spacing: -0.6px;
+            color: var(--text-light);
+        }
+
+        .nav-links {
+        display: flex;
+        gap: 2rem;
+        align-items: center;
+        }
+
+        .nav-links a {
+        color: var(--text-light);
+        text-decoration: none;
+        font-weight: 500;
+        font-size: 0.95rem;
+        transition: var(--transition);
+        position: relative;
+        padding: 0;            /* remove pill background/padding */
+        border-radius: 0;
+        background: none;
+        }
+
+        .nav-links a:hover {
+        color: var(--accent);
+        }
+
+        .nav-links a::after {
+        content: '';
+        position: absolute;
+        bottom: -5px;
+        left: 0;
+        width: 0;
+        height: 2px;
+        background-color: var(--accent);
+        transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+        width: 100%;
+        }
+
+    /* Hide the top-right header links so only the hamburger/side-nav is visible */
+    header .nav-links { display: none !important; }
+
+        .sessions-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .sessions-title {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-size: 2.6rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.6px;
+            background: linear-gradient(135deg, #ffffff 0%, rgba(255, 255, 255, 0.85) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        /* Side nav + action button styles */
+        .nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;cursor:pointer;transition:var(--transition);touch-action:manipulation;-webkit-user-select:none;user-select:none}
+        .nav-toggle:hover{transform:translateY(-2px)}
+        .nav-toggle:active{transform:scale(0.95)}
+        .side-nav{position:fixed;top:0;left:-320px;width:320px;height:100%;background:linear-gradient(180deg, rgba(15,38,33,0.98), rgba(12,34,30,0.98));box-shadow:6px 0 30px rgba(0,0,0,0.45);z-index:1200;padding:2rem 1.25rem;transition:left 0.32s cubic-bezier(.2,.9,.2,1);display:flex;flex-direction:column;gap:1rem}
+        .side-nav.open{left:0}
+        .side-nav .close-side{margin-left:auto;background:none;border:none;color:var(--text-light);font-size:1.25rem;cursor:pointer;opacity:0.85;touch-action:manipulation;-webkit-user-select:none;user-select:none;min-width:44px;min-height:44px}
+        .side-nav .close-side:active{transform:scale(0.9)}
+        .side-nav .side-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.85rem;border-radius:10px;color:var(--text-light);text-decoration:none;font-weight:600;transition:var(--transition);min-height:44px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+        .side-nav .side-link:hover{background:rgba(255,255,255,0.03);transform:translateX(4px)}
+        .side-nav .side-link:active{background:rgba(255,255,255,0.06);transform:translateX(2px) scale(0.98)}
+        .side-divider{height:1px;background:var(--card-border);margin:0.75rem 0}
+        .side-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1100;opacity:0;visibility:hidden;transition:opacity 200ms ease}
+        .side-backdrop.open{opacity:1;visibility:visible}
+        .side-link .material-symbols-outlined{font-variation-settings:'wght' 400;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;line-height:24px;vertical-align:middle;color:var(--text-light)}
+        .side-link span:first-of-type{margin-right:6px}
+        .action-btn{padding:0.6rem 1.2rem;background-color:var(--accent);border:none;border-radius:50px;color:var(--text-light);font-weight:600;cursor:pointer;transition:var(--transition);min-height:44px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+        .action-btn:hover{background-color:var(--secondary);transform:translateY(-2px)}
+        .action-btn:active{transform:translateY(0) scale(0.98)}
+
+        .sessions-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-light);
+            opacity: 0.9;
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.8rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);
+            color: var(--text-light);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(76, 140, 106, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            background: linear-gradient(135deg, #56a07a 0%, var(--accent) 100%);
+        }
+
+        .btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .kick-type-tabs {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+            padding: 0.75rem;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+        }
+
+        .tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-weight: 600;
+            padding: 0.7rem 1.4rem;
+            cursor: pointer;
+            transition: var(--transition);
+            font-size: 0.95rem;
+            position: relative;
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+        }
+
+        .tab-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .tab-btn:active {
+            transform: scale(0.96);
+        }
+
+        .tab-btn::after {
+            display: none;
+        }
+
+        .tab-btn.active {
+            color: var(--text-light);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1));
+            border-color: rgba(255, 255, 255, 0.2);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            font-weight: 700;
+        }
+
+        .tab-btn.active[data-tab="all"] {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active[data-tab="deadball"] {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active[data-tab="freerecord"] {
+            border-color: var(--accent-passing);
+            box-shadow: 0 4px 12px rgba(76, 106, 140, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active[data-tab="longball"] {
+            border-color: var(--accent-longballs);
+            box-shadow: 0 4px 12px rgba(140, 106, 76, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active[data-tab="instep"] {
+            border-color: var(--accent-instep);
+            box-shadow: 0 4px 12px rgba(106, 76, 140, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active[data-tab="sprintwork"] {
+            border-color: var(--accent-sprint);
+            box-shadow: 0 4px 12px rgba(106, 140, 76, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .tab-btn.active[data-tab="jump"] {
+            border-color: var(--accent-sprint);
+            box-shadow: 0 4px 12px rgba(106, 140, 76, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .sessions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+
+        .session-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .session-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2), 0 6px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .session-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .session-card.deadball:hover {
+            border-color: var(--accent);
+        }
+
+        .session-card.passing:hover {
+            border-color: var(--accent-passing);
+        }
+
+        .session-card.longball:hover {
+            border-color: var(--accent-longballs);
+        }
+
+        .session-card.instep:hover {
+            border-color: var(--accent-instep);
+        }
+
+        .session-card.sprintwork:hover {
+            border-color: var(--accent-sprint);
+        }
+
+        .session-date {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.8rem;
+        }
+
+        .session-title {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .session-stats {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .session-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-icon {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .session-card.passing .stat-icon {
+            color: var(--accent-passing);
+        }
+
+        .session-card.longball .stat-icon {
+            color: var(--accent-longballs);
+        }
+
+        .session-card.instep .stat-icon {
+            color: var(--accent-instep);
+        }
+
+        .session-card.sprintwork .stat-icon {
+            color: var(--accent-sprint);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .badge.deadball {
+            background-color: var(--accent);
+        }
+
+        .badge.passing {
+            background-color: var(--accent-passing);
+        }
+
+        .badge.longball {
+            background-color: var(--accent-longballs);
+        }
+
+        .badge.instep {
+            background-color: var(--accent-instep);
+        }
+
+        .badge.sprintwork {
+            background-color: var(--accent-sprint);
+        }
+
+        .loading-spinner {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            border: 4px solid rgba(255, 255, 255, 0.15);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            border-right-color: var(--accent);
+            animation: spin 0.8s cubic-bezier(0.68, -0.55, 0.27, 1.55) infinite;
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 300px;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+            animation: pulse 2s ease-in-out infinite;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.6; }
+            50% { opacity: 1; }
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            grid-column: 1 / -1;
+        }
+
+        .empty-state h3 {
+            margin-bottom: 1rem;
+        }
+
+        .empty-state p {
+            color: var(--text-muted);
+        }
+
+        .player-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1.5rem;
+            padding: 1.25rem;
+            padding-bottom: 1.25rem;
+            border-bottom: 1px solid var(--card-border);
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04));
+            border-radius: 12px;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .player-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--secondary), var(--accent));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 1.2rem;
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .player-name {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+
+        .player-code {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+        }
+
+        /* Custom Scrollbar Styling */
+        ::-webkit-scrollbar {
+            width: 10px;
+            height: 10px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: var(--accent);
+            border-radius: 10px;
+            transition: background 0.3s ease;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #56a07a;
+        }
+
+        /* Firefox scrollbar */
+        * {
+            scrollbar-width: thin;
+            scrollbar-color: var(--accent) rgba(0, 0, 0, 0.2);
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .logo {
+                font-size: 1.6rem;
+            }
+
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .sessions-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .sessions-title {
+                font-size: 2rem;
+            }
+
+            .sessions-subtitle {
+                font-size: 1rem;
+            }
+
+            .nav-links {
+                gap: 0.8rem;
+            }
+
+            .sessions-grid {
+                grid-template-columns: 1fr;
+                gap: 1.25rem;
+            }
+
+            .kick-type-tabs {
+                gap: 0.5rem;
+                overflow-x: auto;
+                -webkit-overflow-scrolling: touch;
+                padding: 0.6rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .tab-btn {
+                flex-shrink: 0;
+                padding: 0.65rem 1.2rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 1rem 1.25rem;
+            }
+
+            .logo {
+                font-size: 1.4rem;
+            }
+
+            .container {
+                padding: 1.25rem;
+            }
+
+            .sessions-header {
+                margin-bottom: 1.25rem;
+                padding-bottom: 1rem;
+            }
+
+            .sessions-title {
+                font-size: 1.75rem;
+            }
+
+            .sessions-subtitle {
+                font-size: 0.95rem;
+            }
+
+            .sessions-grid {
+                gap: 1rem;
+            }
+
+            .session-card {
+                padding: 1.25rem;
+                border-radius: 14px;
+            }
+
+            .session-title {
+                font-size: 1.1rem;
+            }
+
+            .tab-btn {
+                padding: 0.6rem 1.1rem;
+                font-size: 0.85rem;
+            }
+
+            .btn {
+                padding: 0.7rem 1.5rem;
+                font-size: 0.9rem;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .container {
+                padding: 1rem;
+            }
+
+            .sessions-title {
+                font-size: 1.5rem;
+            }
+
+            .sessions-subtitle {
+                font-size: 0.9rem;
+            }
+
+            .session-card {
+                padding: 1rem;
+                border-radius: 12px;
+            }
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+            <button id="navToggle" class="nav-toggle" aria-label="Open navigation">☰</button>
+            <div class="logo">PoseTek</div>
+        </div>
+        <a href="coachesview.html" class="home-btn" title="Home" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; text-decoration: none; color: var(--text-light); transition: var(--transition);">
+            <span class="material-symbols-outlined" style="font-size: 24px;">home</span>
+        </a>
+    </header>
+
+    <!-- Side navigation panel -->
+    <aside id="sideNav" class="side-nav" aria-hidden="true">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div style="font-weight:700;font-size:1.25rem;">Menu</div>
+            <button class="close-side" id="closeSide">✕</button>
+        </div>
+        <div class="side-divider"></div>
+        <div id="sideProfile" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+            <div id="profileAvatar" style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem">C</div>
+            <div style="display:flex;flex-direction:column;">
+                <div id="profileName" style="font-weight:700">Coach</div>
+                <div id="profileEmail" style="font-size:0.85rem;opacity:0.85">email@example.com</div>
+            </div>
+        </div>
+        <div class="side-divider"></div>
+        <div id="sideLinks" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+        <div class="side-divider"></div>
+        <div style="margin-top:auto">
+            <button class="action-btn" id="sideLogout">Logout</button>
+        </div>
+    </aside>
+    <div id="sideBackdrop" class="side-backdrop" tabindex="-1"></div>
+
+    <div class="container">
+        <div class="sessions-header">
+            <div>
+                <h1 class="sessions-title" id="pageTitle">Training Sessions</h1>
+                <p class="sessions-subtitle" id="pageSubtitle">Review and analyze your training history</p>
+            </div>
+        </div>
+
+        <div id="playerInfoContainer" class="player-info" style="display: none;">
+            <div class="player-avatar" id="playerAvatar">PL</div>
+            <div>
+                <div class="player-name" id="playerName">Player Name</div>
+                <div class="player-code" id="playerCode">Code: PLR123</div>
+            </div>
+        </div>
+
+        <div class="kick-type-tabs">
+            <button class="tab-btn active" data-tab="all">All Sessions</button>
+            <button class="tab-btn" data-tab="deadball">Dead Ball</button>
+            <button class="tab-btn" data-tab="freerecord">Free Record</button>
+            <button class="tab-btn" data-tab="longball">Long Balls</button>
+            <button class="tab-btn" data-tab="instep">Instep Passing</button>
+            <button class="tab-btn" data-tab="sprintwork">Sprint Work</button>
+            <button class="tab-btn" data-tab="jump">Static Jump</button>
+        </div>
+
+        <div class="sessions-grid" id="sessionsGrid">
+            <div class="loading-container">
+                <div class="loading-spinner"></div>
+                <p class="loading-text">Loading session data...</p>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // DOM Elements
+        const sessionsGrid = document.getElementById('sessionsGrid');
+    const pageTitle = document.getElementById('pageTitle');
+    const pageSubtitle = document.getElementById('pageSubtitle');
+    const kickingAnalysisLink = document.getElementById('kickingAnalysisLink');
+        const playerInfoContainer = document.getElementById('playerInfoContainer');
+        const playerAvatar = document.getElementById('playerAvatar');
+        const playerName = document.getElementById('playerName');
+        const playerCode = document.getElementById('playerCode');
+        const tabButtons = document.querySelectorAll('.tab-btn');
+        const backToPlayersLink = document.getElementById('backToPlayersLink');
+        const playerProfileLink = document.getElementById('playerProfileLink');
+
+        // Global variables
+        let currentUserInfo = null;
+        let currentPlayerInfo = null;
+        let isViewingPlayer = false;
+        let isCoach = false;
+        let activeTab = 'all';
+
+        // Kick type mappings - UPDATED WITH SPRINT WORK AND STATIC JUMP
+        const KICK_TYPES = {
+            deadball: 'deadballShot',
+            freerecord: 'freeRecord',
+            longball: 'longballPass',
+            instep: 'instepPass',
+            sprintwork: 'sprintWork', // This matches the storage path
+            jump: 'jump'
+        };
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user && !window.location.search.includes('player=')) {
+                window.location.href = 'kickai.html';
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const playerDocId = urlParams.get('player');
+
+            if (user) {
+                // Load current user info first - check if coach
+                const coachQuery = await db.collection('coaches')
+                    .where('userUID', '==', user.uid)
+                    .limit(1)
+                    .get();
+
+                isCoach = !coachQuery.empty;  // true if coach document exists
+                console.log('isCoach:', isCoach);
+                
+                // If not a coach, get player info
+                if (!isCoach) {
+                    let playerQuery = await db.collection('players')
+                        .where('userUID', '==', user.uid)
+                        .limit(1)
+                        .get();
+                    if (playerQuery.empty) {
+                        playerQuery = await db.collection('players')
+                            .where('authenticationUID', '==', user.uid)
+                            .limit(1)
+                            .get();
+                    }
+                    if (!playerQuery.empty) {
+                        currentUserInfo = {
+                            uid: user.uid,
+                            docId: playerQuery.docs[0].id,
+                            ...playerQuery.docs[0].data()
+                        };
+                    }
+                } else {
+                    // For coaches, store basic info
+                    currentUserInfo = {
+                        uid: user.uid,
+                        docId: user.uid,
+                        type: "coach",
+                        ...coachQuery.docs[0].data()
+                    };
+                }
+            }
+
+            // If viewing another player's profile (as coach) or direct link
+            if (playerDocId) {
+                isViewingPlayer = true;
+                currentPlayerInfo = await loadPlayerProfile(playerDocId);
+                
+                // If not authenticated and not a coach viewing a player, redirect
+                if (!user && !isCoach) {
+                    window.location.href = 'kickai.html';
+                    return;
+                }
+            } else if (user) {
+                // Regular player viewing their own sessions
+                isViewingPlayer = false;
+                currentPlayerInfo = currentUserInfo;
+            } else {
+                window.location.href = 'kickai.html';
+                return;
+            }
+
+            setupNavigation();
+            updatePageHeader();
+            setupTabSwitching();
+            loadSessions();
+        });
+
+        // --- Side nav wiring (standardized) ---
+        (function sideNavInit(){
+            const navToggle = document.getElementById('navToggle');
+            const sideNav = document.getElementById('sideNav');
+            const closeSide = document.getElementById('closeSide');
+            const sideLinks = document.getElementById('sideLinks');
+            const sideBackdrop = document.getElementById('sideBackdrop');
+
+            function openSide() { sideNav.classList.add('open'); sideNav.setAttribute('aria-hidden','false'); if(sideBackdrop) sideBackdrop.classList.add('open'); }
+            function closeSideNav() { sideNav.classList.remove('open'); sideNav.setAttribute('aria-hidden','true'); if(sideBackdrop) sideBackdrop.classList.remove('open'); }
+
+            if (navToggle) navToggle.addEventListener('click', (e)=>{ e.preventDefault(); openSide(); });
+            if (closeSide) closeSide.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+            if (sideBackdrop) sideBackdrop.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+            document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeSideNav(); });
+
+            // Consistent navigation: Home, Player Profile, Leaderboards
+            const urlParams = new URLSearchParams(window.location.search);
+            const playerDocId = urlParams.get('player');
+            const navigationLinks = [
+                { href: 'coachesview.html', text: 'Home', icon: 'home' },
+                { href: playerDocId ? `profile.html?player=${playerDocId}` : 'profile.html', text: 'Player Profile', icon: 'person' },
+                { href: 'leaderboard.html', text: 'Leaderboards', icon: 'leaderboard' }
+            ];
+
+            navigationLinks.forEach((a, idx) => {
+                const link = document.createElement('a'); link.href = a.href || '#'; link.className = 'side-link';
+                const icon = document.createElement('span'); icon.className = 'material-symbols-outlined'; icon.style.fontSize = '20px';
+                icon.textContent = a.icon;
+                const spanText = document.createElement('span'); spanText.textContent = a.text;
+                link.appendChild(icon); link.appendChild(spanText);
+                link.style.transitionDelay = (idx * 40) + 'ms';
+                link.addEventListener('click', ()=> closeSideNav());
+                sideLinks.appendChild(link);
+            });
+
+            // side profile is populated by user-badge.js (Firestore preferred)
+
+            const sideLogoutBtn = document.getElementById('sideLogout');
+            if (sideLogoutBtn) sideLogoutBtn.addEventListener('click', (e)=>{ e.preventDefault(); firebase.auth().signOut().then(()=> window.location.href = 'kickai.html'); });
+        })();
+
+        // Load user info from Firestore
+        async function loadUserInfo(userId) {
+            try {
+                // Check if user is coach
+                const coachDoc = await db.collection('coaches').doc(userId).get();
+                if (coachDoc.exists) {
+                    const coachData = coachDoc.data();
+                    return {
+                        uid: userId,
+                        docId: userId,
+                        name: `${coachData.firstName} ${coachData.lastName}`,
+                        firstName: coachData.firstName,
+                        lastName: coachData.lastName,
+                        type: "coach",
+                        organization: coachData.org,
+                        members: coachData.members || [],
+                        ...coachData
+                    };
+                }
+
+                // Check if user is player (try both UID field names used by different signup flows)
+                let playerQuery = await db.collection('players')
+                    .where('userUID', '==', userId)
+                    .limit(1)
+                    .get();
+                if (playerQuery.empty) {
+                    playerQuery = await db.collection('players')
+                        .where('authenticationUID', '==', userId)
+                        .limit(1)
+                        .get();
+                }
+
+                if (!playerQuery.empty) {
+                    const playerDoc = playerQuery.docs[0];
+                    const playerData = playerDoc.data();
+                    return {
+                        uid: userId,
+                        docId: playerDoc.id,
+                        name: `${playerData.firstName} ${playerData.lastName}`,
+                        firstName: playerData.firstName,
+                        lastName: playerData.lastName,
+                        type: "player",
+                        code: playerData.code || "N/A",
+                        organization: playerData.org,
+                        coachUID: playerData.coachUID,
+                        isTemporary: !playerData.userUID,
+                        ...playerData
+                    };
+                }
+
+                return { 
+                    name: "User", 
+                    type: "player", 
+                    code: "N/A",
+                    uid: userId,
+                    docId: userId
+                };
+            } catch (error) {
+                console.error("Error loading user info:", error);
+                return { 
+                    name: "User", 
+                    type: "player", 
+                    code: "N/A",
+                    uid: userId,
+                    docId: userId
+                };
+            }
+        }
+
+        // Load player profile by document ID
+        async function loadPlayerProfile(docId) {
+            try {
+                const playerDoc = await db.collection('players').doc(docId).get();
+                if (!playerDoc.exists) {
+                    throw new Error("Player not found");
+                }
+                
+                const playerData = playerDoc.data();
+                return {
+                    docId: docId,
+                    uid: playerData.userUID || null,
+                    name: `${playerData.firstName} ${playerData.lastName}`,
+                    firstName: playerData.firstName,
+                    lastName: playerData.lastName,
+                    type: "player",
+                    code: playerData.code || "TEMP",
+                    organization: playerData.org,
+                    coachUID: playerData.coachUID,
+                    isTemporary: !playerData.userUID,
+                    ...playerData
+                };
+            } catch (error) {
+                console.error("Error loading player profile:", error);
+                return { 
+                    name: "Player", 
+                    type: "player", 
+                    code: "N/A",
+                    docId: docId,
+                    isTemporary: true
+                };
+            }
+        }
+
+        function setupNavigation() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const playerDocId = urlParams.get('player');
+
+            // Attach logout behavior to the side nav logout button (fallback to legacy #logoutBtn if present)
+            const logoutEl = document.getElementById('sideLogout') || document.getElementById('logoutBtn');
+            if (logoutEl) {
+                logoutEl.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    auth.signOut().then(() => (window.location.href = 'kickai.html'));
+                });
+            }
+
+            // Coach viewing a specific player
+            if (isCoach && playerDocId) {
+                backToPlayersLink.style.display = 'block';
+                backToPlayersLink.href = 'coachesview.html';
+
+                kickingAnalysisLink.href = `kickingview.html?player=${playerDocId}&userType=coach`;
+                playerProfileLink.href = `profile.html?player=${playerDocId}`;
+            } 
+            // Coach, but not scoped to a player
+            else if (isCoach) {
+                backToPlayersLink.style.display = 'block';
+                backToPlayersLink.href = 'coachesview.html';
+
+                kickingAnalysisLink.href = 'kickingview.html?userType=coach';
+                playerProfileLink.href = 'profile.html';
+            } 
+            // Regular player
+            else {
+                backToPlayersLink.style.display = 'none';
+
+                kickingAnalysisLink.href = 'kickingview.html?userType=player';
+                playerProfileLink.href = 'profile.html';
+            }
+            }
+
+
+        // Update page header based on context
+        function updatePageHeader() {
+            if (isViewingPlayer) {
+                pageTitle.textContent = `${currentPlayerInfo.name}'s Sessions`;
+                pageSubtitle.textContent = `Review ${currentPlayerInfo.name}'s training history`;
+            } else {
+                pageTitle.textContent = "Training Sessions";
+                pageSubtitle.textContent = "Review and analyze your training history";
+            }
+        }
+
+        // Set up tab switching functionality
+        function setupTabSwitching() {
+            tabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    tabButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    activeTab = btn.dataset.tab;
+                    loadSessions();
+                });
+            });
+        }
+
+        // Helper: parse date/time strings from Firestore session docs
+        function parseSessionDate(dateStr, timeStr) {
+            try {
+                const cleanDate = (dateStr || '').replace(/\u202F|\u00A0/g, ' ').trim();
+                const cleanTime = (timeStr || '').replace(/\u202F|\u00A0/g, ' ').trim();
+                if (cleanDate && cleanTime) {
+                    const d = new Date(`${cleanDate} ${cleanTime}`);
+                    return isNaN(d.getTime()) ? new Date() : d;
+                }
+                if (cleanDate) {
+                    const d = new Date(cleanDate);
+                    return isNaN(d.getTime()) ? new Date() : d;
+                }
+            } catch (_) {}
+            return new Date();
+        }
+
+        // Helper: try multiple numeric fields for reps (helps across types)
+        function pickNumberReps(data) {
+            const fields = ['numberReps','numberKicks','kickCount','repCount','numReps','numKicks','kicks','reps'];
+            for (const f of fields) {
+                if (data && Object.prototype.hasOwnProperty.call(data, f)) {
+                    const n = Number(data[f]);
+                    if (Number.isFinite(n) && n >= 0) return n;
+                }
+            }
+            return 0;
+        }
+
+        // Fetch sessions from Firestore by player identifier(s)
+    async function fetchSessionsFromFirestore(targetUid, targetDocId) {
+            try {
+                const sessions = [];
+                const coll = db.collection('sessions');
+                const queries = [];
+                // playerUID may be either the auth UID or the player document ID
+                if (targetUid) queries.push(coll.where('playerUID', '==', targetUid).get());
+                if (targetDocId && targetDocId !== targetUid) queries.push(coll.where('playerUID', '==', targetDocId).get());
+
+                const snapshots = await Promise.allSettled(queries);
+                const byId = new Map();
+
+                for (const res of snapshots) {
+                    if (res.status !== 'fulfilled') continue;
+                    res.value.forEach((doc, index) => {
+                        const data = doc.data() || {};
+                        const sessionId = data.currentSession || doc.id;
+                        const type = data.drillType || data.type || '';
+                        const finalCount = pickNumberReps(data);
+                        const date = parseSessionDate(data.currentDate, data.currentTime);
+
+                        const normalized = { id: sessionId, type, kickCount: finalCount, date };
+                        const existing = byId.get(sessionId);
+                        if (!existing || (existing.kickCount === 0 && finalCount > 0)) {
+                            byId.set(sessionId, normalized);
+                        }
+                    });
+                }
+
+                // Also check for jump reps in players/{docId}/reps collection
+                if (targetDocId) {
+                    try {
+                        const repsRef = db.collection('players').doc(targetDocId).collection('reps');
+                        const jumpRepsSnapshot = await repsRef.where('repType', '==', 'jump').get();
+                        
+                        // Group reps by session number
+                        const jumpSessionsMap = new Map();
+                        jumpRepsSnapshot.forEach(doc => {
+                            const data = doc.data();
+                            const sessionNum = data.sessionNumber;
+                            if (!sessionNum) return;
+                            
+                            const sessionId = `session${sessionNum}`;
+                            if (!jumpSessionsMap.has(sessionId)) {
+                                // Get the most recent timestamp for this session
+                                const timestamp = data.createdAt?.toDate() || data.timestamp?.toDate() || new Date();
+                                jumpSessionsMap.set(sessionId, {
+                                    id: sessionId,
+                                    type: 'jump',
+                                    kickCount: 0,
+                                    date: timestamp
+                                });
+                            }
+                            
+                            const session = jumpSessionsMap.get(sessionId);
+                            session.kickCount++;
+                            
+                            // Update to latest timestamp if this rep is newer
+                            const repTimestamp = data.createdAt?.toDate() || data.timestamp?.toDate() || new Date();
+                            if (repTimestamp > session.date) {
+                                session.date = repTimestamp;
+                            }
+                        });
+                        
+                        // Add jump sessions to byId map
+                        jumpSessionsMap.forEach((session, sessionId) => {
+                            byId.set(sessionId, session);
+                        });
+                        
+                        console.log('🏃 [DEBUG] Found', jumpSessionsMap.size, 'jump sessions from reps collection');
+                    } catch (repsError) {
+                        console.warn('⚠️ [DEBUG] Error fetching jump reps:', repsError);
+                    }
+                }
+
+                return Array.from(byId.values());
+            } catch (err) {
+                console.warn('❌ [DEBUG] Firestore sessions fetch failed, will fallback to Storage if needed:', err);
+                return [];
+            }
+        }
+
+        async function loadSessions() {
+            console.log('🚀 [DEBUG] Starting loadSessions()');
+            console.log('🚀 [DEBUG] Active tab:', activeTab);
+            console.log('🚀 [DEBUG] Is viewing player:', isViewingPlayer);
+            
+            sessionsGrid.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Loading session data...</p>
+                </div>
+            `;
+
+            try {
+                // Determine which player's sessions to load
+                const targetPlayerDocId = isViewingPlayer ? currentPlayerInfo.docId : currentUserInfo.docId;
+                const targetPlayerUid = (isViewingPlayer ? currentPlayerInfo?.uid : currentUserInfo?.uid) || null;
+
+                console.log('🚀 [DEBUG] Target player Doc ID:', targetPlayerDocId);
+                console.log('🚀 [DEBUG] Target player UID:', targetPlayerUid);
+
+                // 1) Try Firestore first
+                console.log('🔍 [DEBUG] Attempting Firestore query...');
+                const firestoreSessions = await fetchSessionsFromFirestore(targetPlayerUid, targetPlayerDocId);
+
+                // Filter by active tab if needed
+                const typeFilter = activeTab === 'all' ? null : KICK_TYPES[activeTab];
+                console.log('🔍 [DEBUG] Active tab:', activeTab);
+                console.log('🔍 [DEBUG] Type filter:', typeFilter);
+                
+                let filtered = firestoreSessions.filter(s => {
+                    const matches = !typeFilter || s.type === typeFilter;
+                    if (!matches) {
+                        console.log(`🔍 [DEBUG] Rejecting session ${s.id}: type '${s.type}' doesn't match filter '${typeFilter}'`);
+                    }
+                    return matches;
+                });
+
+                console.log(`🔍 [DEBUG] Firestore sessions before filtering: ${firestoreSessions.length}`);
+                console.log(`🔍 [DEBUG] Firestore sessions after filtering: ${filtered.length}`);
+
+                if (filtered.length > 0) {
+                    console.log('✅ [DEBUG] Using Firestore sessions');
+                    filtered.sort((a, b) => b.date - a.date);
+                    renderSessions(filtered);
+                    return;
+                }
+
+                console.log('🔄 [DEBUG] No Firestore sessions found for active tab, falling back to Storage enumeration');
+                
+                // 2) Fallback to Storage enumeration (existing behavior)
+                const sessions = [];
+                for (const [tabKey, kickType] of Object.entries(KICK_TYPES)) {
+                    if (activeTab !== 'all' && activeTab !== tabKey) {
+                        console.log(`🔍 [DEBUG] Skipping storage check for ${kickType} (tab: ${activeTab})`);
+                        continue;
+                    }
+
+                    console.log(`🔍 [DEBUG] Checking Storage for ${kickType} sessions...`);
+                    try {
+                        const kickTypeRef = storage.ref(`${targetPlayerDocId}/${kickType}`);
+                        const sessionFolders = await kickTypeRef.listAll();
+                        console.log(`🔍 [DEBUG] Found ${sessionFolders.prefixes.length} session folder(s) for ${kickType}`);
+
+                        for (const sessionPrefix of sessionFolders.prefixes) {
+                            try {
+                                const sessionId = sessionPrefix.name;
+                                const kickList = await sessionPrefix.listAll();
+                                // Prefer metadata numberReps from session root (more accurate) otherwise fallback to derived count
+                                let metadataNumberReps = null;
+                                let kickCount = 0;
+
+                                let sessionDate = new Date();
+                                try {
+                                    const metadataFileRef = sessionPrefix.child('metadata.json');
+                                    const metadataUrl = await metadataFileRef.getDownloadURL();
+                                    const response = await fetch(metadataUrl);
+                                    const metadata = await response.json();
+                                    if (metadata.timestamp) {
+                                        sessionDate = new Date(metadata.timestamp);
+                                    }
+                                    const mnr = Number(metadata.numberReps ?? metadata.numberKicks ?? metadata.kickCount ?? metadata.repCount ?? metadata.reps ?? metadata.kicks);
+                                    if (Number.isFinite(mnr)) metadataNumberReps = mnr;
+                                } catch (_) {
+                                    console.log(`🔍 [DEBUG] No metadata.json for session ${sessionId}, using default date`);
+                                }
+
+                                // If no authoritative metadata, infer count for deadballShot
+                                if (!Number.isFinite(metadataNumberReps)) {
+                                    if (kickType === 'deadballShot') {
+                                        // First try to count only kick-like folders
+                                        const kickFolders = kickList.prefixes.filter(p => /^(kick|k)[ _-]?\d+/i.test(p.name));
+                                        if (kickFolders.length > 0) {
+                                            kickCount = kickFolders.length;
+                                        } else {
+                                            // Infer from filenames: side_kick_N.mov/mp4 or back_kick_N.mov/mp4
+                                            const unique = new Set();
+                                            for (const it of kickList.items) {
+                                                const m = it.name.match(/(?:^|[_-])(side|back)_kick_(\d+)\.(mov|mp4)$/i);
+                                                if (m) unique.add(m[2]);
+                                            }
+                                            kickCount = unique.size > 0 ? unique.size : kickList.prefixes.length;
+                                        }
+                                    } else {
+                                        // Other types: fallback to subfolder count
+                                        kickCount = kickList.prefixes.length;
+                                    }
+                                }
+
+                                sessions.push({
+                                    id: sessionId,
+                                    type: kickType,
+                                    kickCount: Number.isFinite(metadataNumberReps) ? metadataNumberReps : kickCount,
+                                    date: sessionDate
+                                });
+                                console.log(`✅ [DEBUG] Added Storage session: ${sessionId} (${kickType}, ${kickCount} kicks, ${sessionDate})`);
+                            } catch (error) {
+                                console.error(`❌ [DEBUG] Error processing session ${sessionPrefix.name}:`, error);
+                                continue;
+                            }
+                        }
+                    } catch (error) {
+                        if (error.code === 'storage/object-not-found') {
+                            console.log(`🔍 [DEBUG] No ${kickType} sessions found for player ${targetPlayerDocId} in Storage`);
+                        } else {
+                            console.error(`❌ [DEBUG] Error loading ${kickType} sessions from Storage:`, error);
+                        }
+                    }
+                }
+
+                console.log(`🔍 [DEBUG] Storage enumeration complete: ${sessions.length} total sessions`);
+
+                if (sessions.length === 0) {
+                    console.log('❌ [DEBUG] No sessions found in either Firestore or Storage');
+                    sessionsGrid.innerHTML = `
+                        <div class="empty-state">
+                            <h3>No sessions found</h3>
+                            <p>${isViewingPlayer ? 'This player has no recorded sessions yet' : 'You have no recorded sessions yet'}</p>
+                        </div>
+                    `;
+                } else {
+                    console.log('✅ [DEBUG] Using Storage sessions');
+                    sessions.sort((a, b) => b.date - a.date);
+                    renderSessions(sessions);
+                }
+            } catch (error) {
+                console.error("❌ [DEBUG] Error loading sessions:", error);
+                sessionsGrid.innerHTML = `
+                    <div class="empty-state">
+                        <h3>Error loading sessions</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        // Render sessions to the grid
+        function renderSessions(sessions) {
+            sessionsGrid.innerHTML = '';
+
+            sessions.forEach(session => {
+                const sessionCard = document.createElement('div');
+                sessionCard.className = `session-card ${getSessionTypeClass(session.type)}`;
+                
+                const formattedDate = session.date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                // extract session number from session.id if present (e.g., "session12")
+                const sessionNumber = extractSessionNumber(session.id);
+                const dateWithSession = sessionNumber ? `Session ${sessionNumber} • ${formattedDate}` : formattedDate;
+
+                const sessionTypeName = getSessionTypeName(session.type);
+                const sessionTypeBadge = getSessionTypeBadge(session.type);
+
+                sessionCard.innerHTML = `
+                    <div class="session-date">${dateWithSession}</div>
+                    <h3 class="session-title">${sessionTypeName} Session</h3>
+                    <div class="session-stats">
+                        <div class="session-stat">
+                            <span class="stat-icon">⚽</span>
+                            <span>${session.kickCount} ${session.type === 'sprintWork' ? 'sprints' : (session.type === 'jump' ? 'jumps' : (session.type === 'freeRecord' ? 'reps' : 'kicks'))}</span>
+                        </div>
+                    </div>
+                    ${sessionTypeBadge}
+                `;
+
+                sessionCard.addEventListener('click', async () => {
+                    // Default destinations for known types
+                    let destinationPage = 'sessionsexpanded.html';
+                    if (session.type === 'freeRecord') {
+                        destinationPage = 'freeRecordPage.html';
+                    } else if (session.type === 'sprintWork' || session.type === 'sprint') {
+                        destinationPage = 'sprintPage.html';
+                    } else if (session.type === 'jump') {
+                        destinationPage = 'StaticJumpPage.html';
+                    } else if (session.type === 'side_kick') {
+                        destinationPage = 'SideKickView.html';
+                    }
+
+                    // For deadballShot, check first kick folder for side/back views
+                    if (session.type === 'deadballShot') {
+                        try {
+                            const playerDocId = isViewingPlayer ? currentPlayerInfo.docId : (currentUserInfo?.docId || null);
+                            if (playerDocId) {
+                                const baseRef = storage.ref(`${playerDocId}/deadballShot/${session.id}`);
+                                const list = await baseRef.listAll();
+                                if (list.prefixes && list.prefixes.length > 0) {
+                                    // sort kick folders naturally (kick1, kick2, ...)
+                                    const sorted = list.prefixes.sort((a,b)=>{
+                                        const na = parseInt(a.name.replace(/\D+/g,'')) || 0;
+                                        const nb = parseInt(b.name.replace(/\D+/g,'')) || 0;
+                                        return na - nb || a.name.localeCompare(b.name);
+                                    });
+                                    const firstKick = sorted[0];
+                                    const items = await firstKick.listAll();
+                                    const hasSide = items.items.some(it => /side_kick_\d+\.(mov|mp4)$/i.test(it.name));
+                                    const hasBack = items.items.some(it => /back_kick_\d+\.(mov|mp4)$/i.test(it.name));
+                                    if (hasSide) {
+                                        destinationPage = 'SideKickView.html';
+                                    } else if (hasBack) {
+                                        destinationPage = 'backKickView.html';
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('Deadball view detection failed, using default page:', err);
+                        }
+                    }
+
+                    let url = `${destinationPage}?session=${session.id}&type=${session.type}`;
+                    if (isViewingPlayer) {
+                        url += `&player=${currentPlayerInfo.docId}`;
+                    }
+                    url += `&userType=${isCoach ? 'coach' : 'player'}`;
+                    window.location.href = url;
+                });
+
+                sessionsGrid.appendChild(sessionCard);
+            });
+        }
+
+        // Helper functions - UPDATED WITH SPRINT WORK AND STATIC JUMP
+        function getSessionTypeName(type) {
+            const typeMap = {
+                'deadballShot': 'Dead Ball',
+                'freeRecord': 'Free Record',
+                'longballPass': 'Long Ball',
+                'instepPass': 'Instep Passing',
+                'sprintWork': 'Sprint Work',
+                'sprint': 'Sprint Work',
+                'jump': 'Static Jump',
+                'side_kick': 'Side Kick'
+            };
+            return typeMap[type] || 'Training';
+        }
+
+        function getSessionTypeClass(type) {
+            const typeMap = {
+                'deadballShot': 'deadball',
+                'freeRecord': 'passing',
+                'longballPass': 'longball',
+                'instepPass': 'instep',
+                'sprintWork': 'sprintwork',
+                'sprint': 'sprintwork',
+                'jump': 'sprintwork',
+                'side_kick': 'deadball'
+            };
+            return typeMap[type] || '';
+        }
+
+        function getSessionTypeBadge(type) {
+            const typeMap = {
+                'deadballShot': { class: 'deadball', text: 'Dead Ball' },
+                'freeRecord': { class: 'passing', text: 'Free Record' },
+                'longballPass': { class: 'longball', text: 'Long Ball' },
+                'instepPass': { class: 'instep', text: 'Instep Passing' },
+                'sprintWork': { class: 'sprintwork', text: 'Sprint Work' },
+                'jump': { class: 'sprintwork', text: 'Static Jump' }
+            };
+            
+            const badgeInfo = typeMap[type] || { class: '', text: 'Session' };
+            return `<span class="badge ${badgeInfo.class}">${badgeInfo.text}</span>`;
+        }
+
+        // Extract the numeric session number from storage session folder names.
+        // Handles formats like: 'session12', 'session_12', 'session-12', 'session12_extra'
+        function extractSessionNumber(sessionId) {
+            if (!sessionId || typeof sessionId !== 'string') return null;
+            // look for 'session' followed by digits
+            const m = sessionId.match(/session[_\-]?([0-9]+)/i);
+            if (m && m[1]) return parseInt(m[1], 10);
+            // fallback: look for any digits in the id
+            const digits = sessionId.match(/(\d+)/);
+            return digits ? parseInt(digits[1], 10) : null;
+        }
+    </script>
+    <!-- Reusable user badge (reads email from Firestore users/{uid}) -->
+    <script src="user-badge.js"></script>
+</body>
+</html>

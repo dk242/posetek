@@ -1,0 +1,928 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Session Details | PoseTek</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --accent-passing: #4c6a8c;
+            --accent-longballs: #8c6a4c;
+            --accent-instep: #6a4c8c;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --text-dark: #121212;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --error: #ff6b6b;
+            --warning: #ffd166;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-light);
+            background-color: var(--primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+       
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .session-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .session-title {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .session-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-muted);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.8rem;
+            background-color: var(--accent);
+            color: var(--text-light);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background-color: #56a07a;
+        }
+
+        .session-nav {
+            display: flex;
+            align-items: center;
+            gap: 1.5rem;
+            margin: 1.5rem 0;
+            width: 100%;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            background-color: var(--accent);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            font-weight: 600;
+            font-size: 0.9rem;
+            min-width: 120px;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+            background-color: #56a07a;
+        }
+
+        .nav-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            background-color: var(--secondary);
+        }
+
+        .session-counter {
+            font-weight: 500;
+            color: var(--text-muted);
+            min-width: 120px;
+            text-align: center;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .error-message {
+            color: var(--error);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .error-message h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        /* Kick List Styles */
+        .kick-list-container {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            margin-top: 2rem;
+            border: 1px solid var(--card-border);
+            backdrop-filter: blur(10px);
+        }
+
+        .kick-list-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .kick-list-title {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .kick-stats {
+            display: flex;
+            gap: 1.5rem;
+        }
+
+        .kick-stat {
+            background-color: rgba(0, 0, 0, 0.2);
+            padding: 0.8rem 1.5rem;
+            border-radius: 12px;
+            border: 1px solid var(--card-border);
+        }
+
+        .kick-stat-value {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+
+        .kick-stat-label {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .kick-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .kick-card {
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            padding: 1.5rem;
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+            cursor: pointer;
+        }
+
+        .kick-card:hover {
+            transform: translateY(-5px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+        }
+
+        .kick-id {
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            color: var(--accent);
+        }
+
+        .kick-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+            margin-top: 1rem;
+        }
+
+        .kick-detail {
+            font-size: 0.9rem;
+        }
+
+        .kick-detail-label {
+            opacity: 0.7;
+            margin-bottom: 0.2rem;
+        }
+
+        .kick-detail-value {
+            font-weight: 500;
+        }
+
+        .no-kicks {
+            text-align: center;
+            padding: 3rem;
+            grid-column: 1 / -1;
+            color: var(--text-muted);
+        }
+
+        .status-badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.8rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-success {
+            background-color: rgba(76, 140, 106, 0.2);
+            color: var(--accent);
+        }
+
+        .status-error {
+            background-color: rgba(255, 107, 107, 0.2);
+            color: var(--error);
+        }
+
+        /* Color coding for kick types */
+        .kick-card.deadball {
+            border-color: var(--accent);
+        }
+        .kick-card.deadball:hover {
+            border-color: var(--accent);
+        }
+        .kick-card.deadball .kick-id,
+        .kick-card.deadball .kick-stat-value {
+            color: var(--accent);
+        }
+
+        .kick-card.passing {
+            border-color: var(--accent-passing);
+        }
+        .kick-card.passing:hover {
+            border-color: var(--accent-passing);
+        }
+        .kick-card.passing .kick-id,
+        .kick-card.passing .kick-stat-value {
+            color: var(--accent-passing);
+        }
+
+        .kick-card.longball {
+            border-color: var(--accent-longballs);
+        }
+        .kick-card.longball:hover {
+            border-color: var(--accent-longballs);
+        }
+        .kick-card.longball .kick-id,
+        .kick-card.longball .kick-stat-value {
+            color: var(--accent-longballs);
+        }
+
+        .kick-card.instep {
+            border-color: var(--accent-instep);
+        }
+        .kick-card.instep:hover {
+            border-color: var(--accent-instep);
+        }
+        .kick-card.instep .kick-id,
+        .kick-card.instep .kick-stat-value {
+            color: var(--accent-instep);
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                padding: 1.5rem;
+            }
+            
+            .session-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .kick-list-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 1.5rem;
+            }
+
+            .kick-stats {
+                width: 100%;
+                justify-content: space-between;
+            }
+
+            .kick-stat {
+                flex: 1;
+                text-align: center;
+            }
+
+            .kick-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .nav-links {
+                gap: 1.2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <div class="logo">PoseTek</div>
+        <nav class="nav-links">
+            <a href="#" id="kickingAnalysisLink" style="display:none;">Kicking Analysis</a>
+            <a href="#" id="playerProfileLink" style="display:none;">Player Profile</a>
+            <a href="coachesview.html" id="backToPlayersLink" style="display:none;">Back to Players</a>
+            <a href="#" id="logoutBtn">Logout</a>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="session-header">
+            <div>
+                <h1 class="session-title">Session Analysis</h1>
+                <p class="session-subtitle" id="sessionSubtitle">Detailed breakdown of your training session</p>
+            </div>
+            <a href="sessions.html" class="btn" id="backToSessionsBtn">Back to Sessions</a>
+        </div>
+
+        <div class="session-nav">
+            <button id="prevSession" class="nav-btn" disabled>
+                <span>← Previous</span>
+            </button>
+            <span id="sessionCounter" class="session-counter">Session 1 of 1</span>
+            <button id="nextSession" class="nav-btn" disabled>
+                <span>Next →</span>
+            </button>
+        </div>
+
+        <!-- Kick List Container -->
+        <div class="kick-list-container">
+            <div class="kick-list-header">
+                <h2 class="kick-list-title" id="sessionTypeTitle">Kicks</h2>
+                <div class="kick-stats">
+                    <div class="kick-stat">
+                        <div class="kick-stat-value" id="totalKicks">0</div>
+                        <div class="kick-stat-label">Total Kicks</div>
+                    </div>
+                    <div class="kick-stat">
+                        <div class="kick-stat-value" id="successRate">0%</div>
+                        <div class="kick-stat-label">Success Rate</div>
+                    </div>
+                    <div class="kick-stat">
+                        <div class="kick-stat-value" id="avgSpeed">--</div>
+                        <div class="kick-stat-label">Avg Speed</div>
+                    </div>
+                    <div class="kick-stat">
+                        <div class="kick-stat-value" id="maxSpeed">--</div>
+                        <div class="kick-stat-label">Max Speed</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="kick-grid" id="kickGrid">
+                <div class="loading-container">
+                    <div class="loading"></div>
+                    <p class="loading-text">Loading kicks...</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // Global variables
+        let currentPlayerId = null;
+        let isCoach = false;
+        let allSessions = [];
+        let filteredSessions = [];
+        let currentSessionIndex = 0;
+        let currentSessionType = null;
+        let currentPlayerDocId = null;
+
+        // Check auth state and load data
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) {
+                window.location.href = 'Kickai.html';
+                return;
+            }
+
+            // Check if user is a coach
+            const coachQuery = await db.collection('coaches')
+                .where('userUID', '==', user.uid)
+                .limit(1)
+                .get();
+            
+            isCoach = !coachQuery.empty;
+
+            // Get URL parameters
+            const urlParams = new URLSearchParams(window.location.search);
+            const playerParam = urlParams.get('player');
+            const sessionId = urlParams.get('session');
+            
+            if (!sessionId) {
+                showError("Session Not Found", "No session ID provided");
+                return;
+            }
+
+            // Set up navigation based on user type
+            setupNavigation(isCoach, playerParam);
+
+            if (playerParam) {
+                // Coach viewing player data
+                currentPlayerDocId = playerParam;
+                currentPlayerId = playerParam;
+            } else {
+                // Player viewing their own data
+                currentPlayerId = user.uid;
+                
+                // Get player document ID (try both UID field names)
+                let playerQuery = await db.collection('players')
+                    .where('userUID', '==', user.uid)
+                    .limit(1)
+                    .get();
+                if (playerQuery.empty) {
+                    playerQuery = await db.collection('players')
+                        .where('authenticationUID', '==', user.uid)
+                        .limit(1)
+                        .get();
+                }
+                if (!playerQuery.empty) {
+                    currentPlayerDocId = playerQuery.docs[0].id;
+                }
+            }
+
+            // Set up UI
+            setupEventListeners();
+            loadSessionData();
+            loadSessionNavigation();
+        });
+
+        function setupNavigation(isCoach, playerParam) {
+            const logoutBtn = document.getElementById('logoutBtn');
+            const backToPlayersLink = document.getElementById('backToPlayersLink');
+            const kickingAnalysisLink = document.getElementById('kickingAnalysisLink');
+            const playerProfileLink = document.getElementById('playerProfileLink');
+
+            // Always show logout
+            logoutBtn.style.display = 'block';
+
+            if (isCoach) {
+                // Coach navigation
+                backToPlayersLink.style.display = 'block';
+                
+                if (playerParam) {
+                    // Coach viewing specific player
+                    kickingAnalysisLink.style.display = 'block';
+                    kickingAnalysisLink.href = `kickingview.html?player=${playerParam}&userType=coach`;
+                    
+                    playerProfileLink.style.display = 'block';
+                    playerProfileLink.href = `profile.html?player=${playerParam}`;
+                } else {
+                    // Coach viewing their own data (unlikely but handle it)
+                    kickingAnalysisLink.style.display = 'none';
+                    playerProfileLink.style.display = 'none';
+                }
+            } else {
+                // Player navigation
+                backToPlayersLink.style.display = 'none';
+                kickingAnalysisLink.style.display = 'block';
+                kickingAnalysisLink.href = 'kickingview.html?userType=player';
+                playerProfileLink.style.display = 'block';
+                playerProfileLink.href = 'profile.html';
+            }
+        }
+
+        function setupEventListeners() {
+            // Add this to your setupEventListeners() function
+            document.getElementById('backToSessionsBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                
+                let url = 'sessions.html';
+                if (currentPlayerDocId) {
+                    url += `?player=${currentPlayerDocId}`;
+                }
+                
+                window.location.href = url;
+            });
+            // Navigation buttons
+            document.getElementById('prevSession').addEventListener('click', () => {
+                if (currentSessionIndex > 0) {
+                    navigateToSession(allSessions[currentSessionIndex - 1].id);
+                }
+            });
+
+            document.getElementById('nextSession').addEventListener('click', () => {
+                if (currentSessionIndex < allSessions.length - 1) {
+                    navigateToSession(allSessions[currentSessionIndex + 1].id);
+                }
+            });
+
+            // Logout button
+            document.getElementById('logoutBtn').addEventListener('click', (e) => {
+                e.preventDefault();
+                auth.signOut().then(() => {
+                    window.location.href = 'Kickai.html';
+                });
+            });
+
+            // Keyboard navigation
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'ArrowLeft' && currentSessionIndex > 0) {
+                    navigateToSession(allSessions[currentSessionIndex - 1].id);
+                } else if (e.key === 'ArrowRight' && currentSessionIndex < allSessions.length - 1) {
+                    navigateToSession(allSessions[currentSessionIndex + 1].id);
+                }
+            });
+        }
+
+        function navigateToSession(sessionId) {
+            const params = new URLSearchParams(window.location.search);
+            params.set('session', sessionId);
+            
+            // Remove any existing type parameter if we have currentSessionType
+            if (currentSessionType) {
+                params.set('type', currentSessionType);
+            }
+            
+            window.location.href = `sessionsexpanded.html?${params.toString()}`;
+        }
+
+        async function loadSessionNavigation() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const sessionType = urlParams.get('type') || currentSessionType;
+                
+                // Query sessions from Firestore filtered by type
+                let sessionsQuery;
+                if (currentPlayerDocId) {
+                    sessionsQuery = await db.collection('sessions')
+                        .where('userId', '==', currentPlayerId)
+                        .where('type', '==', sessionType)
+                        .orderBy('createdAt', 'desc')
+                        .get();
+                } else {
+                    // Fallback to storage-based approach if no Firestore sessions
+                    const storagePath = currentPlayerDocId ? 
+                        `${currentPlayerDocId}/${sessionType}` : 
+                        `${currentPlayerId}/${sessionType}`;
+                    const sessionRef = storage.ref(storagePath);
+                    const sessionFolders = await sessionRef.listAll();
+                    
+                    allSessions = sessionFolders.prefixes.map(prefix => ({
+                        id: prefix.name,
+                        type: sessionType,
+                        createdAt: new Date() // Use current date as fallback
+                    }));
+                    updateSessionCounter();
+                    return;
+                }
+
+                allSessions = sessionsQuery.docs.map(doc => ({
+                    id: doc.id,
+                    type: doc.data().type,
+                    createdAt: doc.data().createdAt.toDate()
+                }));
+
+                updateSessionCounter();
+            } catch (error) {
+                console.error("Error loading session navigation:", error);
+                
+                // Fallback to storage-based approach
+                try {
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const sessionType = urlParams.get('type') || currentSessionType;
+                    const storagePath = currentPlayerDocId ? 
+                        `${currentPlayerDocId}/${sessionType}` : 
+                        `${currentPlayerId}/${sessionType}`;
+                    const sessionRef = storage.ref(storagePath);
+                    const sessionFolders = await sessionRef.listAll();
+                    
+                    allSessions = sessionFolders.prefixes.map(prefix => ({
+                        id: prefix.name,
+                        type: sessionType,
+                        createdAt: new Date() // Use current date as fallback
+                    }));
+                    updateSessionCounter();
+                } catch (fallbackError) {
+                    console.error("Fallback session loading failed:", fallbackError);
+                    allSessions = [];
+                    updateSessionCounter();
+                }
+            }
+        }
+
+        function updateSessionCounter() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session');
+            
+            currentSessionIndex = allSessions.findIndex(session => session.id === sessionId);
+            const totalSessions = allSessions.length;
+            
+            document.getElementById('sessionCounter').textContent = 
+                `Session ${currentSessionIndex + 1} of ${totalSessions}`;
+            
+            // Update button states
+            document.getElementById('prevSession').disabled = currentSessionIndex <= 0;
+            document.getElementById('nextSession').disabled = currentSessionIndex >= totalSessions - 1;
+        }
+
+        async function loadSessionData() {
+            try {
+                const urlParams = new URLSearchParams(window.location.search);
+                const sessionId = urlParams.get('session');
+                const kickType = urlParams.get('type');
+                const playerDocId = urlParams.get('player');
+
+                if (!sessionId) {
+                    throw new Error("Missing session ID in URL.");
+                }
+
+                // If type isn't in URL, try to get it from Firestore
+                currentSessionType = kickType;
+                if (!currentSessionType && allSessions.length > 0) {
+                    const currentSession = allSessions.find(s => s.id === sessionId);
+                    if (currentSession) {
+                        currentSessionType = currentSession.type;
+                    }
+                }
+
+                // Set session title with color coding
+                const typeTitles = {
+                    'deadballShot': { text: 'Dead Ball Shots', color: 'var(--accent)' },
+                    'freeRecord': { text: 'Free Record', color: 'var(--accent-passing)' },
+                    'longballPass': { text: 'Long Ball Passes', color: 'var(--accent-longballs)' },
+                    'instepPass': { text: 'Instep Passes', color: 'var(--accent-instep)' }
+                };
+
+                const titleInfo = typeTitles[currentSessionType] || { text: 'Kicks', color: 'var(--accent)' };
+                const titleElement = document.getElementById('sessionTypeTitle');
+                titleElement.textContent = titleInfo.text;
+                titleElement.style.color = titleInfo.color;
+
+                // Set subtitle with session ID
+                document.getElementById('sessionSubtitle').textContent = `Session: ${sessionId}`;
+
+                const storagePath = playerDocId ? 
+                    `${playerDocId}/${currentSessionType}/${sessionId}` : 
+                    `${currentPlayerId}/${currentSessionType}/${sessionId}`;
+
+                // Get all kick folders under this session
+                const sessionRef = storage.ref(storagePath);
+                const kickFolders = await sessionRef.listAll();
+
+                const kickGrid = document.getElementById('kickGrid');
+                kickGrid.innerHTML = '';
+
+                if (kickFolders.prefixes.length === 0) {
+                    kickGrid.innerHTML = `
+                        <div class="no-kicks">
+                            <p>No kicks found for this session</p>
+                        </div>
+                    `;
+                    return;
+                }
+
+                // Generate cards with only kick number (or placeholder info)
+                kickFolders.prefixes.forEach((kickRef, index) => {
+                    const kickId = kickRef.name;
+                    const kickCard = createKickCard({
+                        kickId: kickId,
+                        sessionId: sessionId,
+                        ballSpeed: Math.floor(Math.random() * 30) + 40,
+                        distance: Math.floor(Math.random() * 10) + 20,
+                        result: Math.random() < 0.8 ? 'success' : 'fail'
+                    });
+                    
+                    // Add color coding based on session type
+                    kickCard.classList.add(getKickTypeClass(currentSessionType));
+                    kickGrid.appendChild(kickCard);
+                });
+
+                // Update summary stats
+                document.getElementById('totalKicks').textContent = kickFolders.prefixes.length;
+                document.getElementById('successRate').textContent = 'N/A';
+                document.getElementById('avgSpeed').textContent = 'N/A';
+                document.getElementById('maxSpeed').textContent = 'N/A';
+
+            } catch (error) {
+                console.error("Error loading session data:", error);
+                showError("Loading Error", "Could not load session data. Please try again.");
+            }
+        }
+
+        function getKickTypeClass(kickType) {
+            const typeMap = {
+                'deadballShot': 'deadball',
+                'freeRecord': 'passing',
+                'longballPass': 'longball',
+                'instepPass': 'instep'
+            };
+            return typeMap[kickType] || '';
+        }
+
+        function createKickCard(kick) {
+            const card = document.createElement('div');
+            card.className = 'kick-card';
+
+            card.addEventListener('click', () => {
+                const params = new URLSearchParams(window.location.search);
+                const player = params.get('player');
+                const type = params.get('type') || currentSessionType;
+                const session = params.get('session');
+                const kickId = kick.kickId;
+
+                const url = `videopage.html?player=${encodeURIComponent(player || currentPlayerDocId)}` +
+                    `&type=${encodeURIComponent(type)}` +
+                    `&session=${encodeURIComponent(session)}` +
+                    `&kick=${encodeURIComponent(kickId)}`;
+
+                window.location.href = url;
+            });
+
+            const isSuccessful = kick.result === 'success';
+            const statusClass = isSuccessful ? 'status-success' : 'status-error';
+            const statusText = isSuccessful ? 'Successful' : 'Missed';
+
+            card.innerHTML = `
+                <div class="kick-id">${kick.kickId || '--'}</div>
+                <div class="status-badge ${statusClass}">${statusText}</div>
+                <div class="kick-details">
+                    <div class="kick-detail">
+                        <div class="kick-detail-label">Speed</div>
+                        <div class="kick-detail-value">${kick.ballSpeed ? kick.ballSpeed.toFixed(1) + ' mph' : '--'}</div>
+                    </div>
+                    <div class="kick-detail">
+                        <div class="kick-detail-label">Time</div>
+                        <div class="kick-detail-value">${kick.timestamp ? formatTime(kick.timestamp.toDate()) : '--'}</div>
+                    </div>
+                    <div class="kick-detail">
+                        <div class="kick-detail-label">Foot</div>
+                        <div class="kick-detail-value">${kick.foot || '--'}</div>
+                    </div>
+                    <div class="kick-detail">
+                        <div class="kick-detail-label">Distance</div>
+                        <div class="kick-detail-value">${kick.distance ? kick.distance + ' yds' : '--'}</div>
+                    </div>
+                </div>
+            `;
+
+            return card;
+        }
+
+        function formatDate(date) {
+            return date.toLocaleDateString('en-US', { 
+                month: 'short', 
+                day: 'numeric', 
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        function formatTime(date) {
+            return date.toLocaleTimeString('en-US', {
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+        }
+
+        function showError(title, message) {
+            const container = document.querySelector('.container');
+            container.innerHTML = `
+                <div class="error-message">
+                    <h3>${title}</h3>
+                    <p>${message}</p>
+                    <a href="sessions.html" class="btn">Back to Sessions</a>
+                </div>
+            `;
+        }
+    </script>
+    <!-- Reusable user badge (reads email from Firestore users/{uid}) -->
+    <script src="user-badge.js"></script>
+</body>
+</html>

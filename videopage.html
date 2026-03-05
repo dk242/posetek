@@ -1,0 +1,1620 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shot Analysis | PoseTek</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --text-dark: #121212;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --error: #ff6b6b;
+            --warning: #ffd166;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-light);
+            background-color: var(--primary);
+            line-height: 1.6;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.5rem 2rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(10px);
+        }
+
+        .logo {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 600;
+            letter-spacing: -0.5px;
+        }
+
+        .nav-links {
+            display: flex;
+            gap: 2rem;
+            align-items: center;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        /* User badge (populated from Firebase) */
+        .user-badge {
+            display: none; /* hidden until populated */
+            align-items: center;
+            gap: 0.6rem;
+            padding: 0.3rem 0.6rem;
+            border-radius: 999px;
+            background-color: var(--card-bg);
+            border: 1px solid var(--card-border);
+        }
+        .user-badge .avatar {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: rgba(255, 255, 255, 0.1);
+        }
+        .user-badge .user-text {
+            display: flex;
+            flex-direction: column;
+            line-height: 1.1;
+        }
+        .user-badge .user-text .name {
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        .user-badge .user-text .email {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+        }
+        @media (max-width: 480px) {
+            .user-badge .user-text .email { display: none; }
+        }
+
+        .analysis-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .analysis-title {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 2.5rem;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        .analysis-subtitle {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--text-light);
+        }
+
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.8rem 1.8rem;
+            background-color: var(--accent);
+            color: var(--text-light);
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 600;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            background-color: #56a07a;
+        }
+
+        .content-wrapper {
+            display: flex;
+            flex-direction: row;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+        }
+
+        .card:hover {
+            transform: translateY(-3px);
+            border-color: var(--accent);
+        }
+
+        .media-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .video-container {
+            background-color: rgba(0, 0, 0, 0.3);
+            border-radius: 12px;
+            overflow: hidden;
+            aspect-ratio: 16/9;
+        }
+
+        .video-player {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .data-column {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .data-section {
+            margin-bottom: 1.5rem;
+        }
+
+        .data-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            color: var(--accent);
+            border-bottom: 1px solid var(--card-border);
+            padding-bottom: 0.5rem;
+        }
+
+        .data-item {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.8rem;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .data-label {
+            font-weight: 400;
+            opacity: 0.7;
+            margin-bottom: 0.2rem;
+        }
+
+        .data-value {
+            font-weight: 500;
+        }
+
+        .tab-bar {
+            display: flex;
+            gap: 1rem;
+            margin: 1rem 0;
+        }
+
+        .tab-btn {
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-weight: 500;
+            font-family: 'Inter', sans-serif;
+            padding: 0.5rem 0;
+            cursor: pointer;
+            position: relative;
+            font-size: 0.95rem;
+            transition: var(--transition);
+        }
+
+        .tab-btn.active {
+            color: var(--accent);
+        }
+
+        .tab-btn.active::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 100%;
+            height: 3px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+        .tab-btn:hover {
+            color: var(--accent);
+        }
+
+        .tab-btn:hover::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .tab-btn:hover::after {
+            width: 100%;
+        }
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        .pose-grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        grid-template-rows: auto auto;
+        gap: 1.5rem;
+        }
+
+        .top-row {
+            grid-column: 1;
+        }
+
+        .bottom-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .bottom-row {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pose-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            padding: 1.5rem;
+            border: 1px solid var(--card-border);
+        }
+
+        .pose-card h3 {
+            color: var(--accent);
+            margin-bottom: 1rem;
+            text-align: center;
+            font-weight: 600;
+        }
+
+        .pose-analysis-container {
+        display: flex;
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+        }
+
+        .pose-analysis-container .pose-card {
+        flex: 1;
+        }
+
+        .ball-trajectory-container {
+        width: 100%;
+        }
+
+        .nav-buttons {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-top: 1rem;
+        }
+
+        .icon-btn {
+            width: 44px;
+            height: 44px;
+            border: none;
+            border-radius: 50%;
+            background-color: var(--accent);
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+            transition: var(--transition);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .icon-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
+        }
+
+        .foot-toggle {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1rem;
+            justify-content: center;
+        }
+
+        .foot-toggle label {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+        }
+
+        canvas {
+            background-color: #1a3a2e;
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            width: 100%;
+        }
+
+        .loading {
+            display: inline-block;
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(255,255,255,0.3);
+            border-radius: 50%;
+            border-top-color: var(--accent);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100%;
+            flex-direction: column;
+            gap: 1.5rem;
+        }
+
+        .loading-text {
+            margin-top: 1rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .error-message {
+            color: var(--error);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .error-message h3 {
+            margin-bottom: 1rem;
+            font-size: 1.2rem;
+        }
+
+        @media (max-width: 768px) {
+            .content-wrapper {
+                flex-direction: column;
+            }
+
+            .pose-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-bar {
+                justify-content: center;
+            }
+        }
+
+        /* Animation for refresh button */
+        .icon-btn[title="Restart"]:active {
+            animation: spin 0.3s linear;
+        }
+    </style>
+</head>
+<body>
+    <header>
+    <div class="logo">PoseTek</div>
+        <nav class="nav-links">
+            <a href="#" id="backToSessionsLink">Back to Session</a>
+            <a href="#" id="profileLink">Profile</a>
+            <a href="coachesview.html" id="backToPlayersLink" style="display:none;">Back to Players</a>
+            <div id="userBadge" class="user-badge">
+                <img id="userAvatar" class="avatar" alt="avatar" />
+                <div class="user-text">
+                    <span id="userName" class="name"></span>
+                    <span id="userEmail" class="email"></span>
+                </div>
+            </div>
+        </nav>
+    </header>
+
+    <div class="container">
+        <div class="analysis-header">
+            <h1 class="analysis-title">Shot Analysis</h1>
+            <p class="analysis-subtitle" id="shotDetails">Loading shot data...</p>
+            <div class="tab-bar">
+                <button class="tab-btn active" data-tab="realTab">Real</button>
+                <button class="tab-btn" data-tab="poseTab">Pose Analysis</button>
+            </div>
+        </div>
+
+        <div id="realTab" class="tab-content active">
+            <div class="content-wrapper">
+                <div class="media-column card">
+                    <div class="video-container">
+                        <video class="video-player" id="analysisVideo" controls>
+                            Your browser does not support the video tag.
+                        </video>
+                    </div>
+                    <div class="video-contact-frame">
+                        <canvas id="contactCanvas" width="480" height="270" style="display: none;"></canvas>
+                        <img id="contactFrameImg" alt="Contact Frame" style="width: 100%; border-radius: 12px; margin-top: 1rem;">
+                    </div>
+                </div>
+
+                <div class="data-column card">
+                    <div class="data-section">
+                        <h3 class="data-title">Shot Metrics</h3>
+                        <div class="data-item">
+                            <span class="data-label">Result:</span>
+                            <span class="data-value" id="shotResult">--</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Speed:</span>
+                            <span class="data-value" id="shotSpeed">-- mph</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Accuracy:</span>
+                            <span class="data-value" id="shotAccuracy">--%</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Power:</span>
+                            <span class="data-value" id="shotPower">--</span>
+                        </div>
+                    </div>
+
+                    <div class="data-section">
+                        <h3 class="data-title">Biomechanical Data</h3>
+                        <div class="data-item">
+                            <span class="data-label">Approach Angle:</span>
+                            <span class="data-value" id="approachAngle">--°</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Plant Foot Position:</span>
+                            <span class="data-value" id="plantFoot">--</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Kicking Leg Flexion:</span>
+                            <span class="data-value" id="legFlexion">--°</span>
+                        </div>
+                        <div class="data-item">
+                            <span class="data-label">Follow Through:</span>
+                            <span class="data-value" id="followThrough">--</span>
+                        </div>
+                    </div>
+
+                    <div class="data-section">
+                        <h3 class="data-title">Recommendations</h3>
+                        <div id="recommendations">
+                            <p>Loading analysis recommendations...</p>
+                        </div>
+                    </div>
+
+                    <button class="btn" id="backBtn">Back to Session</button>
+                </div>
+            </div>
+        </div>
+
+        <div id="poseTab" class="tab-content">
+            <div class="card">
+                <!-- Top row: skeleton + biomech side-by-side -->
+                <div class="pose-analysis-container">
+                <!-- Skeleton view -->
+                <div class="pose-card">
+                    <h3>Skeleton View</h3>
+                    <canvas id="poseRight" width="480" height="360"></canvas>
+
+                    <div class="nav-buttons">
+                    <button id="refreshRight" class="icon-btn" title="Restart">↻</button>
+                    <button id="prevRight" class="icon-btn" title="Previous">←</button>
+                    <button id="playPauseRight" class="icon-btn" title="Play/Pause">▶</button>
+                    <button id="nextRight" class="icon-btn" title="Next">→</button>
+                    <button id="contactRight" class="btn">To Contact Frame</button>
+                    <button id="resetPoseView" class="btn">Reset View</button>
+                    <button id="zoomOutRight" class="icon-btn" title="Zoom Out">–</button>
+                    <button id="zoomInRight"  class="icon-btn" title="Zoom In">+</button>
+                    <button id="speedDownRight" class="icon-btn" title="Slower">🐢</button>
+                    <button id="speedUpRight"   class="icon-btn" title="Faster">🐇</button>
+                    </div>
+
+                    <div class="foot-toggle">
+                    <label>
+                        <input type="checkbox" id="showLeftFoot" checked> Left Foot
+                    </label>
+                    <label>
+                        <input type="checkbox" id="showRightFoot" checked> Right Foot
+                    </label>
+                    </div>
+
+                    <select id="overlayKickSelect" class="btn" style="margin-top: 1rem; width: 100%;">
+                    <option value="none">No Overlay</option>
+                    </select>
+                </div>
+
+                <!-- Biomechanical analysis -->
+                <div class="pose-card">
+                    <h3>Biomechanical Analysis</h3>
+                    <canvas id="flexionCanvas" width="600" height="500"></canvas>
+                    <div class="nav-buttons">
+                    <button id="kneeFlexionBtn" class="btn">Knee Flexion</button>
+                    <button id="ankleAngleBtn" class="btn">Ankle Angle</button>
+                    <button id="hipRotationBtn" class="btn">Hip Rotation</button>
+                    </div>
+                </div>
+                </div>
+
+                <!-- Bottom row: ball trajectory -->
+                <div class="ball-trajectory-container">
+                <div class="pose-card">
+                    <h3>Ball Trajectory</h3>
+                    <canvas id="ballCanvas" width="480" height="360"></canvas>
+                    <div class="nav-buttons">
+                    <button id="refreshBall" class="icon-btn" title="Restart">↻</button>
+                    <button id="prevBall" class="icon-btn" title="Previous">←</button>
+                    <button id="playPauseBall" class="icon-btn" title="Play/Pause">▶</button>
+                    <button id="nextBall" class="icon-btn" title="Next">→</button>
+                    <button id="contactBall" class="btn">To Contact Frame</button>
+                    </div>
+                </div>
+                </div>
+            </div>
+            </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const storage = firebase.storage();
+        const db = firebase.firestore();
+
+        // Development mode check
+        const isDevelopment = window.location.hostname === "localhost" || 
+                            window.location.hostname === "127.0.0.1";
+
+        // Animation control variables
+        let isPlayingRight = false;
+        let isPlayingBall = false;
+        let animationIntervalRight = null;
+        let animationIntervalBall = null;
+        const FPS = 30; // Target frame rate
+
+        let zoomCounter = 0;
+        const MAX_ZOOM    = 5;
+        const ZOOM_BASE   = 1.05;
+
+        // playback speed controls
+        let frameDelay = 100;       // ms between automatic frame steps
+        const MIN_DELAY   = 20;     // fastest (50 fps)
+        const MAX_DELAY   = 1000;   // slowest (1 fps)
+        const DELAY_STEP  = 20;     // change per click
+
+        let poseData = [];
+        let currentFrameRight = 25;
+        let CONTACT_FRAME = 70;
+        const CANVAS_W = 480;          // canvas / video width  (px)
+        const CANVAS_H = 360;          // canvas / video height (px)
+
+        let ballTraj = null;
+        let ballFrameIndex = 0;
+        const ballCanvas = document.getElementById("ballCanvas");
+        const ballCtx = ballCanvas.getContext("2d");
+
+        /* placeholders for interactive view controls */
+        let panX = 0, panY = 0;
+        let scaleX = 1.0, scaleY = 1.0;
+
+        let maxTrailLength = 30; // How many frames to show in trail
+        let currentLeftTrail = [];
+        let currentRightTrail = [];
+        let currentBallTrail = [];
+        let ballCenter = null;          
+        let ballRadius = 0;             
+        let showLeftFoot = true;
+        let showRightFoot = true;
+        let fastForwardInterval = null;
+        let fastForwardDirection = 0;
+
+        // player comparison variables
+        let overlayPoseData = null;
+        let overlayBallCenter = null;
+        let overlayContactFrame = null;
+        let frameOffset = null;
+        let alignmentX = 0;
+        let alignmentY = 0;
+        let overlayScale = 1;
+
+        let currentHighlight = null;
+
+        // Pose connections for visualization
+        const POSE_CONNECTIONS = [
+            [11, 12], [12, 24], [24, 23], [23, 11],
+            [11, 13], [13, 15], [15, 17], [15, 19], [15, 21], [17, 19],
+            [12, 14], [14, 16], [16, 18], [16, 20], [16, 22], [18, 20],
+            [23, 25], [25, 27], [27, 29], [27, 31], [29, 31],
+            [24, 26], [26, 28], [28, 30], [28, 32], [30, 32]
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            // DOM elements
+            const analysisVideo = document.getElementById('analysisVideo');
+            const shotDetails = document.getElementById('shotDetails');
+            const profileLink = document.getElementById('profileLink');
+            const backBtn = document.getElementById('backBtn');
+            const backToSessionsLink = document.getElementById('backToSessionsLink');
+            
+            // Data elements
+            const shotResult = document.getElementById('shotResult');
+            const shotSpeed = document.getElementById('shotSpeed');
+            const shotAccuracy = document.getElementById('shotAccuracy');
+            const shotPower = document.getElementById('shotPower');
+            const approachAngle = document.getElementById('approachAngle');
+            const plantFoot = document.getElementById('plantFoot');
+            const legFlexion = document.getElementById('legFlexion');
+            const followThrough = document.getElementById('followThrough');
+            const recommendations = document.getElementById('recommendations');
+
+            // Get session and kick IDs from URL
+            const urlParams = new URLSearchParams(window.location.search);
+            const sessionId = urlParams.get('session');
+            const kickId = urlParams.get('kick');
+            const playerId = urlParams.get('player');
+            const type = urlParams.get('type');
+
+            if (!sessionId || !kickId) {
+                showError("Invalid URL parameters", "Missing session or kick ID");
+                return;
+            }
+
+            // Check authentication state
+            auth.onAuthStateChanged(async (user) => {
+                if (!user && !isDevelopment) {
+                    window.location.href = 'Kickai.html';
+                    return;
+                }
+
+                if (user) {
+                    // Populate user badge (Auth + optional Firestore profile)
+                    try {
+                        await populateUserBadge(user);
+                    } catch (e) {
+                        console.warn('Could not populate user badge:', e);
+                    }
+
+                    // Check if user is a coach
+                    const coachQuery = await db.collection('coaches')
+                        .where('userUID', '==', user.uid)
+                        .limit(1)
+                        .get();
+                    
+                    const isCoach = !coachQuery.empty;
+                    const isViewingPlayer = !!playerId && isCoach;
+
+                    // Set up navigation links
+                    setupNavigation(isCoach, isViewingPlayer, playerId, type, sessionId);
+
+                    try {
+                        console.info("trying to load the shot data")
+                        await loadShotData(playerId, type, sessionId, kickId);
+                        console.info("successfully loaded the shot info")
+                        await initPlots(playerId, type, sessionId, kickId);
+                        console.info("successfully initialized the plots.")
+                        await loadAndPlotAngles(playerId, type, sessionId, kickId);
+                        console.info("loadandplotangles succeeded")
+                        await populateOverlayKickDropdown(playerId, type, sessionId, kickId);
+                        console.info("getting thru these functions!")
+
+                        document.getElementById('overlayKickSelect').addEventListener('change', async (e) => {
+                            const selectedKickId = e.target.value;
+                            if (selectedKickId === "none") {
+                                overlayPoseData = null;
+                                drawPoseGeneric('poseRight', currentFrameRight, true);
+                                return;
+                            }
+
+                            try {
+                                // Load overlay pose data
+                                const overlayPoseRef = storage.ref(`${playerId}/${type}/${sessionId}/${selectedKickId}/pose.json`);
+                                const overlayUrl = await overlayPoseRef.getDownloadURL();
+                                overlayPoseData = await (await fetch(overlayUrl)).json();
+
+                                // Load overlay pose data
+                                const overlayContactFrameRef = storage.ref(`${playerId}/${type}/${sessionId}/${selectedKickId}/contact_frame.json`);
+                                const contactFrameUrl = await overlayContactFrameRef.getDownloadURL();
+                                overlayContactFrame = await (await fetch(contactFrameUrl)).json();
+                                frameOffset = CONTACT_FRAME - overlayContactFrame[0];
+                                console.log(`overlay contact frame is: ${overlayContactFrame}`);
+                                console.log(`frame offset is: ${frameOffset}`);
+
+                                // Compute alignment using ball centers
+                                await computeOverlayAlignment(playerId, type, sessionId, selectedKickId, ballCenter, ballRadius);
+                                drawPoseGeneric('poseRight', currentFrameRight, true);
+                            } catch (err) {
+                                console.error("Failed to load overlay pose or alignment:", err);
+                                overlayPoseData = null;
+                            }
+                        });
+                    } catch (error) {
+                        console.error("Error loading shot data:", error);
+                        showError("Loading Error", "Failed to load shot data.");
+                    }
+                }
+            });
+            async function populateUserBadge(user) {
+                const badge = document.getElementById('userBadge');
+                if (!badge) return;
+
+                let name = user?.displayName || (user?.email ? user.email.split('@')[0] : '');
+                let email = user?.email || '';
+                let photo = user?.photoURL || '';
+
+                // Try Firestore users/{uid} for enriched profile
+                try {
+                    const userDoc = await db.collection('users').doc(user.uid).get();
+                    if (userDoc.exists) {
+                        const data = userDoc.data();
+                        name = data.displayName || data.fullName || name;
+                        email = data.email || email;
+                        photo = data.photoURL || data.avatarUrl || photo;
+                    }
+                } catch (err) {
+                    // Non-fatal; fall back to Auth fields
+                    console.debug('No Firestore user profile or failed to fetch:', err);
+                }
+
+                const nameEl = document.getElementById('userName');
+                const emailEl = document.getElementById('userEmail');
+                const avatarEl = document.getElementById('userAvatar');
+
+                if (nameEl) nameEl.textContent = name || 'Signed In';
+                if (emailEl) emailEl.textContent = email || '';
+                if (avatarEl) {
+                    if (photo) {
+                        avatarEl.src = photo;
+                        avatarEl.style.display = 'block';
+                    } else {
+                        avatarEl.style.display = 'none';
+                    }
+                }
+                badge.style.display = 'flex';
+            }
+             function setupNavigation(isCoach, isViewingPlayer, playerId, type, sessionId) {
+                const profileLink = document.getElementById('profileLink');
+                const backToSessionsLink = document.getElementById('backToSessionsLink');
+                const backToPlayersLink = document.getElementById('backToPlayersLink');
+                const backBtn = document.getElementById('backBtn');
+
+                // Set back to sessions link
+                let backUrl = `sessionsexpanded.html?session=${sessionId}`;
+                if (type) backUrl += `&type=${type}`;
+                if (playerId) backUrl += `&player=${playerId}`;
+
+                backToSessionsLink.href = backUrl;
+                backBtn.href = backUrl;
+
+                // Set profile link based on context
+                if (isViewingPlayer) {
+                    profileLink.textContent = 'Player Profile';
+                    profileLink.href = `profile.html?player=${playerId}`;
+                    backToPlayersLink.style.display = 'block';
+                } else {
+                    profileLink.textContent = 'Profile';
+                    profileLink.href = 'profile.html';
+                    backToPlayersLink.style.display = 'none';
+                    
+                    // For players, profile link is logout
+                    if (!isCoach) {
+                        profileLink.textContent = 'Logout';
+                        profileLink.addEventListener('click', (e) => {
+                            e.preventDefault();
+                            auth.signOut().then(() => {
+                                window.location.href = 'Kickai.html';
+                            });
+                        });
+                    }
+                }
+            }
+
+            // Load shot data from Firebase
+            async function loadShotData(player, type, sessionId, kickId) {
+                shotDetails.textContent = "Loading shot data...";
+                
+                try {
+                    // 1. Point at the kick’s folder
+                    const folderRef = storage.ref(`${playerId}/${type}/${sessionId}/${kickId}`);
+
+                    // 2. List everything in it
+                    const listResult = await folderRef.listAll();
+
+                    // 3. Find the single .mov entry
+                    const movRef = listResult.items.find(item => item.name.toLowerCase().endsWith('.mov'));
+                    console.info(`video path in loadshot: ${movRef.fullPath}`)
+                    if (!movRef) {
+                        throw new Error('No .mov video found in that kick folder');
+                    }
+                    // Load video
+                    const videoRef = storage.ref(movRef.fullPath);
+                    const videoUrl = await videoRef.getDownloadURL();
+                    analysisVideo.src = videoUrl;
+                    
+                    // Try to load contact frame image
+                    try {
+                        const imageRef = storage.ref(`${player}/${type}/${sessionId}/${kickId}/contact_frame_visualization.png`);
+                        const imageUrl = await imageRef.getDownloadURL();
+                        document.getElementById('contactFrameImg').src = imageUrl;
+                    } catch (err) {
+                        console.warn("Contact frame image not available:", err);
+                        document.getElementById('contactFrameImg').alt = "Contact frame not available.";
+                    }
+                    updateShotUI({});
+                } catch (error) {
+                    console.error("Error loading shot:", error);
+                    showError("Video Error", "Could not load shot video.");
+                }
+            }
+
+            // Update UI with shot data
+            function updateShotUI(data) {
+                const isScored = !kickId.includes('missed');
+                const shotNumber = kickId.replace('kick', '').replace('_missed', '');
+                
+                shotDetails.textContent = `Session ${sessionId.replace('session', '')}, Kick ${shotNumber}`;
+                shotResult.textContent = isScored ? 'Scored' : 'Missed';
+                shotResult.style.color = isScored ? '#4c8c6a' : '#ff6b6b';
+                
+                // Shot metrics
+                shotSpeed.textContent = data.speed ? `${data.speed.toFixed(1)} mph` : '-- mph';
+                shotAccuracy.textContent = data.accuracy ? `${data.accuracy}%` : '--%';
+                shotPower.textContent = data.power ? data.power : '--';
+                
+                // Biomechanical data
+                approachAngle.textContent = data.approach_angle ? `${data.approach_angle}°` : '--°';
+                plantFoot.textContent = data.plant_foot ? `${data.plant_foot} cm from ball` : '--';
+                legFlexion.textContent = data.leg_flexion ? `${data.leg_flexion}°` : '--°';
+                followThrough.textContent = data.follow_through ? data.follow_through : '--';
+                
+                // Generate recommendations
+                generateRecommendations(data, isScored);
+            }
+
+            // Generate dynamic recommendations
+            function generateRecommendations(data, isScored) {
+                let recs = [];
+                
+                if (!isScored) {
+                    recs.push("Focus on keeping your head down during contact");
+                    recs.push("Try planting your foot slightly closer to the ball");
+                }
+                
+                if (data?.approach_angle && data.approach_angle < 30) {
+                    recs.push("Consider a more angled approach for better power transfer");
+                }
+                
+                if (data?.leg_flexion && data.leg_flexion < 120) {
+                    recs.push("Increase knee flexion for more powerful strikes");
+                }
+                
+                if (recs.length === 0) {
+                    recs.push("Great technique! Maintain this form for consistent results");
+                }
+                
+                recommendations.innerHTML = recs.map(rec => 
+                    `<p>• ${rec}</p>`
+                ).join('');
+            }
+
+            // Show error message
+            function showError(title, message) {
+                const container = document.querySelector('.container');
+                container.innerHTML = `
+                    <div class="error-message">
+                        <h3>${title}</h3>
+                        <p>${message}</p>
+                        <a href="sessions.html" class="btn">Back to Sessions</a>
+                    </div>
+                `;
+            }
+        });
+
+        // Pose visualization functions
+        function drawPoseGeneric(canvasId, frameIdx, flipX) {
+            if (!poseData.length) return;
+            const frame = poseData[frameIdx];
+            if (!frame) return;
+
+            console.info("Looking for canvas #", canvasId, "->", document.querySelectorAll("canvas"));
+
+            const canvas = document.getElementById(canvasId);
+            console.info(`here is the canvas: ${canvas}`)
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width;
+            const H = canvas.height;
+
+            /* Clear and draw background */
+            ctx.clearRect(0,0,W,H);
+            ctx.fillStyle = '#1a3a2e'; 
+            ctx.fillRect(0,0,W,H);
+
+            /* Draw grid */
+            ctx.strokeStyle = 'rgba(76,140,106,0.2)'; 
+            ctx.lineWidth = 0.5;
+            for(let i=0;i<=10;i++){
+                const x = i*(W/10), y = i*(H/10);
+                ctx.moveTo(x,0);   ctx.lineTo(x,H); ctx.stroke();
+                ctx.moveTo(0,y);   ctx.lineTo(W,y); ctx.stroke();
+            }
+            if (zoomCounter === 0) {
+                // full view
+                minX = 0;  maxX = 1;
+                minY = 0;  maxY = 1;
+            } else {
+                // 1) get the raw pose bounds
+                let rawMinX = Infinity, rawMaxX = -Infinity;
+                let rawMinY = Infinity, rawMaxY = -Infinity;
+                for (const p of frame) {
+                    if (!p) continue;
+                    rawMinX = Math.min(rawMinX, p[0]);
+                    rawMaxX = Math.max(rawMaxX, p[0]);
+                    rawMinY = Math.min(rawMinY, p[1]);
+                    rawMaxY = Math.max(rawMaxY, p[1]);
+                }
+
+                // 2) compute centered, zoom-scaled window
+                const cx = (rawMinX + rawMaxX) / 2;
+                const cy = (rawMinY + rawMaxY) / 2;
+                const w  = rawMaxX - rawMinX;
+                const h  = rawMaxY - rawMinY;
+
+                const factor = Math.pow(ZOOM_BASE, zoomCounter); 
+                const halfW  = (w / factor) / 2;
+                const halfH  = (h / factor) / 2;
+
+                minX = cx - halfW;
+                maxX = cx + halfW;
+                minY = cy - halfH;
+                maxY = cy + halfH;
+            }
+            
+            // Calculate scale to fit pose in canvas with some padding
+            const padding = 20;
+            const scaleX = (W - padding * 2) / (maxX - minX);
+            const scaleY = (H - padding * 2) / (maxY - minY);
+            const scale = Math.min(scaleX, scaleY);
+            
+            // Calculate offset to center the pose
+            const offsetX = (W - (maxX - minX) * scale) / 2 - minX * scale;
+            const offsetY = (H - (maxY - minY) * scale) / 2 - minY * scale;
+
+            /* Draw the ball */
+            if (ballCenter) {
+                ctx.beginPath();
+                ctx.arc(
+                    (ballCenter.x) * scale + offsetX, 
+                    (ballCenter.y) * scale + offsetY, 
+                    ballRadius * scale, 
+                    0, 2 * Math.PI
+                );
+                ctx.strokeStyle = '#ff0000';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+                ctx.fillStyle = 'rgba(255, 0, 0, 0.25)';
+                ctx.fill();
+            }
+
+            /* Track foot positions */
+            if (frame[31] && frame[32]) { // Left and right foot toes
+                // Add current positions to trails
+                currentLeftTrail.push({
+                    x: ((flipX ? frame[31][0] : W - frame[31][0]) - panX) * scaleX,
+                    y: (frame[31][1] - panY) * scaleY
+                });
+                currentRightTrail.push({
+                    x: ((flipX ? frame[32][0] : W - frame[32][0]) - panX) * scaleX,
+                    y: (frame[32][1] - panY) * scaleY
+                });
+                        
+                // Limit trail length
+                if (currentLeftTrail.length > maxTrailLength) currentLeftTrail.shift();
+                if (currentRightTrail.length > maxTrailLength) currentRightTrail.shift();
+            }
+
+            /* Draw foot trails BEHIND current position */
+            if (showLeftFoot && currentLeftTrail.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(currentLeftTrail[0].x, currentLeftTrail[0].y);
+                for (let i = 1; i < currentLeftTrail.length; i++) {
+                    ctx.lineTo(currentLeftTrail[i].x, currentLeftTrail[i].y);
+                }
+                ctx.strokeStyle = 'rgba(255, 0, 0, 0.7)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+
+            if (showRightFoot && currentRightTrail.length > 1) {
+                ctx.beginPath();
+                ctx.moveTo(currentRightTrail[0].x, currentRightTrail[0].y);
+                for (let i = 1; i < currentRightTrail.length; i++) {
+                    ctx.lineTo(currentRightTrail[i].x, currentRightTrail[i].y);
+                }
+                ctx.strokeStyle = 'rgba(0, 255, 255, 0.7)';
+                ctx.lineWidth = 3;
+                ctx.stroke();
+            }
+
+            for (const [s, e] of POSE_CONNECTIONS) {
+                const p1 = frame[s], p2 = frame[e]; 
+                if (!p1 || !p2) continue;
+                const x1 = p1[0] * scale + offsetX;
+                const y1 = p1[1] * scale + offsetY;
+                const x2 = p2[0] * scale + offsetX;
+                const y2 = p2[1] * scale + offsetY;
+                ctx.beginPath(); 
+                ctx.moveTo(x1, y1); 
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = '#ffffff'; 
+                ctx.lineWidth = 5.5; 
+                ctx.stroke();
+            }
+
+            /* key-points */
+            for (const p of frame) {
+                if (!p) continue;
+                const x = p[0] * scale + offsetX;
+                const y = p[1] * scale + offsetY;
+                ctx.beginPath(); 
+                ctx.arc(x, y, 4, 0, 2 * Math.PI);
+                ctx.fillStyle = '#00ff66'; 
+                ctx.fill();
+            }
+
+            const overlayFrameIdx = frameIdx - frameOffset;
+            console.log(`overlayFrameIdx: ${overlayFrameIdx}`)
+            /* Overlay drawing would need similar coordinate transformation */
+            if (overlayPoseData && overlayPoseData.length > overlayFrameIdx && overlayBallCenter && overlayFrameIdx > 0) {
+                drawOverlayPose(ctx, overlayPoseData[overlayFrameIdx], scale, offsetX, offsetY);
+            }
+        }
+
+        function drawOverlayPose(ctx, frame, scale, offsetX, offsetY) {
+            for (const [s, e] of POSE_CONNECTIONS) {
+                const p1 = frame[s], p2 = frame[e]; 
+                if (!p1 || !p2) continue;
+                const x1 = p1[0] * scale + offsetX;
+                const y1 = p1[1] * scale + offsetY;
+                const x2 = p2[0] * scale + offsetX;
+                const y2 = p2[1] * scale + offsetY;
+                ctx.beginPath(); 
+                ctx.moveTo(x1, y1); 
+                ctx.lineTo(x2, y2);
+                ctx.strokeStyle = '#ffaa00';
+                ctx.lineWidth = 3.5;
+                ctx.stroke();
+            }
+
+            for (const p of frame) {
+                if (!p) continue;
+                const x = p[0] * scale + offsetX;
+                const y = p[1] * scale + offsetY;
+                ctx.beginPath(); 
+                ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                ctx.fillStyle = '#ffaa00';
+                ctx.fill();
+            }
+        }
+
+        async function initPlots(player, type, sessionId, kickId) {
+            try {
+                // Load pose data
+                const poseRef = storage.ref(`${player}/${type}/${sessionId}/${kickId}/pose.json`);
+                const poseUrl = await poseRef.getDownloadURL();
+                poseData = await (await fetch(poseUrl)).json();
+                
+                // try to Load ball data
+                try{
+                    const ballRef = storage.ref(`${player}/${type}/${sessionId}/${kickId}/orig_ball.json`);
+                    const ballUrl = await ballRef.getDownloadURL();
+                    const [x1, y1, x2, y2] = await (await fetch(ballUrl)).json();
+                    
+                    const w = Math.abs(x2 - x1), h = Math.abs(y2 - y1);
+                    const d = (w + h) / 2;
+                    ballCenter = { x: (x1 + x2) / 2, y: (y1 + y2) / 2 };
+                    ballRadius = d / 2;
+                } catch (err) {
+                    console.log("ball doesn't exist.")
+                }
+
+                try {
+                    const contactRef = storage.ref(`${player}/${type}/${sessionId}/${kickId}/contact_frame.json`);
+                    const contactUrl = await contactRef.getDownloadURL();
+                    const contactList = await (await fetch(contactUrl)).json();
+                    if (Array.isArray(contactList) && contactList.length > 0) {
+                        CONTACT_FRAME = contactList[0];
+                        console.info(`Loaded contact frame: ${CONTACT_FRAME}`);
+                    } else {
+                        console.warn("contact_frame.json is malformed or empty.");
+                    }
+                } catch (err) {
+                    console.warn("contact_frame.json not found. Using default:", CONTACT_FRAME);
+                }
+
+                // Try to load ball trajectory
+                try {
+                    const ballTrajRef = storage.ref(`${player}/${type}/${sessionId}/${kickId}/ball_traj.json`);
+                    const ballTrajUrl = await ballTrajRef.getDownloadURL();
+                    ballTraj = await (await fetch(ballTrajUrl)).json();
+                } catch (err) {
+                    console.log("Ball trajectory data not available");
+                }
+
+                // Initialize UI controls
+                currentFrameRight = Math.min(currentFrameRight, poseData.length - 1);
+                drawPoseGeneric('poseRight', currentFrameRight, true);
+
+                // Navigation bindings
+                const prevRight = document.getElementById('prevRight');
+                const nextRight = document.getElementById('nextRight');
+                const contactRight = document.getElementById('contactRight');
+                const showLeftCheckbox = document.getElementById('showLeftFoot');
+                const showRightCheckbox = document.getElementById('showRightFoot');
+
+                prevRight.onmousedown = () => {
+                    fastForwardDirection = -1;
+                    fastForwardInterval = setInterval(() => {
+                        currentFrameRight = Math.max(0, currentFrameRight - 1);
+                        drawPoseGeneric('poseRight', currentFrameRight, true);
+                    }, 100);
+                };
+
+                nextRight.onmousedown = () => {
+                    fastForwardDirection = 1;
+                    fastForwardInterval = setInterval(() => {
+                        currentFrameRight = Math.min(poseData.length - 1, currentFrameRight + 1);
+                        drawPoseGeneric('poseRight', currentFrameRight, true);
+                    }, 100);
+                };
+
+                const stopFastForward = () => {
+                    if (fastForwardInterval) {
+                        clearInterval(fastForwardInterval);
+                        fastForwardInterval = null;
+                        fastForwardDirection = 0;
+                    }
+                };
+
+                prevRight.onmouseup = stopFastForward;
+                prevRight.onmouseleave = stopFastForward;
+                nextRight.onmouseup = stopFastForward;
+                nextRight.onmouseleave = stopFastForward;
+
+                prevRight.onclick = () => {
+                    if (fastForwardDirection === 0) {
+                        currentFrameRight = Math.max(0, currentFrameRight - 1);
+                        drawPoseGeneric('poseRight', currentFrameRight, true);
+                    }
+                };
+
+                nextRight.onclick = () => {
+                    if (fastForwardDirection === 0) {
+                        currentFrameRight = Math.min(poseData.length - 1, currentFrameRight + 1);
+                        drawPoseGeneric('poseRight', currentFrameRight, true);
+                    }
+                };
+
+                contactRight.onclick = () => {
+                    currentFrameRight = Math.min(poseData.length - 1, CONTACT_FRAME);
+                    drawPoseGeneric('poseRight', currentFrameRight, true);
+                };
+
+                showLeftCheckbox.onchange = () => {
+                    showLeftFoot = showLeftCheckbox.checked;
+                    drawPoseGeneric('poseRight', currentFrameRight, true);
+                };
+
+                showRightCheckbox.onchange = () => {
+                    showRightFoot = showRightCheckbox.checked;
+                    drawPoseGeneric('poseRight', currentFrameRight, true);
+                };
+
+                // Ball trajectory controls
+                if (ballTraj) {
+                    drawBallFrame(0);
+                    
+                    const prevBall = document.getElementById('prevBall');
+                    const nextBall = document.getElementById('nextBall');
+                    const contactBall = document.getElementById('contactBall');
+
+                    prevBall.onclick = () => stepBallFrame(-1);
+                    nextBall.onclick = () => stepBallFrame(1);
+                    contactBall.onclick = () => {
+                        ballFrameIndex = Math.min(CONTACT_FRAME, ballTraj.x_positions.length - 1);
+                        drawBallFrame(ballFrameIndex);
+                    };
+                }
+
+                // Reset view button
+                document.getElementById('resetPoseView').addEventListener('click', () => {
+                    panX = 0;
+                    panY = 0;
+                    scaleX = 1.0;
+                    scaleY = 1.0;
+                    currentFrameRight = 0;
+                    drawPoseGeneric('poseRight', currentFrameRight, true);
+                });
+
+                document.getElementById('zoomInRight').addEventListener('click', () => {
+                    zoomCounter = Math.min(MAX_ZOOM, zoomCounter + 1);
+                    drawPoseGeneric('poseRight', currentFrameRight, true);
+                });
+                    document.getElementById('zoomOutRight').addEventListener('click', () => {
+                    zoomCounter = Math.max(0, zoomCounter - 1);
+                    drawPoseGeneric('poseRight', currentFrameRight, true);
+                });
+
+                document.getElementById('speedUpRight').addEventListener('click', () => {
+                    frameDelay = Math.max(MIN_DELAY, frameDelay - DELAY_STEP);
+                    console.log(`New frame delay: ${frameDelay} ms`);
+                });
+                    document.getElementById('speedDownRight').addEventListener('click', () => {
+                    frameDelay = Math.min(MAX_DELAY, frameDelay + DELAY_STEP);
+                    console.log(`New frame delay: ${frameDelay} ms`);
+                });
+
+                // Play/Pause buttons
+                document.getElementById('playPauseRight').addEventListener('click', togglePlayPauseRight);
+                document.getElementById('playPauseBall').addEventListener('click', togglePlayPauseBall);
+
+                // Refresh buttons
+                document.getElementById('refreshRight').addEventListener('click', resetSkeletonAnimation);
+                document.getElementById('refreshBall').addEventListener('click', resetBallAnimation);
+
+                // Biomechanical analysis buttons
+                document.getElementById("kneeFlexionBtn").addEventListener("click", () => {
+                    currentHighlight = 'knee';
+                    loadAndPlotAngles(player, type, sessionId, kickId);
+                });
+                document.getElementById("ankleAngleBtn").addEventListener("click", () => {
+                    currentHighlight = 'ankle';
+                    loadAndPlotAngles(player, type, sessionId, kickId);
+                });
+                document.getElementById("hipRotationBtn").addEventListener("click", () => {
+                    currentHighlight = 'hip';
+                    loadAndPlotAngles(player, type, sessionId, kickId);
+                });
+
+            } catch (err) {
+                console.error('Error initializing pose visualization:', err);
+            }
+        }
+
+        function drawBallFrame(frameIdx) {
+            if (!ballTraj || frameIdx < 0 || frameIdx >= ballTraj.x_positions.length) return;
+
+            const W = 480;
+            const H = 360;
+
+            /* Clear and draw background */
+            ballCtx.clearRect(0,0,W,H);
+            ballCtx.fillStyle = '#1a3a2e'; 
+            ballCtx.fillRect(0,0,W,H);
+
+            /* Draw grid */
+            ballCtx.strokeStyle = 'rgba(76,140,106,0.2)'; 
+            ballCtx.lineWidth = 0.5;
+            for(let i=0;i<=10;i++){
+                const x = i*(W/10), y = i*(H/10);
+                ballCtx.moveTo(x,0);   ballCtx.lineTo(x,H); ballCtx.stroke();
+                ballCtx.moveTo(0,y);   ballCtx.lineTo(W,y); ballCtx.stroke();
+            }
+            ballCtx.moveTo(0,H); ballCtx.lineTo(W,H); ballCtx.stroke();     // X-axis
+            ballCtx.moveTo(0,0); ballCtx.lineTo(0,H); ballCtx.stroke();     // Y-axis
+
+            const x = ballTraj.x_positions[frameIdx];
+            const y = ballTraj.y_positions[frameIdx];
+
+            // Add current position to trail
+            currentBallTrail.push({ x, y });
+            
+            // Limit trail length
+            if (currentBallTrail.length > maxTrailLength) currentBallTrail.shift();
+
+            // Draw ball trail
+            if (currentBallTrail.length > 1) {
+                ballCtx.beginPath();
+                ballCtx.moveTo(currentBallTrail[0].x, currentBallTrail[0].y);
+                for (let i = 1; i < currentBallTrail.length; i++) {
+                    ballCtx.lineTo(currentBallTrail[i].x, currentBallTrail[i].y);
+                }
+                ballCtx.strokeStyle = 'rgba(255, 165, 0, 0.7)';
+                ballCtx.lineWidth = 2;
+                ballCtx.stroke();
+            }
+
+            // Draw ball
+            ballCtx.beginPath();
+            ballCtx.arc(x, y, ballRadius, 0, 2 * Math.PI);
+            ballCtx.fillStyle = "rgba(255, 0, 0, 0.5)";
+            ballCtx.fill();
+            ballCtx.strokeStyle = "#ff0000";
+            ballCtx.lineWidth = 2;
+            ballCtx.stroke();
+        }
+
+        function stepBallFrame(delta) {
+            const newIndex = ballFrameIndex + delta;
+            if (newIndex >= 0 && newIndex < ballTraj.x_positions.length) {
+                ballFrameIndex = newIndex;
+                drawBallFrame(ballFrameIndex);
+            }
+        }
+
+        function togglePlayPauseRight() {
+            const btn = document.getElementById('playPauseRight');
+            isPlayingRight = !isPlayingRight;
+            
+            if (isPlayingRight) {
+                btn.textContent = '⏸';
+                animationIntervalRight = setInterval(() => {
+                    if (currentFrameRight < poseData.length - 1) {
+                        currentFrameRight++;
+                        drawPoseGeneric('poseRight', currentFrameRight, true);
+                    } else {
+                        clearInterval(animationIntervalRight);
+                        isPlayingRight = false;
+                        btn.textContent = '▶';
+                    }
+                }, frameDelay);
+            } else {
+                btn.textContent = '▶';
+                clearInterval(animationIntervalRight);
+            }
+        }
+
+        function resetSkeletonAnimation() {
+            if (isPlayingRight) {
+                clearInterval(animationIntervalRight);
+                isPlayingRight = false;
+                document.getElementById('playPauseRight').textContent = '▶';
+            }
+            
+            currentFrameRight = 0;
+            currentLeftTrail = [];
+            currentRightTrail = [];
+            drawPoseGeneric('poseRight', currentFrameRight, true);
+        }
+
+        function resetBallAnimation() {
+            if (isPlayingBall) {
+                clearInterval(animationIntervalBall);
+                isPlayingBall = false;
+                document.getElementById('playPauseBall').textContent = '▶';
+            }
+            
+            ballFrameIndex = 0;
+            currentBallTrail = [];
+            drawBallFrame(ballFrameIndex);
+        }
+
+        function showTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(content => {
+                content.classList.toggle('active', content.id === tabId);
+            });
+            
+            document.querySelectorAll('.tab-btn').forEach(btn => {
+                btn.classList.toggle('active', btn.dataset.tab === tabId);
+            });
+        }
+
+        /* wire the two buttons */
+        document.querySelectorAll('.tab-btn').forEach(btn =>
+            btn.addEventListener('click', () => showTab(btn.dataset.tab)));
+
+        function initBiomechanicalCanvas() {
+            const canvas = document.getElementById('flexionCanvas');
+            if (!canvas) return;
+            
+            const ctx = canvas.getContext('2d');
+            
+            // Draw empty state with grid
+            ctx.fillStyle = '#1a3a2e';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw grid
+            ctx.strokeStyle = 'rgba(76,140,106,0.2)';
+            ctx.lineWidth = 0.5;
+            
+            for (let i = 0; i <= 10; i++) {
+                const x = i * (canvas.width / 10);
+                const y = i * (canvas.height / 10);
+                ctx.beginPath();
+                ctx.moveTo(x, 0);
+                ctx.lineTo(x, canvas.height);
+                ctx.stroke();
+                ctx.beginPath();
+                ctx.moveTo(0, y);
+                ctx.lineTo(canvas.width, y);
+                ctx.stroke();
+            }
+            
+            // Draw message
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.font = '16px SF Pro Display';
+            ctx.textAlign = 'center';
+            ctx.fillText('Select an analysis type from the options below', canvas.width / 2, canvas.height / 2);
+        }
+
+        async function populateOverlayKickDropdown(player, type, sessionId, kickId) {
+            const overlaySelect = document.getElementById('overlayKickSelect');
+            overlaySelect.innerHTML = '<option value="none">No Overlay</option>';
+
+            try {
+                const kicksRef = storage.ref(`${player}/${type}/${sessionId}/`);
+                const result = await kicksRef.listAll();
+                const kickFolders = result.prefixes
+                
+                for (const folder of kickFolders) {
+                    const kickName = folder.name;
+                    console.log(`we are listing a folder with name: ${kickName}`);
+                    if (kickName !== kickId) {
+                        const option = document.createElement('option');
+                        option.value = kickName;
+                        option.textContent = kickName.replace('kick', 'Kick ');
+                        overlaySelect.appendChild(option);
+                    }
+                 }
+            } catch (error) {
+                console.error("Failed to load kick folders for overlay:", error);
+            }
+        }
+
+        async function computeOverlayAlignment(player, type, sessionId, overlayKickId, currentBallCenter, currentBallRadius) {
+            try {
+                const overlayBallRef = storage.ref(`${player}/${type}/${sessionId}/${overlayKickId}/orig_ball.json`);
+                const ballUrl = await overlayBallRef.getDownloadURL();
+                let [x1, y1, x2, y2] = await (await fetch(ballUrl)).json();
+
+                const overlayBallRadius = ((x2 - x1) / 2 + (y2 - y1) / 2) / 2;
+                overlayScale = currentBallRadius / overlayBallRadius;
+
+                overlayBallCenter = {
+                    x: (x1 + x2) / 2,
+                    y: (y1 + y2) / 2
+                };
+
+                alignmentX = overlayBallCenter.x - currentBallCenter.x;
+                alignmentY = overlayBallCenter.y - currentBallCenter.y;
+            } catch (err) {
+                console.error("Failed to compute overlay alignment:", err);
+                throw err;
+            }
+        }
+
+        async function loadAndPlotAngles(player, type, sessionId, kickId) {
+            const canvas = document.getElementById("flexionCanvas");
+            console.info(`in loadandplotangles we get canvas: ${canvas}`)
+            const ctx = canvas.getContext("2d");
+
+            // Simulated data (replace with fetch if needed)
+            const rightKnee = Array.from({ length: 100 }, (_, i) => 90 + 60 * Math.sin(i * 0.1));
+            const leftKnee  = Array.from({ length: 100 }, (_, i) => 90 + 40 * Math.sin(i * 0.1 + 1));
+            const hips      = Array.from({ length: 100 }, (_, i) => 90 + 20 * Math.sin(i * 0.1 + 2));
+
+            // Canvas setup
+            const W = canvas.width, H = canvas.height;
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#1a3a2e';
+            ctx.fillRect(0, 0, W, H);
+
+            // Grid
+            ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+            ctx.lineWidth = 0.5;
+            for (let i = 0; i <= 10; i++) {
+                const x = i * (W / 10), y = i * (H / 10);
+                ctx.beginPath(); ctx.moveTo(x, 0); ctx.lineTo(x, H); ctx.stroke();
+                ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+            }
+
+            // Draw line helper
+            function drawLine(data, color, thick = false) {
+                ctx.beginPath();
+                ctx.strokeStyle = color;
+                ctx.lineWidth = thick ? 4 : 2;
+                ctx.moveTo(0, H - data[0] * H / 180);
+                for (let i = 1; i < data.length; i++) {
+                    ctx.lineTo(i * W / data.length, H - data[i] * H / 180);
+                }
+                ctx.stroke();
+            }
+
+            drawLine(rightKnee, '#ff6666', currentHighlight === 'knee');
+            drawLine(leftKnee,  '#66ccff', currentHighlight === 'ankle');
+            drawLine(hips,      '#66ff99', currentHighlight === 'hip');
+        }
+    </script>
+    <!-- Reusable user badge (reads email from Firestore users/{uid}) -->
+    <script src="user-badge.js"></script>
+</body>
+</html>

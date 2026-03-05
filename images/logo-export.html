@@ -1,0 +1,80 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>PoseTek Logo Export</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@700&display=swap" rel="stylesheet">
+  <style>
+    body { background: #f0f0f0; display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 100vh; gap: 24px; font-family: sans-serif; }
+    canvas { display: none; }
+    .preview { background: white; padding: 40px 60px; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+    .preview .logo { font-family: 'Inter', sans-serif; font-size: 56px; font-weight: 700; letter-spacing: -1px; color: #1a3a2e; }
+    .preview .logo span { color: #4c8c6a; }
+    .preview-dark { background: #1a3a2e; padding: 40px 60px; border-radius: 16px; box-shadow: 0 4px 24px rgba(0,0,0,0.12); }
+    .preview-dark .logo { font-family: 'Inter', sans-serif; font-size: 56px; font-weight: 700; letter-spacing: -1px; color: #ffffff; }
+    .preview-dark .logo span { color: #4c8c6a; }
+    .btn { padding: 14px 28px; border-radius: 10px; border: none; cursor: pointer; font-size: 1rem; font-weight: 700; background: #4c8c6a; color: white; }
+    .btn:hover { background: #3a7055; }
+    .row { display: flex; gap: 16px; }
+    h3 { margin: 0; color: #555; }
+  </style>
+</head>
+<body>
+  <h3>Click a button to download the logo as a PNG</h3>
+
+  <div class="row">
+    <div>
+      <div class="preview"><div class="logo">Pose<span>Tek</span></div></div>
+      <br>
+      <button class="btn" onclick="download('white')">⬇ Download (White background)</button>
+    </div>
+    <div>
+      <div class="preview-dark"><div class="logo">Pose<span>Tek</span></div></div>
+      <br>
+      <button class="btn" onclick="download('dark')">⬇ Download (Dark background)</button>
+    </div>
+  </div>
+
+  <canvas id="c"></canvas>
+
+  <script>
+    function download(variant) {
+      const canvas = document.getElementById('c');
+      const size = 1000; // square — fits Instagram profile icon
+      canvas.width = size;
+      canvas.height = size;
+      const ctx = canvas.getContext('2d');
+
+      // background
+      ctx.fillStyle = variant === 'dark' ? '#1a3a2e' : '#ffffff';
+      ctx.fillRect(0, 0, size, size);
+
+      document.fonts.ready.then(() => {
+        const fontSize = 160;
+        ctx.font = '700 ' + fontSize + 'px Inter';
+
+        // measure both words to center the full text
+        ctx.fillStyle = variant === 'dark' ? '#ffffff' : '#1a3a2e';
+        const poseWidth = ctx.measureText('Pose').width;
+        const tekWidth  = ctx.measureText('Tek').width;
+        const totalWidth = poseWidth + tekWidth;
+        const startX = (size - totalWidth) / 2;
+        const baseY  = (size / 2) + (fontSize / 3); // vertically centered
+
+        // "Pose"
+        ctx.fillStyle = variant === 'dark' ? '#ffffff' : '#1a3a2e';
+        ctx.fillText('Pose', startX, baseY);
+
+        // "Tek" in accent green
+        ctx.fillStyle = '#4c8c6a';
+        ctx.fillText('Tek', startX + poseWidth, baseY);
+
+        const link = document.createElement('a');
+        link.download = 'posetek-logo-instagram-' + variant + '.png';
+        link.href = canvas.toDataURL('image/png');
+        link.click();
+      });
+    }
+  </script>
+</body>
+</html>

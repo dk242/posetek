@@ -1,0 +1,776 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drill Creation | PoseTek</title>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #1a3a2e;
+      --accent: #4c8c6a;
+      --text-light: #ffffff;
+      --card-bg: rgba(255, 255, 255, 0.08);
+      --card-border: rgba(255, 255, 255, 0.1);
+      --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+      --grid-gap: 40px; /* distance between grid lines in px */
+    }
+    * { margin:0; padding:0; box-sizing:border-box; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--primary);
+      color: var(--text-light);
+    }
+    header {
+      display:flex; justify-content:space-between; align-items:center;
+      padding:1rem 2rem; background-color:rgba(0,0,0,0.2); backdrop-filter:blur(10px);
+    }
+    .logo { font-family:'SF Pro Display',sans-serif; font-size:1.8rem; font-weight:600; }
+    .nav-links a { color:var(--text-light); text-decoration:none; margin-left:1.5rem; font-weight:500; }
+
+    .topbar {
+      display:flex; align-items:center; gap:.75rem;
+      padding:1rem 1rem 0 1rem;
+    }
+    .name-wrap {
+      display:flex; align-items:center; gap:.5rem;
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:10px;
+      padding:.5rem .75rem;
+    }
+    .name-wrap label { font-weight:600; opacity:.95; }
+    .name-wrap input {
+      border:1px solid var(--accent);
+      border-radius:8px; padding:.45rem .6rem; background:#fff; color:#000;
+      min-width:260px;
+    }
+
+    .container { display:flex; padding:1rem; gap:1rem; }
+    .grid-wrap { position:relative; flex:1; }
+    .grid {
+      position:relative;
+      background:#0e2016;
+      border:1px solid var(--card-border);
+      border-radius:12px;
+      min-height:70vh;
+      cursor:crosshair;
+      background-image:
+        repeating-linear-gradient(to right, rgba(255,255,255,0.25) 0 1px, transparent 1px var(--grid-gap)),
+        repeating-linear-gradient(to bottom, rgba(255,255,255,0.25) 0 1px, transparent 1px var(--grid-gap));
+      overflow:hidden;
+    }
+    /* overlay canvas for paths/arrows/dup arrow */
+    canvas.overlay {
+      position:absolute; inset:0; width:100%; height:100%;
+      pointer-events:none;
+    }
+
+    .panel {
+      width:220px; background:var(--card-bg); border:1px solid var(--card-border);
+      border-radius:12px; padding:1rem; display:flex; flex-direction:column; gap:1rem;
+      align-self:flex-start;
+    }
+    .panel-item {
+      background:rgba(255,255,255,0.05);
+      border:1px solid var(--card-border);
+      border-radius:8px; padding:.5rem;
+      display:flex; flex-direction:column;
+      align-items:center; justify-content:center;
+      cursor:pointer; position:relative; transition:var(--transition);
+      user-select:none;
+    }
+    .panel-item:hover { transform:translateY(-2px); }
+    .panel-item.active { outline:2px solid #fff; outline-offset:2px; }
+    .panel-item span.emoji { font-size:2rem; line-height:1; }
+    .panel-item span.label {
+      font-size:.8rem; position:absolute; bottom:4px; right:6px; opacity:0.85;
+    }
+
+    .grid-item {
+      position:absolute; transform:translate(-50%,-50%);
+      font-size:2rem; cursor:pointer; user-select:none;
+    }
+    /* Per-type size tuning: cone 2/3, goal 3x */
+    .grid-item[data-type="cone"]  { font-size:1.333rem; } /* 2/3 of 2rem */
+    .grid-item[data-type="goal"]  { font-size:6rem; }     /* 3x 2rem */
+    .grid-item[data-type="gate"]  { font-size:2rem; }
+
+    .ghost { opacity:0.55; filter:saturate(0.8) brightness(1.1); pointer-events:none; }
+
+    .context-menu {
+      position:absolute; background:#333; border:1px solid #555;
+      border-radius:6px; display:none; z-index:50; min-width:140px;
+      box-shadow:0 6px 20px rgba(0,0,0,0.35);
+    }
+    .context-menu button {
+      background:none; border:none; color:white; padding:.6rem 1rem; width:100%;
+      text-align:left; cursor:pointer; font-weight:500;
+    }
+    .context-menu button:hover { background:rgba(255,255,255,0.08); }
+
+    .mini-panel {
+      position:absolute; z-index:60; background:#1f1f1f; color:#fff;
+      border:1px solid #555; border-radius:8px; padding:.5rem .6rem;
+      display:flex; align-items:center; gap:.4rem;
+      box-shadow:0 6px 20px rgba(0,0,0,0.35);
+    }
+    .mini-panel input[type="number"]{
+      width:70px; padding:.3rem .4rem; border-radius:6px;
+      border:1px solid #777; background:#fff; color:#000;
+    }
+    .mini-panel button{
+      padding:.4rem .6rem; border-radius:6px; border:none; cursor:pointer;
+      background:var(--accent); color:#fff; font-weight:600;
+    }
+    .mini-panel button.secondary{
+      background:transparent; color:#fff; border:1px solid #777;
+    }
+
+    .controls { padding:1rem; display:flex; gap:1rem; align-items:center; flex-wrap:wrap; }
+    .controls label { display:flex; align-items:center; gap:.5rem; }
+    .controls input, .controls textarea {
+      padding:.5rem; border-radius:6px; border:1px solid var(--card-border); background:#fff; color:#000;
+    }
+    .controls textarea { flex:1 1 480px; min-height:60px; }
+    .finish-btn {
+      padding:.7rem 1.1rem; border:none; border-radius:8px;
+      background:var(--accent); color:white; font-weight:600; cursor:pointer;
+    }
+
+    /* Grid header controls (top-left & top-right inside grid) */
+    .grid-controls-left {
+      position:absolute; top:10px; left:10px; z-index:10; display:flex; gap:.5rem;
+    }
+    .grid-controls-right {
+      position:absolute; top:10px; right:10px; z-index:10; display:flex; gap:.5rem; align-items:center;
+    }
+    .icon-btn {
+      border:none; border-radius:8px; padding:.45rem .7rem; font-weight:700; cursor:pointer;
+      background:var(--accent); color:#fff;
+    }
+    .scale-wrap { display:flex; align-items:center; gap:.4rem; }
+    .scale-bar {
+      width:60px; height:4px; background:#fff; border-radius:3px;
+    }
+    .scale-label { font-size:.85rem; opacity:.9; }
+  </style>
+</head>
+<body>
+  <header>
+  <div class="logo">PoseTek</div>
+    <nav class="nav-links"><a href="sessions.html">Back to Sessions</a></nav>
+  </header>
+
+  <!-- Drill name -->
+  <div class="topbar">
+    <div class="name-wrap">
+      <label for="drillName">Drill Name</label>
+      <input id="drillName" type="text" placeholder="e.g., Gate Weave + Finish" />
+    </div>
+  </div>
+
+  <div class="container">
+    <!-- main grid -->
+    <div class="grid-wrap">
+      <div class="grid" id="grid">
+        <!-- left control buttons -->
+        <div class="grid-controls-left">
+          <button id="pathBtn" class="icon-btn">Draw Path</button>
+          <button id="arrowBtn" class="icon-btn" title="Draw Arrow">Draw Arrow</button>
+        </div>
+        <!-- right control buttons + scale -->
+        <div class="grid-controls-right">
+          <button id="zoomInBtn" class="icon-btn" title="Zoom In">+</button>
+          <button id="zoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
+          <div class="scale-wrap" title="Grid spacing">
+            <div class="scale-bar"></div>
+            <span class="scale-label">1 m</span>
+          </div>
+        </div>
+
+        <canvas id="drawCanvas" class="overlay"></canvas>
+      </div>
+    </div>
+
+    <!-- palette -->
+    <div class="panel" id="palette">
+      <div class="panel-item" data-type="cone"><span class="emoji">🟠</span><span class="label">cone</span></div>
+      <div class="panel-item" data-type="gate"><span class="emoji">🚪</span><span class="label">gate</span></div>
+      <div class="panel-item" data-type="goal"><span class="emoji">🥅</span><span class="label">goal</span></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <label>Reps <input type="number" id="reps" min="1" value="1"></label>
+    <label>Rest (s) <input type="number" id="rest" min="0" value="30"></label>
+    <textarea id="summary" placeholder="Summary..."></textarea>
+    <button id="finishDrillBtn" class="finish-btn">Finish Drill Creation</button>
+  </div>
+
+  <div class="context-menu" id="contextMenu">
+    <button id="duplicateBtn">Duplicate</button>
+    <button id="deleteBtn">Delete</button>
+  </div>
+
+  <!-- Mini panel appears during duplicate drag -->
+  <div class="mini-panel" id="dupPanel" style="display:none">
+    <span>Count</span>
+    <input type="number" id="dupCount" min="1" value="1" />
+    <button id="dupApply">Apply</button>
+    <button class="secondary" id="dupCancel">Cancel</button>
+  </div>
+
+  <script>
+    // Firebase SDKs
+    const scriptApp = document.createElement('script'); scriptApp.src = 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js'; document.head.appendChild(scriptApp);
+    const scriptAuth = document.createElement('script'); scriptAuth.src = 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js'; document.head.appendChild(scriptAuth);
+    const scriptFs = document.createElement('script'); scriptFs.src = 'https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js'; document.head.appendChild(scriptFs);
+
+    // Wait for scripts to load then init
+    scriptFs.onload = () => {
+      const firebaseConfig = {
+        apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+        authDomain: "kickai-69dd0.firebaseapp.com",
+        projectId: "kickai-69dd0",
+        storageBucket: "kickai-69dd0.firebasestorage.app",
+        messagingSenderId: "839600313930",
+        appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+        measurementId: "G-RX99K62ZEH"
+      };
+      if (!window.firebase.apps?.length) firebase.initializeApp(firebaseConfig);
+      const auth = firebase.auth();
+      const db = firebase.firestore();
+
+      // If URL contains ?drill=ID, load it in view-only mode
+      const urlParams = new URLSearchParams(location.search);
+      const viewDrillId = urlParams.get('drill');
+      const viewPlayer = urlParams.get('player');
+      if (viewDrillId) {
+        // Hide interactive controls for view-only
+        document.getElementById('palette').style.display = 'none';
+        document.querySelector('.controls').style.display = 'none';
+        document.querySelector('.grid').style.cursor = 'default';
+        // prevent placing items
+        grid.removeEventListener('click', () => {});
+        // Load drill doc and render
+        (async ()=>{
+          try {
+            const doc = await db.collection('drills').doc(viewDrillId).get();
+            if (!doc.exists) return alert('Drill not found');
+            const d = doc.data();
+            // populate metadata
+            document.getElementById('drillName').value = d.name || '';
+            document.getElementById('reps').value = d.reps || 1;
+            document.getElementById('rest').value = d.rest || 0;
+            document.getElementById('summary').value = d.summary || '';
+            // render items
+            const rect = grid.getBoundingClientRect();
+            if (Array.isArray(d.items)) {
+              d.items.forEach(it=>{
+                const x = (it.x || 0) * rect.width;
+                const y = (it.y || 0) * rect.height;
+                const el = document.createElement('div');
+                el.className = 'grid-item'; el.dataset.type = it.type || 'item';
+                el.textContent = it.type === 'cone' ? '🟠' : (it.type === 'gate' ? '🚪' : '🥅');
+                el.style.left = `${x}px`; el.style.top = `${y}px`;
+                // disable interactions
+                el.style.pointerEvents = 'none';
+                grid.appendChild(el);
+              });
+            }
+          } catch (err) { console.error('Failed to load drill', err); alert('Failed to load drill'); }
+        })();
+      }
+
+      // Helper to serialize placed items
+      function collectItems() {
+        const items = [];
+        const gridRect = grid.getBoundingClientRect();
+        document.querySelectorAll('.grid-item').forEach(el=>{
+          const type = el.dataset.type;
+          const left = parseFloat(el.style.left || '0');
+          const top = parseFloat(el.style.top || '0');
+          // normalize to grid size
+          const x = Math.round((left / gridRect.width) * 10000)/10000;
+          const y = Math.round((top  / gridRect.height) * 10000)/10000;
+          items.push({type, x, y});
+        });
+        return items;
+      }
+
+      // Wait for auth to be ready and then handle save
+      document.getElementById('finishDrillBtn').addEventListener('click', async ()=>{
+        const name = document.getElementById('drillName').value.trim() || 'Untitled Drill';
+        const reps = Number(document.getElementById('reps').value) || 1;
+        const rest = document.getElementById('rest').value || '0';
+        const summary = document.getElementById('summary').value || '';
+        const items = collectItems();
+
+        const urlParams = new URLSearchParams(location.search);
+        const assignedTo = urlParams.get('player') || null;
+
+        auth.onAuthStateChanged(async (user) => {
+          if (!user) {
+            alert('Please sign in to save drills.');
+            return;
+          }
+
+          const doc = {
+            name, reps, rest, summary, items,
+            createdBy: user.uid,
+            assignedTo: assignedTo,
+            // include a client timestamp so the drill shows up immediately in client queries
+            createdAtClient: firebase.firestore.Timestamp.fromDate(new Date()),
+            createdAt: firebase.firestore.FieldValue.serverTimestamp()
+          };
+
+          try {
+            const res = await db.collection('drills').add(doc);
+            // redirect to drill list and highlight new drill
+            location.href = `drillList.html?new=${res.id}${assignedTo ? `&player=${assignedTo}` : ''}`;
+          } catch (err) {
+            console.error('Failed to save drill:', err);
+            alert('Failed to save drill. See console for details.');
+          }
+        });
+      });
+    };
+
+    // ---------- Palette selection ----------
+    let selectedType = null;
+    const palette = document.getElementById('palette');
+    palette.addEventListener('click', (e) => {
+      const item = e.target.closest('.panel-item');
+      if (!item) return;
+      palette.querySelectorAll('.panel-item').forEach(p => p.classList.remove('active'));
+      item.classList.add('active');
+      selectedType = item.dataset.type;
+    });
+
+    // ESC to clear palette selection and exit modes
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') {
+        clearSelectionAndModes();
+      }
+    });
+    function clearSelectionAndModes(){
+      selectedType = null;
+      palette.querySelectorAll('.panel-item').forEach(p => p.classList.remove('active'));
+      if (dupState.active) endDuplicate(true);
+      if (pathState.active) finishPath(false);
+      if (arrowState.active) finishArrow(false);
+    }
+
+    // ---------- Grid, overlay & coordinates ----------
+    const grid = document.getElementById('grid');
+    const drawCanvas = document.getElementById('drawCanvas');
+    const ctx = drawCanvas.getContext('2d');
+
+    function resizeOverlay() {
+      const dpr = window.devicePixelRatio || 1;
+      const { width, height } = grid.getBoundingClientRect();
+      drawCanvas.style.width = width + 'px';
+      drawCanvas.style.height = height + 'px';
+      drawCanvas.width = Math.floor(width * dpr);
+      drawCanvas.height = Math.floor(height * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); // draw in CSS pixels
+      redrawAll();
+    }
+    window.addEventListener('resize', resizeOverlay);
+    requestAnimationFrame(resizeOverlay);
+
+    function gridPointFromEvent(ev) {
+      const rect = grid.getBoundingClientRect();
+      // prefer client coords to avoid offset quirks when target != grid
+      const x = Math.max(0, Math.min(rect.width, ev.clientX - rect.left));
+      const y = Math.max(0, Math.min(rect.height, ev.clientY - rect.top));
+      return { x, y };
+    }
+
+    // ---------- Placing items ----------
+    grid.addEventListener('click', (e) => {
+      if (pathState.active || arrowState.active) return; // drawing modes handle their own clicks
+      if (!selectedType) return;
+      if (e.target !== grid && e.target !== drawCanvas) return; // only empty grid
+      const { x, y } = gridPointFromEvent(e);
+      placeItem(selectedType, x, y);
+    });
+
+    function placeItem(type, x, y) {
+      const div = document.createElement('div');
+      div.className = 'grid-item';
+      div.dataset.type = type;
+      div.textContent = type === 'cone' ? '🟠' : (type === 'gate' ? '🚪' : '🥅');
+      div.style.left = `${x}px`;
+      div.style.top  = `${y}px`;
+      grid.appendChild(div);
+      attachItemHandlers(div);
+      return div;
+    }
+
+    function attachItemHandlers(el) {
+      el.addEventListener('contextmenu', (evt) => {
+        if (pathState.active || dupState.active || arrowState.active) { evt.preventDefault(); return; }
+        evt.preventDefault();
+        showContextMenu(evt.pageX, evt.pageY, el);
+      });
+    }
+
+    // ---------- Context menu ----------
+    const contextMenu = document.getElementById('contextMenu');
+    let contextTarget = null;
+
+    function showContextMenu(px, py, target) {
+      contextTarget = target;
+      contextMenu.style.left = px + 'px';
+      contextMenu.style.top  = py + 'px';
+      contextMenu.style.display = 'block';
+    }
+    document.addEventListener('click', () => {
+      contextMenu.style.display = 'none';
+    });
+
+    document.getElementById('deleteBtn').onclick = () => {
+      if (contextTarget) contextTarget.remove();
+      contextMenu.style.display = 'none';
+    };
+
+    // ---------- Duplicate with arrow + count ----------
+    const dupPanel = document.getElementById('dupPanel');
+    const dupCountInput = document.getElementById('dupCount');
+    const dupApplyBtn = document.getElementById('dupApply');
+    const dupCancelBtn = document.getElementById('dupCancel');
+
+    const dupState = {
+      active: false,
+      originEl: null,
+      origin: { x: 0, y: 0 },
+      head:   { x: 0, y: 0 },
+      ghosts: [],
+      count: 1,
+      dragging: false
+    };
+
+    document.getElementById('duplicateBtn').onclick = () => {
+      contextMenu.style.display = 'none';
+      if (!contextTarget) return;
+      startDuplicate(contextTarget);
+    };
+
+    function startDuplicate(el) {
+      dupState.active = true;
+      dupState.originEl = el;
+      dupState.count = Math.max(1, parseInt(dupCountInput.value, 10) || 1);
+
+      const rect = el.getBoundingClientRect();
+      const gridRect = grid.getBoundingClientRect();
+      dupState.origin.x = rect.left - gridRect.left + rect.width / 2;
+      dupState.origin.y = rect.top  - gridRect.top  + rect.height / 2;
+      dupState.head.x = dupState.origin.x + 120;
+      dupState.head.y = dupState.origin.y;
+
+      positionDupPanel(dupState.head.x, dupState.head.y);
+      dupPanel.style.display = 'flex';
+
+      dupState.dragging = true;
+      updateGhosts();
+      redrawAll();
+    }
+
+    function endDuplicate(cancelOnly = false) {
+      // IMPORTANT: commit BEFORE removing ghosts
+      if (!cancelOnly) {
+        commitDuplicates();
+      }
+      dupPanel.style.display = 'none';
+      dupState.dragging = false;
+      // remove any remaining ghost nodes
+      if (dupState.ghosts.length) {
+        dupState.ghosts.forEach(g => g.remove());
+        dupState.ghosts = [];
+      }
+      dupState.active = false;
+      dupState.originEl = null;
+      redrawAll();
+    }
+
+    function commitDuplicates() {
+      const type = dupState.originEl?.dataset?.type;
+      if (!type) return;
+      // use a snapshot of ghosts to avoid mutation during loop
+      const snapshot = [...dupState.ghosts];
+      snapshot.forEach(g => {
+        const x = parseFloat(g.style.left);
+        const y = parseFloat(g.style.top);
+        placeItem(type, x, y);
+      });
+    }
+
+    function positionDupPanel(x, y) {
+      const gridRect = grid.getBoundingClientRect();
+      const px = gridRect.left + x + 12;
+      const py = gridRect.top  + y + 12;
+      dupPanel.style.left = px + 'px';
+      dupPanel.style.top  = py + 'px';
+    }
+
+    dupApplyBtn.addEventListener('click', () => endDuplicate(false));
+    dupCancelBtn.addEventListener('click', () => endDuplicate(true));
+
+    dupCountInput.addEventListener('input', () => {
+      const n = Math.max(1, parseInt(dupCountInput.value, 10) || 1);
+      dupState.count = n;
+      updateGhosts();
+      redrawAll();
+    });
+
+    grid.addEventListener('mousemove', (e) => {
+      if (!dupState.active || !dupState.dragging) return;
+      const { x, y } = gridPointFromEvent(e);
+      dupState.head.x = x;
+      dupState.head.y = y;
+      positionDupPanel(x, y);
+      updateGhosts();
+      redrawAll();
+    });
+    grid.addEventListener('mouseup', () => {
+      if (dupState.active) dupState.dragging = false;
+    });
+    grid.addEventListener('mouseleave', () => {
+      if (dupState.active) dupState.dragging = false;
+    });
+
+    function updateGhosts() {
+      // remove old ghosts
+      dupState.ghosts.forEach(g => g.remove());
+      dupState.ghosts = [];
+
+      const type = dupState.originEl?.dataset?.type;
+      if (!type) return;
+
+      const dx = dupState.head.x - dupState.origin.x;
+      const dy = dupState.head.y - dupState.origin.y;
+      const count = dupState.count;
+
+      if (dx === 0 && dy === 0) return;
+
+      for (let i = 1; i <= count; i++) {
+        const t = i; // spacing by full vector length per copy
+        const gx = dupState.origin.x + t * dx;
+        const gy = dupState.origin.y + t * dy;
+        const g = document.createElement('div');
+        g.className = 'grid-item ghost';
+        g.dataset.type = type;
+        g.textContent = type === 'cone' ? '🟠' : (type === 'gate' ? '🚪' : '🥅');
+        // apply per-type sizing (match CSS)
+        if (type === 'cone') g.style.fontSize = '1.333rem';
+        if (type === 'goal') g.style.fontSize = '6rem';
+        g.style.left = `${gx}px`; g.style.top = `${gy}px`;
+        grid.appendChild(g);
+        dupState.ghosts.push(g);
+      }
+    }
+
+    // ---------- Draw Path (with smoothing) ----------
+    const pathBtn = document.getElementById('pathBtn');
+    const pathState = { active: false, points: [], smoothed: [] };
+
+    pathBtn.addEventListener('click', () => {
+      if (!pathState.active) {
+        startPath();
+      } else {
+        // manual finish via button (don’t add a point)
+        finishPath(false);
+      }
+    });
+
+    function startPath() {
+      pathState.active = true;
+      pathState.points = [];
+      pathBtn.textContent = 'Finish';
+      redrawAll();
+    }
+
+    function finishPath(fromRightClick) {
+      pathState.active = false;
+      pathBtn.textContent = 'Draw Path';
+      // Smooth the collected points and replace raw path
+      if (pathState.points.length >= 3) {
+        pathState.smoothed = chaikinSmooth(pathState.points, 3); // 3 iterations = very stable
+      } else {
+        pathState.smoothed = [...pathState.points];
+      }
+      redrawAll();
+    }
+
+    // Capture path clicks (left = add point, right = finalize)
+    grid.addEventListener('mousedown', (e) => {
+      if (!pathState.active) return;
+
+      if (e.button === 2) {
+        e.preventDefault();
+        const { x, y } = gridPointFromEvent(e);
+        pathState.points.push({ x, y });
+        finishPath(true);
+        return;
+      }
+      if (e.button === 0) {
+        const { x, y } = gridPointFromEvent(e);
+        pathState.points.push({ x, y });
+        redrawAll();
+      }
+    });
+
+    // Chaikin corner-cutting smoothing (robust & simple)
+    function chaikinSmooth(pts, iterations=2){
+      let out = pts.map(p => ({x:p.x, y:p.y}));
+      for (let k=0; k<iterations; k++){
+        if (out.length < 2) break;
+        const next = [];
+        for (let i=0; i<out.length-1; i++){
+          const p = out[i], q = out[i+1];
+          const P = { x: 0.75*p.x + 0.25*q.x, y: 0.75*p.y + 0.25*q.y };
+          const Q = { x: 0.25*p.x + 0.75*q.x, y: 0.25*p.y + 0.75*q.y };
+          next.push(P, Q);
+        }
+        out = next;
+      }
+      return out;
+    }
+
+    // ---------- Draw Arrow mode ----------
+    const arrowBtn = document.getElementById('arrowBtn');
+    const arrows = []; // persistent arrows [{x1,y1,x2,y2}]
+    const arrowState = { active:false, start:null, current:null, dragging:false };
+
+    arrowBtn.addEventListener('click', () => {
+      if (!arrowState.active) startArrow(); else finishArrow(false);
+    });
+
+    function startArrow(){
+      arrowState.active = true;
+      arrowBtn.textContent = 'Finish Arrow';
+      arrowState.start = null;
+      arrowState.current = null;
+      arrowState.dragging = false;
+      redrawAll();
+    }
+    function finishArrow(commit){
+      if (commit && arrowState.start && arrowState.current){
+        arrows.push({ x1:arrowState.start.x, y1:arrowState.start.y, x2:arrowState.current.x, y2:arrowState.current.y });
+      }
+      arrowState.active = false;
+      arrowBtn.textContent = 'Draw Arrow';
+      arrowState.start = null; arrowState.current = null; arrowState.dragging = false;
+      redrawAll();
+    }
+
+    grid.addEventListener('mousedown', (e) => {
+      if (!arrowState.active) return;
+      if (e.button !== 0) return;
+      const { x, y } = gridPointFromEvent(e);
+      arrowState.start = { x, y };
+      arrowState.current = { x, y };
+      arrowState.dragging = true;
+      redrawAll();
+    });
+    grid.addEventListener('mousemove', (e) => {
+      if (!arrowState.active || !arrowState.dragging) return;
+      const { x, y } = gridPointFromEvent(e);
+      arrowState.current = { x, y };
+      redrawAll();
+    });
+    grid.addEventListener('mouseup', (e) => {
+      if (!arrowState.active || e.button !== 0) return;
+      arrowState.dragging = false;
+      finishArrow(true);
+    });
+
+    // Prevent native context menu while in draw modes
+    grid.addEventListener('contextmenu', (e) => {
+      if (pathState.active || dupState.active || arrowState.active) e.preventDefault();
+    });
+
+    // ---------- Dummy zoom buttons (no-op) ----------
+    document.getElementById('zoomInBtn').addEventListener('click', () => {/* no-op */});
+    document.getElementById('zoomOutBtn').addEventListener('click', () => {/* no-op */});
+
+    // ---------- Drawing overlays (paths + duplicate arrow + arrows) ----------
+    function redrawAll() {
+      ctx.clearRect(0, 0, drawCanvas.width, drawCanvas.height);
+
+      // Smoothed path (final)
+      if (pathState.smoothed && pathState.smoothed.length >= 2 && !pathState.active){
+        drawPolyline(pathState.smoothed, '#ffffff', 2);
+      }
+      // While drawing, show current raw path as a line (no points)
+      if (pathState.active && pathState.points.length >= 2){
+        drawPolyline(pathState.points, '#ffffff', 2);
+      }
+
+      // Persistent arrows
+      arrows.forEach(a => drawArrow(a.x1, a.y1, a.x2, a.y2, '#FFD166'));
+
+      // Live arrow preview during draw
+      if (arrowState.active && arrowState.start && arrowState.current){
+        drawArrow(arrowState.start.x, arrowState.start.y, arrowState.current.x, arrowState.current.y, '#FFD166');
+      }
+
+      // Duplicate arrow
+      if (dupState.active) {
+        drawArrow(dupState.origin.x, dupState.origin.y, dupState.head.x, dupState.head.y, '#FFD166');
+      }
+    }
+
+    function drawPolyline(pts, color='#fff', width=2){
+      ctx.save();
+      ctx.strokeStyle = color; ctx.lineWidth = width;
+      ctx.beginPath();
+      ctx.moveTo(pts[0].x, pts[0].y);
+      for (let i=1;i<pts.length;i++){
+        ctx.lineTo(pts[i].x, pts[i].y);
+      }
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawArrow(x1, y1, x2, y2, color) {
+      ctx.save();
+      ctx.strokeStyle = color;
+      ctx.fillStyle = color;
+      ctx.lineWidth = 2;
+
+      // shaft
+      ctx.beginPath();
+      ctx.moveTo(x1, y1);
+      ctx.lineTo(x2, y2);
+      ctx.stroke();
+
+      // arrow head
+      const angle = Math.atan2(y2 - y1, x2 - x1);
+      const headLen = 12;
+      const hx1 = x2 - headLen * Math.cos(angle - Math.PI / 6);
+      const hy1 = y2 - headLen * Math.sin(angle - Math.PI / 6);
+      const hx2 = x2 - headLen * Math.cos(angle + Math.PI / 6);
+      const hy2 = y2 - headLen * Math.sin(angle + Math.PI / 6);
+      ctx.beginPath();
+      ctx.moveTo(x2, y2);
+      ctx.lineTo(hx1, hy1);
+      ctx.lineTo(hx2, hy2);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.restore();
+    }
+
+    // ---------- Utility: hide context menu on outside click ----------
+    document.addEventListener('click', (e) => {
+      if (!e.target.closest('.context-menu')) {
+        contextMenu.style.display = 'none';
+      }
+    });
+  </script>
+</body>
+</html>
+

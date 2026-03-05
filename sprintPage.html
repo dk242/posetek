@@ -1,0 +1,2738 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Sprint Work | PoseTek</title>
+  <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+  <style>
+    :root { --primary:#1a3a2e; --secondary:#2d5e4a; --accent:#4c8c6a; --accent-light:#5ea87e; --text-light:#ffffff; --text-muted:rgba(255,255,255,0.7); --text-dark:#121212; --card-bg:rgba(255,255,255,0.08); --card-border:rgba(255,255,255,0.1); --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color: rgba(76, 140, 106, 0.3);} 
+    body{font-family:'Inter',sans-serif;background-color:var(--primary);color:var(--text-light);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-overflow-scrolling:touch}
+    body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(76,140,106,0.08),transparent),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(76,140,106,0.05),transparent);pointer-events:none;z-index:0}
+
+    header{display:flex;justify-content:space-between;align-items:center;padding:1rem 2rem;background:rgba(15,31,27,0.85);position:sticky;top:0;z-index:100;backdrop-filter:blur(20px);-webkit-backdrop-filter:blur(20px);border-bottom:1px solid var(--card-border)}
+    .logo{font-family:'Poppins','SF Pro Display',sans-serif;font-size:1.6rem;font-weight:700;letter-spacing:-0.5px;background:linear-gradient(135deg,var(--text-light),var(--accent-light));-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+    .nav-links { display: none !important; }
+    .nav-links a{color:var(--text-light);text-decoration:none;font-weight:500;font-size:0.95rem;transition:var(--transition);position:relative}
+    .nav-links a:hover{color:var(--accent)}
+    .nav-links a::after{content:'';position:absolute;bottom:-5px;left:0;width:0;height:2px;background-color:var(--accent);transition:var(--transition)}
+    .nav-links a:hover::after{width:100%}
+
+    .container{max-width:1200px;margin:0 auto;padding:2rem}
+    .title{font-family:'SF Pro Display',sans-serif;font-size:1.9rem;font-weight:600;margin-bottom:.25rem}
+    .sub{color:var(--text-muted);margin-bottom:1rem}
+    /* Rep selector (mirrors StaticJumpPage) */
+    .reps-bar{display:flex;gap:.5rem;align-items:center;padding:.25rem 0 1rem 0;overflow-x:auto}
+    .rep-pill{flex:0 0 auto;padding:.45rem .95rem;border-radius:999px;border:1px solid var(--card-border);background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));color:var(--text-light);font-weight:600;user-select:none;transition:transform 200ms ease, box-shadow 200ms ease, background 200ms ease, opacity 200ms ease;box-shadow:0 6px 16px rgba(0,0,0,0.18)}
+    .rep-pill:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,0.24)}
+    .rep-pill.active{background:linear-gradient(180deg, rgba(76,140,106,0.95), rgba(76,140,106,0.85));border-color:var(--accent);box-shadow:0 10px 24px rgba(76,140,106,0.35)}
+    .bottom-row{display:grid;grid-template-columns:1fr;gap:1rem;margin-top:1rem}
+    @media (min-width:1000px){.bottom-row{grid-template-columns:1fr 1fr}}
+
+    .card{background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));border:1px solid var(--card-border);border-radius:12px;padding:1rem 1rem 1.25rem;backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28)}
+    .canvas-wrap{position:relative}
+    canvas{display:block;width:100%;border:1px solid var(--card-border);border-radius:12px;background:#0f241c}
+    .overlay-box{position:absolute;top:12px;right:12px;z-index:5;padding:.45rem .7rem;border-radius:12px;
+      background:rgba(0,0,0,0.55);border:1px solid var(--card-border);backdrop-filter:blur(10px);
+      font-size:.85rem;color:rgba(255,255,255,0.9);display:flex;gap:.5rem;align-items:center}
+    .overlay-box .k{opacity:.75}
+    .overlay-box .v{font-weight:700;color:#fff}
+
+    .controls{display:flex;gap:1rem;align-items:center;justify-content:space-between;margin-top:1rem;flex-wrap:wrap}
+    .tracker-panel{display:flex;flex-direction:row;gap:.75rem;flex-wrap:wrap}
+    .tracker-item{display:flex;flex-direction:column;align-items:center;padding:.6rem .8rem;background:var(--card-bg);border:1px solid var(--card-border);border-radius:10px;min-width:90px;backdrop-filter:blur(10px)}
+    .tracker-label{font-size:.75rem;color:var(--text-muted);margin-bottom:.3rem;font-weight:500}
+    .tracker-value{font-size:.95rem;font-weight:700;color:var(--text-light)}
+    .control-buttons{display:flex;gap:.6rem;flex-wrap:wrap;align-items:center}
+    .btn,.icon{border:1px solid var(--card-border);border-radius:12px;cursor:pointer;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);color:var(--text-light);transition:var(--transition);font-weight:600;box-shadow:0 4px 12px rgba(76,140,106,0.3), inset 0 1px 0 rgba(255,255,255,0.2);touch-action:manipulation;-webkit-user-select:none;user-select:none}
+    .btn{padding:.6rem 1.1rem;min-height:44px}
+    .icon{width:44px;height:44px;display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+    .btn:hover,.icon:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(76,140,106,0.4), inset 0 1px 0 rgba(255,255,255,0.2);background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%)}
+    .btn:active,.icon:active{transform:translateY(0) scale(0.98)}
+    .meta{display:flex;gap:1rem;flex-wrap:wrap;justify-content:center;color:var(--text-muted);margin-top:.5rem;font-size:.9rem}
+    .pill{padding:.35rem .75rem;border:1px solid var(--card-border);border-radius:999px;background:var(--card-bg);font-weight:500}
+    .error{color:#ff6b6b;text-align:center;margin:.75rem 0;font-weight:600}
+
+    /* Right column */
+    .tabs{display:flex;gap:.5rem;margin-bottom:.75rem}
+    .tab{padding:.5rem 1rem;border-radius:999px;border:1px solid var(--card-border);cursor:pointer;color:var(--text-muted);background:transparent;transition:var(--transition);font-weight:600;min-height:44px;touch-action:manipulation}
+    .tab:hover{background:rgba(255,255,255,0.05)}
+    .tab.active{background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);color:var(--text-light);box-shadow:0 4px 12px rgba(76,140,106,0.3)}
+    .chartWrap{position:relative}
+    .chartWrap canvas{height:260px}
+
+    /* Video player (ported from StaticJumpPage) */
+    .video-container{background:linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25));border:1px solid var(--card-border);border-radius:12px;padding:1rem;position:relative;width:100%;backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28)}
+    .video-container video,#rawFrameCanvas{width:100%;max-width:100%;height:auto;aspect-ratio:16/9;border-radius:8px}
+    .fullscreen-btn{position:absolute;top:10px;right:10px;width:34px;height:34px;border:1px solid var(--card-border);border-radius:10px;background:linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.55));color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:var(--transition);z-index:10;backdrop-filter:blur(8px);box-shadow:0 6px 16px rgba(0,0,0,0.25)}
+    .fullscreen-btn:hover{background:linear-gradient(180deg, rgba(0,0,0,0.78), rgba(0,0,0,0.68));transform:translateY(-1px) scale(1.03);box-shadow:0 10px 24px rgba(0,0,0,0.3)}
+    .nav-buttons{display:flex;flex-direction:column;gap:0.6rem;padding:0.6rem;background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));border:1px solid var(--card-border);border-radius:12px;backdrop-filter:blur(10px);box-shadow:0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)}
+    .btn-row{display:flex;gap:0.5rem;justify-content:center;flex-wrap:wrap}
+    .icon-btn{width:44px;height:44px;border:1px solid var(--card-border);border-radius:12px;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);color:#fff;font-size:1.1rem;cursor:pointer;transition:transform 200ms ease, box-shadow 200ms ease, background 200ms ease, opacity 200ms ease;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(76,140,106,0.3), inset 0 1px 0 rgba(255,255,255,0.2);touch-action:manipulation;-webkit-user-select:none;user-select:none}
+    .icon-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(76,140,106,0.4), 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%)}
+    .icon-btn:active{transform:translateY(0) scale(0.95)}
+    .icon-btn.active{background:linear-gradient(135deg, var(--secondary), #2b5a47);box-shadow:0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)}
+
+    /* Fullscreen */
+    .video-container:fullscreen{width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;border-radius:0!important;margin:0!important;padding:0!important;box-shadow:none!important;border:none!important}
+    .video-container:fullscreen{display:flex;align-items:center;justify-content:center;background:#000}
+    .video-container:fullscreen #rawFrameCanvas{max-width:100vw!important;max-height:100vh!important;border-radius:0!important}
+    .video-container:fullscreen .nav-buttons{position:absolute;left:12px;right:12px;bottom:12px;z-index:1000;margin:0;padding:0.6rem;background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.45));border:1px solid var(--card-border);border-radius:12px;backdrop-filter:blur(8px)}
+    .video-container:fullscreen .fullscreen-btn{top:16px;right:16px;z-index:1000}
+    
+    /* Canvas + Stats row layout */
+    .canvas-stats-row{display:flex;gap:0.75rem;align-items:stretch}
+    .canvas-stats-row .canvas-wrap{flex:1;min-width:0}
+    
+    /* Stats Panel (green buttons to the right of canvas) */
+    .stats-panel{display:flex;flex-direction:column;gap:0.5rem;justify-content:center}
+    .stat-btn{padding:0.6rem 0.85rem;border-radius:12px;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);border:1px solid var(--card-border);display:flex;flex-direction:column;align-items:center;min-width:90px;transition:var(--transition);box-shadow:0 4px 12px rgba(76,140,106,0.3), inset 0 1px 0 rgba(255,255,255,0.2);cursor:default}
+    .stat-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(76,140,106,0.4), inset 0 1px 0 rgba(255,255,255,0.2);background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%)}
+    .stat-label{font-size:0.65rem;color:rgba(255,255,255,0.85);font-weight:500;text-transform:uppercase;letter-spacing:0.5px}
+    .stat-val{font-size:0.9rem;font-weight:700;color:#fff}
+    
+    /* Custom Scrollbar Styling */
+    ::-webkit-scrollbar{width:10px;height:10px}
+    ::-webkit-scrollbar-track{background:rgba(0,0,0,0.2);border-radius:10px}
+    ::-webkit-scrollbar-thumb{background:var(--accent);border-radius:10px;transition:background 0.3s ease}
+    ::-webkit-scrollbar-thumb:hover{background:#56a07a}
+    *{scrollbar-width:thin;scrollbar-color:var(--accent) rgba(0,0,0,0.2)}
+    
+    .nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;cursor:pointer;transition:var(--transition);color:var(--text-light);font-size:1.1rem}
+    .nav-toggle:hover{background:rgba(255,255,255,0.12);transform:translateY(-1px)}
+    .home-btn-style{display:inline-flex;align-items:center;justify-content:center;width:40px;height:40px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;text-decoration:none;transition:var(--transition)}
+    .home-btn-style:hover{background:rgba(255,255,255,0.12);transform:translateY(-1px)}
+    .header-nav-btn{display:inline-flex;align-items:center;gap:0.4rem;padding:0.45rem 0.85rem;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;text-decoration:none;color:var(--text-muted);font-family:'Inter',sans-serif;font-size:0.8rem;font-weight:600;transition:var(--transition);white-space:nowrap;letter-spacing:0.2px}
+    .header-nav-btn:hover{background:rgba(255,255,255,0.12);color:var(--text-light);transform:translateY(-1px)}
+    .header-nav-btn .material-symbols-outlined{font-size:1.05rem}
+    .side-nav{position:fixed;top:0;left:-320px;width:320px;height:100%;background:linear-gradient(180deg, rgba(15,38,33,0.98), rgba(12,34,30,0.98));box-shadow:6px 0 30px rgba(0,0,0,0.45);z-index:1200;padding:2rem 1.25rem;transition:left 0.32s cubic-bezier(.2,.9,.2,1);display:flex;flex-direction:column;gap:1rem}
+    .side-nav.open{left:0}
+    .side-nav .close-side{margin-left:auto;background:none;border:none;color:var(--text-light);font-size:1.25rem;cursor:pointer;opacity:0.85;touch-action:manipulation;-webkit-user-select:none;user-select:none;min-width:44px;min-height:44px}
+    .side-nav .close-side:active{transform:scale(0.9)}
+    .side-nav .side-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.85rem;border-radius:10px;color:var(--text-light);text-decoration:none;font-weight:600;transition:var(--transition);min-height:44px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+    .side-nav .side-link:hover{background:rgba(255,255,255,0.03);transform:translateX(4px)}
+    .side-nav .side-link:active{background:rgba(255,255,255,0.06);transform:translateX(2px) scale(0.98)}
+    .side-divider{height:1px;background:var(--card-border);margin:0.75rem 0}
+    .side-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1100;opacity:0;visibility:hidden;transition:opacity 200ms ease}
+    .side-backdrop.open{opacity:1;visibility:visible}
+    .side-link .material-symbols-outlined{font-variation-settings:'wght' 400;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;line-height:24px;vertical-align:middle;color:var(--text-light)}
+    .side-link span:first-of-type{margin-right:6px}
+    .action-btn{padding:0.6rem 1.2rem;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);border:none;border-radius:50px;color:var(--text-light);font-weight:600;cursor:pointer;transition:var(--transition);min-height:44px;touch-action:manipulation;-webkit-user-select:none;user-select:none;box-shadow:0 4px 12px rgba(76,140,106,0.3), inset 0 1px 0 rgba(255,255,255,0.2)}
+    .action-btn:hover{background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%);transform:translateY(-2px);box-shadow:0 6px 16px rgba(76,140,106,0.4), inset 0 1px 0 rgba(255,255,255,0.2)}
+    .action-btn:active{transform:translateY(0) scale(0.98)}
+
+    /* Responsive: stack on small widths */
+    @media (max-width: 980px) {
+      header{padding:1.25rem 1.5rem}
+      .logo{font-size:1.6rem}
+      .container{padding:1.5rem}
+      .icon, .btn{min-height:48px}
+      .icon{width:48px;height:48px;font-size:1.3rem}
+    }
+    @media (max-width: 480px) {
+      header{padding:1rem 1.25rem}
+      .logo{font-size:1.4rem}
+      .container{padding:1.25rem}
+      .controls{gap:0.75rem}
+    }
+    @media (max-width: 375px) {
+      .container{padding:1rem}
+      .logo{font-size:1.3rem}
+    }
+  </style>
+</head>
+<body>
+<header>
+  <div style="display:flex;align-items:center;gap:0.75rem;">
+    <button id="navToggle" class="nav-toggle" aria-label="Open navigation">&#9776;</button>
+    <div class="logo">PoseTek</div>
+  </div>
+  <div style="display:flex;align-items:center;gap:0.5rem;">
+    <a id="leaderboardBtn" href="leaderboard.html" class="header-nav-btn" title="Leaderboards">
+      <span class="material-symbols-outlined">leaderboard</span>
+      <span>Leaderboard</span>
+    </a>
+    <a href="coachesview.html" class="home-btn home-btn-style" title="Home">
+      <span class="material-symbols-outlined" style="color:var(--text-light);font-size:1.3rem;">home</span>
+    </a>
+  </div>
+</header>
+
+<!-- Side navigation panel -->
+<aside id="sideNav" class="side-nav" aria-hidden="true">
+  <div style="display:flex;align-items:center;gap:0.5rem;">
+    <div style="font-weight:700;font-size:1.25rem;">Menu</div>
+    <button class="close-side" id="closeSide">✕</button>
+  </div>
+  <div class="side-divider"></div>
+  <div id="sideProfile" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+    <div id="profileAvatar" style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem">C</div>
+    <div style="display:flex;flex-direction:column;">
+      <div id="profileName" style="font-weight:700">Coach</div>
+      <div id="profileEmail" style="font-size:0.85rem;opacity:0.85">email@example.com</div>
+    </div>
+  </div>
+  <div class="side-divider"></div>
+  <div id="sideLinks" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+  <div class="side-divider"></div>
+  <div style="margin-top:auto">
+    <button class="action-btn" id="sideLogout">Logout</button>
+  </div>
+</aside>
+<div id="sideBackdrop" class="side-backdrop" tabindex="-1"></div>
+
+<main class="container">
+  <div class="title">Sprint Work</div>
+  <div id="crumb" class="sub">Loading…</div>
+  <div id="repsBar" class="reps-bar" aria-label="Repetitions"></div>
+
+  <!-- Full width pose display -->
+  <section class="card">
+    <div class="canvas-stats-row">
+      <div class="canvas-wrap">
+        <canvas id="poseCanvas"></canvas>
+      </div>
+      <div id="statsPanel" class="stats-panel">
+        <div class="stat-btn"><span class="stat-label">Avg Vel</span><span id="avgVelVal" class="stat-val">—</span></div>
+        <div class="stat-btn"><span class="stat-label">Distance</span><span id="distanceVal" class="stat-val">—</span></div>
+        <div class="stat-btn"><span class="stat-label">Max Vel</span><span id="maxVelVal" class="stat-val">—</span></div>
+        <div class="stat-btn"><span class="stat-label">Max Accel</span><span id="maxAccelVal" class="stat-val">—</span></div>
+        <div class="stat-btn"><span class="stat-label">Max Speed</span><span id="maxSpeedReachedVal" class="stat-val">—</span></div>
+      </div>
+    </div>
+    <div class="controls">
+      <!-- Left side: Current velocity tracker -->
+      <div class="tracker-panel">
+        <div class="tracker-item">
+          <div class="tracker-label">Current Velocity</div>
+          <div class="tracker-value" id="velocityTracker">— mph</div>
+        </div>
+      </div>
+      
+      <!-- Right side: Controls -->
+      <div class="control-buttons">
+        <button id="btnPlay" class="icon" title="Play/Pause">▶</button>
+        <button id="btnSlow" class="icon" title="Slow Down">🐢</button>
+        <button id="btnFast" class="icon" title="Speed Up">🐇</button>
+        <button id="btnReset" class="btn" title="Reset">Reset</button>
+        <button id="btnAutoTrack" class="btn" title="Auto-tracking zoom">Auto-Track: Off</button>
+        <button id="btnZoomIn" class="icon" title="Zoom In">🔍+</button>
+        <button id="btnZoomOut" class="icon" title="Zoom Out">🔍-</button>
+      </div>
+    </div>
+    <div class="meta" style="margin-top: 0.5rem; font-size: 0.85rem; color: var(--muted); text-align: center;">
+      <div>Zoom: Click and drag to select area</div>
+      <div>Pan: Right-click and drag to move view</div>
+    </div>
+    <div class="meta">
+      <span class="pill">Frame: <span id="frameLabel">0</span></span>
+      <span class="pill">FPS target: <span id="fpsTarget">60</span></span>
+    </div>
+    <div id="err" class="error" style="display:none;"></div>
+  </section>
+
+  <!-- Bottom row: Video player and Technique Analyzer -->
+  <div class="bottom-row">
+    <!-- Left: Video Player -->
+    <section class="card video-section">
+      <div class="video-container">
+        <video id="rawVideo" preload="metadata" playsinline muted style="display:none"></video>
+        <canvas id="rawFrameCanvas" width="480" height="270" style="width:100%;height:auto;border-radius:8px;background:#000"></canvas>
+        <button id="videoFullscreenBtn" class="fullscreen-btn" title="Fullscreen Video">⛶</button>
+        <div class="nav-buttons" style="margin-top:.5rem;">
+          <div class="btn-row">
+            <button id="rawPrevBtn" class="icon-btn" title="Previous frame">←</button>
+            <button id="rawPlayPauseBtn" class="icon-btn" title="Play/Pause">▶</button>
+            <button id="rawNextBtn" class="icon-btn" title="Next frame">→</button>
+            <button id="rawShowPoseBtn" class="icon-btn" title="Show Pose">🦵</button>
+          </div>
+          <div class="btn-row">
+            <button id="rawRestartBtn" class="icon-btn" title="Restart">⟲</button>
+            <button id="rawZoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
+            <button id="rawZoomInBtn" class="icon-btn" title="Zoom In">+</button>
+            <span id="rawFrameLabel" style="align-self:center;font-weight:600;opacity:.85">Frame: 0</span>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Frame</span>
+              <span id="rawFrameSliderValue" style="font-size:0.75rem;font-weight:600;">0</span>
+            </div>
+            <input id="rawFrameSlider" type="range" min="0" max="0" step="1" value="0" style="width:100%;cursor:pointer;"/>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Speed</span>
+              <span id="rawSpeedValue" style="font-size:0.75rem;font-weight:600;">1.0x</span>
+            </div>
+            <input id="rawSpeedSlider" type="range" min="0" max="8" step="1" value="5" list="rawSpeedMarkers" style="width:100%;cursor:pointer;"/>
+            <datalist id="rawSpeedMarkers">
+              <option value="0" label="0.05x"></option>
+              <option value="1" label="0.1x"></option>
+              <option value="2" label="0.25x"></option>
+              <option value="3" label="0.5x"></option>
+              <option value="4" label="0.75x"></option>
+              <option value="5" label="1x"></option>
+              <option value="6" label="1.25x"></option>
+              <option value="7" label="1.5x"></option>
+              <option value="8" label="2x"></option>
+            </datalist>
+          </div>
+      </div>
+    </section>
+
+    <!-- Right: Velocity Over Time Chart -->
+    <section class="card chart-section">
+      <div style="font-weight:600;margin-bottom:0.5rem;font-size:0.95rem;">Velocity Over Time</div>
+      <div class="chartWrap">
+        <canvas id="velChart"></canvas>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- Firebase compat SDKs -->
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+<script>
+/** =========================
+ *  Firebase boot
+ *  ========================= */
+const firebaseConfig = {
+  apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+  authDomain: "kickai-69dd0.firebaseapp.com",
+  projectId: "kickai-69dd0",
+  storageBucket: "kickai-69dd0.firebasestorage.app",
+  messagingSenderId: "839600313930",
+  appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+  measurementId: "G-RX99K62ZEH"
+};
+const app = firebase.initializeApp(firebaseConfig);
+const auth = firebase.auth();
+const db = firebase.firestore();
+const storage = firebase.storage();
+const isDev = location.hostname === "localhost" || location.hostname === "127.0.0.1";
+
+// Expose for shared scripts (e.g. user-badge.js)
+window.auth = auth;
+window.db = db;
+window.storage = storage;
+
+/** =========================
+ *  Side navigation setup
+ *  ========================= */
+(function sideNavSetup(){
+  const waitForAuth = () => new Promise(resolve => {
+    if (window.firebase && window.firebase.auth) return resolve();
+    const t = setInterval(()=>{ if (window.firebase && window.firebase.auth) { clearInterval(t); resolve(); } }, 50);
+  });
+
+  waitForAuth().then(()=>{
+    const navToggle = document.getElementById('navToggle');
+    const sideNav = document.getElementById('sideNav');
+    const closeSide = document.getElementById('closeSide');
+    const sideLinks = document.getElementById('sideLinks');
+    const sideBackdrop = document.getElementById('sideBackdrop');
+
+    function openSide() { sideNav.classList.add('open'); sideNav.setAttribute('aria-hidden','false'); if(sideBackdrop) sideBackdrop.classList.add('open'); }
+    function closeSideNav() { sideNav.classList.remove('open'); sideNav.setAttribute('aria-hidden','true'); if(sideBackdrop) sideBackdrop.classList.remove('open'); }
+
+    if (navToggle) navToggle.addEventListener('click', (e)=>{ e.preventDefault(); openSide(); });
+    if (closeSide) closeSide.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+    if (sideBackdrop) sideBackdrop.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+    document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeSideNav(); });
+
+    // Get player parameter from URL
+    const urlParams = new URLSearchParams(window.location.search || '');
+    const playerParam = urlParams.get('player');
+    const sideNavUserType = urlParams.get('userType');
+    const profileHref = playerParam ? `profile.html?player=${encodeURIComponent(playerParam)}` : 'profile.html';
+    const drillsHref = playerParam ? `drillList.html?player=${encodeURIComponent(playerParam)}` : 'drillList.html';
+    const kickingViewHref = (playerParam ? `kickingview.html?player=${encodeURIComponent(playerParam)}` : 'kickingview.html')
+      + (sideNavUserType ? `${playerParam ? '&' : '?'}userType=${sideNavUserType}` : '');
+
+    // Define navigation links
+    const navigationLinks = [
+      { href: profileHref, text: 'Player Profile', icon: 'person' },
+      { href: 'coachesview.html', text: 'Player Roster', icon: 'people' },
+      { href: 'leaderboard.html', text: 'Leaderboards', icon: 'leaderboard' }
+    ];
+
+    const lbBtn = document.getElementById('leaderboardBtn');
+    if (lbBtn) lbBtn.href = 'leaderboard.html';
+
+    navigationLinks.forEach((a, idx) => {
+      const link = document.createElement('a'); link.href = a.href || '#'; link.className = 'side-link';
+      const icon = document.createElement('span'); icon.className = 'material-symbols-outlined'; icon.style.fontSize = '20px';
+      icon.textContent = a.icon;
+      const spanText = document.createElement('span'); spanText.textContent = a.text;
+      link.appendChild(icon); link.appendChild(spanText);
+      link.style.transitionDelay = (idx * 40) + 'ms';
+      link.addEventListener('click', ()=> closeSideNav());
+      sideLinks.appendChild(link);
+    });
+
+    // Update header Performance Dashboard link with player parameter
+    const performanceDashboardLink = document.getElementById('performanceDashboardLink');
+    if (performanceDashboardLink && playerParam) {
+      performanceDashboardLink.href = kickingViewHref;
+    }
+
+    // side profile is populated by user-badge.js (Firestore preferred)
+
+    const sideLogoutBtn = document.getElementById('sideLogout');
+    if (sideLogoutBtn) sideLogoutBtn.addEventListener('click', (e)=>{ e.preventDefault(); firebase.auth().signOut().then(()=> window.location.href = 'kickai.html'); });
+  });
+})();
+
+/** =========================
+ *  URL / paths
+ *  ========================= */
+const params = new URLSearchParams(location.search);
+const player = params.get("player");
+const session = params.get("session");
+// Reps are stored under a kick{n} folder (e.g. .../<session>/kick1/<files>)
+const kickParamRaw = params.get("kick") || params.get("rep") || params.get("trial");
+const preferredKickId = kickParamRaw
+  ? (/^kick/i.test(kickParamRaw) ? kickParamRaw : `kick${kickParamRaw}`)
+  : null;
+
+// When velocity.json is an array, it's typically velocity-per-frame (meters/frame).
+// produced at a known extraction FPS (defaults to 10 unless overridden).
+const sourceFps = Number(params.get("sourceFps") || params.get("fpsSource") || "") || 10;
+
+let sessionRoot = null;   // e.g. "<player>/sprintWork/<session>"
+let kickIds = [];         // ["kick1","kick2",...]
+let currentKickId = null; // "kickN"
+
+function getPossibleSessionRoots() {
+  const roots = [];
+  if (player) {
+    roots.push(`${player}/sprintWork/${session}`);
+    // Back-compat (older experiments)
+    roots.push(`${player}/sprint/${session}`);
+  } else {
+    roots.push(`sprintWork/${session}`);
+    roots.push(`sprint/${session}`);
+  }
+  // de-dupe
+  return Array.from(new Set(roots));
+}
+
+function updateCrumb() {
+  const kickSuffix = currentKickId ? `/${currentKickId}` : "";
+  document.getElementById("crumb").textContent = player
+    ? `/${player}/sprintWork/${session}${kickSuffix}`
+    : `/sprintWork/${session}${kickSuffix}`;
+}
+
+async function resolveSessionRootAndKicks() {
+  if (sessionRoot && kickIds.length) return;
+  const roots = getPossibleSessionRoots();
+  let lastErr = null;
+  for (const root of roots) {
+    try {
+      const list = await storage.ref(`${root}/`).listAll();
+      const kicks = (list?.prefixes || [])
+        .map(p => p?.name)
+        .filter(Boolean)
+        .filter(name => /^kick\d+$/i.test(name))
+        .sort((a,b) => {
+          const na = parseInt(a.replace(/\D+/g,''), 10) || 0;
+          const nb = parseInt(b.replace(/\D+/g,''), 10) || 0;
+          return na - nb || a.localeCompare(b);
+        });
+
+      if (kicks.length) {
+        sessionRoot = root;
+        kickIds = kicks;
+        return;
+      }
+    } catch (e) {
+      lastErr = e;
+    }
+  }
+  throw lastErr || new Error("No kick{n} subfolders found for this session.");
+}
+
+async function initRepsBar() {
+  const repsBar = document.getElementById("repsBar");
+  if (!repsBar) return;
+  repsBar.innerHTML = "";
+
+  await resolveSessionRootAndKicks();
+
+  // Choose initial rep
+  const preferred = preferredKickId ? (preferredKickId.toLowerCase().startsWith("kick") ? preferredKickId : `kick${preferredKickId}`) : null;
+  const normalizedPreferred = preferred ? preferred.toLowerCase() : null;
+  currentKickId = kickIds.find(k => k.toLowerCase() === normalizedPreferred) || kickIds[0] || null;
+
+  if (!kickIds.length) {
+    const hint = document.createElement("div");
+    hint.style.opacity = "0.8";
+    hint.textContent = "No repetitions detected.";
+    repsBar.appendChild(hint);
+    updateCrumb();
+    return;
+  }
+
+  kickIds.forEach((kid, idx) => {
+    const btn = document.createElement("button");
+    btn.className = "rep-pill" + ((currentKickId === kid || (idx === 0 && !currentKickId)) ? " active" : "");
+    btn.textContent = kid.replace(/^kick/i, "Rep ");
+    btn.onclick = async () => {
+      Array.from(repsBar.children).forEach(el => el.classList.remove("active"));
+      btn.classList.add("active");
+      currentKickId = kid;
+      updateCrumb();
+      await loadAllForCurrentRep();
+    };
+    repsBar.appendChild(btn);
+  });
+
+  updateCrumb();
+}
+
+function buildCandidates(fileNames) {
+  if (!sessionRoot || !currentKickId) return [];
+  const base = `${sessionRoot}/${currentKickId}`;
+  return fileNames.map(f => `${base}/${f}`);
+}
+
+// Initial crumb (before reps are resolved)
+updateCrumb();
+
+/** =========================
+ *  DOM refs
+ *  ========================= */
+const poseCanvas = document.getElementById("poseCanvas");
+const poseCtx = poseCanvas.getContext("2d", { alpha: false });
+// Ported video player (StaticJumpPage-style): hidden <video> + canvas renderer + custom controls
+const rawVideoEl = document.getElementById("rawVideo");
+const rawCanvas = document.getElementById("rawFrameCanvas");
+const rawCtx = rawCanvas ? rawCanvas.getContext("2d", { alpha: false }) : null;
+
+// Raw video player state (kept independent from the sprint pose renderer)
+const RAW_SPEEDS = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+let rawSpeedIdx = 5; // 1.0x
+let rawIsPlaying = false;
+let rawRvfcHandle = null;
+let rawTimeHandler = null;
+let rawDuration = 0;
+let rawCurrentFrame = 0;
+let rawMaxFrame = 0;
+
+// Choose a default FPS for frame stepping; can be overridden via ?videoFps=...
+const rawVideoFps = Number(params.get("videoFps") || "") || 60;
+let rawFrameStepSec = 1 / rawVideoFps;
+
+// Simple zoom support (normalized bounds within the source video)
+let rawZoomBounds = { leftX: 0, rightX: 1, topY: 0, bottomY: 1 };
+let rawZoomCenterX = 0.5, rawZoomCenterY = 0.5;
+
+// Pose overlay on raw video
+let rawPoseVisible = false;
+
+function clamp(n, a, b) { return Math.max(a, Math.min(b, n)); }
+
+function recalcRawTiming() {
+  const dur = Number.isFinite(rawDuration) ? rawDuration : 0;
+  const step = Number.isFinite(rawFrameStepSec) && rawFrameStepSec > 0 ? rawFrameStepSec : (1 / 60);
+  rawFrameStepSec = step;
+  rawMaxFrame = dur > 0 ? Math.max(0, Math.floor(dur / step) - 1) : 0;
+  rawCurrentFrame = clamp(rawCurrentFrame, 0, rawMaxFrame);
+}
+
+function updateRawUi() {
+  const frameLabel = document.getElementById("rawFrameLabel");
+  const frameSlider = document.getElementById("rawFrameSlider");
+  const frameSliderValue = document.getElementById("rawFrameSliderValue");
+  const speedValue = document.getElementById("rawSpeedValue");
+  const speedSlider = document.getElementById("rawSpeedSlider");
+
+  if (frameLabel) frameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+  if (frameSlider) {
+    frameSlider.max = String(rawMaxFrame || 0);
+    frameSlider.value = String(rawCurrentFrame);
+  }
+  if (frameSliderValue) frameSliderValue.textContent = String(rawCurrentFrame);
+
+  const sp = RAW_SPEEDS[rawSpeedIdx] || 1;
+  if (speedValue) speedValue.textContent = `${sp.toFixed(2).replace(/0+$/,'').replace(/\.$/,'')}x`;
+  if (speedSlider) speedSlider.value = String(rawSpeedIdx);
+}
+
+function sizeRawCanvas() {
+  if (!rawCanvas || !rawCtx) return;
+  const cssW = rawCanvas.clientWidth || 480;
+  const vw = rawVideoEl?.videoWidth || 16;
+  const vh = rawVideoEl?.videoHeight || 9;
+  const cssH = Math.max(120, Math.round(cssW * (vh / vw)));
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  rawCanvas.style.height = cssH + "px";
+  rawCanvas.width = Math.round(cssW * dpr);
+  rawCanvas.height = Math.round(cssH * dpr);
+  rawCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function drawRawFrameToCanvas() {
+  if (!rawVideoEl || !rawCanvas || !rawCtx) return;
+  // If no metadata yet, just clear to black
+  if (!rawVideoEl.videoWidth || !rawVideoEl.videoHeight) {
+    const W = rawCanvas.clientWidth || 480;
+    const H = rawCanvas.clientHeight || 270;
+    rawCtx.fillStyle = "#000";
+    rawCtx.fillRect(0, 0, W, H);
+    return;
+  }
+
+  sizeRawCanvas();
+  const cssW = rawCanvas.clientWidth || 480;
+  const cssH = rawCanvas.clientHeight || 270;
+
+  const vw = rawVideoEl.videoWidth;
+  const vh = rawVideoEl.videoHeight;
+
+  const bx0 = clamp(rawZoomBounds.leftX, 0, 1);
+  const bx1 = clamp(rawZoomBounds.rightX, 0, 1);
+  const by0 = clamp(rawZoomBounds.topY, 0, 1);
+  const by1 = clamp(rawZoomBounds.bottomY, 0, 1);
+
+  const sx = Math.round(vw * Math.min(bx0, bx1));
+  const sy = Math.round(vh * Math.min(by0, by1));
+  const sw = Math.max(1, Math.round(vw * Math.abs(bx1 - bx0)));
+  const sh = Math.max(1, Math.round(vh * Math.abs(by1 - by0)));
+
+  rawCtx.fillStyle = "#000";
+  rawCtx.fillRect(0, 0, cssW, cssH);
+  try {
+    rawCtx.drawImage(rawVideoEl, sx, sy, sw, sh, 0, 0, cssW, cssH);
+  } catch (e) {
+    console.warn("[sprintPage] drawRawFrameToCanvas failed:", e);
+  }
+
+  // Draw pose overlay if enabled
+  if (rawPoseVisible) {
+    drawRawPoseOverlay(rawCurrentFrame);
+  }
+}
+
+/** Draw pose skeleton, COM, ground line, and ArUco markers on the raw video canvas */
+function drawRawPoseOverlay(frameIdx) {
+  if (!rawCanvas || !rawCtx) return;
+  if (!poseSeries.length && !comSeries.length && x1n == null) return;
+
+  const W = rawCanvas.clientWidth, H = rawCanvas.clientHeight;
+
+  // Calculate zoom offset for coordinate mapping (so overlay matches zoomed video)
+  const bx0 = clamp(rawZoomBounds.leftX, 0, 1);
+  const bx1 = clamp(rawZoomBounds.rightX, 0, 1);
+  const by0 = clamp(rawZoomBounds.topY, 0, 1);
+  const by1 = clamp(rawZoomBounds.bottomY, 0, 1);
+  const zoomOffsetX = Math.min(bx0, bx1);
+  const zoomOffsetY = Math.min(by0, by1);
+  const zoomScaleX = 1 / Math.max(0.001, Math.abs(bx1 - bx0));
+  const zoomScaleY = 1 / Math.max(0.001, Math.abs(by1 - by0));
+
+  // Helper: map normalized coord to canvas pixel accounting for zoom
+  const mapX = (nx) => (nx - zoomOffsetX) * zoomScaleX * W;
+  const mapY = (ny) => (ny - zoomOffsetY) * zoomScaleY * H;
+
+  // --- 1) ArUco vertical lines (start / end markers) ---
+  if (x1n != null && x2n != null) {
+    rawCtx.save();
+    rawCtx.lineWidth = 2;
+    rawCtx.setLineDash([]);
+    rawCtx.strokeStyle = "#ffd166";
+    const lx1 = mapX(x1n);
+    const lx2 = mapX(x2n);
+    rawCtx.beginPath(); rawCtx.moveTo(lx1, 0); rawCtx.lineTo(lx1, H); rawCtx.stroke();
+    rawCtx.beginPath(); rawCtx.moveTo(lx2, 0); rawCtx.lineTo(lx2, H); rawCtx.stroke();
+
+    // --- 2) Ground line (yMid between the two ArUco markers) ---
+    if (yMid != null) {
+      rawCtx.setLineDash([8, 6]);
+      rawCtx.strokeStyle = "#ffffff";
+      const groundPx = mapY(yMid);
+      const xLeft = Math.min(lx1, lx2);
+      const xRight = Math.max(lx1, lx2);
+      rawCtx.beginPath(); rawCtx.moveTo(xLeft, groundPx); rawCtx.lineTo(xRight, groundPx); rawCtx.stroke();
+    }
+    rawCtx.restore();
+  }
+
+  // --- 3) Pose skeleton ---
+  const idx = Math.max(0, Math.min(frameIdx, poseSeries.length - 1));
+  const frame = poseSeries?.[idx];
+  if (frame && Array.isArray(frame)) {
+    const n = frame.length;
+    const COCO_EDGES = [
+      [0,1],[0,2],[1,3],[2,4],
+      [5,6],[5,7],[7,9],[6,8],[8,10],
+      [5,11],[6,12],[11,12],
+      [11,13],[13,15],[12,14],[14,16]
+    ];
+    const MEDIAPIPE_EDGES = [
+      [0,1],[1,2],[2,3],[3,7],[0,4],[4,5],[5,6],[6,8],
+      [11,12],[11,23],[12,24],[23,24],
+      [11,13],[13,15],[15,17],[15,19],[15,21],[17,19],
+      [12,14],[14,16],[16,18],[16,20],[16,22],[18,20],
+      [23,25],[25,27],[27,29],[27,31],[29,31],
+      [24,26],[26,28],[28,30],[28,32],[30,32]
+    ];
+    const edges = (n === 33) ? MEDIAPIPE_EDGES : (n === 17 ? COCO_EDGES : []);
+
+    const isValidPoint = (pt) => {
+      if (!pt) return false;
+      const x = pt[0], y = pt[1];
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return false;
+      if (Math.abs(x) < 0.001 && Math.abs(y) < 0.001) return false;
+      return true;
+    };
+
+    // Bones
+    rawCtx.save();
+    rawCtx.lineWidth = Math.max(2, Math.round(W / 500));
+    rawCtx.lineCap = "round";
+    rawCtx.strokeStyle = "rgba(255,255,255,0.9)";
+    for (const [a, b] of edges) {
+      const pa = frame[a], pb = frame[b];
+      if (!isValidPoint(pa) || !isValidPoint(pb)) continue;
+      rawCtx.beginPath();
+      rawCtx.moveTo(mapX(pa[0]), mapY(pa[1]));
+      rawCtx.lineTo(mapX(pb[0]), mapY(pb[1]));
+      rawCtx.stroke();
+    }
+    rawCtx.restore();
+
+    // Joints
+    rawCtx.save();
+    const r = Math.max(2, Math.round(W / 300));
+    rawCtx.fillStyle = "rgba(34,197,94,0.95)";
+    for (const p of frame) {
+      if (!isValidPoint(p)) continue;
+      rawCtx.beginPath();
+      rawCtx.arc(mapX(p[0]), mapY(p[1]), r, 0, Math.PI * 2);
+      rawCtx.fill();
+    }
+    rawCtx.restore();
+  }
+
+  // --- 4) COM dot ---
+  const comIdx = Math.max(0, Math.min(frameIdx, comSeries.length - 1));
+  const comPt = comSeries?.[comIdx];
+  if (comPt && comPt.length >= 2 && Number.isFinite(comPt[0]) && Number.isFinite(comPt[1])) {
+    const cx = mapX(comPt[0]);
+    const cy = mapY(comPt[1]);
+    rawCtx.save();
+    // Vertical dashed line from COM to ground
+    if (yMid != null) {
+      const groundPx = mapY(yMid);
+      rawCtx.lineWidth = 2;
+      rawCtx.strokeStyle = "#ff4b4b";
+      rawCtx.setLineDash([6, 5]);
+      rawCtx.beginPath();
+      rawCtx.moveTo(cx, cy);
+      rawCtx.lineTo(cx, groundPx);
+      rawCtx.stroke();
+      rawCtx.setLineDash([]);
+    }
+    // COM dot
+    rawCtx.fillStyle = "#ff4b4b";
+    rawCtx.beginPath();
+    rawCtx.arc(cx, cy, 5, 0, Math.PI * 2);
+    rawCtx.fill();
+    rawCtx.strokeStyle = "rgba(255,255,255,0.85)";
+    rawCtx.lineWidth = 1.5;
+    rawCtx.stroke();
+    rawCtx.restore();
+  }
+}
+
+function frameIdxToTime(i) {
+  const t = i * rawFrameStepSec;
+  if (!Number.isFinite(t)) return 0;
+  return clamp(t, 0, Math.max(0, (rawDuration || 0) - 1e-4));
+}
+
+function seekAndDraw(t) {
+  if (!rawVideoEl) return;
+  const target = clamp(t, 0, Math.max(0, (rawDuration || rawVideoEl.duration || 0) - 1e-4));
+  try {
+    rawVideoEl.currentTime = target;
+  } catch (e) {
+    console.warn("[sprintPage] seek failed:", e);
+  }
+  // draw after seeked; also attempt immediate draw
+  drawRawFrameToCanvas();
+}
+
+function stopRawPlayback() {
+  rawIsPlaying = false;
+  try { rawVideoEl?.pause(); } catch (_) {}
+  try {
+    if (rawRvfcHandle && rawVideoEl && typeof rawVideoEl.cancelVideoFrameCallback === "function") {
+      rawVideoEl.cancelVideoFrameCallback(rawRvfcHandle);
+    }
+  } catch (_) {}
+  rawRvfcHandle = null;
+  try { if (rawTimeHandler && rawVideoEl) rawVideoEl.removeEventListener("timeupdate", rawTimeHandler); } catch (_) {}
+  rawTimeHandler = null;
+  const btn = document.getElementById("rawPlayPauseBtn");
+  if (btn) btn.textContent = "▶";
+}
+
+function startRawPlayback() {
+  if (!rawVideoEl) return;
+  rawIsPlaying = true;
+  const sp = RAW_SPEEDS[rawSpeedIdx] || 1;
+  try { rawVideoEl.playbackRate = sp; } catch (_) {}
+  const btn = document.getElementById("rawPlayPauseBtn");
+  if (btn) btn.textContent = "⏸";
+
+  const useRvfc = typeof rawVideoEl.requestVideoFrameCallback === "function";
+  if (useRvfc) {
+    const onFrame = () => {
+      if (!rawIsPlaying) return;
+      const t = rawVideoEl.currentTime || 0;
+      rawCurrentFrame = clamp(Math.round(t / rawFrameStepSec), 0, rawMaxFrame);
+      updateRawUi();
+      drawRawFrameToCanvas();
+      // Stop if at end
+      const dur = rawDuration || rawVideoEl.duration || 0;
+      if (dur && (rawVideoEl.ended || t >= dur - rawFrameStepSec)) {
+        stopRawPlayback();
+        return;
+      }
+      rawRvfcHandle = rawVideoEl.requestVideoFrameCallback(onFrame);
+    };
+    try { rawVideoEl.play().catch(()=>{}); } catch (_) {}
+    rawRvfcHandle = rawVideoEl.requestVideoFrameCallback(onFrame);
+  } else {
+    // Fallback: drive updates via timeupdate
+    rawTimeHandler = () => {
+      if (!rawIsPlaying) return;
+      const t = rawVideoEl.currentTime || 0;
+      rawCurrentFrame = clamp(Math.round(t / rawFrameStepSec), 0, rawMaxFrame);
+      updateRawUi();
+      drawRawFrameToCanvas();
+      const dur = rawDuration || rawVideoEl.duration || 0;
+      if (dur && (rawVideoEl.ended || t >= dur - rawFrameStepSec)) stopRawPlayback();
+    };
+    try { rawVideoEl.addEventListener("timeupdate", rawTimeHandler); } catch (_) {}
+    try { rawVideoEl.play().catch(()=>{}); } catch (_) {}
+  }
+}
+
+function rawResetZoom() {
+  rawZoomBounds = { leftX: 0, rightX: 1, topY: 0, bottomY: 1 };
+  rawZoomCenterX = 0.5; rawZoomCenterY = 0.5;
+}
+
+function rawZoomIn() {
+  const bx0 = rawZoomBounds.leftX, bx1 = rawZoomBounds.rightX;
+  const by0 = rawZoomBounds.topY, by1 = rawZoomBounds.bottomY;
+  const w = Math.abs(bx1 - bx0);
+  const h = Math.abs(by1 - by0);
+  const newW = Math.max(0.1, w * 0.8);
+  const newH = Math.max(0.1, h * 0.8);
+  const cx = clamp(rawZoomCenterX, 0, 1);
+  const cy = clamp(rawZoomCenterY, 0, 1);
+  rawZoomBounds = {
+    leftX: clamp(cx - newW / 2, 0, 1),
+    rightX: clamp(cx + newW / 2, 0, 1),
+    topY: clamp(cy - newH / 2, 0, 1),
+    bottomY: clamp(cy + newH / 2, 0, 1),
+  };
+  drawRawFrameToCanvas();
+}
+
+function rawZoomOut() {
+  const bx0 = rawZoomBounds.leftX, bx1 = rawZoomBounds.rightX;
+  const by0 = rawZoomBounds.topY, by1 = rawZoomBounds.bottomY;
+  const w = Math.abs(bx1 - bx0);
+  const h = Math.abs(by1 - by0);
+  const newW = Math.min(1, w / 0.8);
+  const newH = Math.min(1, h / 0.8);
+  const cx = clamp(rawZoomCenterX, 0, 1);
+  const cy = clamp(rawZoomCenterY, 0, 1);
+  rawZoomBounds = {
+    leftX: clamp(cx - newW / 2, 0, 1),
+    rightX: clamp(cx + newW / 2, 0, 1),
+    topY: clamp(cy - newH / 2, 0, 1),
+    bottomY: clamp(cy + newH / 2, 0, 1),
+  };
+  // If effectively full frame, snap to default
+  if (newW >= 0.999 && newH >= 0.999) rawResetZoom();
+  drawRawFrameToCanvas();
+}
+
+function initRawVideoPlayerControls() {
+  if (!rawVideoEl || !rawCanvas || !rawCtx) {
+    console.warn("[sprintPage] Raw video player elements missing; video will not render.");
+    return;
+  }
+
+  // Click on canvas sets zoom center (matches StaticJumpPage behavior)
+  rawCanvas.addEventListener("click", (e) => {
+    const rect = rawCanvas.getBoundingClientRect();
+    const x = e.clientX - rect.left;
+    const y = e.clientY - rect.top;
+    const W = rect.width || 1;
+    const H = rect.height || 1;
+    rawZoomCenterX = clamp(x / W, 0, 1);
+    rawZoomCenterY = clamp(y / H, 0, 1);
+  });
+
+  // Basic controls
+  const playBtn = document.getElementById("rawPlayPauseBtn");
+  if (playBtn) playBtn.onclick = () => { rawIsPlaying ? stopRawPlayback() : startRawPlayback(); };
+  const prevBtn = document.getElementById("rawPrevBtn");
+  if (prevBtn) prevBtn.onclick = () => { stopRawPlayback(); rawCurrentFrame = Math.max(0, rawCurrentFrame - 1); updateRawUi(); seekAndDraw(frameIdxToTime(rawCurrentFrame)); };
+  const nextBtn = document.getElementById("rawNextBtn");
+  if (nextBtn) nextBtn.onclick = () => { stopRawPlayback(); rawCurrentFrame = Math.min(rawMaxFrame, rawCurrentFrame + 1); updateRawUi(); seekAndDraw(frameIdxToTime(rawCurrentFrame)); };
+  const restartBtn = document.getElementById("rawRestartBtn");
+  if (restartBtn) restartBtn.onclick = () => { stopRawPlayback(); rawCurrentFrame = 0; rawResetZoom(); updateRawUi(); seekAndDraw(0); };
+  const zoomInBtn = document.getElementById("rawZoomInBtn");
+  if (zoomInBtn) zoomInBtn.onclick = () => { rawZoomIn(); };
+  const zoomOutBtn = document.getElementById("rawZoomOutBtn");
+  if (zoomOutBtn) zoomOutBtn.onclick = () => { rawZoomOut(); };
+
+  // Show Pose overlay toggle
+  const showPoseBtn = document.getElementById("rawShowPoseBtn");
+  if (showPoseBtn) showPoseBtn.onclick = () => {
+    rawPoseVisible = !rawPoseVisible;
+    showPoseBtn.classList.toggle("active", rawPoseVisible);
+    drawRawFrameToCanvas();
+  };
+
+  const frameSlider = document.getElementById("rawFrameSlider");
+  if (frameSlider) frameSlider.addEventListener("input", () => {
+    stopRawPlayback();
+    rawCurrentFrame = clamp(parseInt(frameSlider.value, 10) || 0, 0, rawMaxFrame);
+    updateRawUi();
+    seekAndDraw(frameIdxToTime(rawCurrentFrame));
+  });
+
+  const speedSlider = document.getElementById("rawSpeedSlider");
+  if (speedSlider) speedSlider.addEventListener("input", () => {
+    rawSpeedIdx = clamp(parseInt(speedSlider.value, 10) || 5, 0, RAW_SPEEDS.length - 1);
+    try { rawVideoEl.playbackRate = RAW_SPEEDS[rawSpeedIdx] || 1; } catch (_) {}
+    updateRawUi();
+  });
+
+  rawVideoEl.addEventListener("loadedmetadata", () => {
+    rawDuration = rawVideoEl.duration || 0;
+    recalcRawTiming();
+    rawCurrentFrame = 0;
+    updateRawUi();
+    sizeRawCanvas();
+    rawResetZoom();
+    seekAndDraw(0);
+  });
+  rawVideoEl.addEventListener("seeked", () => { drawRawFrameToCanvas(); });
+  rawVideoEl.addEventListener("error", (e) => { console.warn("[sprintPage] raw video error:", e); });
+
+  // Fullscreen wiring (mirrors StaticJumpPage)
+  const videoContainer = document.querySelector(".video-section .video-container") || document.querySelector(".video-container");
+  const videoFsBtn = document.getElementById("videoFullscreenBtn");
+  function requestFullscreen(el){ if (!el) return; if (el.requestFullscreen) el.requestFullscreen(); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); else if (el.msRequestFullscreen) el.msRequestFullscreen(); }
+  function exitFullscreen(){ if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); else if (document.msExitFullscreen) document.msExitFullscreen(); }
+  function isElFullscreen(el){ const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement; return fsEl === el; }
+  function toggleVideoFullscreen(){ if (isElFullscreen(videoContainer)) exitFullscreen(); else requestFullscreen(videoContainer); }
+  if (videoFsBtn) videoFsBtn.onclick = toggleVideoFullscreen;
+
+  ["fullscreenchange","webkitfullscreenchange","msfullscreenchange"].forEach(evt => {
+    document.addEventListener(evt, () => {
+      try { sizeRawCanvas(); } catch(_) {}
+      try { drawRawFrameToCanvas(); } catch(_) {}
+    });
+  });
+  window.addEventListener("resize", () => { try { sizeRawCanvas(); } catch(_){} try { drawRawFrameToCanvas(); } catch(_){} });
+
+  // Initial UI
+  updateRawUi();
+  sizeRawCanvas();
+  drawRawFrameToCanvas();
+}
+
+initRawVideoPlayerControls();
+
+/** =========================
+ *  Velocity Chart (right of video)
+ *  ========================= */
+const velChartCanvas = document.getElementById("velChart");
+const velChartCtx = velChartCanvas ? velChartCanvas.getContext("2d") : null;
+const CHART_VIDEO_FPS = 60; // Assume video is captured at 60 fps
+
+function sizeVelChart() {
+  if (!velChartCanvas || !velChartCtx) return;
+  const cssW = velChartCanvas.clientWidth || 480;
+  const cssH = 260;
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  velChartCanvas.style.height = cssH + "px";
+  velChartCanvas.width = Math.round(cssW * dpr);
+  velChartCanvas.height = Math.round(cssH * dpr);
+  velChartCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function drawVelocityChart(currentFrame) {
+  if (!velChartCanvas || !velChartCtx) return;
+  sizeVelChart();
+
+  const W = velChartCanvas.clientWidth;
+  const H = velChartCanvas.clientHeight;
+  const ctx = velChartCtx;
+
+  // Margins
+  const marginLeft = 58;
+  const marginRight = 18;
+  const marginTop = 22;
+  const marginBottom = 38;
+  const plotW = W - marginLeft - marginRight;
+  const plotH = H - marginTop - marginBottom;
+
+  // Background
+  ctx.fillStyle = "#0b1b14";
+  ctx.fillRect(0, 0, W, H);
+
+  if (!velocitySeries.length) {
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.font = "13px Inter";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("No velocity data", W / 2, H / 2);
+    return;
+  }
+
+  // Determine data range
+  const effStart = startFrame;
+  const effEnd = endFrame != null ? Math.min(endFrame, velocitySeries.length - 1) : velocitySeries.length - 1;
+
+  // Convert to mph and collect valid points
+  const pts = [];
+  let yMin = Infinity, yMax = -Infinity;
+  for (let i = effStart; i <= effEnd; i++) {
+    const v = velocitySeries[i];
+    if (Number.isFinite(v)) {
+      const mph = v * MS_TO_MPH;
+      const timeSec = (i - effStart) / CHART_VIDEO_FPS;
+      pts.push({ frame: i, mph, time: timeSec });
+      if (mph < yMin) yMin = mph;
+      if (mph > yMax) yMax = mph;
+    }
+  }
+
+  if (!pts.length) {
+    ctx.fillStyle = "rgba(255,255,255,0.5)";
+    ctx.font = "13px Inter";
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    ctx.fillText("No valid velocity data", W / 2, H / 2);
+    return;
+  }
+
+  // Pad y-axis
+  const yPad = (yMax - yMin) * 0.12 || 1;
+  yMin = Math.max(0, yMin - yPad);
+  yMax = yMax + yPad;
+
+  const tMin = 0;
+  const tMax = (effEnd - effStart) / CHART_VIDEO_FPS;
+  const tSpan = Math.max(0.001, tMax - tMin);
+  const ySpan = Math.max(0.001, yMax - yMin);
+
+  // Map functions
+  const xFor = (t) => marginLeft + ((t - tMin) / tSpan) * plotW;
+  const yFor = (mph) => marginTop + (1 - (mph - yMin) / ySpan) * plotH;
+
+  // --- Grid lines ---
+  ctx.strokeStyle = "rgba(255,255,255,0.08)";
+  ctx.lineWidth = 1;
+
+  // Horizontal grid + y-axis labels
+  const yTicks = 5;
+  ctx.fillStyle = "rgba(255,255,255,0.6)";
+  ctx.font = "11px Inter";
+  ctx.textAlign = "right";
+  ctx.textBaseline = "middle";
+  for (let i = 0; i <= yTicks; i++) {
+    const val = yMin + (ySpan * i / yTicks);
+    const y = yFor(val);
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.beginPath();
+    ctx.moveTo(marginLeft, y);
+    ctx.lineTo(W - marginRight, y);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    ctx.fillText(val.toFixed(1), marginLeft - 6, y);
+  }
+
+  // Vertical grid + x-axis labels
+  const totalSeconds = tMax - tMin;
+  const xTickInterval = totalSeconds <= 1 ? 0.1 : totalSeconds <= 2 ? 0.25 : totalSeconds <= 5 ? 0.5 : totalSeconds <= 10 ? 1 : 2;
+  ctx.textAlign = "center";
+  ctx.textBaseline = "top";
+  for (let t = 0; t <= tMax + 0.0001; t += xTickInterval) {
+    const x = xFor(t);
+    ctx.strokeStyle = "rgba(255,255,255,0.08)";
+    ctx.beginPath();
+    ctx.moveTo(x, marginTop);
+    ctx.lineTo(x, marginTop + plotH);
+    ctx.stroke();
+    ctx.fillStyle = "rgba(255,255,255,0.6)";
+    const label = xTickInterval < 0.5 ? t.toFixed(2) : t.toFixed(1);
+    ctx.fillText(label + "s", x, marginTop + plotH + 6);
+  }
+
+  // Axis labels
+  ctx.save();
+  ctx.fillStyle = "rgba(255,255,255,0.7)";
+  ctx.font = "bold 11px Inter";
+  ctx.textAlign = "center";
+  ctx.translate(14, marginTop + plotH / 2);
+  ctx.rotate(-Math.PI / 2);
+  ctx.fillText("Speed (mph)", 0, 0);
+  ctx.restore();
+
+  ctx.fillStyle = "rgba(255,255,255,0.7)";
+  ctx.font = "bold 11px Inter";
+  ctx.textAlign = "center";
+  ctx.fillText("Time (seconds)", marginLeft + plotW / 2, H - 4);
+
+  // Plot border
+  ctx.strokeStyle = "rgba(255,255,255,0.15)";
+  ctx.lineWidth = 1;
+  ctx.strokeRect(marginLeft, marginTop, plotW, plotH);
+
+  // --- Velocity line ---
+  ctx.save();
+  ctx.beginPath();
+  ctx.rect(marginLeft, marginTop, plotW, plotH);
+  ctx.clip();
+
+  // Gradient fill under curve
+  const grad = ctx.createLinearGradient(0, marginTop, 0, marginTop + plotH);
+  grad.addColorStop(0, "rgba(88, 197, 154, 0.25)");
+  grad.addColorStop(1, "rgba(88, 197, 154, 0.02)");
+  ctx.fillStyle = grad;
+  ctx.beginPath();
+  let started = false;
+  for (const pt of pts) {
+    const x = xFor(pt.time);
+    const y = yFor(pt.mph);
+    if (!started) { ctx.moveTo(x, y); started = true; }
+    else ctx.lineTo(x, y);
+  }
+  // Close to bottom for fill
+  if (pts.length) {
+    ctx.lineTo(xFor(pts[pts.length - 1].time), marginTop + plotH);
+    ctx.lineTo(xFor(pts[0].time), marginTop + plotH);
+    ctx.closePath();
+    ctx.fill();
+  }
+
+  // Line stroke
+  ctx.strokeStyle = "#58c59a";
+  ctx.lineWidth = 2;
+  ctx.lineJoin = "round";
+  ctx.lineCap = "round";
+  ctx.beginPath();
+  started = false;
+  for (const pt of pts) {
+    const x = xFor(pt.time);
+    const y = yFor(pt.mph);
+    if (!started) { ctx.moveTo(x, y); started = true; }
+    else ctx.lineTo(x, y);
+  }
+  ctx.stroke();
+
+  // --- Current frame indicator ---
+  const curTimeSec = (currentFrame - effStart) / CHART_VIDEO_FPS;
+  const curX = xFor(curTimeSec);
+
+  // Vertical line at current frame
+  ctx.strokeStyle = "rgba(255, 75, 75, 0.6)";
+  ctx.lineWidth = 1.5;
+  ctx.setLineDash([4, 3]);
+  ctx.beginPath();
+  ctx.moveTo(curX, marginTop);
+  ctx.lineTo(curX, marginTop + plotH);
+  ctx.stroke();
+  ctx.setLineDash([]);
+
+  // Dot at current value
+  const curVel = velocitySeries[currentFrame];
+  if (Number.isFinite(curVel)) {
+    const curMph = curVel * MS_TO_MPH;
+    const curY = yFor(curMph);
+
+    // Glow
+    ctx.shadowColor = "#ff4b4b";
+    ctx.shadowBlur = 8;
+    ctx.fillStyle = "#ff4b4b";
+    ctx.beginPath();
+    ctx.arc(curX, curY, 5, 0, Math.PI * 2);
+    ctx.fill();
+    ctx.shadowBlur = 0;
+
+    ctx.strokeStyle = "rgba(255,255,255,0.9)";
+    ctx.lineWidth = 1.5;
+    ctx.stroke();
+
+    // Value label (position smartly to avoid going off-edge)
+    ctx.fillStyle = "#fff";
+    ctx.font = "bold 12px Inter";
+    const labelText = curMph.toFixed(1) + " mph";
+    const labelW = ctx.measureText(labelText).width;
+    const labelX = (curX + 10 + labelW > marginLeft + plotW) ? curX - labelW - 10 : curX + 10;
+    const labelY = (curY - 10 < marginTop) ? curY + 16 : curY - 10;
+    ctx.textAlign = "left";
+    ctx.textBaseline = "bottom";
+    ctx.fillText(labelText, labelX, labelY);
+  }
+
+  ctx.restore();
+}
+
+/** =========================
+ *  Canvas sizing
+ *  ========================= */
+function sizeCanvas(c) {
+  const cssW = c.clientWidth || 800;
+  // Pose canvas: half the original height (3/8 instead of 3/4) to show only the lower portion
+  const cssH = c === poseCanvas ? Math.round(cssW * 3/8) : 260;
+  const dpr  = Math.min(window.devicePixelRatio || 1, 2);
+  c.style.height = cssH + "px";
+  c.width  = Math.round(cssW * dpr);
+  c.height = Math.round(cssH * dpr);
+  const ctx = c.getContext("2d");
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function sizeAll(){
+  [poseCanvas].forEach(sizeCanvas);
+  sizeVelChart();
+}
+sizeAll();
+window.addEventListener("resize", sizeAll);
+
+/** =========================
+ *  Data containers
+ *  ========================= */
+let curIdx = 0;           // frame index (driven by COM length)
+let fpsTarget = 30;       // assume 60fps recordings; adjustable to 300 fps
+let playing = false;
+let rafId = null;
+let lastTs = 0;
+let accumMs = 0;
+
+let x1n = null, x2n = null, yMid = null, arucoDist = null;
+let groundY = null; // lower ArUco marker y (larger value = lower on screen)
+
+// Frame range from aruco_points.json
+let startFrame = 0;   // from aruco_points.json start_frame (default 0)
+let endFrame = null;  // from aruco_points.json end_frame (null = use full length)
+
+// Rep statistics from Firestore
+let repStats = null;  // {average_velocity, distance, max_acceleration, max_velocity}
+
+// Compute vertical shift so groundY displays at 95% (5% from bottom of full canvas)
+function getYShift() {
+  if (groundY == null || !Number.isFinite(groundY)) return 0;
+  return 0.95 - groundY;
+}
+
+// Apply shift to a normalized y-coordinate, then crop to bottom half
+// This maps the bottom half of the shifted coordinate space to fill the (now shorter) canvas
+function shiftY(yNorm) {
+  const shifted = yNorm + getYShift();
+  // Crop: map [0.5, 1.0] → [0, 1.0] (viewing only the bottom half)
+  return (shifted - 0.5) * 2;
+}
+
+let comSeries = [];       // Array<[xNorm,yNorm] | null>
+let comMetersSeries = []; // Array<number|null>
+let comMeterBaseline = null;
+
+// Pose + velocity (optional)
+let poseSeries = [];      // Array<Array<[xNorm,yNorm] | null>>
+let velocitySeries = [];  // Array<number|null> (raw values from velocity.json)
+
+// Auto-tracking zoom state
+let autoTrackEnabled = false;
+let autoTrackBounds = null; // {topY,bottomY,leftX,rightX} in normalized coords
+
+// Manual zoom and pan state
+let manualZoomBounds = null; // {leftX, rightX, topY, bottomY} in normalized coords
+let isZoomSelecting = false;
+let zoomStartX = 0, zoomStartY = 0;
+let zoomCurrentX = 0, zoomCurrentY = 0;
+let panOffsetX = 0, panOffsetY = 0; // additional offset for panning
+let panStartX = 0, panStartY = 0; // starting position for panning
+let isPanning = false; // track if we're currently panning
+
+function recomputeAutoTrackBoundsIfPossible(){
+  if (!comSeries || !comSeries.length) {
+    console.log("[AutoTrack] Cannot compute: comSeries empty");
+    autoTrackBounds = null; return;
+  }
+  if (yMid == null) {
+    console.log("[AutoTrack] Cannot compute: yMid is null");
+    autoTrackBounds = null; return;
+  }
+  const ys = comSeries.map(p=>p? p[1] : null).filter(v=>Number.isFinite(v));
+  if (!ys.length) { console.log("[AutoTrack] Cannot compute: no valid COM y values"); autoTrackBounds = null; return; }
+  const minY = Math.min(...ys);
+  const bottomY = yMid;
+  const diff = bottomY - minY;
+  const topY = Math.max(0, bottomY - 2*diff);
+  autoTrackBounds = { topY, bottomY, leftX:null, rightX:null };
+  console.log("[AutoTrack] Computed bounds:", { minY: minY.toFixed(4), bottomY: bottomY.toFixed(4), diff: diff.toFixed(4), topY: topY.toFixed(4) });
+}
+
+// Pose skeleton rendering removed (COM + ArUco viewer only).
+
+/** =========================
+ *  Helpers
+ *  ========================= */
+async function getJSONFromCandidates(paths) {
+  for (const p of paths) {
+    try {
+      const url = await storage.ref(p).getDownloadURL();
+      const j = await (await fetch(url)).json();
+      return j;
+    } catch(e) { /* try next */ }
+  }
+  throw new Error("None of the JSON candidates were found:\n" + paths.join("\n"));
+}
+
+function normFrameFromPixels(framePx, W, H) {
+  return framePx.map(pt => (!pt || pt.length < 2) ? null : [pt[0]/W, pt[1]/H]);
+}
+
+function drawGrid(ctx, W, H) {
+  ctx.fillStyle = "#0f241c";
+  ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle = "rgba(76,140,106,0.18)";
+  ctx.lineWidth = 1;
+  // Twice as dense (20x20)
+  for (let i=0;i<=20;i++){
+    const x = (W/20)*i, y = (H/20)*i;
+    ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+}
+
+function applyAutoTrackTransform(ctx, W, H, frameIdx){
+  if (!autoTrackEnabled || !autoTrackBounds || !comSeries.length) return null;
+  const pt = getComPoint(frameIdx);
+  if (!pt) return null;
+  const { x: comX } = pt;
+
+  const bottomY = autoTrackBounds.bottomY; // normalized
+  const topY = autoTrackBounds.topY;       // normalized
+  const viewHeightN = Math.max(0.05, bottomY - topY);
+  // Use aspect-preserving width based on canvas aspect ratio
+  const viewWidthN = viewHeightN * (W / H);
+  const halfW = viewWidthN / 2;
+  let leftX = comX - halfW;
+  let rightX = comX + halfW;
+  // Clamp to [0, 1 - viewWidthN] to keep window in bounds
+  if (leftX < 0) { leftX = 0; rightX = viewWidthN; }
+  if (rightX > 1) { rightX = 1; leftX = 1 - viewWidthN; }
+
+  // Non-uniform scaling to map viewport to full canvas
+  const sx = 1 / viewWidthN;
+  const sy = 1 / viewHeightN;
+  const leftPx = leftX * W;
+  const topPx = topY * H;
+
+  // Apply transform with DPR awareness
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  ctx.save();
+  ctx.setTransform(dpr * sx, 0, 0, dpr * sy, dpr * (-sx * leftPx), dpr * (-sy * topPx));
+  
+  // Log transform details for debugging
+  console.log("[AutoTrack] sx:", sx.toFixed(3), "sy:", sy.toFixed(3), "leftX:", leftX.toFixed(3), "rightX:", rightX.toFixed(3), "center:", comX.toFixed(3));
+  
+  return { leftX, rightX, topY, bottomY, sx, sy, center: comX };
+}
+
+function applyManualZoomTransform(ctx, W, H) {
+  if (!manualZoomBounds) return null;
+  
+  const { leftX, rightX, topY, bottomY } = manualZoomBounds;
+  const viewWidthN = rightX - leftX;
+  const viewHeightN = bottomY - topY;
+  
+  // Apply pan offset
+  const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, leftX + panOffsetX));
+  const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, topY + panOffsetY));
+  
+  // Non-uniform scaling to map viewport to full canvas
+  const sx = 1 / viewWidthN;
+  const sy = 1 / viewHeightN;
+  const leftPx = adjustedLeftX * W;
+  const topPx = adjustedTopY * H;
+
+  // Apply transform with DPR awareness
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  ctx.save();
+  ctx.setTransform(dpr * sx, 0, 0, dpr * sy, dpr * (-sx * leftPx), dpr * (-sy * topPx));
+  
+  return { leftX: adjustedLeftX, rightX: adjustedLeftX + viewWidthN, topY: adjustedTopY, bottomY: adjustedTopY + viewHeightN, sx, sy };
+}
+
+function restoreTransform(ctx){
+  ctx.restore();
+  // reset to device pixel ratio scaling
+  const dpr = Math.min(window.devicePixelRatio || 1, 2);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+
+function drawArucoGuides(ctx, W, H) {
+  if (x1n==null || x2n==null || yMid==null) return;
+  ctx.save();
+  ctx.lineWidth = 2;
+  ctx.setLineDash([]);
+  ctx.strokeStyle = "#ffd166";
+  ctx.beginPath(); ctx.moveTo(x1n*W, 0); ctx.lineTo(x1n*W, H); ctx.stroke();
+  ctx.beginPath(); ctx.moveTo(x2n*W, 0); ctx.lineTo(x2n*W, H); ctx.stroke();
+
+  // White dashed line at yMid, shifted so groundY is at 95%
+  ctx.setLineDash([8,6]);
+  ctx.strokeStyle = "#ffffff";
+  const xLeft = Math.min(x1n, x2n)*W, xRight = Math.max(x1n, x2n)*W;
+  const shiftedYMid = shiftY(yMid) * H;
+  ctx.beginPath(); ctx.moveTo(xLeft, shiftedYMid); ctx.lineTo(xRight, shiftedYMid); ctx.stroke();
+  ctx.restore();
+}
+
+function getComPoint(frameIdx) {
+  if (!comSeries.length) return null;
+  const idx = Math.min(Math.max(frameIdx, 0), comSeries.length - 1);
+  const pt = comSeries[idx];
+  if (!pt || pt.length < 2) return null;
+  const [x, y] = pt;
+  if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+  return { x, y, idx };
+}
+
+function drawComShadow(frameIdx, W, H) {
+  if (!comSeries.length || x1n == null || x2n == null || yMid == null) return;
+  const idx = Math.min(Math.max(frameIdx, 0), comSeries.length - 1);
+  const topPoints = [];
+  for (let k = 0; k <= idx; k++) {
+    const pt = comSeries[k];
+    if (!pt || pt.length < 2) continue;
+    const [x, y] = pt;
+    if (!Number.isFinite(x) || !Number.isFinite(y)) continue;
+    if (x < x1n) continue;
+    if (x > x2n) continue;
+    topPoints.push([x * W, shiftY(y) * H]);
+  }
+  if (!topPoints.length) return;
+
+  const baseY = shiftY(yMid) * H;
+  const leftX = x1n * W;
+  const poly = [];
+  const firstTop = topPoints[0];
+  poly.push([leftX, baseY]);
+  poly.push([leftX, Math.min(firstTop[1], baseY)]);
+  for (const p of topPoints) {
+    poly.push([p[0], Math.min(p[1], baseY)]);
+  }
+  const lastTop = topPoints[topPoints.length - 1];
+  poly.push([lastTop[0], baseY]);
+
+  poseCtx.save();
+  poseCtx.fillStyle = "rgba(255, 64, 64, 0.18)";
+  poseCtx.beginPath();
+  poly.forEach(([x, y], i) => {
+    if (i === 0) poseCtx.moveTo(x, y);
+    else poseCtx.lineTo(x, y);
+  });
+  poseCtx.closePath();
+  poseCtx.fill();
+  poseCtx.restore();
+}
+
+function ensureComMeterBaseline(frameIdx) {
+  if (comMeterBaseline != null || x1n == null || !comSeries.length || !comMetersSeries.length) return;
+  const idx = Math.min(Math.max(frameIdx, 0), Math.min(comSeries.length - 1, comMetersSeries.length - 1));
+  for (let k = 0; k <= idx; k++) {
+    const pt = comSeries[k];
+    const meters = comMetersSeries[k];
+    if (!pt || pt.length < 2 || meters == null) continue;
+    if (pt[0] >= x1n) {
+      comMeterBaseline = meters;
+      return;
+    }
+  }
+}
+
+function drawComProgress(frameIdx, W, H) {
+  if (!comSeries.length || !comMetersSeries.length || x1n == null || x2n == null || yMid == null) return;
+  const ptInfo = getComPoint(frameIdx);
+  if (!ptInfo) return;
+  const { x, idx } = ptInfo;
+  if (x <= x1n) return;
+
+  ensureComMeterBaseline(idx);
+
+  const leftX = x1n * W;
+  const rightBoundX = x2n * W; // Use x2n as the right bound
+  const currentX = Math.min(x * W, rightBoundX);
+  const width = currentX - leftX;
+  if (width < 8) return;
+
+  // Progress bar sits just below the shifted yMid line
+  const shiftedYMid = shiftY(yMid) * H;
+  const barY = Math.min(shiftedYMid + 28, H - 42);
+  const barHeight = 8;
+  const isAtBound = x * W >= rightBoundX;
+
+  // Draw progress bar background (full width to bound)
+  poseCtx.save();
+  poseCtx.fillStyle = "rgba(255, 255, 255, 0.2)";
+  poseCtx.fillRect(leftX, barY - barHeight/2, rightBoundX - leftX, barHeight);
+  
+  // Draw progress bar fill (current progress)
+  poseCtx.fillStyle = isAtBound ? "#ff8c00" : "#ff4b4b"; // Orange when at bound, red otherwise
+  poseCtx.fillRect(leftX, barY - barHeight/2, width, barHeight);
+  
+  // Draw progress bar border
+  poseCtx.strokeStyle = "rgba(255, 255, 255, 0.6)";
+  poseCtx.lineWidth = 1;
+  poseCtx.strokeRect(leftX, barY - barHeight/2, rightBoundX - leftX, barHeight);
+  poseCtx.restore();
+
+  // Calculate distance - use the last valid value when at bound
+  let deltaLabel = "—";
+  if (comMetersSeries.length > 0) {
+    let baseline = comMeterBaseline;
+    if (baseline == null) {
+      for (let k = 0; k <= idx; k++) {
+        const pt = comSeries[k];
+        const meters = comMetersSeries[k];
+        if (pt && pt.length >=2 && meters != null && pt[0] >= x1n) {
+          baseline = meters;
+          break;
+        }
+      }
+    }
+    
+    if (baseline != null) {
+      let metersCurrent;
+      if (isAtBound) {
+        // Find the last valid meters value before or at the bound
+        for (let k = idx; k >= 0; k--) {
+          const pt = comSeries[k];
+          const meters = comMetersSeries[k];
+          if (pt && pt.length >=2 && meters != null && pt[0] <= x2n) {
+            metersCurrent = meters;
+            break;
+          }
+        }
+      } else {
+        metersCurrent = comMetersSeries[idx];
+      }
+      
+      if (metersCurrent != null) {
+        const delta = metersCurrent - baseline;
+        deltaLabel = `${delta.toFixed(2)} m`;
+      }
+    }
+  }
+
+  poseCtx.save();
+  poseCtx.font = "14px Inter";
+  poseCtx.fillStyle = "#ffffff";
+  poseCtx.textAlign = "center";
+  poseCtx.textBaseline = "top";
+  poseCtx.fillText(deltaLabel, (leftX + currentX) / 2, barY + 8);
+  poseCtx.restore();
+}
+
+function drawComDotAndLine(frameIdx, W, H) {
+  if (!comSeries.length || yMid == null) return;
+  const ptInfo = getComPoint(frameIdx);
+  if (!ptInfo) return;
+  const { x, y } = ptInfo;
+  const dotX = x * W;
+  const dotY = shiftY(y) * H;
+  const baseY = shiftY(yMid) * H;
+
+  // Scale down COM elements when auto-track is enabled
+  const scale = autoTrackEnabled ? 1/3 : 1;
+
+  poseCtx.save();
+  poseCtx.lineWidth = 2.5 * scale;
+  poseCtx.strokeStyle = "#ff4b4b";
+  poseCtx.setLineDash([6,5]);
+  poseCtx.beginPath();
+  poseCtx.moveTo(dotX, dotY);
+  poseCtx.lineTo(dotX, baseY);
+  poseCtx.stroke();
+  poseCtx.setLineDash([]);
+  poseCtx.fillStyle = "#ff4b4b";
+  poseCtx.beginPath();
+  poseCtx.arc(dotX, dotY, 6 * scale, 0, Math.PI*2);
+  poseCtx.fill();
+  poseCtx.strokeStyle = "rgba(255,255,255,0.85)";
+  poseCtx.lineWidth = 1.5 * scale;
+  poseCtx.stroke();
+  poseCtx.restore();
+}
+
+function drawZoomSelection(W, H) {
+  if (!isZoomSelecting) return;
+  
+  const leftX = Math.min(zoomStartX, zoomCurrentX);
+  const rightX = Math.max(zoomStartX, zoomCurrentX);
+  const topY = Math.min(zoomStartY, zoomCurrentY);
+  const bottomY = Math.max(zoomStartY, zoomCurrentY);
+  
+  poseCtx.save();
+  poseCtx.fillStyle = "rgba(128, 128, 128, 0.3)";
+  poseCtx.fillRect(leftX, topY, rightX - leftX, bottomY - topY);
+  poseCtx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+  poseCtx.lineWidth = 2;
+  poseCtx.strokeRect(leftX, topY, rightX - leftX, bottomY - topY);
+  poseCtx.restore();
+}
+
+function drawPoseFrame(i) {
+  const W = poseCanvas.clientWidth, H = poseCanvas.clientHeight;
+  drawGrid(poseCtx, W, H);
+  
+  // Draw zoom selection overlay
+  drawZoomSelection(W, H);
+  
+  // Apply transforms (manual zoom takes precedence over auto-track)
+  let tx = null;
+  if (manualZoomBounds) {
+    tx = applyManualZoomTransform(poseCtx, W, H);
+  } else if (autoTrackEnabled) {
+    tx = applyAutoTrackTransform(poseCtx, W, H, i);
+    if (autoTrackEnabled) {
+      console.log("[AutoTrack] Transform applied?", !!tx, tx);
+    }
+  }
+  
+  drawArucoGuides(poseCtx, W, H);
+
+  // Pose overlay (optional)
+  const frame = poseSeries?.[i];
+  if (frame && Array.isArray(frame)) {
+    // Determine skeleton type by landmark count
+    const n = frame.length;
+    const COCO_EDGES = [
+      [0,1],[0,2],[1,3],[2,4],
+      [5,6],[5,7],[7,9],[6,8],[8,10],
+      [5,11],[6,12],[11,12],
+      [11,13],[13,15],[12,14],[14,16]
+    ];
+    const MEDIAPIPE_EDGES = [
+      [0,1],[1,2],[2,3],[3,7],[0,4],[4,5],[5,6],[6,8],
+      [11,12],[11,23],[12,24],[23,24],
+      [11,13],[13,15],[15,17],[15,19],[15,21],[17,19],
+      [12,14],[14,16],[16,18],[16,20],[16,22],[18,20],
+      [23,25],[25,27],[27,29],[27,31],[29,31],
+      [24,26],[26,28],[28,30],[28,32],[30,32]
+    ];
+    const edges = (n === 33) ? MEDIAPIPE_EDGES : (n === 17 ? COCO_EDGES : []);
+    const scale = autoTrackEnabled ? 1/3 : 1;
+
+    // Helper: check if keypoint is valid (not at origin 0,0)
+    const isValidPoint = (pt) => {
+      if (!pt) return false;
+      const x = pt[0], y = pt[1];
+      if (!Number.isFinite(x) || !Number.isFinite(y)) return false;
+      // Skip points at or very near (0,0) - these are typically undetected keypoints
+      if (Math.abs(x) < 0.001 && Math.abs(y) < 0.001) return false;
+      return true;
+    };
+
+    // bones (with y-shift so groundY is at 95%)
+    poseCtx.lineWidth = 3.5 * scale;
+    poseCtx.strokeStyle = "rgba(255,255,255,0.9)";
+    for (const [a,b] of edges) {
+      const pa = frame[a], pb = frame[b];
+      if (!isValidPoint(pa) || !isValidPoint(pb)) continue;
+      const ax = pa[0], ay = pa[1], bx = pb[0], by = pb[1];
+      poseCtx.beginPath();
+      poseCtx.moveTo(ax * W, shiftY(ay) * H);
+      poseCtx.lineTo(bx * W, shiftY(by) * H);
+      poseCtx.stroke();
+    }
+
+    // joints (with y-shift)
+    poseCtx.fillStyle = "#00ff88";
+    for (const p of frame) {
+      if (!isValidPoint(p)) continue;
+      const x = p[0], y = p[1];
+      poseCtx.beginPath();
+      poseCtx.arc(x * W, shiftY(y) * H, 3.5 * scale, 0, Math.PI * 2);
+      poseCtx.fill();
+    }
+  }
+
+  drawComShadow(i, W, H);
+
+  drawComDotAndLine(i, W, H);
+  drawComProgress(i, W, H);
+
+  if (autoTrackEnabled && autoTrackBounds) {
+    console.log("[AutoTrack frame] topY:", autoTrackBounds.topY.toFixed(4), "bottomY:", autoTrackBounds.bottomY.toFixed(4));
+  }
+
+  if (autoTrackEnabled || manualZoomBounds) {
+    restoreTransform(poseCtx);
+  }
+}
+
+/** =========================
+ *  Series loaders (vel/acc)
+ *  ========================= */
+function computeYBounds(values){
+  if (!values.length) return {yMin:0, yMax:1};
+  let vmin = Math.min(...values.filter(v=>Number.isFinite(v)));
+  let vmax = Math.max(...values.filter(v=>Number.isFinite(v)));
+  if (!Number.isFinite(vmin) || !Number.isFinite(vmax)) return {yMin:0,yMax:1};
+  if (vmax === vmin) { vmax += 1; vmin -= 1; }
+  const pad = 0.1*(vmax - vmin);
+  return {yMin:vmin - pad, yMax:vmax + pad};
+}
+
+// Velocity/acceleration were removed; COM drives playback now.
+
+// Helper: extract numeric value from session/kick string (e.g., "session1" → 1, "kick2" → 2)
+function extractNumber(str) {
+  if (!str) return null;
+  const match = String(str).match(/(\d+)/);
+  return match ? parseInt(match[1], 10) : null;
+}
+
+// Load rep statistics from Firestore
+async function loadRepStats() {
+  repStats = null;
+  updateStatsUI();
+  
+  if (!player) {
+    console.log("[RepStats] No player param; skipping Firestore query");
+    return;
+  }
+  
+  // Extract session and rep numbers from URL params / current state
+  const sessionNum = extractNumber(session);
+  const repNum = extractNumber(currentKickId || kickParamRaw);
+  
+  if (!sessionNum || !repNum) {
+    console.log("[RepStats] Missing sessionNumber or repNumber:", { sessionNum, repNum });
+    return;
+  }
+  
+  console.log("[RepStats] Querying Firestore for player:", player, "sessionNumber:", sessionNum, "repNumber:", repNum);
+  
+  try {
+    const repsRef = db.collection('players').doc(player).collection('reps');
+    const snapshot = await repsRef
+      .where('sessionNumber', '==', sessionNum)
+      .where('repNumber', '==', repNum)
+      .limit(1)
+      .get();
+    
+    if (snapshot.empty) {
+      console.log("[RepStats] No matching rep found in Firestore");
+      return;
+    }
+    
+    const doc = snapshot.docs[0];
+    const data = doc.data();
+    console.log("[RepStats] Found rep data:", data);
+    
+    repStats = {
+      average_velocity: data.average_velocity ?? null,
+      distance: data.distance ?? null,
+      max_acceleration: data.max_acceleration ?? null,
+      max_velocity: data.max_velocity ?? null
+    };
+    
+    updateStatsUI();
+  } catch (err) {
+    console.warn("[RepStats] Firestore query failed:", err);
+  }
+}
+
+// Unit conversion helpers
+const MS_TO_MPH = 2.23694;    // m/s to mph
+const M_TO_YARDS = 1.09361;   // meters to yards
+
+// Acceleration conversion: m/s² to mph/s
+const MS2_TO_MPHS = 2.23694;
+
+// Update the stats panel UI with current repStats (imperial units)
+function updateStatsUI() {
+  const avgVelEl = document.getElementById("avgVelVal");
+  const distEl = document.getElementById("distanceVal");
+  const maxVelEl = document.getElementById("maxVelVal");
+  const maxAccelEl = document.getElementById("maxAccelVal");
+  const maxSpeedReachedEl = document.getElementById("maxSpeedReachedVal");
+  
+  if (avgVelEl) {
+    const mph = repStats?.average_velocity != null ? (repStats.average_velocity * MS_TO_MPH).toFixed(1) : null;
+    avgVelEl.textContent = mph != null ? mph + " mph" : "—";
+  }
+  if (distEl) {
+    const yards = repStats?.distance != null ? (repStats.distance * M_TO_YARDS).toFixed(1) : null;
+    distEl.textContent = yards != null ? yards + " yds" : "—";
+  }
+  if (maxVelEl) {
+    const mph = repStats?.max_velocity != null ? (repStats.max_velocity * MS_TO_MPH).toFixed(1) : null;
+    maxVelEl.textContent = mph != null ? mph + " mph" : "—";
+  }
+  if (maxAccelEl) {
+    const mphs = repStats?.max_acceleration != null ? (repStats.max_acceleration * MS2_TO_MPHS).toFixed(1) : null;
+    maxAccelEl.textContent = mphs != null ? mphs + " mph/s" : "—";
+  }
+  if (maxSpeedReachedEl) {
+    const reached = computeMaxSpeedReached();
+    if (reached === null) {
+      maxSpeedReachedEl.textContent = "—";
+      maxSpeedReachedEl.style.color = "";
+    } else if (reached) {
+      maxSpeedReachedEl.textContent = "Yes";
+      maxSpeedReachedEl.style.color = "#4ade80";
+    } else {
+      maxSpeedReachedEl.textContent = "No";
+      maxSpeedReachedEl.style.color = "#fbbf24";
+    }
+  }
+}
+
+/**
+ * Determine whether the athlete reached their max speed before the second ArUco marker.
+ * Logic: Look at velocity in the last ~15% of frames before x2n. If velocity is still
+ * accelerating (positive slope) in that tail window, max speed was NOT reached.
+ * If velocity is flat or declining, max speed WAS reached.
+ * Returns true/false/null (null = insufficient data).
+ */
+function computeMaxSpeedReached() {
+  if (!velocitySeries.length || !comSeries.length || x2n == null) return null;
+
+  // Find the last frame index where COM x <= x2n (athlete at or before stop marker)
+  let lastIdxAtMarker = -1;
+  for (let i = 0; i < Math.min(comSeries.length, velocitySeries.length); i++) {
+    const pt = comSeries[i];
+    if (!pt || pt.length < 2) continue;
+    if (pt[0] <= x2n) lastIdxAtMarker = i;
+  }
+  if (lastIdxAtMarker < 5) return null; // not enough data
+
+  // Find first frame where COM x >= x1n (athlete past start marker)
+  let firstIdxAtStart = -1;
+  for (let i = 0; i < comSeries.length; i++) {
+    const pt = comSeries[i];
+    if (!pt || pt.length < 2) continue;
+    if (pt[0] >= x1n) { firstIdxAtStart = i; break; }
+  }
+  if (firstIdxAtStart < 0) return null;
+
+  const rangeLen = lastIdxAtMarker - firstIdxAtStart;
+  if (rangeLen < 5) return null;
+
+  // Look at the last ~15% of frames in the range (minimum 3 frames)
+  const tailLen = Math.max(3, Math.round(rangeLen * 0.15));
+  const tailStart = lastIdxAtMarker - tailLen;
+
+  // Collect valid velocity values in the tail window
+  const tailVals = [];
+  for (let i = tailStart; i <= lastIdxAtMarker; i++) {
+    const v = velocitySeries[i];
+    if (Number.isFinite(v)) tailVals.push(v);
+  }
+  if (tailVals.length < 2) return null;
+
+  // Simple linear regression slope over the tail
+  const n = tailVals.length;
+  let sumX = 0, sumY = 0, sumXY = 0, sumX2 = 0;
+  for (let i = 0; i < n; i++) {
+    sumX += i; sumY += tailVals[i]; sumXY += i * tailVals[i]; sumX2 += i * i;
+  }
+  const slope = (n * sumXY - sumX * sumY) / (n * sumX2 - sumX * sumX);
+
+  // Also compute max velocity in the full range and at the tail
+  let maxVelFull = -Infinity;
+  for (let i = firstIdxAtStart; i <= lastIdxAtMarker; i++) {
+    const v = velocitySeries[i];
+    if (Number.isFinite(v) && v > maxVelFull) maxVelFull = v;
+  }
+  const avgTail = sumY / n;
+
+  // Max speed is "reached" if:
+  // 1) The tail slope is near-zero or negative (not still accelerating), AND
+  // 2) The tail average is close to the overall max (within 5%)
+  const slopeThreshold = maxVelFull * 0.01; // 1% of max per frame index
+  const isFlat = slope < slopeThreshold;
+  const isNearMax = avgTail >= maxVelFull * 0.95;
+
+  return isFlat && isNearMax;
+}
+
+async function loadAllForCurrentRep(){
+  if (!sessionRoot || !currentKickId) {
+    await initRepsBar();
+    if (!sessionRoot || !currentKickId) throw new Error("Missing rep selection (kick folder).");
+  }
+
+  // Stop playback and reset view/state
+  pause();
+  curIdx = 0;
+  fpsTarget = 30;
+  const fpsEl = document.getElementById("fpsTarget");
+  if (fpsEl) fpsEl.textContent = fpsTarget;
+  resetZoomPan();
+  comMeterBaseline = null;
+  autoTrackBounds = null;
+
+  // Clear previous datasets so UI doesn't show stale values
+  comSeries = [];
+  comMetersSeries = [];
+  x1n = null; x2n = null; yMid = null; groundY = null; arucoDist = null;
+  poseSeries = [];
+  velocitySeries = [];
+  startFrame = 0;
+  endFrame = null;
+  repStats = null;
+  updateStatsUI();
+
+  const errEl = document.getElementById("err");
+  if (errEl) { errEl.style.display = "none"; errEl.textContent = ""; }
+
+  await Promise.all([
+    loadAruco(),
+    loadComSeries(),
+    loadPoseSeries().catch(()=>{ poseSeries = []; }),
+    loadVelocitySeries().catch(()=>{ velocitySeries = []; }),
+    loadRepStats().catch((e)=>{ console.warn("[RepStats] Load failed:", e); })
+  ]);
+  console.log("[Data Load] COM frames:", comSeries?.length || 0, "Aruco ready:", x1n != null && x2n != null && yMid != null);
+  console.log("[Data Load] Frame range:", startFrame, "to", endFrame ?? "(end)");
+
+  // Refresh stats UI now that velocity/COM/aruco are all available
+  // (initial call inside loadRepStats may fire before velocity/COM finish)
+  updateStatsUI();
+
+  if (!autoTrackBounds) {
+    console.log("[AutoTrack] Post-bootstrap recompute attempt...");
+    recomputeAutoTrackBoundsIfPossible();
+  }
+
+  // Set initial frame to startFrame
+  curIdx = startFrame;
+
+  // Video is optional; do not block COM viewer if missing.
+  try { await loadVideo(); } catch (e) { console.warn("[Video] Optional load failed:", e?.message || e); }
+  render(performance.now());
+}
+
+async function loadPoseSeries() {
+  const raw = await getJSONFromCandidates(buildCandidates([
+    "pose.json",
+    "poses.json"
+  ]));
+  if (!Array.isArray(raw)) throw new Error("pose.json is not an array");
+
+  // Expected: Array<Frame>, Frame = Array<[x,y,...] | null>
+  // Keep null frames to preserve frame indices (must align with comSeries and velocitySeries)
+  poseSeries = raw.map((fr) => {
+    if (!Array.isArray(fr)) return null;
+    return fr.map((pt) => {
+      if (!pt) return null;
+      if (Array.isArray(pt)) {
+        const x = pt[0], y = pt[1];
+        return (Number.isFinite(x) && Number.isFinite(y)) ? [x, y] : null;
+      }
+      if (typeof pt === "object") {
+        const x = pt.x, y = pt.y;
+        return (Number.isFinite(x) && Number.isFinite(y)) ? [x, y] : null;
+      }
+      return null;
+    });
+  });
+}
+
+async function loadVelocitySeries() {
+  const raw = await getJSONFromCandidates(buildCandidates([
+    "velocity.json"
+  ]));
+  if (!Array.isArray(raw)) throw new Error("velocity.json is not an array");
+  velocitySeries = raw.map(v => Number.isFinite(v) ? v : null);
+}
+
+// (velocity loaders removed)
+
+/** =========================
+ *  Chart drawing (windowed)
+ *  ========================= */
+function clearChart(ctx, canvas){
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  ctx.fillStyle = "#0b1b14";
+  ctx.fillRect(0,0,W,H);
+  // axes
+  ctx.strokeStyle = "rgba(255,255,255,0.15)";
+  ctx.lineWidth = 1;
+  // horizontal grid lines (5)
+  for (let i=0;i<=5;i++){
+    const y = (H/5)*i;
+    ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke();
+  }
+}
+
+function drawSeriesWindow(ctx, canvas, frames, values, currentFrame, yMin, yMax, nowMs){
+  const W = canvas.clientWidth, H = canvas.clientHeight;
+  clearChart(ctx, canvas);
+
+  if (!frames.length) {
+    ctx.fillStyle = "#fff"; ctx.font = "13px Inter";
+    ctx.fillText("No data", 12, 22);
+    return;
+  }
+
+  const winEnd = currentFrame;
+  const winStart = winEnd - 50;      // inclusive window [f-50, f]
+  // find first index >= winStart
+  let i0 = 0;
+  while (i0 < frames.length && frames[i0] < winStart) i0++;
+  // find last index <= winEnd
+  let i1 = i0;
+  while (i1+1 < frames.length && frames[i1+1] <= winEnd) i1++;
+
+  // guard
+  if (i0 > i1) { i0 = Math.max(0, i1-1); }
+
+  const f0 = frames[i0] ?? winStart;
+  const f1 = frames[i1] ?? winEnd;
+  const fSpan = Math.max(1, f1 - f0);
+
+  // scales
+  const xFor = (f)=> ( ( (f - f0) / fSpan ) * (W-20) ) + 10;
+  const yFor = (v)=> {
+    const t = (v - yMin) / (yMax - yMin);
+    return (1 - t) * (H-18) + 9;
+  };
+
+  // series line
+  ctx.strokeStyle = "#58c59a";
+  ctx.lineWidth = 2;
+  ctx.beginPath();
+  for (let i=i0;i<=i1;i++){
+    const x = xFor(frames[i]);
+    const y = yFor(values[i]);
+    if (i===i0) ctx.moveTo(x,y);
+    else ctx.lineTo(x,y);
+  }
+  ctx.stroke();
+
+  // animated current point marker (pulse)
+  // use nearest record to currentFrame
+  let k = i1;
+  // draw vertical marker at current frame
+  const xCur = xFor(Math.min(Math.max(currentFrame, f0), f1));
+  ctx.strokeStyle = "rgba(255,255,255,0.35)";
+  ctx.setLineDash([6,6]);
+  ctx.beginPath(); ctx.moveTo(xCur, 0); ctx.lineTo(xCur, H); ctx.stroke();
+  ctx.setLineDash([]);
+
+  if (frames[k] != null) {
+    const yCur = yFor(values[k]);
+    const r = 4 + 2*Math.sin((nowMs/300)% (2*Math.PI)); // small pulse
+    ctx.fillStyle = "#ffffff";
+    ctx.beginPath(); ctx.arc(xCur, yCur, Math.abs(r), 0, Math.PI*2); ctx.fill();
+  }
+
+  // y-axis labels (min/max)
+  ctx.fillStyle = "rgba(255,255,255,0.8)";
+  ctx.font = "11px Inter";
+  ctx.fillText(yMax.toFixed(2), 8, 12);
+  ctx.fillText(yMin.toFixed(2), 8, H-6);
+
+  // x-axis labels (start/end frame in window)
+  ctx.fillText(Math.round(f0).toString(), W-70, H-6);
+  ctx.fillText(Math.round(f1).toString(), W-30, H-6);
+}
+
+/** =========================
+ *  Playback (RAF up to 300fps)
+ *  ========================= */
+// Get the effective end frame (clamped to data length)
+function getEffectiveEndFrame() {
+  const n = Math.max(comSeries?.length || 0, poseSeries?.length || 0, velocitySeries?.length || 0, 1);
+  return endFrame != null ? Math.min(endFrame, n - 1) : (n - 1);
+}
+
+function tick(ts){
+  if (!playing) return;
+  if (!lastTs) lastTs = ts;
+  const dt = ts - lastTs; lastTs = ts;
+  accumMs += dt;
+
+  const stepMs = Math.max(1000/300, 1000/Math.max(1,fpsTarget)); // clamp to 300 fps
+  while (accumMs >= stepMs) {
+    accumMs -= stepMs;
+    const effEnd = getEffectiveEndFrame();
+    // Increment within [startFrame, effEnd], wrap to startFrame
+    curIdx = (curIdx + 1 <= effEnd) ? (curIdx + 1) : startFrame;
+  }
+
+  render(ts);
+  rafId = requestAnimationFrame(tick);
+}
+
+function play(){
+  if (playing) return;
+  playing = true;
+  document.getElementById("btnPlay").textContent = "⏸";
+  lastTs = 0; accumMs = 0;
+  rafId = requestAnimationFrame(tick);
+}
+function pause(){
+  if (!playing) return;
+  playing = false;
+  document.getElementById("btnPlay").textContent = "▶";
+  if (rafId) cancelAnimationFrame(rafId);
+  rafId = null;
+}
+function togglePlay(){ playing ? pause() : play(); }
+function slower(){
+  fpsTarget = Math.max(1, Math.round(fpsTarget - 10));
+  document.getElementById("fpsTarget").textContent = fpsTarget;
+}
+function faster(){
+  fpsTarget = Math.min(300, Math.round(fpsTarget + 10));
+  document.getElementById("fpsTarget").textContent = fpsTarget;
+}
+function resetAll(){
+  pause();
+  curIdx = startFrame;
+  fpsTarget = 30;
+  document.getElementById("fpsTarget").textContent = fpsTarget;
+  resetZoomPan();
+  render(performance.now());
+}
+
+/** =========================
+ *  Render
+ *  ========================= */
+function currentAbsoluteFrame(){
+  return curIdx;
+}
+
+function render(nowMs){
+  drawPoseFrame(curIdx);
+
+  // labels
+  document.getElementById("frameLabel").textContent = currentAbsoluteFrame();
+
+  // Update current velocity tracker (from velocity.json, converted to mph)
+  const velocityTracker = document.getElementById("velocityTracker");
+  if (velocityTracker) {
+    const v = velocitySeries?.[curIdx];
+    if (Number.isFinite(v)) {
+      const mph = (v * MS_TO_MPH).toFixed(1);
+      velocityTracker.textContent = mph + " mph";
+    } else {
+      velocityTracker.textContent = "— mph";
+    }
+  }
+
+  // Update velocity chart
+  drawVelocityChart(curIdx);
+}
+
+/** =========================
+ *  Loaders
+ *  ========================= */
+
+async function loadAruco() {
+  const aru = await getJSONFromCandidates(buildCandidates(["aruco_points.json"]));
+  const fx = aru?.frame_shape?.x, fy = aru?.frame_shape?.y;
+  const p1 = aru?.point1, p2 = aru?.point2;
+  const dist = aru?.distance;
+  if (!(p1 && p2)) throw new Error("aruco_points.json missing required fields");
+
+  function normalizeArucoPoint(pt){
+    const x = pt?.x, y = pt?.y;
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+    // New format already stores normalized [0..1]
+    if (x <= 1.5 && y <= 1.5) return { x, y };
+    // Legacy format stores pixel coords with known frame_shape
+    if (Number.isFinite(fx) && Number.isFinite(fy) && fx > 0 && fy > 0) return { x: x / fx, y: y / fy };
+    return { x, y };
+  }
+
+  const p1n = normalizeArucoPoint(p1);
+  const p2n = normalizeArucoPoint(p2);
+  if (!p1n || !p2n) throw new Error("aruco_points.json has invalid point values");
+
+  // Treat the left-most ArUco marker as the "start" marker (x1n)
+  // and the other marker as the "stop" marker (x2n).
+  if (p1n.x <= p2n.x) {
+    x1n = p1n.x;
+    x2n = p2n.x;
+  } else {
+    x1n = p2n.x;
+    x2n = p1n.x;
+  }
+  yMid = (p1n.y + p2n.y) / 2;
+  groundY = Math.max(p1n.y, p2n.y); // lower marker (larger y = lower on screen)
+  arucoDist = dist ?? null;
+
+  // Extract frame range from aruco_points.json
+  const sf = aru?.start_frame;
+  const ef = aru?.end_frame;
+  startFrame = (Number.isFinite(sf) && sf >= 0) ? sf : 0;
+  endFrame = (Number.isFinite(ef) && ef > startFrame) ? ef : null;
+  console.log("[Aruco] Frame range:", startFrame, "to", endFrame ?? "(end of data)");
+
+  // Update ArUco display elements if they exist
+  const x1El = document.getElementById("x1Val");
+  const x2El = document.getElementById("x2Val");
+  const yMidEl = document.getElementById("yMidVal");
+  const distEl = document.getElementById("distVal");
+  
+  if (x1El) x1El.textContent = x1n.toFixed(4);
+  if (x2El) x2El.textContent = x2n.toFixed(4);
+  if (yMidEl) yMidEl.textContent = yMid.toFixed(4);
+  if (distEl) distEl.textContent = arucoDist ?? "—";
+}
+
+async function loadComSeries() {
+  comMeterBaseline = null;
+  try {
+    const raw = await getJSONFromCandidates(buildCandidates(["COM.json"]));
+    if (Array.isArray(raw)) {
+      comSeries = raw.map(pt => {
+        if (!pt || pt.length < 2) return null;
+        const [x, y] = pt;
+        return Number.isFinite(x) && Number.isFinite(y) ? [x, y] : null;
+      });
+      // Precompute auto-track vertical bounds
+      const ys = comSeries.map(p=>p? p[1] : null).filter(v=>Number.isFinite(v));
+      if (ys.length && yMid != null) {
+        const minY = Math.min(...ys); // highest centroid (smallest y)
+        const bottomY = yMid;         // white dashed line
+        const diff = bottomY - minY;  // positive if minY above bottom
+        const topY = Math.max(0, bottomY - 2*diff);
+        autoTrackBounds = { topY, bottomY, leftX:null, rightX:null };
+        console.log("[AutoTrack] minY:", minY.toFixed(4), "bottomY:", bottomY.toFixed(4), "diff:", diff.toFixed(4), "topY:", topY.toFixed(4));
+      } else {
+        autoTrackBounds = null;
+      }
+    }
+  } catch (err) {
+    console.warn("COM.json not found", err);
+    comSeries = [];
+  }
+
+  try {
+    const rawMeters = await getJSONFromCandidates(buildCandidates(["COM_meters.json"]));
+    if (Array.isArray(rawMeters)) {
+      comMetersSeries = rawMeters.map(pt => {
+        if (Array.isArray(pt) && pt.length > 0) {
+          const candidate = pt[0]; // Use x-coordinate (first element)
+          return Number.isFinite(candidate) ? candidate : null;
+        }
+        if (Number.isFinite(pt)) return pt;
+        return null;
+      });
+    }
+  } catch (err) {
+    console.warn("COM_meters.json not found", err);
+    comMetersSeries = [];
+  }
+}
+
+// Video loading function
+async function loadVideo() {
+  async function getDownloadURLFromCandidates(paths){
+    for (const p of paths) {
+      try {
+        const url = await storage.ref(p).getDownloadURL();
+        return { url, path: p };
+      } catch (e) { /* try next */ }
+    }
+    throw new Error("None of the video candidates were found:\n" + paths.join("\n"));
+  }
+
+  try {
+    // New format commonly uses sprint.mov (often inside kick1/)
+    const { url: videoUrl, path: videoPath } = await getDownloadURLFromCandidates(buildCandidates([
+      "sprint.mov",
+      "sprint.mp4",
+      "IMG_7737.mov",
+      "IMG_7737.mp4"
+    ]));
+    console.log("[Video] Got download URL:", videoUrl, "from", videoPath);
+
+    if (!rawVideoEl) {
+      console.warn("[Video] rawVideoEl missing; cannot set src");
+      return;
+    }
+    stopRawPlayback();
+    rawVideoEl.src = videoUrl;
+    rawVideoEl.load();
+
+    console.log("[Video] Loaded:", videoPath);
+  } catch (err) {
+    console.error("[Video] Failed to load video:", err);
+    // Fallback: try to find any .mov file
+    try {
+      const sessionRef = storage.ref(`${sessionRoot}/${currentKickId}/`);
+      const list = await sessionRef.listAll();
+      const movFile = list.items.find(item => item.name.toLowerCase().endsWith('.mov'));
+      if (movFile) {
+        const videoUrl = await movFile.getDownloadURL();
+        if (!rawVideoEl) { console.warn("[Video] rawVideoEl missing; cannot set fallback src"); return; }
+        stopRawPlayback();
+        rawVideoEl.src = videoUrl;
+        rawVideoEl.load();
+        console.log("[Video] Fallback loaded:", movFile.name);
+      } else {
+        console.log("[Video] No .mov file found in session");
+      }
+    } catch (fallbackErr) {
+      console.error("[Video] Fallback also failed:", fallbackErr);
+    }
+  }
+}
+
+/** =========================
+ *  Auth + bootstrap
+ *  ========================= */
+function showErr(msg){
+  const el = document.getElementById("err");
+  el.style.display = "block";
+  el.textContent = msg;
+}
+
+// Some pages/layouts may not include a header logout link.
+const logoutLinkEl = document.getElementById("logoutLink");
+if (logoutLinkEl) {
+  logoutLinkEl.addEventListener("click", (e)=>{
+    e.preventDefault();
+    auth.signOut().then(()=>location.href="kickai.html");
+  });
+}
+
+auth.onAuthStateChanged(async (user)=>{
+  if (!user && !isDev){ location.href = "kickai.html"; return; }
+  let isCoach = false;
+  let currentUserInfo = null;
+  let isViewingPlayer = false;
+  const urlParams = new URLSearchParams(window.location.search);
+  const playerDocId = urlParams.get('player');
+
+  async function loadUserInfo(userId) {
+    try {
+      // Check if user is coach
+      const coachDoc = await db.collection('coaches').doc(userId).get();
+      if (coachDoc.exists) {
+        const coachData = coachDoc.data();
+        return {
+          uid: userId,
+          docId: userId,
+          name: `${coachData.firstName} ${coachData.lastName}`,
+          firstName: coachData.firstName,
+          lastName: coachData.lastName,
+          type: "coach",
+          organization: coachData.org,
+          members: coachData.members || [],
+          ...coachData
+        };
+      }
+      // Check if user is player (try both UID field names used by different signup flows)
+      let playerQuery = await db.collection('players')
+        .where('userUID', '==', userId)
+        .limit(1)
+        .get();
+      if (playerQuery.empty) {
+        playerQuery = await db.collection('players')
+          .where('authenticationUID', '==', userId)
+          .limit(1)
+          .get();
+      }
+      if (!playerQuery.empty) {
+        const playerDoc = playerQuery.docs[0];
+        const playerData = playerDoc.data();
+        return {
+          uid: userId,
+          docId: playerDoc.id,
+          name: `${playerData.firstName} ${playerData.lastName}`,
+          firstName: playerData.firstName,
+          lastName: playerData.lastName,
+          type: "player",
+          code: playerData.code || "N/A",
+          organization: playerData.org,
+          coachUID: playerData.coachUID,
+          isTemporary: !playerData.userUID,
+          ...playerData
+        };
+      }
+      return { name: "User", type: "player", code: "N/A", uid: userId, docId: userId };
+    } catch (error) {
+      console.error("Error loading user info:", error);
+      return { name: "User", type: "player", code: "N/A", uid: userId, docId: userId };
+    }
+  }
+
+  if (!user && !isDev){ location.href = "kickai.html"; return; }
+  if (user) {
+    currentUserInfo = await loadUserInfo(user.uid);
+    isCoach = currentUserInfo.type === 'coach';
+    localStorage.setItem('userType', isCoach ? 'coach' : 'player');
+  }
+
+  // If viewing another player's sprint work (as coach) or direct link
+  if (playerDocId) {
+    isViewingPlayer = true;
+    // Optionally, load player info if needed
+  }
+
+  // Setup navigation links (centralized, mirrors other pages)
+  function setupNavigation(isCoach, isViewingPlayer, playerId, type, sessionId) {
+    const backToPlayersLink = document.getElementById('backToPlayersLink');
+    const kickingAnalysisLink = document.getElementById('kickingAnalysisLink');
+    const playerProfileLink = document.getElementById('playerProfileLink');
+
+    if (!backToPlayersLink || !kickingAnalysisLink || !playerProfileLink) {
+      console.warn('[sprintPage] setupNavigation: missing header link(s)', {
+        backToPlayersLink: !!backToPlayersLink,
+        kickingAnalysisLink: !!kickingAnalysisLink,
+        playerProfileLink: !!playerProfileLink
+      });
+      return;
+    }
+
+    // Coach viewing a specific player
+    if (isCoach && playerId) {
+      backToPlayersLink.style.display = 'inline';
+      backToPlayersLink.href = 'coachesview.html';
+
+      // Preserve only the player parameter for profile pathing
+      kickingAnalysisLink.href = `kickingview.html?player=${playerId}&userType=coach`;
+      playerProfileLink.textContent = 'Player Profile';
+      playerProfileLink.href = `profile.html?player=${playerId}`;
+    }
+    // Coach, but not scoped to a player
+    else if (isCoach) {
+      backToPlayersLink.style.display = 'inline';
+      backToPlayersLink.href = 'coachesview.html';
+      kickingAnalysisLink.href = 'kickingview.html?userType=coach';
+      playerProfileLink.textContent = 'Profile';
+      playerProfileLink.href = 'profile.html';
+    }
+    // Regular player (or direct-link viewing a player)
+    else {
+      backToPlayersLink.style.display = 'none';
+      // If the URL includes ?player=..., preserve it when navigating back
+      kickingAnalysisLink.href = playerId ? `kickingview.html?player=${playerId}&userType=player` : 'kickingview.html?userType=player';
+      playerProfileLink.textContent = 'Profile';
+      playerProfileLink.href = playerId ? `profile.html?player=${playerId}` : 'profile.html';
+    }
+  }
+
+  // Call setup with current context (preserve same signature as other pages)
+  setupNavigation(isCoach, isViewingPlayer, playerDocId, params.get('type'), params.get('session'));
+
+  try{
+    await initRepsBar();
+    await loadAllForCurrentRep();
+  }catch(err){
+    console.error(err);
+    showErr(err?.message || "Failed to load required data.");
+  }
+});
+
+/** =========================
+ *  Controls wiring
+ *  ========================= */
+function safeOn(id, event, handler) {
+  const el = document.getElementById(id);
+  if (!el) {
+    console.warn(`[sprintPage] Missing #${id} for ${event} handler`);
+    return null;
+  }
+  el.addEventListener(event, handler);
+  return el;
+}
+
+safeOn("btnPlay", "click", togglePlay);
+safeOn("btnSlow", "click", slower);
+safeOn("btnFast", "click", faster);
+safeOn("btnReset", "click", resetAll);
+safeOn("btnAutoTrack", "click", ()=>{
+  console.log("[AutoTrack] Toggle clicked. Prev:", autoTrackEnabled);
+  autoTrackEnabled = !autoTrackEnabled;
+  document.getElementById("btnAutoTrack").textContent = `Auto-Track: ${autoTrackEnabled?"On":"Off"}`;
+  if (autoTrackEnabled && !autoTrackBounds) {
+    console.log("[AutoTrack] No bounds present; recomputing now...");
+    recomputeAutoTrackBoundsIfPossible();
+  }
+  console.log("[AutoTrack] Now enabled:", autoTrackEnabled, "Bounds:", autoTrackBounds);
+  try {
+    render(performance.now());
+    console.log("[AutoTrack] Render requested after toggle.");
+  } catch (e) {
+    console.error("[AutoTrack] Render failed after toggle:", e);
+  }
+});
+safeOn("btnZoomIn", "click", zoomIn);
+safeOn("btnZoomOut", "click", zoomOut);
+
+// Canvas mouse event handlers for zoom and pan
+poseCanvas.addEventListener("mousedown", (e) => {
+  const rect = poseCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  if (e.button === 0) { // Left click - start zoom selection
+    isZoomSelecting = true;
+    zoomStartX = x;
+    zoomStartY = y;
+    zoomCurrentX = x;
+    zoomCurrentY = y;
+    console.log("[Zoom] Started selection at:", x, y);
+  } else if (e.button === 2) { // Right click - start pan
+    e.preventDefault();
+    isZoomSelecting = false;
+    isPanning = true;
+    panStartX = x;
+    panStartY = y;
+    console.log("[Pan] Started at:", x, y, "Current offset:", panOffsetX.toFixed(4), panOffsetY.toFixed(4));
+  }
+});
+
+poseCanvas.addEventListener("mousemove", (e) => {
+  const rect = poseCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  if (isZoomSelecting) {
+    zoomCurrentX = x;
+    zoomCurrentY = y;
+    try {
+      render(performance.now());
+    } catch (e) {
+      console.error("[Zoom] Render failed during selection:", e);
+    }
+  } else if (e.buttons === 2 && isPanning) { // Right mouse button held and we're panning
+    e.preventDefault();
+    const deltaX = (x - panStartX) / poseCanvas.clientWidth;
+    const deltaY = (y - panStartY) / poseCanvas.clientHeight;
+    // Invert panning direction: mouse movement should move view in opposite direction
+    panOffsetX -= deltaX;
+    panOffsetY -= deltaY;
+    panStartX = x;
+    panStartY = y;
+    console.log("[Pan] Delta:", deltaX.toFixed(4), deltaY.toFixed(4), "Total offset:", panOffsetX.toFixed(4), panOffsetY.toFixed(4));
+    try {
+      render(performance.now());
+      console.log("[Pan] Render completed");
+    } catch (e) {
+      console.error("[Pan] Render failed:", e);
+    }
+  }
+});
+
+poseCanvas.addEventListener("mouseup", (e) => {
+  const rect = poseCanvas.getBoundingClientRect();
+  const x = e.clientX - rect.left;
+  const y = e.clientY - rect.top;
+  
+  if (e.button === 0 && isZoomSelecting) { // Left click release - finish zoom selection
+    isZoomSelecting = false;
+    const leftX = Math.min(zoomStartX, x) / poseCanvas.clientWidth;
+    const rightX = Math.max(zoomStartX, x) / poseCanvas.clientWidth;
+    const topY = Math.min(zoomStartY, y) / poseCanvas.clientHeight;
+    const bottomY = Math.max(zoomStartY, y) / poseCanvas.clientHeight;
+    
+    const widthPx = Math.abs(x - zoomStartX);
+    const heightPx = Math.abs(y - zoomStartY);
+    const minSize = 20; // Minimum 20 pixels in each dimension
+    
+    if (widthPx >= minSize && heightPx >= minSize) {
+      // Calculate aspect ratio preserving bounds
+      const canvasAspect = poseCanvas.clientWidth / poseCanvas.clientHeight;
+      const selectionAspect = widthPx / heightPx;
+      
+      let finalLeftX = leftX;
+      let finalRightX = rightX;
+      let finalTopY = topY;
+      let finalBottomY = bottomY;
+      
+      if (selectionAspect > canvasAspect) {
+        // Selection is wider than canvas aspect - trim width
+        const centerX = (leftX + rightX) / 2;
+        const targetWidth = (bottomY - topY) * canvasAspect;
+        finalLeftX = centerX - targetWidth / 2;
+        finalRightX = centerX + targetWidth / 2;
+      } else {
+        // Selection is taller than canvas aspect - trim height
+        const centerY = (topY + bottomY) / 2;
+        const targetHeight = (rightX - leftX) / canvasAspect;
+        finalTopY = centerY - targetHeight / 2;
+        finalBottomY = centerY + targetHeight / 2;
+      }
+      
+      manualZoomBounds = { leftX: finalLeftX, rightX: finalRightX, topY: finalTopY, bottomY: finalBottomY };
+      panOffsetX = 0;
+      panOffsetY = 0;
+      console.log("[Zoom] Applied aspect-preserving bounds:", manualZoomBounds);
+      console.log("[Zoom] Original selection:", widthPx.toFixed(1), "x", heightPx.toFixed(1), "pixels");
+      console.log("[Zoom] Aspect ratio:", selectionAspect.toFixed(3), "vs canvas:", canvasAspect.toFixed(3));
+      try {
+        render(performance.now());
+        console.log("[Zoom] Render completed successfully");
+      } catch (e) {
+        console.error("[Zoom] Render failed:", e);
+      }
+    } else {
+      console.log("[Zoom] Selection too small:", widthPx.toFixed(1), "x", heightPx.toFixed(1), "pixels (minimum:", minSize, "px)");
+      try {
+        render(performance.now());
+        console.log("[Zoom] Render completed after failed selection");
+      } catch (e) {
+        console.error("[Zoom] Render failed after failed selection:", e);
+      }
+    }
+  }
+  
+  if (e.button === 2 && isPanning) { // Right click release - stop panning
+    isPanning = false;
+    console.log("[Pan] Stopped. Final offset:", panOffsetX.toFixed(4), panOffsetY.toFixed(4));
+  }
+});
+
+poseCanvas.addEventListener("contextmenu", (e) => {
+  e.preventDefault(); // Prevent right-click context menu
+});
+
+// Reset zoom and pan
+function resetZoomPan() {
+  manualZoomBounds = null;
+  panOffsetX = 0;
+  panOffsetY = 0;
+  isZoomSelecting = false;
+  isPanning = false;
+  console.log("[Zoom/Pan] Reset");
+}
+
+// Zoom in/out functions
+function zoomIn() {
+  if (!manualZoomBounds) {
+    // If no manual zoom, create one centered on current panned position
+    const centerX = 0.5 + panOffsetX;
+    const centerY = 0.5 + panOffsetY;
+    const zoomFactor = 0.8; // 20% reduction
+    const halfWidth = 0.1 * zoomFactor;
+    const halfHeight = 0.1 * zoomFactor;
+    manualZoomBounds = {
+      leftX: centerX - halfWidth,
+      rightX: centerX + halfWidth,
+      topY: centerY - halfHeight,
+      bottomY: centerY + halfHeight
+    };
+    // Clear pan offset since we've incorporated it into the bounds
+    panOffsetX = 0;
+    panOffsetY = 0;
+  } else {
+    // Zoom in by 20% (reduce view by 20%) centered on current panned position
+    const currentCenterX = (manualZoomBounds.leftX + manualZoomBounds.rightX) / 2 + panOffsetX;
+    const currentCenterY = (manualZoomBounds.topY + manualZoomBounds.bottomY) / 2 + panOffsetY;
+    const currentWidth = manualZoomBounds.rightX - manualZoomBounds.leftX;
+    const currentHeight = manualZoomBounds.bottomY - manualZoomBounds.topY;
+    const zoomFactor = 0.8; // 20% reduction
+    const newWidth = currentWidth * zoomFactor;
+    const newHeight = currentHeight * zoomFactor;
+    
+    manualZoomBounds = {
+      leftX: currentCenterX - newWidth / 2,
+      rightX: currentCenterX + newWidth / 2,
+      topY: currentCenterY - newHeight / 2,
+      bottomY: currentCenterY + newHeight / 2
+    };
+    // Clear pan offset since we've incorporated it into the bounds
+    panOffsetX = 0;
+    panOffsetY = 0;
+  }
+  console.log("[Zoom In] Applied bounds:", manualZoomBounds);
+  try {
+    render(performance.now());
+    console.log("[Zoom In] Render completed");
+  } catch (e) {
+    console.error("[Zoom In] Render failed:", e);
+  }
+}
+
+function zoomOut() {
+  if (!manualZoomBounds) {
+    console.log("[Zoom Out] No manual zoom to zoom out from");
+    return;
+  }
+  
+  // Zoom out by 25% (increase view by 25%) centered on current panned position
+  const currentCenterX = (manualZoomBounds.leftX + manualZoomBounds.rightX) / 2 + panOffsetX;
+  const currentCenterY = (manualZoomBounds.topY + manualZoomBounds.bottomY) / 2 + panOffsetY;
+  const currentWidth = manualZoomBounds.rightX - manualZoomBounds.leftX;
+  const currentHeight = manualZoomBounds.bottomY - manualZoomBounds.topY;
+  const zoomFactor = 1.25; // 25% increase
+  const newWidth = Math.min(1, currentWidth * zoomFactor);
+  const newHeight = Math.min(1, currentHeight * zoomFactor);
+  
+  // Check if we've zoomed out too far (back to full view)
+  if (newWidth >= 0.95 || newHeight >= 0.95) {
+    manualZoomBounds = null;
+    panOffsetX = 0;
+    panOffsetY = 0;
+    console.log("[Zoom Out] Reached full view, cleared manual zoom");
+  } else {
+    manualZoomBounds = {
+      leftX: Math.max(0, currentCenterX - newWidth / 2),
+      rightX: Math.min(1, currentCenterX + newWidth / 2),
+      topY: Math.max(0, currentCenterY - newHeight / 2),
+      bottomY: Math.min(1, currentCenterY + newHeight / 2)
+    };
+    // Clear pan offset since we've incorporated it into the bounds
+    panOffsetX = 0;
+    panOffsetY = 0;
+    console.log("[Zoom Out] Applied bounds:", manualZoomBounds);
+  }
+  
+  try {
+    render(performance.now());
+    console.log("[Zoom Out] Render completed");
+  } catch (e) {
+    console.error("[Zoom Out] Render failed:", e);
+  }
+}
+
+// keyboard
+window.addEventListener("keydown",(e)=>{
+  if (e.code === "Space"){ e.preventDefault(); togglePlay(); }
+  else if (e.key === "ArrowLeft"){ pause(); curIdx = Math.max(startFrame, curIdx-1); render(performance.now()); }
+  else if (e.key === "ArrowRight"){ pause(); const effEnd = getEffectiveEndFrame(); curIdx = Math.min(effEnd, curIdx+1); render(performance.now()); }
+});
+</script>
+<!-- Reusable user badge (reads email from Firestore users/{uid}) -->
+<script src="user-badge.js"></script>
+</body>
+</html>

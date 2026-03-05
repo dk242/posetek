@@ -1,0 +1,39 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "kickingSessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "playerId", "order": "ASCENDING" },
+        { "fieldPath": "kickType", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "kickingSessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "playerId", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "kickingSessions",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "playerId", "order": "ASCENDING" },
+        { "fieldPath": "kickType", "order": "ASCENDING" },
+        { "fieldPath": "maxVelocity", "order": "DESCENDING" }
+      ]
+    },
+    {
+      "collectionGroup": "reps",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "repType", "order": "ASCENDING" },
+        { "fieldPath": "createdAt", "order": "DESCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

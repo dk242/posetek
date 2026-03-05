@@ -1,0 +1,470 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>PoseTek - Player Interest Signup</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --text-light: #ffffff;
+            --text-dark: #121212;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(76, 140, 106, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--text-light);
+            background: linear-gradient(160deg, var(--primary) 0%, #0f2920 40%, var(--secondary) 100%);
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .page-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            padding: 2rem 1.5rem;
+        }
+
+        .logo {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-light);
+            text-decoration: none;
+            margin-bottom: 0.5rem;
+            display: block;
+            text-align: center;
+        }
+
+        .page-subtitle {
+            text-align: center;
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.95rem;
+            margin-bottom: 2rem;
+        }
+
+        .form-card {
+            background: linear-gradient(145deg, rgba(26, 58, 46, 0.95), rgba(45, 94, 74, 0.9));
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            border: 1px solid rgba(76, 140, 106, 0.2);
+            overflow: hidden;
+        }
+
+        .form-card-inner {
+            padding: 2.5rem;
+        }
+
+        .form-header {
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .form-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #4c8c6a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            margin-bottom: 0.4rem;
+        }
+
+        .form-description {
+            color: rgba(255, 255, 255, 0.6);
+            font-size: 0.9rem;
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255, 255, 255, 0.15);
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-light);
+            font-family: 'Inter', sans-serif;
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-group select option {
+            background-color: var(--primary);
+            color: var(--text-light);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.15),
+                        0 4px 12px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffffff, #e8f5e9);
+            color: var(--primary);
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15),
+                        0 0 0 1px rgba(76, 140, 106, 0.2);
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            margin-top: 0.5rem;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #f5f5f5, #c8e6c9);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25),
+                        0 0 0 1px rgba(76, 140, 106, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .spinner {
+            display: none;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(26, 58, 46, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        .message {
+            padding: 0.9rem 1.1rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1.25rem;
+            display: none;
+        }
+
+        .message.error {
+            background-color: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(220, 53, 69, 0.3);
+            color: #ff8a95;
+        }
+
+        .message.success {
+            background-color: rgba(76, 140, 106, 0.15);
+            border: 1px solid rgba(76, 140, 106, 0.3);
+            color: #8cdeaa;
+        }
+
+        .success-view {
+            display: none;
+            text-align: center;
+            padding: 2rem 0;
+        }
+
+        .success-view .checkmark {
+            width: 72px;
+            height: 72px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4c8c6a, #2d5e4a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 8px 24px rgba(76, 140, 106, 0.3);
+        }
+
+        .success-view .checkmark svg {
+            width: 36px;
+            height: 36px;
+            stroke: white;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .success-view h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 0.75rem;
+            background: linear-gradient(135deg, #ffffff, #4c8c6a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .success-view p {
+            color: rgba(255, 255, 255, 0.7);
+            font-size: 0.95rem;
+            line-height: 1.6;
+            max-width: 360px;
+            margin: 0 auto;
+        }
+
+        @media (max-width: 600px) {
+            .page-wrapper {
+                padding: 1.5rem 1rem;
+            }
+
+            .form-card-inner {
+                padding: 2rem 1.5rem;
+            }
+
+            .form-title {
+                font-size: 1.35rem;
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .form-group label {
+                font-size: 0.9rem;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 0.85rem 1rem;
+                font-size: 16px;
+                min-height: 44px;
+            }
+
+            .submit-btn {
+                padding: 1rem;
+                font-size: 1rem;
+                min-height: 48px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .form-card-inner {
+                padding: 1.5rem 1.25rem;
+            }
+
+            .form-title {
+                font-size: 1.2rem;
+            }
+
+            .form-group {
+                margin-bottom: 0.9rem;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+                margin-bottom: 0.5rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="page-wrapper">
+        <a href="kickai.html" class="logo">PoseTek</a>
+        <p class="page-subtitle">Soccer Performance Analytics</p>
+
+        <div class="form-card">
+            <div class="form-card-inner">
+                <div class="form-header">
+                    <h1 class="form-title">Player Interest Signup</h1>
+                    <p class="form-description">Register your interest and we'll be in touch with more information soon.</p>
+                </div>
+
+                <div id="errorMessage" class="message error"></div>
+
+                <form id="signupForm">
+                    <div class="form-group">
+                        <label for="playerName">Player's Full Name</label>
+                        <input type="text" id="playerName" placeholder="Enter player's full name" required autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parentName">Parent/Guardian's Full Name</label>
+                        <input type="text" id="parentName" placeholder="Enter parent or guardian's full name" required autocomplete="name">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="parentEmail">Player/Parent Email</label>
+                        <input type="email" id="parentEmail" placeholder="Enter email address" required autocomplete="email">
+                    </div>
+
+                    <div class="form-group">
+                        <label for="position">Player's Field Position</label>
+                        <select id="position" required>
+                            <option value="" disabled selected>Select a position</option>
+                            <option value="Goalkeeper">Goalkeeper</option>
+                            <option value="Center Back">Center Back</option>
+                            <option value="Full Back">Full Back</option>
+                            <option value="Wing Back">Wing Back</option>
+                            <option value="Defensive Midfielder">Defensive Midfielder</option>
+                            <option value="Central Midfielder">Central Midfielder</option>
+                            <option value="Attacking Midfielder">Attacking Midfielder</option>
+                            <option value="Winger">Winger</option>
+                            <option value="Striker">Striker</option>
+                        </select>
+                    </div>
+
+                    <button type="submit" class="submit-btn" id="submitBtn">
+                        Submit
+                        <span class="spinner"></span>
+                    </button>
+                    <p style="text-align:center;font-size:0.8rem;color:rgba(255,255,255,0.45);margin-top:1rem;margin-bottom:0;">By submitting you agree to our <a href="privacy.html" style="color:#4c8c6a;">Privacy Policy</a>.</p>
+                </form>
+
+                <div class="success-view" id="successView">
+                    <div class="checkmark">
+                        <svg viewBox="0 0 24 24">
+                            <polyline points="20 6 9 17 4 12"></polyline>
+                        </svg>
+                    </div>
+                    <h2>You're All Set!</h2>
+                    <p>Thank you for registering your interest. We'll reach out to <span id="confirmEmail"></span> with more information soon.</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+
+        const signupForm = document.getElementById('signupForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successView = document.getElementById('successView');
+        const confirmEmail = document.getElementById('confirmEmail');
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.style.display = 'block';
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        function setLoading(loading) {
+            submitBtn.disabled = loading;
+            submitBtn.querySelector('.spinner').style.display = loading ? 'block' : 'none';
+        }
+
+        signupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            const playerName = document.getElementById('playerName').value.trim();
+            const parentName = document.getElementById('parentName').value.trim();
+            const parentEmail = document.getElementById('parentEmail').value.trim();
+            const position = document.getElementById('position').value;
+
+            if (!playerName || !parentName || !parentEmail || !position) {
+                showError('Please fill out all fields.');
+                return;
+            }
+
+            setLoading(true);
+
+            try {
+                await db.collection('Demo1PlayerInterest').add({
+                    playerName: playerName,
+                    parentName: parentName,
+                    parentEmail: parentEmail,
+                    position: position,
+                    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                signupForm.style.display = 'none';
+                document.querySelector('.form-header').style.display = 'none';
+                hideError();
+                confirmEmail.textContent = parentEmail;
+                successView.style.display = 'block';
+            } catch (err) {
+                console.error('Firestore write error:', err);
+                showError('Something went wrong. Please try again.');
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
+</body>
+</html>

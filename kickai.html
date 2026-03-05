@@ -1,0 +1,1893 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>PoseTek - Soccer Performance Analytics</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --text-light: #ffffff;
+            --text-dark: #121212;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* Improve touch scrolling on mobile */
+            -webkit-tap-highlight-color: rgba(76, 140, 106, 0.2);
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: var(--text-light);
+            background-color: var(--primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+            /* Smooth scrolling for mobile */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 2rem 5%;
+            position: absolute;
+            width: 100%;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 1.8rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            color: var(--text-light);
+        }
+
+        .nav-buttons {
+            display: flex;
+            gap: 1rem;
+        }
+
+        .nav-btn {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 1rem;
+            font-weight: 500;
+            background-color: transparent;
+            color: var(--text-light);
+            padding: 0.6rem 1.4rem;
+            border-radius: 50px;
+            text-decoration: none;
+            border: 1px solid rgba(255,255,255,0.3);
+            transition: var(--transition);
+            cursor: pointer;
+            /* Mobile touch improvements */
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .nav-btn:hover {
+            background-color: rgba(255,255,255,0.1);
+            border-color: var(--text-light);
+        }
+
+        .nav-btn:active {
+            transform: scale(0.96);
+        }
+
+        .hero {
+            position: relative;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .hero-image {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, rgba(0,0,0,0.1) 0%, var(--primary) 100%), 
+                        url('https://images.unsplash.com/photo-1574629810360-7efbbe195018?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=1920&q=80') center/cover no-repeat;
+        }
+
+        .hero-content {
+            position: absolute;
+            bottom: 20%;
+            left: 5%;
+            max-width: 600px;
+        }
+
+        h1 {
+            font-size: 3.5rem;
+            font-weight: 700;
+            line-height: 1.1;
+            margin-bottom: 1.5rem;
+        }
+
+        .subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 2rem;
+            font-weight: 300;
+        }
+
+        .cta-button {
+            font-family: 'SF Pro Display', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 700;
+            color: var(--primary);
+            background: linear-gradient(135deg, #ffffff, #e8f5e9);
+            padding: 1rem 2.5rem;
+            border-radius: 50px;
+            text-decoration: none;
+            display: inline-block;
+            transition: var(--transition);
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.3),
+                        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            position: relative;
+            overflow: hidden;
+            /* Mobile touch improvements */
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .cta-button::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.3), transparent);
+            transition: left 0.6s ease;
+        }
+
+        .cta-button:hover::before {
+            left: 100%;
+        }
+
+        .cta-button:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.4),
+                        0 0 0 1px rgba(255, 255, 255, 0.2) inset;
+        }
+
+        .cta-button:active {
+            transform: translateY(-1px) scale(1);
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26, 58, 46, 0.95), rgba(45, 94, 74, 0.95));
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-modal {
+            background: linear-gradient(145deg, rgba(26, 58, 46, 0.95), rgba(45, 94, 74, 0.9));
+            padding: 0;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 500px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+                        0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            transform: scale(0.95) translateY(20px);
+            transition: var(--transition);
+            border: 1px solid rgba(76, 140, 106, 0.2);
+        }
+
+        .modal-overlay.active .auth-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        /* Modal content wrapper for proper scrolling */
+        .modal-content-wrapper {
+            padding: 3rem 2.5rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            /* Smooth scrolling on mobile */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        /* Custom scrollbar for modal */
+        .modal-content-wrapper::-webkit-scrollbar {
+            width: 8px;
+        }
+
+        .modal-content-wrapper::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 10px;
+            margin: 10px 0;
+        }
+
+        .modal-content-wrapper::-webkit-scrollbar-thumb {
+            background: rgba(76, 140, 106, 0.5);
+            border-radius: 10px;
+        }
+
+        .modal-content-wrapper::-webkit-scrollbar-thumb:hover {
+            background: rgba(76, 140, 106, 0.7);
+        }
+
+        .modal-header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            margin-bottom: 2rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .modal-title {
+            font-size: 1.8rem;
+            font-weight: 700;
+            background: linear-gradient(135deg, #ffffff, #4c8c6a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .close-btn {
+            position: fixed;
+            top: 1.25rem;
+            right: 1.25rem;
+            z-index: 1001;
+            background: rgba(255, 255, 255, 0.15);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            color: var(--text-light);
+            font-size: 1.4rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: var(--transition);
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+            border-color: var(--accent);
+        }
+
+        .close-btn:active {
+            transform: rotate(90deg) scale(0.95);
+        }
+
+        .form-group {
+            margin-bottom: 1.25rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            letter-spacing: 0.3px;
+        }
+
+        .form-group input, 
+        .form-group select {
+            width: 100%;
+            padding: 0.9rem 1.1rem;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background-color: rgba(0, 0, 0, 0.2);
+            color: var(--text-light);
+            font-size: 1rem;
+            transition: var(--transition);
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .form-group input::placeholder {
+            color: rgba(255, 255, 255, 0.4);
+        }
+
+        .form-group input:focus,
+        .form-group select:focus {
+            outline: none;
+            border-color: var(--accent);
+            background-color: rgba(0, 0, 0, 0.3);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.15),
+                        0 4px 12px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .name-fields {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .checkbox-group input[type="checkbox"] {
+            width: 20px;
+            height: 20px;
+            margin-right: 0.75rem;
+            cursor: pointer;
+            accent-color: var(--accent);
+        }
+
+        .checkbox-group label {
+            cursor: pointer;
+            font-weight: 500;
+            margin-bottom: 0;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffffff, #e8f5e9);
+            color: var(--primary);
+            border: none;
+            font-weight: 700;
+            font-size: 1.05rem;
+            cursor: pointer;
+            transition: var(--transition);
+            position: relative;
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15),
+                        0 0 0 1px rgba(76, 140, 106, 0.2);
+            /* Mobile touch improvements */
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .submit-btn:hover {
+            background: linear-gradient(135deg, #f5f5f5, #c8e6c9);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.25),
+                        0 0 0 1px rgba(76, 140, 106, 0.3);
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.7;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .spinner {
+            display: none;
+            position: absolute;
+            right: 1rem;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(26, 58, 46, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 1s ease-in-out infinite;
+        }
+
+        @keyframes spin {
+            to { transform: translateY(-50%) rotate(360deg); }
+        }
+
+        .auth-links {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 1.5rem;
+            padding-top: 1.5rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .auth-links a {
+            color: var(--text-light);
+            opacity: 0.8;
+            text-decoration: none;
+            font-size: 0.95rem;
+            font-weight: 500;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .auth-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -2px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background: linear-gradient(90deg, var(--accent), transparent);
+            transition: width 0.3s ease;
+        }
+
+        .auth-links a:hover {
+            opacity: 1;
+            color: var(--accent);
+        }
+
+        .auth-links a:hover::after {
+            width: 100%;
+        }
+
+        .error-message {
+            color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+            border: 1px solid rgba(255, 107, 107, 0.3);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+            animation: shake 0.5s ease;
+        }
+
+        .success-message {
+            color: #4c8c6a;
+            background: rgba(76, 140, 106, 0.15);
+            border: 1px solid rgba(76, 140, 106, 0.4);
+            border-radius: 10px;
+            padding: 0.75rem 1rem;
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
+            text-align: center;
+            display: none;
+            font-weight: 500;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-10px); }
+            75% { transform: translateX(10px); }
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .verification-banner {
+            background: linear-gradient(135deg, rgba(255, 107, 107, 0.15), rgba(255, 107, 107, 0.1));
+            border: 1.5px solid rgba(255, 107, 107, 0.4);
+            border-radius: 12px;
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            text-align: center;
+            display: none;
+            box-shadow: 0 4px 12px rgba(255, 107, 107, 0.1);
+        }
+
+        .verification-banner p {
+            margin-bottom: 0.6rem;
+            font-weight: 600;
+            color: #ff8a8a;
+        }
+
+        .verification-banner a {
+            color: var(--text-light);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0.4rem 1rem;
+            border-radius: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            display: inline-block;
+            transition: var(--transition);
+        }
+
+        .verification-banner a:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border-color: rgba(255, 255, 255, 0.3);
+            transform: translateY(-1px);
+        }
+
+        /* Tab System Styles */
+        .tab-container {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            background-color: rgba(0, 0, 0, 0.2);
+            border-radius: 14px;
+            padding: 0.5rem;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .tab {
+            padding: 0.75rem 1rem;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.6);
+            transition: var(--transition);
+            border-radius: 10px;
+            text-align: center;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+            /* Mobile touch improvements */
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .tab::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(76, 140, 106, 0), rgba(76, 140, 106, 0.1));
+            opacity: 0;
+            transition: var(--transition);
+            z-index: 0;
+        }
+
+        .tab > * {
+            position: relative;
+            z-index: 1;
+        }
+
+        .tab:hover {
+            background-color: rgba(255, 255, 255, 0.05);
+            color: rgba(255, 255, 255, 0.9);
+            border-color: rgba(76, 140, 106, 0.3);
+        }
+
+        .tab:hover::before {
+            opacity: 1;
+        }
+
+        .tab:active {
+            transform: scale(0.97);
+        }
+
+        .tab.active {
+            background: linear-gradient(135deg, rgba(76, 140, 106, 0.3), rgba(76, 140, 106, 0.2));
+            color: #ffffff;
+            border-color: rgba(76, 140, 106, 0.5);
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.2),
+                        0 0 0 1px rgba(76, 140, 106, 0.3) inset;
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from { 
+                opacity: 0; 
+                transform: translateY(15px) scale(0.98);
+            }
+            to { 
+                opacity: 1; 
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Responsive adjustments */
+        /* Tablet and smaller */
+        @media (max-width: 768px) {
+            nav {
+                padding: 1.5rem 4%;
+            }
+
+            .logo {
+                font-size: 1.5rem;
+            }
+
+            .nav-btn {
+                font-size: 0.9rem;
+                padding: 0.5rem 1.2rem;
+            }
+
+            .hero-content {
+                left: 4%;
+                right: 4%;
+                bottom: 15%;
+                max-width: 92%;
+            }
+
+            h1 {
+                font-size: 2.5rem;
+            }
+            
+            .subtitle {
+                font-size: 1.2rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .modal-content-wrapper {
+                padding: 2rem 1.5rem;
+            }
+
+            .auth-modal {
+                margin: 0 1rem;
+                border-radius: 20px;
+                max-width: 95%;
+                max-height: 85vh;
+            }
+
+            .modal-title {
+                font-size: 1.5rem;
+            }
+
+            .close-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 1.2rem;
+                top: 1rem;
+                right: 1rem;
+            }
+
+            .name-fields {
+                grid-template-columns: 1fr;
+            }
+
+            .tab-container {
+                gap: 0.4rem;
+                padding: 0.4rem;
+            }
+
+            .tab {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+                min-height: 44px; /* Better touch target */
+            }
+
+            .form-group {
+                margin-bottom: 1rem;
+            }
+
+            .form-group label {
+                font-size: 0.9rem;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 0.85rem 1rem;
+                font-size: 16px; /* Prevent iOS zoom - minimum 16px */
+                min-height: 44px; /* Better touch target */
+            }
+
+            .submit-btn {
+                padding: 1rem;
+                font-size: 1rem;
+                min-height: 48px; /* Better touch target */
+            }
+
+            .cta-button {
+                font-size: 1.1rem;
+                padding: 1rem 2rem;
+                min-height: 48px;
+            }
+
+            .auth-links {
+                flex-direction: column;
+                gap: 0.75rem;
+                text-align: center;
+            }
+
+            .verification-banner {
+                padding: 0.85rem 1rem;
+            }
+        }
+
+        /* Mobile phones */
+        @media (max-width: 480px) {
+            nav {
+                padding: 1.25rem 3%;
+            }
+
+            .logo {
+                font-size: 1.3rem;
+            }
+
+            .nav-buttons {
+                gap: 0.5rem;
+            }
+
+            .nav-btn {
+                font-size: 0.85rem;
+                padding: 0.5rem 1rem;
+            }
+
+            .hero-content {
+                bottom: 12%;
+                left: 3%;
+                right: 3%;
+                max-width: 94%;
+            }
+
+            h1 {
+                font-size: 2rem;
+                line-height: 1.15;
+                margin-bottom: 1rem;
+            }
+            
+            .subtitle {
+                font-size: 1rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .modal-content-wrapper {
+                padding: 1.5rem 1.25rem;
+            }
+
+            .auth-modal {
+                margin: 0 0.75rem;
+                border-radius: 16px;
+                max-width: 96%;
+                max-height: 90vh;
+            }
+
+            .modal-header {
+                margin-bottom: 1.5rem;
+                padding-bottom: 0.85rem;
+            }
+
+            .modal-title {
+                font-size: 1.35rem;
+            }
+
+            .close-btn {
+                width: 34px;
+                height: 34px;
+                font-size: 1.1rem;
+                top: 0.75rem;
+                right: 0.75rem;
+            }
+
+            .tab-container {
+                gap: 0.35rem;
+                padding: 0.35rem;
+                margin-bottom: 1.5rem;
+            }
+
+            .tab {
+                padding: 0.7rem 0.4rem;
+                font-size: 0.8rem;
+                min-height: 44px;
+            }
+
+            .form-group {
+                margin-bottom: 0.9rem;
+            }
+
+            .form-group label {
+                font-size: 0.85rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .form-group input,
+            .form-group select {
+                padding: 0.8rem 0.9rem;
+                font-size: 16px; /* Prevent iOS zoom - minimum 16px */
+                border-radius: 10px;
+            }
+
+            .name-fields {
+                gap: 0.75rem;
+            }
+
+            .submit-btn {
+                padding: 0.95rem;
+                font-size: 0.95rem;
+                border-radius: 10px;
+            }
+
+            .cta-button {
+                font-size: 1rem;
+                padding: 0.9rem 1.75rem;
+            }
+
+            .auth-links {
+                margin-top: 1.25rem;
+                padding-top: 1.25rem;
+            }
+
+            .auth-links a {
+                font-size: 0.9rem;
+            }
+
+            .error-message,
+            .success-message {
+                font-size: 0.85rem;
+                padding: 0.65rem 0.85rem;
+            }
+
+            .verification-banner {
+                padding: 0.75rem 0.9rem;
+                margin-bottom: 1.25rem;
+            }
+
+            .verification-banner p {
+                font-size: 0.9rem;
+                margin-bottom: 0.5rem;
+            }
+
+            .verification-banner a {
+                font-size: 0.85rem;
+                padding: 0.35rem 0.85rem;
+            }
+        }
+
+        /* Very small phones */
+        @media (max-width: 375px) {
+            .logo {
+                font-size: 1.2rem;
+            }
+
+            h1 {
+                font-size: 1.75rem;
+            }
+
+            .subtitle {
+                font-size: 0.95rem;
+            }
+
+            .modal-content-wrapper {
+                padding: 1.25rem 1rem;
+            }
+
+            .modal-title {
+                font-size: 1.2rem;
+            }
+
+            .tab {
+                font-size: 0.75rem;
+                padding: 0.65rem 0.3rem;
+            }
+
+            .form-group input,
+            .form-group select {
+                font-size: 16px; /* Prevent iOS zoom - minimum 16px */
+            }
+
+            .cta-button {
+                font-size: 0.95rem;
+                padding: 0.85rem 1.5rem;
+            }
+        }
+
+        /* Mini-modal utility styles */
+        .mini-modal-buttons {
+            display: flex;
+            gap: 0.75rem;
+            margin-top: 1.5rem;
+            align-items: center;
+        }
+
+        .mini-cancel-btn {
+            padding: 0.85rem 1.25rem;
+            border-radius: 12px;
+            border: 1.5px solid rgba(255,255,255,0.15);
+            background: rgba(255,255,255,0.05);
+            color: rgba(255,255,255,0.8);
+            font-size: 0.95rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+        }
+
+        .mini-cancel-btn:hover {
+            background: rgba(255,255,255,0.1);
+            border-color: rgba(255,255,255,0.25);
+        }
+
+        .org-choice-btn {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            padding: 1.1rem 1.25rem;
+            border-radius: 14px;
+            border: 1.5px solid rgba(76,140,106,0.25);
+            background: rgba(76,140,106,0.08);
+            color: var(--text-light);
+            cursor: pointer;
+            transition: var(--transition);
+            text-align: left;
+            width: 100%;
+        }
+
+        .org-choice-btn:hover {
+            background: rgba(76,140,106,0.18);
+            border-color: rgba(76,140,106,0.5);
+            transform: translateY(-1px);
+        }
+
+        .org-choice-btn:active { transform: translateY(0); }
+
+        .org-choice-icon {
+            font-size: 1.4rem;
+            width: 2.5rem;
+            height: 2.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(76,140,106,0.2);
+            border-radius: 50%;
+            flex-shrink: 0;
+            color: var(--accent);
+        }
+
+        .org-choice-title {
+            font-weight: 700;
+            font-size: 0.95rem;
+            margin-bottom: 0.2rem;
+        }
+
+        .org-choice-sub {
+            font-size: 0.8rem;
+            color: rgba(255,255,255,0.55);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav>
+            <a href="index.html" class="logo" style="text-decoration:none;">PoseTek</a>
+            <div class="nav-buttons">
+                <button class="nav-btn" id="authBtn">Login</button>
+            </div>
+        </nav>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="hero-image"></div>
+            <div class="hero-content">
+                <h1>Precision Training for Athletes</h1>
+                <p class="subtitle">Elevate your game with AI-powered biomechanical analysis</p>
+                <a href="#" class="cta-button" id="getStartedBtn">Get Started</a>
+            </div>
+        </section>
+    </main>
+
+    <!-- Login Modal -->
+    <div class="modal-overlay" id="loginModal">
+        <div class="auth-modal">
+            <div class="modal-content-wrapper">
+                <div class="modal-header">
+                    <h3 class="modal-title">Login to PoseTek</h3>
+                    <button class="close-btn" id="closeModal">&times;</button>
+                </div>
+                <div class="verification-banner" id="verificationBanner">
+                    <p>Your email is not verified</p>
+                    <a id="resendVerification">Resend verification email</a>
+                </div>
+                <form id="loginForm">
+                    <div class="form-group">
+                        <label for="email">Email</label>
+                        <input type="email" id="email" placeholder="Enter your email" required>
+                    </div>
+                    <div class="form-group">
+                        <label for="password">Password</label>
+                        <input type="password" id="password" placeholder="Enter your password" required>
+                    </div>
+                    <div class="checkbox-group">
+                        <input type="checkbox" id="rememberMe">
+                        <label for="rememberMe">Remember me</label>
+                    </div>
+                    <div class="error-message" id="loginError"></div>
+                    <div class="success-message" id="loginSuccess"></div>
+                    <button type="submit" class="submit-btn" id="loginSubmit">
+                        <span>Login</span>
+                        <span class="spinner" id="loginSpinner"></span>
+                    </button>
+                    <div class="auth-links">
+                        <a href="#" id="forgotPassword">Forgot password?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- Signup Modal -->
+    <div class="modal-overlay" id="signupModal">
+        <div class="auth-modal">
+            <div class="modal-content-wrapper">
+                <div class="modal-header">
+                    <h3 class="modal-title">Create Account</h3>
+                    <button class="close-btn" id="closeSignupModal">&times;</button>
+                </div>
+                
+                <div class="tab-container">
+                    <div class="tab active" data-tab="playerCode">Player</div>
+                    <div class="tab" data-tab="organization">Organization</div>
+                    <div class="tab" data-tab="independent">Coach</div>
+                </div>
+
+                <!-- Player Tab -->
+                <div class="tab-content active" id="playerCodeTab">
+                    <form id="playerCodeForm">
+                        <div class="form-group">
+                            <label for="playerCode">Player Code</label>
+                            <input type="text" id="playerCode" placeholder="Enter login code" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="playerEmail">Email</label>
+                            <input type="email" id="playerEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="playerPassword">Password</label>
+                            <input type="password" id="playerPassword" placeholder="Create password" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="playerConfirmPassword">Confirm Password</label>
+                            <input type="password" id="playerConfirmPassword" placeholder="Confirm password" required>
+                        </div>
+                        <div class="error-message" id="playerCodeError"></div>
+                        <div class="success-message" id="playerCodeSuccess"></div>
+                        <button type="submit" class="submit-btn" id="playerCodeSubmit">
+                            <span>Create Account</span>
+                            <span class="spinner" id="playerCodeSpinner"></span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Organization Tab -->
+                <div class="tab-content" id="organizationTab">
+                    <form id="orgSignupForm">
+                        <div class="name-fields">
+                            <div class="form-group">
+                                <label for="firstName">First Name</label>
+                                <input type="text" id="firstName" placeholder="First name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="lastName">Last Name</label>
+                                <input type="text" id="lastName" placeholder="Last name" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupEmail">Email</label>
+                            <input type="email" id="signupEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="signupPassword">Password (min 6 characters)</label>
+                            <input type="password" id="signupPassword" placeholder="Create a password" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="confirmPassword">Confirm Password</label>
+                            <input type="password" id="confirmPassword" placeholder="Confirm your password" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="userType">I am a:</label>
+                            <select id="userType" required>
+                                <option value="">Select account type</option>
+                                <option value="player">Player</option>
+                                <option value="coach">Coach</option>
+                            </select>
+                        </div>
+                        <div class="form-group" id="orgCodeGroup">
+                            <label for="orgCode">Organization Code (if joining existing)</label>
+                            <input type="text" id="orgCode" placeholder="Enter organization code">
+                        </div>
+                        <div class="error-message" id="orgSignupError"></div>
+                        <div class="success-message" id="orgSignupSuccess"></div>
+                        <button type="submit" class="submit-btn" id="orgSignupSubmit">
+                            <span>Sign Up</span>
+                            <span class="spinner" id="orgSignupSpinner"></span>
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Coach Tab -->
+                <div class="tab-content" id="independentTab">
+                    <form id="independentSignupForm">
+                        <div class="name-fields">
+                            <div class="form-group">
+                                <label for="indFirstName">First Name</label>
+                                <input type="text" id="indFirstName" placeholder="First name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="indLastName">Last Name</label>
+                                <input type="text" id="indLastName" placeholder="Last name" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label for="indEmail">Email</label>
+                            <input type="email" id="indEmail" placeholder="Enter your email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="indPassword">Password</label>
+                            <input type="password" id="indPassword" placeholder="Create password" required minlength="6">
+                        </div>
+                        <div class="form-group">
+                            <label for="indConfirmPassword">Confirm Password</label>
+                            <input type="password" id="indConfirmPassword" placeholder="Confirm password" required>
+                        </div>
+                        <div class="error-message" id="independentError"></div>
+                        <div class="success-message" id="independentSuccess"></div>
+                        <button type="submit" class="submit-btn" id="independentSubmit">
+                            <span>Sign Up</span>
+                            <span class="spinner" id="independentSpinner"></span>
+                        </button>
+                    </form>
+                </div>
+
+                <div class="auth-links">
+                    <a href="#" id="showLogin">Already have an account? Login</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Forgot Password Modal -->
+    <div class="modal-overlay" id="forgotPasswordModal">
+        <div class="auth-modal" style="max-width:420px;">
+            <div class="modal-content-wrapper">
+                <div class="modal-header">
+                    <h3 class="modal-title">Reset Password</h3>
+                    <button class="close-btn" id="closeForgotModal">&times;</button>
+                </div>
+                <p style="color:rgba(255,255,255,0.7);margin-bottom:1.5rem;font-size:0.95rem;">Enter your email and we'll send you a reset link.</p>
+                <div class="form-group">
+                    <label for="forgotEmailInput">Email Address</label>
+                    <input type="email" id="forgotEmailInput" placeholder="Enter your email" autocomplete="email">
+                </div>
+                <div class="mini-modal-buttons">
+                    <button class="mini-cancel-btn" id="forgotCancelBtn">Cancel</button>
+                    <button class="submit-btn" id="forgotConfirmBtn" style="flex:1;">Send Reset Email</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Coach Organization Setup Modal -->
+    <div class="modal-overlay" id="coachOrgModal">
+        <div class="auth-modal" style="max-width:420px;">
+            <div class="modal-content-wrapper">
+                <!-- Step 1: Choose action -->
+                <div id="coachOrgStep1">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Organization Setup</h3>
+                        <button class="close-btn" id="closeCoachOrgModal">&times;</button>
+                    </div>
+                    <p style="color:rgba(255,255,255,0.7);margin-bottom:1.5rem;font-size:0.95rem;">As a coach, how would you like to get started?</p>
+                    <div style="display:flex;flex-direction:column;gap:1rem;">
+                        <button class="org-choice-btn" id="coachCreateOrgBtn">
+                            <span class="org-choice-icon">＋</span>
+                            <div>
+                                <div class="org-choice-title">Create a new organization</div>
+                                <div class="org-choice-sub">Set up your own team or club</div>
+                            </div>
+                        </button>
+                        <button class="org-choice-btn" id="coachJoinOrgBtn">
+                            <span class="org-choice-icon">→</span>
+                            <div>
+                                <div class="org-choice-title">Join an existing organization</div>
+                                <div class="org-choice-sub">Enter a code to join a club</div>
+                            </div>
+                        </button>
+                    </div>
+                </div>
+                <!-- Step 2: Input org name or join code -->
+                <div id="coachOrgStep2" style="display:none;">
+                    <div class="modal-header">
+                        <h3 class="modal-title" id="coachOrgStep2Title">Organization Name</h3>
+                        <button class="close-btn" id="closeCoachOrgModal2">&times;</button>
+                    </div>
+                    <div class="form-group">
+                        <label id="coachOrgInputLabel">Organization Name</label>
+                        <input type="text" id="coachOrgInput" placeholder="">
+                    </div>
+                    <div id="coachOrgInputError" class="error-message"></div>
+                    <div class="mini-modal-buttons">
+                        <button class="mini-cancel-btn" id="coachOrgBackBtn">← Back</button>
+                        <button class="submit-btn" id="coachOrgConfirmBtn" style="flex:1;">Confirm</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+
+    <script>
+        // Firebase configuration
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        // Initialize Firebase
+        const app = firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+
+        // DOM Elements
+        const authBtn = document.getElementById('authBtn');
+        const closeModal = document.getElementById('closeModal');
+        const loginModal = document.getElementById('loginModal');
+        const loginForm = document.getElementById('loginForm');
+        const signupModal = document.getElementById('signupModal');
+        const closeSignupModal = document.getElementById('closeSignupModal');
+        const showLogin = document.getElementById('showLogin');
+        const forgotPassword = document.getElementById('forgotPassword');
+        const getStartedBtn = document.getElementById('getStartedBtn');
+        const loginError = document.getElementById('loginError');
+        const loginSuccess = document.getElementById('loginSuccess');
+        const verificationBanner = document.getElementById('verificationBanner');
+        const resendVerification = document.getElementById('resendVerification');
+        const loginSubmit = document.getElementById('loginSubmit');
+        const loginSpinner = document.getElementById('loginSpinner');
+        
+        // Form references
+        const orgSignupForm = document.getElementById('orgSignupForm');
+        const playerCodeForm = document.getElementById('playerCodeForm');
+        const independentSignupForm = document.getElementById('independentSignupForm');
+
+        // Modal toggle functions
+        function showModal(modal) {
+            document.body.style.overflow = 'hidden';
+            modal.classList.add('active');
+        }
+
+        function hideModal(modal) {
+            document.body.style.overflow = 'auto';
+            modal.classList.remove('active');
+        }
+
+        // Promise-based forgot password modal
+        function showForgotPasswordModal(prefillEmail) {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('forgotPasswordModal');
+                const input = document.getElementById('forgotEmailInput');
+                const confirmBtn = document.getElementById('forgotConfirmBtn');
+                const cancelBtn = document.getElementById('forgotCancelBtn');
+                const closeBtn = document.getElementById('closeForgotModal');
+
+                input.value = prefillEmail || '';
+                showModal(modal);
+                setTimeout(() => { if (!prefillEmail) input.focus(); }, 300);
+
+                function done(value) {
+                    hideModal(modal);
+                    confirmBtn.replaceWith(confirmBtn.cloneNode(true));
+                    cancelBtn.replaceWith(cancelBtn.cloneNode(true));
+                    closeBtn.replaceWith(closeBtn.cloneNode(true));
+                    resolve(value);
+                }
+
+                document.getElementById('forgotConfirmBtn').addEventListener('click', () => {
+                    const val = document.getElementById('forgotEmailInput').value.trim();
+                    if (val) done(val);
+                });
+                document.getElementById('forgotCancelBtn').addEventListener('click', () => done(null));
+                document.getElementById('closeForgotModal').addEventListener('click', () => done(null));
+            });
+        }
+
+        // Promise-based coach org modal
+        function showCoachOrgModal() {
+            return new Promise((resolve) => {
+                const modal = document.getElementById('coachOrgModal');
+                const step1 = document.getElementById('coachOrgStep1');
+                const step2 = document.getElementById('coachOrgStep2');
+                const step2Title = document.getElementById('coachOrgStep2Title');
+                const inputLabel = document.getElementById('coachOrgInputLabel');
+                const orgInput = document.getElementById('coachOrgInput');
+                const inputError = document.getElementById('coachOrgInputError');
+                let currentAction = null;
+
+                step1.style.display = 'block';
+                step2.style.display = 'none';
+                showModal(modal);
+
+                function done(value) {
+                    hideModal(modal);
+                    // Clone buttons to remove old listeners
+                    ['coachCreateOrgBtn','coachJoinOrgBtn','coachOrgBackBtn','coachOrgConfirmBtn',
+                     'closeCoachOrgModal','closeCoachOrgModal2'].forEach(id => {
+                        const el = document.getElementById(id);
+                        if (el) el.replaceWith(el.cloneNode(true));
+                    });
+                    resolve(value);
+                }
+
+                function goToStep2(action) {
+                    currentAction = action;
+                    inputError.style.display = 'none';
+                    orgInput.value = '';
+                    if (action === 'create') {
+                        step2Title.textContent = 'Organization Name';
+                        inputLabel.textContent = 'Organization Name';
+                        orgInput.placeholder = 'e.g. Riverside FC';
+                    } else {
+                        step2Title.textContent = 'Join Organization';
+                        inputLabel.textContent = 'Organization Code';
+                        orgInput.placeholder = 'Enter the code';
+                    }
+                    step1.style.display = 'none';
+                    step2.style.display = 'block';
+                    setTimeout(() => orgInput.focus(), 150);
+                }
+
+                document.getElementById('coachCreateOrgBtn').addEventListener('click', () => goToStep2('create'));
+                document.getElementById('coachJoinOrgBtn').addEventListener('click', () => goToStep2('join'));
+                document.getElementById('coachOrgBackBtn').addEventListener('click', () => {
+                    step2.style.display = 'none';
+                    step1.style.display = 'block';
+                });
+                document.getElementById('coachOrgConfirmBtn').addEventListener('click', () => {
+                    const val = orgInput.value.trim();
+                    if (!val) {
+                        inputError.textContent = currentAction === 'create' ? 'Organization name is required.' : 'Organization code is required.';
+                        inputError.style.display = 'block';
+                        return;
+                    }
+                    done({ action: currentAction, value: val });
+                });
+                document.getElementById('closeCoachOrgModal').addEventListener('click', () => done(null));
+                document.getElementById('closeCoachOrgModal2').addEventListener('click', () => done(null));
+            });
+        }
+
+        // Show loading state
+        function showLoading(button, spinner) {
+            button.disabled = true;
+            button.querySelector('span:first-child').style.opacity = '0.5';
+            spinner.style.display = 'block';
+        }
+
+        // Hide loading state
+        function hideLoading(button, spinner) {
+            button.disabled = false;
+            button.querySelector('span:first-child').style.opacity = '1';
+            spinner.style.display = 'none';
+        }
+
+        // Tab switching functionality
+        function setupTabSwitching() {
+            const tabs = document.querySelectorAll('.tab');
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs and contents
+                    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+                    
+                    // Add active class to clicked tab and corresponding content
+                    tab.classList.add('active');
+                    const tabId = tab.dataset.tab + 'Tab';
+                    document.getElementById(tabId).classList.add('active');
+                });
+            });
+        }
+
+        // Generate a random alphanumeric code
+        function generateCode(prefix = '', length = 6) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+            let result = prefix;
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        // Create a new organization in Firestore
+        async function createOrganization(name, coachId) {
+            const orgRef = db.collection('organizations').doc();
+            const orgData = {
+                name: name,
+                coaches: [coachId],
+                players: [],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                code: generateCode('ORG', 6),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            await orgRef.set(orgData);
+            return orgRef;
+        }
+
+        // Create coach document in Firestore
+        async function createCoachDocument(coachId, email, firstName, lastName, orgRef = null) {
+            const coachData = {
+                firstName: firstName,
+                lastName: lastName,
+                email: email,
+                userUID: coachId,
+                members: [],
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            if (orgRef) {
+                coachData.organization = orgRef;
+                coachData.coachCode = generateCode('COACH', 4);
+            }
+
+            await db.collection('coaches').doc(coachId).set(coachData);
+            return coachData;
+        }
+
+        // Create player document in Firestore
+        async function createPlayerDocument(playerId, email, firstName, lastName, coachRef = null, orgRef = null, isTemporary = false) {
+            const playerData = {
+                firstName: firstName,
+                lastName: lastName,
+                userUID: playerId,
+                createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp(),
+                isTemporary: isTemporary
+            };
+
+            if (email) {
+                playerData.email = email;
+            }
+
+            if (coachRef) {
+                playerData.coach = coachRef;
+                playerData.playerCode = generateCode('PLR', 4);
+            }
+
+            if (orgRef) {
+                playerData.organization = orgRef;
+            }
+
+            await db.collection('players').doc(playerId).set(playerData);
+            return playerData;
+        }
+
+        // Find organization by code
+        async function findOrganizationByCode(code) {
+            const snapshot = await db.collection('organizations')
+                .where('code', '==', code.toUpperCase())
+                .limit(1)
+                .get();
+            
+            if (!snapshot.empty) {
+                const doc = snapshot.docs[0];
+                return {
+                    id: doc.id,
+                    ref: doc.ref,
+                    ...doc.data()
+                };
+            }
+            return null;
+        }
+
+        // Find player by code
+        async function findPlayerByCode(code) {
+            const codeRaw = code.trim();
+            const codeUpper = codeRaw.toUpperCase();
+            console.log('[findPlayerByCode] Input (raw):', JSON.stringify(codeRaw), '| uppercased:', JSON.stringify(codeUpper));
+
+            // DEBUG: dump ALL player docs and log their signupCode values
+            const allSnap = await db.collection('players').get();
+            console.log('[DEBUG] Total player docs in collection:', allSnap.size);
+            allSnap.forEach(d => {
+                const data = d.data();
+                console.log('[DEBUG] doc id:', d.id, '| signupCode:', JSON.stringify(data.signupCode), '| registered:', data.registered);
+            });
+
+            // Try exact match first, then case-insensitive fallback
+            let snapshot = await db.collection('players')
+                .where('signupCode', '==', codeRaw)
+                .limit(1)
+                .get();
+            console.log('[findPlayerByCode] Exact match query (no toUpperCase) returned', snapshot.size, 'doc(s)');
+
+            if (snapshot.empty) {
+                snapshot = await db.collection('players')
+                    .where('signupCode', '==', codeUpper)
+                    .limit(1)
+                    .get();
+                console.log('[findPlayerByCode] Uppercased match query returned', snapshot.size, 'doc(s)');
+            }
+
+            if (!snapshot.empty) {
+                const doc = snapshot.docs[0];
+                const data = doc.data();
+                console.log('[findPlayerByCode] Found doc id:', doc.id, '| data:', data);
+                return {
+                    id: doc.id,
+                    ref: doc.ref,
+                    ...data
+                };
+            }
+            console.warn('[findPlayerByCode] No matching player doc found for either casing');
+            return null;
+        }
+
+        // Event Listeners
+        authBtn.addEventListener('click', () => showModal(loginModal));
+        getStartedBtn.addEventListener('click', () => {
+            showModal(signupModal);
+            // Reset to first tab when opening modal
+            document.querySelector('.tab').click();
+        });
+        closeModal.addEventListener('click', () => hideModal(loginModal));
+        closeSignupModal.addEventListener('click', () => hideModal(signupModal));
+        
+        showLogin.addEventListener('click', (e) => {
+            e.preventDefault();
+            hideModal(signupModal);
+            showModal(loginModal);
+        });
+
+        // Clicking outside the modal no longer closes it
+
+        // Close modal with Escape key
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                if (loginModal.classList.contains('active')) hideModal(loginModal);
+                if (signupModal.classList.contains('active')) hideModal(signupModal);
+            }
+        });
+
+        // Form submission handlers
+        orgSignupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleOrgSignup();
+        });
+
+        playerCodeForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handlePlayerCodeSignup();
+        });
+
+        independentSignupForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            await handleIndependentSignup();
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                showLoading(loginSubmit, loginSpinner);
+                const userCredential = await auth.signInWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                
+                // Check both coach and player documents for the user's UID
+                const coachQuery = await db.collection('coaches')
+                    .where('userUID', '==', user.uid)
+                    .limit(1)
+                    .get();
+                
+                const playerQuery = await db.collection('players')
+                    .where('authenticationUID', '==', user.uid)
+                    .limit(1)
+                    .get();
+                
+                if (coachQuery.empty && playerQuery.empty) {
+                    throw new Error("Account not found in system");
+                }
+                
+                // Determine user type and redirect accordingly
+                if (!coachQuery.empty) {
+                    const coachDoc = coachQuery.docs[0];
+                    const coachData = coachDoc.data();
+                    
+                    // Update last login
+                    await db.collection('coaches').doc(coachDoc.id).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    window.location.href = 'coachesview.html?userType=coach';
+
+                } else {
+                    // Player logic
+                    const playerDoc = playerQuery.docs[0];
+                    await db.collection('players').doc(playerDoc.id).update({
+                        lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    window.location.href = 'profile.html?player=' + playerDoc.id + '&userType=player';
+                }
+            } catch (error) {
+                loginError.textContent = error.message;
+                loginError.style.display = 'block';
+            } finally {
+                hideLoading(loginSubmit, loginSpinner);
+            }
+        });
+
+        // Resend verification email
+        resendVerification.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const user = auth.currentUser;
+            if (user) {
+                showLoading(loginSubmit, loginSpinner);
+                try {
+                    await user.sendEmailVerification();
+                    loginSuccess.textContent = 'Verification email resent!';
+                    loginSuccess.style.display = 'block';
+                } catch (error) {
+                    loginError.textContent = error.message;
+                    loginError.style.display = 'block';
+                } finally {
+                    hideLoading(loginSubmit, loginSpinner);
+                }
+            }
+        });
+
+        // Password Reset
+        forgotPassword.addEventListener('click', async (e) => {
+            e.preventDefault();
+            const existing = document.getElementById('email').value.trim();
+            const email = existing || await showForgotPasswordModal();
+            if (email) {
+                showLoading(loginSubmit, loginSpinner);
+                try {
+                    await auth.sendPasswordResetEmail(email);
+                    loginSuccess.textContent = 'Password reset email sent. Please check your inbox.';
+                    loginSuccess.style.display = 'block';
+                } catch (error) {
+                    loginError.textContent = error.message;
+                    loginError.style.display = 'block';
+                } finally {
+                    hideLoading(loginSubmit, loginSpinner);
+                }
+            }
+        });
+
+        // Organization signup handler
+        async function handleOrgSignup() {
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const email = document.getElementById('signupEmail').value;
+            const password = document.getElementById('signupPassword').value;
+            const confirmPassword = document.getElementById('confirmPassword').value;
+            const userType = document.getElementById('userType').value;
+            const orgCode = document.getElementById('orgCode').value;
+
+            const errorElement = document.getElementById('orgSignupError');
+            const successElement = document.getElementById('orgSignupSuccess');
+            const submitBtn = document.getElementById('orgSignupSubmit');
+            const spinner = document.getElementById('orgSignupSpinner');
+
+            try {
+                showLoading(submitBtn, spinner);
+                errorElement.style.display = 'none';
+                successElement.style.display = 'none';
+                
+                if (!firstName || !lastName) throw new Error("Please enter your name");
+                if (password !== confirmPassword) throw new Error("Passwords don't match");
+                
+                // Create user in Firebase Auth
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                await user.sendEmailVerification();
+                
+                let orgRef = null;
+                
+                if (userType === 'player') {
+                    if (!orgCode) throw new Error("Organization code is required for players");
+                    
+                    // Find organization by code
+                    const org = await findOrganizationByCode(orgCode);
+                    if (!org) throw new Error("Organization not found - check your code");
+                    orgRef = org.ref;
+                    
+                    // Create player document
+                    await createPlayerDocument(user.uid, email, firstName, lastName, null, orgRef);
+                    
+                    // Add player to organization's players list
+                    await orgRef.update({
+                        players: firebase.firestore.FieldValue.arrayUnion(user.uid)
+                    });
+                    
+                    // Redirect to profile
+                    window.location.href = 'profile.html?userType=player';
+                    
+                } else if (userType === 'coach') {
+                    const coachSetup = await showCoachOrgModal();
+                    if (!coachSetup) throw new Error("Organization setup cancelled");
+
+                    if (coachSetup.action === 'create') {
+                        orgRef = await createOrganization(coachSetup.value, user.uid);
+                    } else {
+                        const org = await findOrganizationByCode(coachSetup.value);
+                        if (!org) throw new Error("Organization not found — check your code");
+                        orgRef = org.ref;
+                    }
+                    
+                    // Create coach document
+                    await createCoachDocument(user.uid, email, firstName, lastName, orgRef);
+                    
+                    // Add coach to organization's coaches list
+                    await orgRef.update({
+                        coaches: firebase.firestore.FieldValue.arrayUnion(user.uid)
+                    });
+                    
+                    // Redirect to coach dashboard
+                    window.location.href = 'coachesview.html?userType=coach';
+                }
+                
+            } catch (error) {
+                console.error("Signup error:", error);
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+            } finally {
+                hideLoading(submitBtn, spinner);
+            }
+        }
+
+        // Player code signup handler
+        async function handlePlayerCodeSignup() {
+            const code = document.getElementById('playerCode').value.trim();
+            const email = document.getElementById('playerEmail').value;
+            const password = document.getElementById('playerPassword').value;
+            const confirmPassword = document.getElementById('playerConfirmPassword').value;
+
+            const errorElement = document.getElementById('playerCodeError');
+            const successElement = document.getElementById('playerCodeSuccess');
+            const submitBtn = document.getElementById('playerCodeSubmit');
+            const spinner = document.getElementById('playerCodeSpinner');
+
+            try {
+                showLoading(submitBtn, spinner);
+                errorElement.style.display = 'none';
+                successElement.style.display = 'none';
+                
+                console.log('[handlePlayerCodeSignup] Code entered (raw):', code);
+                if (password !== confirmPassword) throw new Error("Passwords don't match");
+                
+                const player = await findPlayerByCode(code);
+                console.log('[handlePlayerCodeSignup] Player lookup result:', player);
+                if (!player) throw new Error("Invalid player code");
+                
+                console.log('[handlePlayerCodeSignup] registered field value:', player.registered, '| type:', typeof player.registered);
+                if (player.registered === true) throw new Error("Player already signed up");
+                
+                console.log('[handlePlayerCodeSignup] Creating Firebase Auth user...');
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                console.log('[handlePlayerCodeSignup] Auth user created, uid:', user.uid);
+                await user.sendEmailVerification();
+                
+                console.log('[handlePlayerCodeSignup] Updating player doc id:', player.id);
+                await db.collection('players').doc(player.id).update({
+                    authenticationUID: user.uid,
+                    userUID: user.uid,
+                    registered: true,
+                    email: email,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                });
+                console.log('[handlePlayerCodeSignup] Player doc updated successfully');
+                
+                successElement.textContent = "Account created successfully!";
+                successElement.style.display = 'block';
+                
+                setTimeout(() => {
+                    window.location.href = 'profile.html?userType=player';
+                }, 1500);
+                
+            } catch (error) {
+                console.error("Signup error:", error);
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+            } finally {
+                hideLoading(submitBtn, spinner);
+            }
+        }
+
+        // Independent signup handler
+        async function handleIndependentSignup() {
+            const firstName = document.getElementById('indFirstName').value.trim();
+            const lastName = document.getElementById('indLastName').value.trim();
+            const email = document.getElementById('indEmail').value;
+            const password = document.getElementById('indPassword').value;
+            const confirmPassword = document.getElementById('indConfirmPassword').value;
+
+            const errorElement = document.getElementById('independentError');
+            const successElement = document.getElementById('independentSuccess');
+            const submitBtn = document.getElementById('independentSubmit');
+            const spinner = document.getElementById('independentSpinner');
+
+            try {
+                showLoading(submitBtn, spinner);
+                errorElement.style.display = 'none';
+                successElement.style.display = 'none';
+                
+                if (!firstName || !lastName) throw new Error("Please enter your name");
+                if (password !== confirmPassword) throw new Error("Passwords don't match");
+                
+                // Create user in Firebase Auth
+                const userCredential = await auth.createUserWithEmailAndPassword(email, password);
+                const user = userCredential.user;
+                await user.sendEmailVerification();
+                
+                await createCoachDocument(user.uid, email, firstName, lastName);
+                window.location.href = 'coachesview.html?userType=coach';
+                
+            } catch (error) {
+                console.error("Signup error:", error);
+                errorElement.textContent = error.message;
+                errorElement.style.display = 'block';
+            } finally {
+                hideLoading(submitBtn, spinner);
+            }
+        }
+
+        // Check auth state to update UI
+        auth.onAuthStateChanged((user) => {
+            if (user) {
+                // User is signed in
+                authBtn.textContent = 'Logout';
+                authBtn.onclick = () => {
+                    auth.signOut().then(() => {
+                        window.location.reload();
+                    });
+                };
+            } else {
+                // No user is signed in
+                authBtn.textContent = 'Login';
+                authBtn.onclick = () => showModal(loginModal);
+            }
+        });
+
+        // Initialize tab switching when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            setupTabSwitching();
+        });
+    </script>
+
+    <footer style="text-align:center;padding:1.5rem;font-size:0.82rem;color:rgba(255,255,255,0.4);border-top:1px solid rgba(255,255,255,0.08);margin-top:2rem;">
+        © 2026 PoseTek &nbsp;·&nbsp; <a href="privacy.html" style="color:#4c8c6a;text-decoration:none;">Privacy Policy</a>
+    </footer>
+</body>
+</html>

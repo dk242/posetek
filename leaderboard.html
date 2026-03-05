@@ -1,0 +1,1230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Leaderboard | PoseTek</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #0f1f1b;
+            --primary-light: #162b24;
+            --secondary: #1e3f33;
+            --accent: #4c8c6a;
+            --accent-light: #5ea87e;
+            --accent-glow: rgba(76, 140, 106, 0.35);
+            --gold: #f0c850;
+            --gold-glow: rgba(240, 200, 80, 0.25);
+            --silver: #c0c8d4;
+            --silver-glow: rgba(192, 200, 212, 0.2);
+            --bronze: #cd8f52;
+            --bronze-glow: rgba(205, 143, 82, 0.2);
+            --text-light: #f0f4f2;
+            --text-muted: rgba(240, 244, 242, 0.55);
+            --text-dim: rgba(240, 244, 242, 0.35);
+            --card-bg: rgba(255, 255, 255, 0.05);
+            --card-bg-hover: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --transition-fast: all 0.15s ease;
+            --radius-sm: 8px;
+            --radius-md: 12px;
+            --radius-lg: 16px;
+            --radius-xl: 20px;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-light);
+            background: var(--primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Subtle background pattern */
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(76, 140, 106, 0.08), transparent),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(76, 140, 106, 0.05), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 2rem 1.5rem 4rem;
+            position: relative;
+            z-index: 1;
+        }
+
+        /* ── Header ── */
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(15, 31, 27, 0.85);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo {
+            font-family: 'Poppins', 'SF Pro Display', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links { display: none !important; }
+
+        .nav-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        .nav-toggle:hover { background: var(--card-bg-hover); transform: translateY(-1px); }
+
+        .home-btn-style {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-sm);
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .home-btn-style:hover { background: var(--card-bg-hover); transform: translateY(-1px); }
+
+        /* ── Side Navigation ── */
+        .side-nav {
+            position: fixed;
+            top: 0; left: -320px;
+            width: 320px; height: 100%;
+            background: linear-gradient(180deg, rgba(15,38,33,0.98), rgba(12,34,30,0.98));
+            box-shadow: 6px 0 30px rgba(0,0,0,0.45);
+            z-index: 1200;
+            padding: 2rem 1.25rem;
+            transition: left 0.32s cubic-bezier(.2,.9,.2,1);
+            display: flex; flex-direction: column; gap: 1rem;
+        }
+        .side-nav.open { left: 0; }
+        .side-nav .close-side {
+            margin-left: auto; background: none; border: none;
+            color: var(--text-light); font-size: 1.25rem; cursor: pointer;
+            opacity: 0.85; min-width: 44px; min-height: 44px;
+        }
+        .side-nav .close-side:active { transform: scale(0.9); }
+        .side-nav .side-link {
+            display: flex; align-items: center; gap: 0.75rem;
+            padding: 0.65rem 0.85rem; border-radius: 10px;
+            color: var(--text-light); text-decoration: none; font-weight: 600;
+            transition: var(--transition); min-height: 44px;
+        }
+        .side-nav .side-link:hover { background: rgba(255,255,255,0.03); transform: translateX(4px); }
+        .side-divider { height: 1px; background: var(--card-border); margin: 0.75rem 0; }
+        .side-link .material-symbols-outlined {
+            font-variation-settings: 'wght' 400;
+            display: inline-flex; align-items: center; justify-content: center;
+            width: 24px; height: 24px; line-height: 24px;
+        }
+        .side-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1100; opacity: 0; visibility: hidden; transition: opacity 200ms ease; }
+        .side-backdrop.open { opacity: 1; visibility: visible; }
+        .action-btn {
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);
+            border: none; border-radius: 50px; color: var(--text-light);
+            font-weight: 600; cursor: pointer; transition: var(--transition);
+            min-height: 44px;
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .action-btn:hover { transform: translateY(-2px); }
+
+        /* ── Page Header ── */
+        .page-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+            padding-top: 0.5rem;
+        }
+
+        .page-header h1 {
+            font-family: 'Poppins', 'SF Pro Display', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.4rem;
+        }
+
+        .page-header p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            font-weight: 500;
+        }
+
+        /* ── Category Tabs ── */
+        .category-tabs {
+            display: flex;
+            gap: 6px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-lg);
+            padding: 5px;
+            margin-bottom: 2rem;
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .category-tabs::-webkit-scrollbar { display: none; }
+
+        .cat-tab {
+            flex: 1;
+            min-width: 0;
+            padding: 0.65rem 0.5rem;
+            border: none;
+            border-radius: var(--radius-md);
+            background: transparent;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.82rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            white-space: nowrap;
+            text-align: center;
+            position: relative;
+        }
+
+        .cat-tab:hover { color: var(--text-light); background: rgba(255,255,255,0.04); }
+
+        .cat-tab.active {
+            background: var(--accent);
+            color: #fff;
+            box-shadow: 0 2px 12px var(--accent-glow);
+        }
+
+        .cat-tab .tab-icon {
+            display: block;
+            font-size: 1.2rem;
+            margin-bottom: 2px;
+        }
+
+        /* ── Leaderboard Card ── */
+        .lb-card {
+            background: linear-gradient(160deg, rgba(255,255,255,0.06) 0%, rgba(255,255,255,0.02) 100%);
+            border: 1px solid var(--card-border);
+            border-radius: var(--radius-xl);
+            overflow: hidden;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .lb-card-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 1.25rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .lb-card-header h2 {
+            font-size: 1rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .lb-card-header h2 .material-symbols-outlined {
+            font-size: 1.2rem;
+            color: var(--accent-light);
+        }
+
+        .lb-card-header .player-count {
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            background: var(--card-bg);
+            padding: 0.25rem 0.7rem;
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
+        }
+        .lb-card-header .player-count.hidden { display: none !important; }
+
+        .overall-note {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 1rem;
+            padding: 0 1.5rem 1.25rem;
+            line-height: 1.5;
+        }
+
+        /* ── Podium (top 3) ── */
+        .podium {
+            display: flex;
+            justify-content: center;
+            align-items: flex-end;
+            gap: 12px;
+            padding: 2rem 1rem 1.5rem;
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .podium-slot {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 6px;
+            flex: 0 0 auto;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+        .podium-slot:hover { transform: translateY(-3px); }
+        .podium-slot.no-click { cursor: default; }
+        .podium-slot.no-click:hover { transform: none; }
+
+        .podium-avatar {
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .podium-slot:nth-child(2) .podium-avatar {
+            width: 72px; height: 72px; font-size: 1.3rem;
+            background: linear-gradient(135deg, #d4a830, #f0c850);
+            box-shadow: 0 4px 20px var(--gold-glow), 0 0 0 3px rgba(240,200,80,0.2);
+        }
+        .podium-slot:nth-child(1) .podium-avatar {
+            width: 56px; height: 56px; font-size: 1rem;
+            background: linear-gradient(135deg, #8a95a8, #c0c8d4);
+            box-shadow: 0 4px 16px var(--silver-glow), 0 0 0 3px rgba(192,200,212,0.15);
+        }
+        .podium-slot:nth-child(3) .podium-avatar {
+            width: 56px; height: 56px; font-size: 1rem;
+            background: linear-gradient(135deg, #a06830, #cd8f52);
+            box-shadow: 0 4px 16px var(--bronze-glow), 0 0 0 3px rgba(205,143,82,0.15);
+        }
+
+        .podium-rank {
+            position: absolute;
+            bottom: -6px; right: -4px;
+            width: 22px; height: 22px;
+            border-radius: 50%;
+            font-size: 0.65rem;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid var(--primary);
+        }
+
+        .podium-slot:nth-child(2) .podium-rank { background: var(--gold); color: #5a4000; }
+        .podium-slot:nth-child(1) .podium-rank { background: var(--silver); color: #3a3f4a; }
+        .podium-slot:nth-child(3) .podium-rank { background: var(--bronze); color: #4a2a10; }
+
+        .podium-name {
+            font-size: 0.78rem;
+            font-weight: 600;
+            max-width: 80px;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            white-space: nowrap;
+        }
+
+        .podium-stat {
+            font-size: 0.72rem;
+            color: var(--text-muted);
+            font-weight: 500;
+        }
+
+        .podium-bar {
+            width: 50px;
+            border-radius: 6px 6px 0 0;
+            margin-top: 4px;
+        }
+        .podium-slot:nth-child(2) .podium-bar { height: 60px; background: linear-gradient(180deg, var(--gold), rgba(240,200,80,0.15)); }
+        .podium-slot:nth-child(1) .podium-bar { height: 42px; background: linear-gradient(180deg, var(--silver), rgba(192,200,212,0.1)); }
+        .podium-slot:nth-child(3) .podium-bar { height: 32px; background: linear-gradient(180deg, var(--bronze), rgba(205,143,82,0.1)); }
+
+        /* ── Table ── */
+        .lb-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .lb-table thead { display: none; }
+
+        .lb-table tr {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            transition: var(--transition-fast);
+            cursor: pointer;
+        }
+
+        .lb-table tr:last-child { border-bottom: none; }
+        .lb-table tr:hover { background: rgba(255,255,255,0.04); }
+        .lb-table tr.no-click { cursor: default; }
+
+        .lb-table .col-rank {
+            width: 36px;
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: var(--text-dim);
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .lb-table .col-player {
+            flex: 1;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            min-width: 0;
+        }
+
+        .tbl-avatar {
+            width: 36px; height: 36px;
+            border-radius: 50%;
+            background: var(--secondary);
+            display: flex; align-items: center; justify-content: center;
+            font-weight: 700; font-size: 0.8rem;
+            flex-shrink: 0;
+            color: var(--text-light);
+        }
+
+        .tbl-name {
+            font-weight: 600;
+            font-size: 0.88rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .lb-table .col-stat {
+            width: 100px;
+            text-align: right;
+            font-weight: 700;
+            font-size: 0.9rem;
+            flex-shrink: 0;
+        }
+
+        .lb-table .col-sessions {
+            width: 60px;
+            text-align: right;
+            font-size: 0.78rem;
+            color: var(--text-muted);
+            flex-shrink: 0;
+        }
+
+        .stat-unit {
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            margin-left: 2px;
+        }
+
+        /* ── Score Bar (for overall) ── */
+        .score-bar-wrap {
+            width: 100px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .score-bar-track {
+            flex: 1;
+            height: 6px;
+            background: rgba(255,255,255,0.06);
+            border-radius: 3px;
+            overflow: hidden;
+        }
+
+        .score-bar-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: linear-gradient(90deg, var(--accent), var(--accent-light));
+            transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+        }
+
+        .score-bar-val {
+            font-weight: 700;
+            font-size: 0.88rem;
+            width: 36px;
+            text-align: right;
+            flex-shrink: 0;
+        }
+
+        /* ── Own Row highlights ── */
+        tr.own-row-top5 { background: rgba(76, 140, 106, 0.12) !important; box-shadow: inset 3px 0 0 var(--accent); }
+        tr.own-row-outside { background: rgba(240, 200, 80, 0.08) !important; box-shadow: inset 3px 0 0 var(--gold); }
+
+        .you-badge {
+            font-size: 0.65rem;
+            font-weight: 700;
+            padding: 1px 6px;
+            border-radius: 4px;
+            margin-left: 6px;
+            vertical-align: middle;
+        }
+        .you-badge-top { background: rgba(76,140,106,0.2); color: var(--accent-light); }
+        .you-badge-out { background: rgba(240,200,80,0.15); color: var(--gold); }
+
+        tr.own-row-no-data { background: rgba(240, 200, 80, 0.06) !important; box-shadow: inset 3px 0 0 var(--gold); }
+
+        /* ── Separator row ── */
+        .separator-row td,
+        tr.sep-row {
+            justify-content: center;
+            padding: 0.3rem 1.5rem !important;
+            color: var(--text-dim);
+            font-size: 0.85rem;
+            letter-spacing: 0.4em;
+            cursor: default !important;
+        }
+        tr.sep-row:hover { background: transparent !important; }
+
+        /* ── Empty / Loading / Error ── */
+        .state-box {
+            text-align: center;
+            padding: 3.5rem 2rem;
+            border-radius: var(--radius-xl);
+            border: 1px solid var(--card-border);
+            background: var(--card-bg);
+        }
+
+        .state-box h3 { font-size: 1.1rem; margin-bottom: 0.4rem; }
+        .state-box p { color: var(--text-muted); font-size: 0.9rem; }
+
+        .loading-dots { display: inline-flex; gap: 4px; margin-bottom: 0.75rem; }
+        .loading-dots span {
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            background: var(--accent);
+            animation: dotPulse 1.2s ease-in-out infinite;
+        }
+        .loading-dots span:nth-child(2) { animation-delay: 0.15s; }
+        .loading-dots span:nth-child(3) { animation-delay: 0.3s; }
+        @keyframes dotPulse {
+            0%, 80%, 100% { opacity: 0.25; transform: scale(0.85); }
+            40% { opacity: 1; transform: scale(1); }
+        }
+
+        /* ── Fade-in animation ── */
+        .fade-up {
+            opacity: 0;
+            transform: translateY(12px);
+            animation: fadeUp 0.5s ease forwards;
+        }
+        @keyframes fadeUp {
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 640px) {
+            .container { padding: 1.25rem 1rem 3rem; }
+            .page-header h1 { font-size: 1.6rem; }
+            .cat-tab { font-size: 0.75rem; padding: 0.55rem 0.25rem; }
+            .cat-tab .tab-icon { font-size: 1rem; }
+            .podium { gap: 8px; padding: 1.5rem 0.5rem 1rem; }
+            .podium-slot:nth-child(2) .podium-avatar { width: 58px; height: 58px; font-size: 1.1rem; }
+            .podium-slot:nth-child(1) .podium-avatar,
+            .podium-slot:nth-child(3) .podium-avatar { width: 46px; height: 46px; font-size: 0.85rem; }
+            .podium-slot:nth-child(2) .podium-bar { height: 48px; }
+            .podium-slot:nth-child(1) .podium-bar { height: 34px; }
+            .podium-slot:nth-child(3) .podium-bar { height: 26px; }
+            .lb-table tr { padding: 0.65rem 1rem; }
+            .lb-table .col-sessions { display: none; }
+            .lb-card-header { padding: 1rem 1.25rem; }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+            <button id="navToggle" class="nav-toggle" aria-label="Open navigation">&#9776;</button>
+            <div class="logo">PoseTek</div>
+        </div>
+        <a href="coachesview.html" class="home-btn home-btn-style" title="Home">
+            <span class="material-symbols-outlined" style="color:var(--text-light);font-size:1.3rem;">home</span>
+        </a>
+    </header>
+
+    <!-- Side navigation panel -->
+    <aside id="sideNav" class="side-nav" aria-hidden="true">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div style="font-weight:700;font-size:1.25rem;">Menu</div>
+            <button class="close-side" id="closeSide">&#10005;</button>
+        </div>
+        <div class="side-divider"></div>
+        <div id="sideProfile" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+            <div id="profileAvatar" style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem">C</div>
+            <div style="display:flex;flex-direction:column;">
+                <div id="profileName" style="font-weight:700">Coach</div>
+                <div id="profileEmail" style="font-size:0.85rem;opacity:0.85">email@example.com</div>
+            </div>
+        </div>
+        <div class="side-divider"></div>
+        <div id="sideLinks" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+        <div class="side-divider"></div>
+        <div style="margin-top:auto">
+            <button class="action-btn" id="sideLogout">Logout</button>
+        </div>
+    </aside>
+    <div id="sideBackdrop" class="side-backdrop" tabindex="-1"></div>
+
+    <div class="container">
+        <!-- Page Header -->
+        <div class="page-header fade-up">
+            <h1>Leaderboard</h1>
+            <p>Compare performance across your team</p>
+        </div>
+
+        <!-- Category Tabs -->
+        <div class="category-tabs fade-up" style="animation-delay:0.06s;">
+            <button class="cat-tab active" data-category="overall">
+                <span class="tab-icon">&#127942;</span>Overall
+            </button>
+            <button class="cat-tab" data-category="jump">
+                <span class="tab-icon">&#128170;</span>Jump
+            </button>
+            <button class="cat-tab" data-category="sprint">
+                <span class="tab-icon">&#9889;</span>Sprint
+            </button>
+            <button class="cat-tab" data-category="kick">
+                <span class="tab-icon">&#9917;</span>Kicking
+            </button>
+        </div>
+
+        <!-- Overall Leaderboard -->
+        <div id="overallLeaderboard" class="fade-up" style="animation-delay:0.12s;">
+            <div class="lb-card">
+                <div class="lb-card-header">
+                    <h2><span class="material-symbols-outlined">emoji_events</span>Overall Score</h2>
+                    <span class="player-count" id="overallCount">0 players</span>
+                </div>
+                <div class="podium" id="overallPodium"></div>
+                <table class="lb-table">
+                    <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
+                    <tbody id="overallBody"></tbody>
+                </table>
+                <p class="overall-note" id="overallNote">Overall score = 50% Jump + 50% Kicking. Athletes who haven't completed a kick will have a lower overall score.</p>
+            </div>
+        </div>
+
+        <!-- Jump Leaderboard -->
+        <div id="jumpLeaderboard" style="display:none;">
+            <div class="lb-card">
+                <div class="lb-card-header">
+                    <h2><span class="material-symbols-outlined">fitness_center</span>Jump Height</h2>
+                    <span class="player-count" id="jumpCount">0 players</span>
+                </div>
+                <div class="podium" id="jumpPodium"></div>
+                <table class="lb-table">
+                    <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
+                    <tbody id="jumpLeaderboardBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Sprint Leaderboard -->
+        <div id="sprintLeaderboard" style="display:none;">
+            <div class="lb-card">
+                <div class="lb-card-header">
+                    <h2><span class="material-symbols-outlined">directions_run</span>Sprint Speed</h2>
+                    <span class="player-count" id="sprintCount">0 players</span>
+                </div>
+                <div class="podium" id="sprintPodium"></div>
+                <table class="lb-table">
+                    <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
+                    <tbody id="sprintLeaderboardBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <!-- Kick Leaderboard -->
+        <div id="kickLeaderboard" style="display:none;">
+            <div class="lb-card">
+                <div class="lb-card-header">
+                    <h2><span class="material-symbols-outlined">sports_soccer</span>Kicking Power</h2>
+                    <span class="player-count" id="kickCount">0 players</span>
+                </div>
+                <div class="podium" id="kickPodium"></div>
+                <table class="lb-table">
+                    <thead><tr><th></th><th></th><th></th><th></th></tr></thead>
+                    <tbody id="kickLeaderboardBody"></tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="state-box" id="emptyState" style="display:none;">
+            <h3>No data available</h3>
+            <p>Add players to your team to see the leaderboard</p>
+        </div>
+
+        <div class="state-box" id="loadingState">
+            <div class="loading-dots"><span></span><span></span><span></span></div>
+            <p style="color:var(--text-muted);">Loading leaderboard&hellip;</p>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        // DOM refs
+        const overallBody = document.getElementById('overallBody');
+        const jumpLeaderboardBody = document.getElementById('jumpLeaderboardBody');
+        const sprintLeaderboardBody = document.getElementById('sprintLeaderboardBody');
+        const kickLeaderboardBody = document.getElementById('kickLeaderboardBody');
+        const overallLeaderboard = document.getElementById('overallLeaderboard');
+        const jumpLeaderboard = document.getElementById('jumpLeaderboard');
+        const sprintLeaderboard = document.getElementById('sprintLeaderboard');
+        const kickLeaderboard = document.getElementById('kickLeaderboard');
+        const emptyState = document.getElementById('emptyState');
+        const loadingState = document.getElementById('loadingState');
+        const categoryTabs = document.querySelectorAll('.cat-tab');
+
+        let currentCategory = 'overall';
+        let playersData = [];
+        let isCoachView = false;
+        let currentUserDocId = null;
+
+        function getInitials(firstName, lastName) {
+            return `${(firstName || '')[0] || ''}${(lastName || '')[0] || ''}`.toUpperCase();
+        }
+
+        // ── Data fetching ──
+        // Stats come from players/{docId}.stats (jump_height, strike_velocity, max_velocity)
+
+        async function getPlayerStats(playerDocId) {
+            try {
+                const snap = await db.collection('players').doc(playerDocId).get();
+                if (!snap.exists) return { jump_height: 0, strike_velocity: 0, max_velocity: 0 };
+                const data = snap.data() || {};
+                const nested = data.stats || {};
+                return {
+                    jump_height: Number(nested.jump_height ?? data["stats.jump_height"]) || 0,
+                    strike_velocity: Number(nested.strike_velocity ?? data["stats.strike_velocity"]) || 0,
+                    max_velocity: Number(nested.max_velocity ?? data["stats.max_velocity"]) || 0
+                };
+            } catch {
+                return { jump_height: 0, strike_velocity: 0, max_velocity: 0 };
+            }
+        }
+
+        async function getTotalSessions(playerDocId, playerUid) {
+            try {
+                const queries = [];
+                if (playerUid) queries.push(db.collection('sessions').where('playerUID', '==', playerUid).get());
+                if (playerDocId && playerDocId !== playerUid) queries.push(db.collection('sessions').where('playerUID', '==', playerDocId).get());
+                const results = await Promise.allSettled(queries);
+                const ids = new Set();
+                for (const r of results) if (r.status === 'fulfilled') r.value.forEach(doc => ids.add(doc.id));
+                return ids.size;
+            } catch { return 0; }
+        }
+
+        // ── Load players ──
+
+        async function loadPlayersForCoach(coachId) {
+            try {
+                const coachDoc = await db.collection('coaches').doc(coachId).get();
+                if (!coachDoc.exists) return [];
+                const coachData = coachDoc.data();
+                const players = [];
+                if (coachData.members && coachData.members.length > 0) {
+                    const chunks = [];
+                    for (let i = 0; i < coachData.members.length; i += 10) chunks.push(coachData.members.slice(i, i + 10));
+                    for (const chunk of chunks) {
+                        const snap = await db.collection('players').where(firebase.firestore.FieldPath.documentId(), 'in', chunk).get();
+                        snap.forEach(doc => {
+                            const d = doc.data();
+                            players.push({
+                                docId: doc.id,
+                                uid: d.userUID || null,
+                                name: `${d.firstName || ''} ${d.lastName || ''}`.trim(),
+                                firstName: d.firstName || '',
+                                lastName: d.lastName || '',
+                                initials: getInitials(d.firstName, d.lastName)
+                            });
+                        });
+                    }
+                }
+                return players;
+            } catch { return []; }
+        }
+
+        async function loadAllPlayerStats(players) {
+            const results = [];
+            for (const p of players) {
+                const [stats, sessions] = await Promise.all([
+                    getPlayerStats(p.docId),
+                    getTotalSessions(p.docId, p.uid)
+                ]);
+                results.push({
+                    ...p,
+                    maxJumpHeightInches: stats.jump_height,
+                    maxSprintSpeedMph: stats.max_velocity,
+                    maxKickSpeedMph: stats.strike_velocity,
+                    totalSessions: sessions,
+                    stats
+                });
+            }
+            return results;
+        }
+
+        function computeOverallScores(players) {
+            players.forEach(p => {
+                p.overallScore = 0.5 * (p.stats.jump_height || 0) + 0.5 * (p.stats.strike_velocity || 0);
+            });
+        }
+
+        // ── Rendering helpers ──
+
+        function getStatVal(player, category) {
+            if (category === 'overall') return player.overallScore > 0 ? player.overallScore.toFixed(1) : null;
+            if (category === 'jump') return player.maxJumpHeightInches > 0 ? player.maxJumpHeightInches.toFixed(1) : null;
+            if (category === 'sprint') return player.maxSprintSpeedMph > 0 ? player.maxSprintSpeedMph.toFixed(1) : null;
+            if (category === 'kick') return player.maxKickSpeedMph > 0 ? player.maxKickSpeedMph.toFixed(1) : null;
+            return null;
+        }
+
+        function getStatUnit(category) {
+            return ''; // All stats are 0-100 scores
+        }
+
+        function playerLink(player, category) {
+            if (isCoachView) return `profile.html?player=${player.docId}&userType=coach`;
+            const tabMap = { jump: 'jump', sprint: 'sprint', kick: 'kick', overall: 'jump' };
+            return `kickingview.html?tab=${tabMap[category]}&userType=player&player=${player.docId}`;
+        }
+
+        // ── Podium ──
+
+        function renderPodium(containerId, sorted, category) {
+            const el = document.getElementById(containerId);
+            el.innerHTML = '';
+            const top3 = sorted.filter(p => getStatVal(p, category) !== null).slice(0, 3);
+            if (top3.length < 2) { el.style.display = 'none'; return; }
+            el.style.display = '';
+
+            // Display order: 2nd, 1st, 3rd
+            const order = [top3[1], top3[0], top3[2]].filter(Boolean);
+            order.forEach((player, i) => {
+                const actualRank = i === 0 ? 2 : i === 1 ? 1 : 3;
+                const val = getStatVal(player, category);
+                const unit = getStatUnit(category);
+                const slot = document.createElement('div');
+                slot.className = 'podium-slot';
+                const isOwnSlot = !isCoachView && player.docId === currentUserDocId;
+                const canClick = isCoachView || isOwnSlot;
+                if (canClick) {
+                    slot.onclick = () => window.location.href = playerLink(player, category);
+                } else {
+                    slot.classList.add('no-click');
+                }
+                slot.innerHTML = `
+                    <div class="podium-avatar">
+                        ${player.initials}
+                        <div class="podium-rank">${actualRank}</div>
+                    </div>
+                    <div class="podium-name">${player.firstName || player.name.split(' ')[0]}</div>
+                    <div class="podium-stat">${val}${unit ? '<span class="stat-unit">' + unit + '</span>' : ''}</div>
+                    <div class="podium-bar"></div>
+                `;
+                el.appendChild(slot);
+            });
+        }
+
+        // ── Table Row ──
+
+        function buildRow(player, rank, category, isOwnRow) {
+            const row = document.createElement('tr');
+            const inTop5 = rank <= 5;
+            if (isOwnRow) row.classList.add(inTop5 ? 'own-row-top5' : 'own-row-outside');
+
+            const canClick = isCoachView || isOwnRow;
+            if (canClick) {
+                row.onclick = () => window.location.href = playerLink(player, category);
+            } else {
+                row.classList.add('no-click');
+            }
+
+            const val = getStatVal(player, category);
+            const unit = getStatUnit(category);
+            const badge = isOwnRow
+                ? `<span class="you-badge ${inTop5 ? 'you-badge-top' : 'you-badge-out'}">YOU</span>`
+                : '';
+
+            let statHTML;
+            if (category === 'overall' && val !== null) {
+                const pct = Math.min(100, (player.overallScore / 100) * 100);
+                statHTML = `
+                    <div class="score-bar-wrap">
+                        <div class="score-bar-track"><div class="score-bar-fill" style="width:${pct}%"></div></div>
+                        <span class="score-bar-val">${val}</span>
+                    </div>`;
+            } else {
+                statHTML = `<span>${val || '—'}${val && unit ? '<span class="stat-unit">' + unit + '</span>' : ''}</span>`;
+            }
+
+            row.innerHTML = `
+                <td class="col-rank">${rank}</td>
+                <td class="col-player">
+                    <div class="tbl-avatar">${player.initials}</div>
+                    <span class="tbl-name">${player.name}${badge}</span>
+                </td>
+                <td class="col-stat">${statHTML}</td>
+                <td class="col-sessions">${player.totalSessions}s</td>
+            `;
+            return row;
+        }
+
+        // ── Render leaderboard ──
+
+        function buildNoParticipationRow(player, category) {
+            const row = document.createElement('tr');
+            row.classList.add('own-row-no-data');
+            const canClick = isCoachView || player.docId === currentUserDocId;
+            if (canClick) {
+                row.onclick = () => window.location.href = playerLink(player, category);
+            } else {
+                row.classList.add('no-click');
+            }
+            const badge = `<span class="you-badge you-badge-out">YOU</span>`;
+            row.innerHTML = `
+                <td class="col-rank">—</td>
+                <td class="col-player">
+                    <div class="tbl-avatar">${player.initials}</div>
+                    <span class="tbl-name">${player.name}${badge}</span>
+                </td>
+                <td class="col-stat">—</td>
+                <td class="col-sessions">${player.totalSessions}s</td>
+            `;
+            return row;
+        }
+
+        function renderLeaderboard(tbody, podiumId, countId, sortedPlayers, category, emptyMsg) {
+            tbody.innerHTML = '';
+            const withData = sortedPlayers.filter(p => getStatVal(p, category) !== null);
+            const countEl = document.getElementById(countId);
+            countEl.textContent = `${withData.length} player${withData.length !== 1 ? 's' : ''}`;
+            if (!isCoachView) countEl.classList.add('hidden');
+            else countEl.classList.remove('hidden');
+
+            renderPodium(podiumId, sortedPlayers, category);
+
+            if (withData.length === 0) {
+                tbody.innerHTML = `<tr style="cursor:default;justify-content:center;"><td colspan="4" style="text-align:center;padding:2rem;color:var(--text-muted);width:100%;">${emptyMsg}</td></tr>`;
+                if (!isCoachView && currentUserDocId) {
+                    const currentPlayer = playersData.find(p => p.docId === currentUserDocId);
+                    if (currentPlayer) {
+                        const sep = document.createElement('tr');
+                        sep.className = 'sep-row';
+                        sep.innerHTML = `<td colspan="4" style="text-align:center;width:100%;color:var(--text-dim);letter-spacing:0.4em;">&#8226; &#8226; &#8226;</td>`;
+                        tbody.appendChild(sep);
+                        tbody.appendChild(buildNoParticipationRow(currentPlayer, category));
+                    }
+                }
+                return;
+            }
+
+            // Remaining players after top 3 (shown in podium)
+            const startFrom = withData.length >= 3 ? 3 : 0;
+            const list = startFrom > 0 ? sortedPlayers.slice(startFrom) : sortedPlayers;
+
+            if (isCoachView) {
+                list.forEach((player, i) => {
+                    const rank = startFrom + i + 1;
+                    if (getStatVal(player, category) !== null) {
+                        tbody.appendChild(buildRow(player, rank, category, false));
+                    }
+                });
+            } else {
+                // Player view: show top 5 (minus podium) + own row if outside
+                const top5Remaining = sortedPlayers.slice(startFrom, 5);
+                top5Remaining.forEach((player, i) => {
+                    const rank = startFrom + i + 1;
+                    if (getStatVal(player, category) !== null) {
+                        tbody.appendChild(buildRow(player, rank, category, player.docId === currentUserDocId));
+                    }
+                });
+
+                const selfIdx = sortedPlayers.findIndex(p => p.docId === currentUserDocId);
+                const currentPlayer = currentUserDocId ? playersData.find(p => p.docId === currentUserDocId) : null;
+                const hasData = selfIdx >= 0 && getStatVal(sortedPlayers[selfIdx], category) !== null;
+
+                if (selfIdx >= 5 && hasData) {
+                    const sep = document.createElement('tr');
+                    sep.className = 'sep-row';
+                    sep.innerHTML = `<td colspan="4" style="text-align:center;width:100%;color:var(--text-dim);letter-spacing:0.4em;">&#8226; &#8226; &#8226;</td>`;
+                    tbody.appendChild(sep);
+                    tbody.appendChild(buildRow(sortedPlayers[selfIdx], selfIdx + 1, category, true));
+                } else if (currentPlayer && !hasData) {
+                    const sep = document.createElement('tr');
+                    sep.className = 'sep-row';
+                    sep.innerHTML = `<td colspan="4" style="text-align:center;width:100%;color:var(--text-dim);letter-spacing:0.4em;">&#8226; &#8226; &#8226;</td>`;
+                    tbody.appendChild(sep);
+                    tbody.appendChild(buildNoParticipationRow(currentPlayer, category));
+                }
+            }
+        }
+
+        function sortBy(players, category) {
+            const copy = [...players];
+            if (category === 'overall') return copy.sort((a, b) => b.overallScore - a.overallScore);
+            if (category === 'jump') return copy.sort((a, b) => b.maxJumpHeightInches - a.maxJumpHeightInches);
+            if (category === 'sprint') return copy.sort((a, b) => b.maxSprintSpeedMph - a.maxSprintSpeedMph);
+            if (category === 'kick') return copy.sort((a, b) => b.maxKickSpeedMph - a.maxKickSpeedMph);
+            return copy;
+        }
+
+        function renderAll(players) {
+            renderLeaderboard(overallBody, 'overallPodium', 'overallCount', sortBy(players, 'overall'), 'overall', 'No overall scores yet');
+            renderLeaderboard(jumpLeaderboardBody, 'jumpPodium', 'jumpCount', sortBy(players, 'jump'), 'jump', 'No jump data available yet');
+            renderLeaderboard(sprintLeaderboardBody, 'sprintPodium', 'sprintCount', sortBy(players, 'sprint'), 'sprint', 'No sprint data available yet');
+            renderLeaderboard(kickLeaderboardBody, 'kickPodium', 'kickCount', sortBy(players, 'kick'), 'kick', 'No kicking data available yet');
+        }
+
+        // ── Tab switching ──
+
+        function switchCategory(cat) {
+            currentCategory = cat;
+            [overallLeaderboard, jumpLeaderboard, sprintLeaderboard, kickLeaderboard].forEach(el => el.style.display = 'none');
+            const map = { overall: overallLeaderboard, jump: jumpLeaderboard, sprint: sprintLeaderboard, kick: kickLeaderboard };
+            if (map[cat]) {
+                map[cat].style.display = 'block';
+                map[cat].classList.add('fade-up');
+                requestAnimationFrame(() => map[cat].style.animationDelay = '0s');
+            }
+        }
+
+        categoryTabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                categoryTabs.forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                switchCategory(tab.dataset.category);
+            });
+        });
+
+        // ── Init ──
+
+        async function initLeaderboard(coachId) {
+            loadingState.style.display = '';
+            emptyState.style.display = 'none';
+            try {
+                const players = await loadPlayersForCoach(coachId);
+                if (players.length === 0) {
+                    loadingState.style.display = 'none';
+                    emptyState.style.display = '';
+                    return;
+                }
+                playersData = await loadAllPlayerStats(players);
+                computeOverallScores(playersData);
+                console.log('Loaded player stats:', playersData);
+                renderAll(playersData);
+                loadingState.style.display = 'none';
+            } catch (e) {
+                console.error('Error initializing leaderboard:', e);
+                loadingState.style.display = 'none';
+                emptyState.innerHTML = `<h3>Error loading leaderboard</h3><p>${e.message}</p>`;
+                emptyState.style.display = '';
+            }
+        }
+
+        // ── Auth ──
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!user) { window.location.href = 'kickai.html'; return; }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const coachParam = urlParams.get('coach');
+            const urlUserType = urlParams.get('userType');
+
+            if (urlUserType === 'coach') {
+                isCoachView = true;
+                currentUserDocId = null;
+                initLeaderboard(user.uid);
+                return;
+            }
+
+            if (urlUserType === 'player') {
+                isCoachView = false;
+                const playerParam = urlParams.get('player');
+                if (playerParam) {
+                    currentUserDocId = playerParam;
+                } else {
+                    let playerSnap = await db.collection('players').where('userUID', '==', user.uid).limit(1).get();
+                    if (playerSnap.empty) playerSnap = await db.collection('players').where('authenticationUID', '==', user.uid).limit(1).get();
+                    currentUserDocId = !playerSnap.empty ? playerSnap.docs[0].id : null;
+                }
+                if (coachParam) { initLeaderboard(coachParam); }
+                else if (currentUserDocId) {
+                    const coachSnap = await db.collection('coaches').where('members', 'array-contains', currentUserDocId).limit(1).get();
+                    if (!coachSnap.empty) initLeaderboard(coachSnap.docs[0].id);
+                    else {
+                        loadingState.style.display = 'none';
+                        emptyState.innerHTML = `<h3>No team found</h3><p>You haven't been added to a team yet. Ask your coach to add you.</p>`;
+                        emptyState.style.display = '';
+                    }
+                }
+                return;
+            }
+
+            // Fallback detection
+            if (coachParam) {
+                isCoachView = false;
+                let playerSnap = await db.collection('players').where('userUID', '==', user.uid).limit(1).get();
+                if (playerSnap.empty) playerSnap = await db.collection('players').where('authenticationUID', '==', user.uid).limit(1).get();
+                currentUserDocId = !playerSnap.empty ? playerSnap.docs[0].id : null;
+                initLeaderboard(coachParam);
+                return;
+            }
+
+            const coachDoc = await db.collection('coaches').doc(user.uid).get();
+            if (coachDoc.exists) {
+                isCoachView = true;
+                currentUserDocId = null;
+                initLeaderboard(user.uid);
+                return;
+            }
+
+            let playerSnap = await db.collection('players').where('userUID', '==', user.uid).limit(1).get();
+            if (playerSnap.empty) playerSnap = await db.collection('players').where('authenticationUID', '==', user.uid).limit(1).get();
+            if (!playerSnap.empty) {
+                isCoachView = false;
+                currentUserDocId = playerSnap.docs[0].id;
+                const coachSnap = await db.collection('coaches').where('members', 'array-contains', currentUserDocId).limit(1).get();
+                if (!coachSnap.empty) initLeaderboard(coachSnap.docs[0].id);
+                else {
+                    loadingState.style.display = 'none';
+                    emptyState.innerHTML = `<h3>No team found</h3><p>You haven't been added to a team yet. Ask your coach to add you.</p>`;
+                    emptyState.style.display = '';
+                }
+                return;
+            }
+
+            loadingState.style.display = 'none';
+            emptyState.innerHTML = `<h3>Access Denied</h3><p>Your account isn't linked to a player or coach profile.</p>`;
+            emptyState.style.display = '';
+        });
+
+        // ── Side nav ──
+
+        (function sideNavSetup() {
+            const navToggle = document.getElementById('navToggle');
+            const sideNav = document.getElementById('sideNav');
+            const closeSide = document.getElementById('closeSide');
+            const sideLinks = document.getElementById('sideLinks');
+            const sideBackdrop = document.getElementById('sideBackdrop');
+
+            function openSide() {
+                sideNav.classList.add('open');
+                sideNav.setAttribute('aria-hidden', 'false');
+                if (sideBackdrop) sideBackdrop.classList.add('open');
+            }
+            function closeSideNav() {
+                sideNav.classList.remove('open');
+                sideNav.setAttribute('aria-hidden', 'true');
+                if (sideBackdrop) sideBackdrop.classList.remove('open');
+            }
+
+            if (navToggle) navToggle.addEventListener('click', (e) => { e.preventDefault(); openSide(); });
+            if (closeSide) closeSide.addEventListener('click', (e) => { e.preventDefault(); closeSideNav(); });
+            if (sideBackdrop) sideBackdrop.addEventListener('click', (e) => { e.preventDefault(); closeSideNav(); });
+            document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSideNav(); });
+
+            auth.onAuthStateChanged(() => {
+                sideLinks.innerHTML = '';
+                const playerParam = new URLSearchParams(window.location.search).get('player');
+                const userTypeParam = isCoachView ? 'coach' : 'player';
+                const profileHref = playerParam
+                    ? `profile.html?player=${playerParam}&userType=${userTypeParam}`
+                    : `profile.html?userType=${userTypeParam}`;
+                const navigationLinks = isCoachView
+                    ? [{ href: `coachesview.html?userType=coach`, text: 'Player Roster', icon: 'people' }]
+                    : [{ href: profileHref, text: 'Profile', icon: 'person' }];
+
+                const homeBtn = document.querySelector('.home-btn');
+                if (homeBtn) homeBtn.href = isCoachView
+                    ? `coachesview.html?userType=coach`
+                    : (playerParam ? `profile.html?player=${playerParam}&userType=player` : `profile.html?userType=player`);
+
+                navigationLinks.forEach((a, idx) => {
+                    const link = document.createElement('a');
+                    link.href = a.href || '#';
+                    link.className = 'side-link';
+                    const icon = document.createElement('span');
+                    icon.className = 'material-symbols-outlined';
+                    icon.style.fontSize = '20px';
+                    icon.textContent = a.icon;
+                    const spanText = document.createElement('span');
+                    spanText.textContent = a.text;
+                    link.appendChild(icon);
+                    link.appendChild(spanText);
+                    link.style.transitionDelay = (idx * 40) + 'ms';
+                    link.addEventListener('click', () => closeSideNav());
+                    sideLinks.appendChild(link);
+                });
+            });
+
+            const sideLogoutBtn = document.getElementById('sideLogout');
+            if (sideLogoutBtn) {
+                sideLogoutBtn.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    auth.signOut().then(() => window.location.href = 'kickai.html');
+                });
+            }
+        })();
+    </script>
+</body>
+</html>

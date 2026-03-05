@@ -1,0 +1,3629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>Free Record | PoseTek</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+  <style>
+  :root {
+  --primary: #1a3a2e;
+  --secondary: #2d5e4a;
+  --accent: #4c8c6a;
+  --text-light: #ffffff;
+  --text-muted: rgba(255, 255, 255, 0.7);
+  --text-dark: #121212;
+  --card-bg: rgba(255, 255, 255, 0.08);
+  --card-border: rgba(255, 255, 255, 0.1);
+  --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+  }
+
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: rgba(76, 140, 106, 0.3);
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background-color: var(--primary);
+      color: var(--text-light);
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
+      -webkit-overflow-scrolling: touch;
+    }
+
+  header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 1.5rem 2rem;
+  background: linear-gradient(135deg, rgba(0, 0, 0, 0.25), rgba(0, 0, 0, 0.15));
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  backdrop-filter: blur(15px);
+  border-bottom: 1px solid var(--card-border);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  }
+
+  .logo {
+  font-family: 'Poppins', 'Inter', sans-serif;
+  font-size: 1.9rem;
+  font-weight: 700;
+  letter-spacing: -0.6px;
+  color: var(--text-light);
+  }
+
+  .nav-links a {
+  color: var(--text-light);
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 0.95rem;
+  transition: var(--transition);
+  position: relative;
+  }
+  .nav-links a:hover { color: var(--accent); }
+  .nav-links a::after {
+  content: '';
+  position: absolute;
+  bottom: -5px;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background-color: var(--accent);
+  transition: var(--transition);
+  }
+  .nav-links a:hover::after { width: 100%; }
+
+  .container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  }
+
+    .frames-container {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 2rem;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .video-container {
+      background: linear-gradient(135deg, rgba(0, 0, 0, 0.35), rgba(0, 0, 0, 0.25));
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 1rem;
+      position: relative;
+      width: 100%;
+      max-width: 480px;
+      backdrop-filter: blur(10px);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .video-container video, #rawFrameCanvas {
+      width: 100%;
+      max-width:100%;
+      height: auto;
+      aspect-ratio: 16/9;
+      border-radius: 8px;
+    }
+
+    .pose-container {
+      background: linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25));
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      position: relative;
+      overflow: hidden;
+      width: 480px;
+      z-index: 5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+
+    .pose-container canvas, #summaryCanvas {
+      display: block;
+      width: 100%;
+      max-width:100%;
+      height: auto;
+      aspect-ratio: 4/3;
+      background-color: #1a3a2e;
+    }
+
+    .nav-buttons {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      padding: 0.5rem;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      backdrop-filter: blur(5px);
+      border-top: 1px solid var(--card-border);
+    }
+
+    .btn-row {
+      display: flex;
+      gap: 0.5rem;
+      justify-content: center;
+    }
+
+    .icon-btn {
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border: none;
+      border-radius: 50%;
+      background: linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);
+      color: white;
+      font-size: 1.2rem;
+      cursor: pointer;
+      transition: var(--transition);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .icon-btn:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 16px rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.15);
+    }
+
+    .icon-btn:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    }
+
+    .reps-bar {
+      display: flex;
+      gap: .5rem;
+      align-items: center;
+      padding: .75rem 0 1.25rem 0;
+      overflow-x: auto;
+    }
+
+    .rep-pill {
+      flex: 0 0 auto;
+      padding: .4rem .9rem;
+      min-height: 44px;
+      display: flex;
+      align-items: center;
+      border-radius: 999px;
+      border: 1px solid var(--card-border);
+      background: var(--card-bg);
+      color: var(--text-light);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      user-select: none;
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+
+    .rep-pill:hover { 
+      transform: translateY(-2px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+    }
+    
+    .rep-pill:active {
+      transform: translateY(0);
+      box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+    }
+    
+    .rep-pill.active {
+      background: linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(76,140,106,0.3);
+    }
+
+    /* Fullscreen styles */
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      width: 44px;
+      height: 44px;
+      min-width: 44px;
+      min-height: 44px;
+      border: none;
+      border-radius: 8px;
+      background: linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.7));
+      backdrop-filter: blur(10px);
+      color: white;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 16px;
+      transition: var(--transition);
+      z-index: 10;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+      touch-action: manipulation;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .fullscreen-btn:hover {
+      background: linear-gradient(135deg, rgba(0,0,0,0.9), rgba(0,0,0,0.8));
+      transform: scale(1.05);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.4);
+    }
+
+    .fullscreen-btn:active {
+      transform: scale(1);
+      box-shadow: 0 2px 8px rgba(0,0,0,0.3);
+    }
+
+    .frame-number {
+      position: absolute;
+      top: 10px;
+      left: 10px;
+      background: rgba(0, 0, 0, 0.7);
+      color: white;
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 12px;
+      font-weight: 600;
+      z-index: 10;
+    }
+
+    /* Layout change for fullscreen mode */
+    .container.focused-pose .video-container { display: none; }
+    .container.focused-pose .pose-container { max-width: 800px; width: 100%; margin: 0 auto; }
+    .container.focused-pose .pose-container canvas { width: 100%; height: auto; aspect-ratio: 4/3; }
+
+    .container.focused-video .pose-container { display: none; }
+    .container.focused-video .video-container { max-width: 900px; width: 100%; margin: 0 auto; }
+    .container.focused-video .video-container canvas { width: 100%; height: auto; aspect-ratio: 16/9; }
+
+  /* Layout: three equal-width columns that fill the page */
+  .frames-container { display: flex; gap: 1rem; align-items:flex-start; justify-content:space-between; flex-wrap:nowrap; padding:0 1rem; }
+  .video-container, .pose-container, #summaryContainer { flex: 1 1 calc((100% - 2rem) / 3); min-width: 280px; }
+  .video-container { max-width: 40%; }
+  .pose-container { max-width: 40%; }
+  #summaryContainer { max-width: 40%; }
+
+    /* Custom Scrollbars */
+    ::-webkit-scrollbar {
+      width: 10px;
+      height: 10px;
+    }
+
+    ::-webkit-scrollbar-track {
+      background: rgba(0,0,0,0.1);
+      border-radius: 5px;
+    }
+
+    ::-webkit-scrollbar-thumb {
+      background: var(--accent);
+      border-radius: 5px;
+      transition: background 0.3s ease;
+    }
+
+    ::-webkit-scrollbar-thumb:hover {
+      background: #56a07a;
+    }
+
+    /* Firefox scrollbar */
+    * {
+      scrollbar-width: thin;
+      scrollbar-color: var(--accent) rgba(0,0,0,0.1);
+    }
+
+    @media (max-width: 980px) {
+      .frames-container { flex-direction: column; gap: 0.75rem; padding:0.5rem; }
+      .video-container, .pose-container, #summaryContainer { width: 100%; max-width: 100%; flex: none; }
+    }
+
+    /* Mobile Optimization - 480px */
+    @media (max-width: 480px) {
+      header {
+        padding: 0.75rem 1rem;
+      }
+
+      .frames-container {
+        padding: 0.5rem;
+        gap: 0.5rem;
+      }
+
+      .video-container, .pose-container {
+        border-radius: 10px;
+      }
+
+      .summary-container {
+        padding: 0.5rem;
+        border-radius: 10px;
+      }
+
+      .nav-buttons {
+        padding: 0.5rem;
+      }
+
+      .btn-row {
+        gap: 0.4rem;
+      }
+
+      .icon-btn {
+        width: 48px;
+        height: 48px;
+        min-width: 48px;
+        min-height: 48px;
+      }
+
+      .rep-pill {
+        min-height: 48px;
+        padding: 0.5rem 1rem;
+      }
+
+      .stat {
+        min-width: 100px;
+      }
+    }
+
+    /* Small Mobile - 375px */
+    @media (max-width: 375px) {
+      header {
+        padding: 0.5rem 0.75rem;
+      }
+
+      .frames-container {
+        padding: 0.25rem;
+      }
+
+      .summary-stats {
+        gap: 0.4rem;
+      }
+
+      .stat {
+        min-width: 90px;
+        padding: 0.4rem 0.6rem;
+      }
+
+      .stat-label {
+        font-size: 0.75rem;
+      }
+
+      .stat-value {
+        font-size: 1.3rem;
+      }
+    }
+
+    /* Align prompt (pose viewer) */
+    .align-prompt {
+      position: absolute;
+      left: 50%;
+      top: 5%;
+      transform: translateX(-50%);
+      background: rgba(255, 230, 0, 0.9);
+      color: #1a1a1a;
+      font-weight: 700;
+      padding: 10px 20px;
+      text-align: center;
+      font-size: 16px;
+      z-index: 9;
+      display: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    }
+    .align-prompt.flashing { animation: flashPrompt 1s infinite; }
+    @keyframes flashPrompt {
+      0%, 100% { background: rgba(255, 230, 0, 0.9); opacity: 1; }
+      50% { background: rgba(255, 230, 0, 0.6); opacity: 0.85; }
+    }
+    .mini-pose-selector {
+      position: absolute;
+      top: 12px;
+      left: 12px;
+      width: 140px;
+      height: 180px;
+      background: rgba(0, 0, 0, 0.75);
+      border: 1px solid rgba(255, 255, 255, 0.2);
+      border-radius: 8px;
+      z-index: 100;
+      backdrop-filter: blur(4px);
+      padding: 4px;
+      cursor: pointer;
+    }
+    .pose-container:fullscreen .mini-pose-selector {
+      top: calc(12px + 10vh);
+      width: 175px;
+      height: 225px;
+    }
+    .mini-pose-label {
+      position: absolute;
+      top: 4px;
+      left: 4px;
+      right: 4px;
+      text-align: center;
+      font-size: 10px;
+      color: rgba(255, 255, 255, 0.8);
+      font-weight: 600;
+      pointer-events: none;
+      text-shadow: 0 1px 2px rgba(0, 0, 0, 0.8);
+      z-index: 1;
+    }
+    #miniPoseCanvas { display: block; width: 100%; height: 100%; }
+    .pose-container .angle-hud {
+      position: absolute;
+      bottom: 16px;
+      right: 16px;
+      z-index: 2000;
+      padding: 6px 12px;
+      border-radius: 8px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.25);
+      color: #fff;
+      font-weight: 700;
+      letter-spacing: 0.3px;
+      pointer-events: none;
+    }
+    .pose-container:fullscreen .angle-hud { right: 16px; }
+    .pose-container .jump-height-overlay {
+      position: absolute;
+      bottom: 12px;
+      left: 12px;
+      z-index: 25;
+      padding: 8px 10px;
+      border-radius: 10px;
+      background: rgba(0, 0, 0, 0.55);
+      border: 1px solid rgba(255, 255, 255, 0.22);
+      color: #fff;
+      font-weight: 800;
+      font-size: 0.85rem;
+      letter-spacing: 0.2px;
+      pointer-events: none;
+      backdrop-filter: blur(6px);
+      display: none;
+      min-width: 120px;
+      text-align: left;
+    }
+    .pose-container .jump-height-overlay .label {
+      display: block;
+      font-weight: 700;
+      font-size: 0.7rem;
+      opacity: 0.8;
+      text-transform: uppercase;
+      letter-spacing: 0.6px;
+      text-align: left;
+    }
+    .pose-container .jump-height-overlay .value {
+      display: block;
+      font-weight: 900;
+      font-size: 0.95rem;
+      line-height: 1.1;
+    }
+    .view-toggle {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+      padding: 0.5rem;
+      background: rgba(0, 0, 0, 0.2);
+      border-radius: 10px;
+    }
+    .view-toggle-btn {
+      flex: 1;
+      padding: 0.5rem 1rem;
+      border: 1px solid var(--card-border);
+      border-radius: 8px;
+      background: rgba(255, 255, 255, 0.05);
+      color: var(--text-light);
+      font-weight: 600;
+      cursor: pointer;
+      transition: var(--transition);
+      text-align: center;
+    }
+    .view-toggle-btn:hover { background: rgba(255, 255, 255, 0.08); }
+    .view-toggle-btn.active {
+      background: linear-gradient(135deg, var(--accent), #56a07a);
+      border-color: var(--accent);
+      box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3);
+    }
+    .overlay-controls {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      padding: 0.5rem;
+      background: rgba(0, 0, 0, 0.15);
+      border-radius: 8px;
+      margin-top: 0.5rem;
+    }
+    .overlay-controls label {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.85rem;
+      cursor: pointer;
+      user-select: none;
+    }
+    .overlay-controls input[type="checkbox"] { cursor: pointer; width: 18px; height: 18px; }
+
+    /* Summary container beneath players */
+    .summary-container {
+      /* when used as third column, don't add extra top margin */
+      margin-top: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      backdrop-filter: blur(10px);
+      border: 1px solid var(--card-border);
+      border-radius: 12px;
+      padding: 0.75rem;
+      display: flex;
+      gap: 0.75rem;
+      align-items: stretch;
+      justify-content: center;
+      flex-wrap: wrap;
+      flex-direction: column;
+      position: relative;
+      z-index: 5;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .summary-left {
+      width: 100%;
+      max-width: 720px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 0.5rem;
+      padding: 0.25rem;
+    }
+  .summary-zoom-controls{display:flex;gap:.5rem;align-items:center;justify-content:center}
+    .summary-stats {
+      width: 100%;
+      display:flex;
+      gap:0.5rem;
+      align-items:center;
+      justify-content:center;
+      flex-wrap:wrap;
+      padding-top:0.5rem;
+    }
+    .stat {
+      flex:0 1 auto;
+      min-width:120px;
+      background: linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));
+      backdrop-filter: blur(5px);
+      border-radius:10px;
+      padding:0.5rem 0.75rem;
+      border:1px solid var(--card-border);
+      text-align:center;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05);
+    }
+    .stat-label{font-size:0.75rem;color:var(--muted);margin-bottom:0.15rem}
+    .stat-value{font-size:1.05rem;font-weight:700}
+    .stat { width: 100%; }
+    .stat-label { font-size: .85rem; opacity: .8; margin-bottom: .25rem; }
+    .stat-value { font-size: 1.5rem; font-weight: 700; letter-spacing: .3px; }
+    .muted { opacity: .7; }
+    .small { font-size: .9rem; }
+
+  /* Side nav + compact header styles (shared) */
+  .nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;min-width:44px;min-height:44px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;cursor:pointer;transition:var(--transition);touch-action:manipulation;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 6px rgba(0,0,0,0.1)}
+  .nav-toggle:hover{transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.15)}
+  .side-nav{position:fixed;top:0;left:-320px;width:320px;height:100%;background:linear-gradient(180deg, rgba(15,38,33,0.98), rgba(12,34,30,0.98));box-shadow:6px 0 30px rgba(0,0,0,0.45);z-index:1200;padding:2rem 1.25rem;transition:left 0.32s cubic-bezier(.2,.9,.2,1);display:flex;flex-direction:column;gap:1rem}
+  .side-nav.open{left:0}
+  .side-nav .close-side{margin-left:auto;background:none;border:none;color:var(--text-light);font-size:1.25rem;cursor:pointer;opacity:0.85}
+  .side-nav .side-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.85rem;min-height:44px;border-radius:10px;color:var(--text-light);text-decoration:none;font-weight:600;transition:var(--transition);touch-action:manipulation;-webkit-tap-highlight-color:transparent}
+  .side-nav .side-link:hover{background:rgba(255,255,255,0.08);transform:translateX(4px)}
+  .side-divider{height:1px;background:var(--card-border);margin:0.75rem 0}
+  .side-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1100;opacity:0;visibility:hidden;transition:opacity 200ms ease}
+  .side-backdrop.open{opacity:1;visibility:visible}
+  .side-link .material-symbols-outlined{font-variation-settings:'wght' 400;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;line-height:24px;vertical-align:middle;color:var(--text-light)}
+  .side-link span:first-of-type{margin-right:6px}
+  .action-btn{padding:0.6rem 1.2rem;min-height:44px;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);border:none;border-radius:50px;color:var(--text-light);font-weight:600;cursor:pointer;transition:var(--transition);touch-action:manipulation;-webkit-tap-highlight-color:transparent;box-shadow:0 2px 8px rgba(0,0,0,0.15), inset 0 1px 0 rgba(255,255,255,0.1)}
+  .action-btn:hover{background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%);transform:translateY(-2px);box-shadow:0 4px 12px rgba(0,0,0,0.25)}
+  .action-btn:active{transform:translateY(0);box-shadow:0 2px 8px rgba(0,0,0,0.15)}
+
+  /* Hide top-right links so only hamburger is visible */
+  header .nav-links { display: none !important; }
+
+  /* --- Themed control enhancements (video + pose) --- */
+  .nav-buttons {
+    gap: 0.6rem;
+    padding: 0.6rem;
+    background-color: var(--card-bg);
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    backdrop-filter: blur(8px);
+  }
+
+  .btn-row { gap: 0.5rem; justify-content: center; }
+
+  .icon-btn {
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--card-border);
+    border-radius: 12px;
+    background: linear-gradient(180deg, rgba(76,140,106,0.95), rgba(76,140,106,0.85));
+    color: #fff;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, opacity 200ms ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 6px 20px rgba(0,0,0,0.25);
+  }
+  .icon-btn:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(0,0,0,0.3); }
+  .icon-btn:active { transform: translateY(0); box-shadow: 0 6px 16px rgba(0,0,0,0.28); }
+  .icon-btn:focus { outline: none; }
+  .icon-btn:focus-visible { box-shadow: 0 0 0 3px rgba(76,140,106,0.35), 0 6px 20px rgba(0,0,0,0.25); }
+  .icon-btn.active { background: linear-gradient(180deg, var(--secondary), #2b5a47); }
+
+  .fullscreen-btn {
+    width: 34px;
+    height: 34px;
+    border: 1px solid var(--card-border);
+    border-radius: 10px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.55));
+    backdrop-filter: blur(8px);
+    box-shadow: 0 6px 16px rgba(0,0,0,0.25);
+    transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease;
+  }
+  .fullscreen-btn:hover { background: linear-gradient(180deg, rgba(0,0,0,0.78), rgba(0,0,0,0.68)); transform: translateY(-1px) scale(1.03); box-shadow: 0 10px 24px rgba(0,0,0,0.3); }
+  .fullscreen-btn:active { transform: scale(1.0); }
+
+  .frame-number {
+    background: linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.55));
+    padding: 4px 9px;
+    border-radius: 8px;
+    font-weight: 700;
+    border: 1px solid var(--card-border);
+    backdrop-filter: blur(8px);
+  }
+
+  .pose-container,
+  .video-container { box-shadow: 0 14px 40px rgba(0,0,0,0.28); }
+
+  /* Repetition pills */
+  .reps-bar { gap: .5rem; }
+  .rep-pill {
+    padding: .45rem .95rem;
+    border-radius: 999px;
+    border: 1px solid var(--card-border);
+    background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));
+    color: var(--text-light);
+    font-weight: 600;
+    user-select: none;
+    transition: transform 200ms ease, box-shadow 200ms ease, background 200ms ease, opacity 200ms ease;
+    box-shadow: 0 6px 16px rgba(0,0,0,0.18);
+  }
+  .rep-pill:hover { transform: translateY(-2px); box-shadow: 0 10px 22px rgba(0,0,0,0.24); }
+  .rep-pill.active { background: linear-gradient(180deg, rgba(76,140,106,0.95), rgba(76,140,106,0.85)); border-color: var(--accent); box-shadow: 0 10px 24px rgba(76,140,106,0.35); }
+
+  /* Themed select */
+  #overlayRepSelect {
+    border-radius: 10px;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid var(--card-border);
+    color: var(--text-light);
+    padding: .55rem .75rem;
+    outline: none;
+    transition: border-color 200ms ease, box-shadow 200ms ease;
+  }
+  #overlayRepSelect:focus { border-color: var(--accent); box-shadow: 0 0 0 3px rgba(76,140,106,0.25); }
+
+  /* Fullscreen polish (if used via native fullscreen) */
+  .video-container:fullscreen,
+  .pose-container:fullscreen {
+    width: 100vw !important;
+    height: 100vh !important;
+    max-width: none !important;
+    max-height: none !important;
+    border-radius: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+  .video-container:fullscreen {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: #000;
+  }
+  .video-container:fullscreen #rawFrameCanvas,
+  .video-container:fullscreen video {
+    width: auto !important;
+    height: auto !important;
+    max-width: 100vw !important;
+    max-height: 100vh !important;
+  }
+  .pose-container:fullscreen #poseCanvas {
+    width: 100% !important;
+    height: auto !important;
+    max-width: 100% !important;
+  }
+  .pose-container:fullscreen #pose3DCanvas {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+  }
+  .pose-container:fullscreen ~ #summaryContainer { display: none !important; }
+  .video-container:fullscreen .nav-buttons {
+    position: absolute;
+    left: 12px; right: 12px; bottom: 12px;
+    z-index: 1000; margin: 0; padding: 0.6rem;
+    background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.45));
+    border: 1px solid var(--card-border); border-radius: 12px; backdrop-filter: blur(8px);
+  }
+  .pose-container:fullscreen .nav-buttons {
+    position: absolute; right: 16px; bottom: 16px; z-index: 1000; width: auto; max-width: 48vw; margin: 0; padding: 0.6rem;
+    background: linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.45)); border: 1px solid var(--card-border); border-radius: 12px; backdrop-filter: blur(8px);
+  }
+  .video-container:fullscreen .fullscreen-btn,
+  .pose-container:fullscreen .fullscreen-btn,
+  .pose-container:fullscreen .frame-number { top: 16px; right: 16px; left: 16px; z-index: 1000; }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button id="navToggle" class="nav-toggle" aria-label="Open navigation">☰</button>
+      <div class="logo">PoseTek</div>
+    </div>
+    <a href="coachesview.html" class="home-btn" title="Home" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; text-decoration: none; transition: var(--transition);" onmouseover="this.style.transform='translateY(-2px)'; this.style.background='rgba(255,255,255,0.12)';" onmouseout="this.style.transform=''; this.style.background='var(--card-bg)';">
+      <span class="material-symbols-outlined" style="color: var(--text-light); font-size: 1.4rem;">home</span>
+    </a>
+  </header>
+
+  <!-- Side navigation panel -->
+  <aside id="sideNav" class="side-nav" aria-hidden="true">
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <div style="font-weight:700;font-size:1.25rem;">Menu</div>
+      <button class="close-side" id="closeSide">✕</button>
+    </div>
+    <div class="side-divider"></div>
+    <div id="sideProfile" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+      <div id="profileAvatar" style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem">C</div>
+      <div style="display:flex;flex-direction:column;">
+        <div id="profileName" style="font-weight:700">Coach</div>
+        <div id="profileEmail" style="font-size:0.85rem;opacity:0.85">email@example.com</div>
+      </div>
+    </div>
+    <div class="side-divider"></div>
+    <div id="sideLinks" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+    <div class="side-divider"></div>
+    <div style="margin-top:auto">
+      <button class="action-btn" id="sideLogout">Logout</button>
+    </div>
+  </aside>
+  <div id="sideBackdrop" class="side-backdrop" tabindex="-1"></div>
+
+  <div class="container">
+    <div id="repsBar" class="reps-bar" aria-label="Repetitions"></div>
+    <div class="frames-container">
+      <div class="video-container">
+        <video id="rawVideo" preload="metadata" playsinline muted style="display:none"></video>
+        <canvas id="rawFrameCanvas" width="480" height="270" style="width:100%;height:auto;border-radius:8px;background:#000"></canvas>
+        <button id="videoFullscreenBtn" class="fullscreen-btn" title="Fullscreen Video">⛶</button>
+        <div class="nav-buttons" style="margin-top:.5rem;margin-left:8px;">
+          <div class="btn-row">
+            <button id="rawPrevBtn"      class="icon-btn" title="Previous frame">←</button>
+            <button id="rawPlayPauseBtn" class="icon-btn" title="Play/Pause">▶</button>
+            <button id="rawNextBtn"      class="icon-btn" title="Next frame">→</button>
+            <button id="rawShowPoseBtn"  class="icon-btn" title="Show Pose">🦵</button>
+          </div>
+          <div class="btn-row">
+            <button id="rawRestartBtn" class="icon-btn" title="Restart">⟲</button>
+            <button id="rawZoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
+            <button id="rawZoomInBtn" class="icon-btn" title="Zoom In">+</button>
+            <span id="rawFrameLabel" style="align-self:center;font-weight:600;opacity:.85">Frame: 0</span>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Frame</span>
+              <span id="rawFrameSliderValue" style="font-size:0.75rem;font-weight:600;">0</span>
+            </div>
+            <input id="rawFrameSlider" type="range" min="0" max="0" step="1" value="0" style="width:100%;cursor:pointer;"/>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Speed</span>
+              <span id="rawSpeedValue" style="font-size:0.75rem;font-weight:600;">1.0x</span>
+            </div>
+            <input id="rawSpeedSlider" type="range" min="0" max="8" step="1" value="5" list="rawSpeedMarkers" style="width:100%;cursor:pointer;"/>
+            <datalist id="rawSpeedMarkers">
+              <option value="0" label="0.05x"></option>
+              <option value="1" label="0.1x"></option>
+              <option value="2" label="0.25x"></option>
+              <option value="3" label="0.5x"></option>
+              <option value="4" label="0.75x"></option>
+              <option value="5" label="1x"></option>
+              <option value="6" label="1.25x"></option>
+              <option value="7" label="1.5x"></option>
+              <option value="8" label="2x"></option>
+            </datalist>
+          </div>
+        </div>
+      </div>
+
+      <div class="pose-container">
+        <div id="frameNumberDisplay" class="frame-number">Frame: 0</div>
+        <button id="poseFullscreenBtn" class="fullscreen-btn" title="Fullscreen Pose">⛶</button>
+        <div id="jumpHeightOverlay" class="jump-height-overlay" aria-label="Jump height">
+          <span class="label">Jump Height</span>
+          <span class="value">--</span>
+        </div>
+        <div class="view-toggle" style="position:absolute;top:10px;left:50%;transform:translateX(-50%);z-index:15;">
+          <button id="view2DBtn" class="view-toggle-btn active">2D</button>
+          <button id="view3DBtn" class="view-toggle-btn">3D</button>
+        </div>
+        <div class="mini-pose-selector" id="miniPoseSelector">
+          <div class="mini-pose-label">Joint Selector</div>
+          <canvas id="miniPoseCanvas" width="132" height="172"></canvas>
+        </div>
+        <canvas id="poseCanvas" width="480" height="360"></canvas>
+        <canvas id="pose3DCanvas" style="display:none; width:100%; height:100%;"></canvas>
+        <div id="angleHudDom" class="angle-hud" style="display:none">0.0°</div>
+        <div id="alignPrompt" class="align-prompt">Select the joint to overlay from</div>
+        <div class="nav-buttons">
+          <div class="btn-row">
+            <button id="prevBtn"      class="icon-btn" title="Previous">←</button>
+            <button id="playPauseBtn" class="icon-btn" title="Play/Pause">▶</button>
+            <button id="nextBtn"      class="icon-btn" title="Next">→</button>
+            <button id="resetViewBtn" class="icon-btn" title="Reset View">⟲</button>
+            <button id="toggleMiniPoseBtn" class="icon-btn" title="Show Joint Selector">◉</button>
+            <button id="toggle3DFixedBtn" class="icon-btn" title="Toggle Fixed/Unfixed 3D Pose" style="display:none;">📍</button>
+          </div>
+          <div class="btn-row">
+            <button id="zoomOutBtn"   class="icon-btn" title="Zoom Out">–</button>
+            <button id="zoomInBtn"    class="icon-btn" title="Zoom In">+</button>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Frame</span>
+              <span id="poseFrameSliderValue" style="font-size:0.75rem;font-weight:600;">0</span>
+            </div>
+            <input id="poseFrameSlider" type="range" min="0" max="0" step="1" value="0" style="width:100%;cursor:pointer;"/>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Speed</span>
+              <span id="poseSpeedValue" style="font-size:0.75rem;font-weight:600;">1.0x</span>
+            </div>
+            <input id="poseSpeedSlider" type="range" min="0" max="8" step="1" value="5" list="poseSpeedMarkers" style="width:100%;cursor:pointer;"/>
+            <datalist id="poseSpeedMarkers">
+              <option value="0" label="0.05x"></option>
+              <option value="1" label="0.1x"></option>
+              <option value="2" label="0.25x"></option>
+              <option value="3" label="0.5x"></option>
+              <option value="4" label="0.75x"></option>
+              <option value="5" label="1x"></option>
+              <option value="6" label="1.25x"></option>
+              <option value="7" label="1.5x"></option>
+              <option value="8" label="2x"></option>
+            </datalist>
+          </div>
+          <div style="margin-top: 0.5rem; font-size: 0.75rem; color: rgba(255,255,255,0.7); text-align: center;">
+            <div>Zoom: Click and drag to select area</div>
+            <div>Pan: Right-click and drag to move view</div>
+          </div>
+          <div style="margin-top: 0.5rem;">
+            <select id="overlayRepSelect" class="btn full-width" style="background:var(--card-bg);border:1px solid var(--card-border);color:#fff">
+              <option value="none">No Overlay</option>
+            </select>
+          </div>
+          <div class="btn-row" style="margin-top:.5rem;">
+            <button id="alignOverlayBtn" class="btn">Align Overlay</button>
+          </div>
+          <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;justify-content:center;">
+            <label for="overlayShiftSlider" style="opacity:.85;">Frame shift:</label>
+            <input id="overlayShiftSlider" type="range" min="0" max="0" step="1" value="0" style="width:60%"/>
+            <span id="overlayShiftValue" style="min-width:48px;text-align:right;opacity:.85;">0</span>
+          </div>
+          <div style="margin-top:.5rem;display:flex;gap:.75rem;flex-direction:column;font-size:0.85rem;">
+            <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+              <input type="checkbox" id="autoAlignToggle" checked style="cursor:pointer;"/>
+              <span>Auto-align (torso)</span>
+            </label>
+            <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
+              <input type="checkbox" id="normalizeScaleToggle" checked style="cursor:pointer;"/>
+              <span>Normalize scale</span>
+            </label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+  <script>
+    const firebaseConfig = {
+      apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+      authDomain: "kickai-69dd0.firebaseapp.com",
+      projectId: "kickai-69dd0",
+      storageBucket: "kickai-69dd0.firebasestorage.app",
+      messagingSenderId: "839600313930",
+      appId: "1:839600313930:web:13b1e94c2c540561e3f8b3"
+    };
+    firebase.initializeApp(firebaseConfig);
+  const auth = firebase.auth();
+  const db = firebase.firestore();
+    const storage = firebase.storage();
+
+    // --- Side nav wiring (standardized) ---
+    (function sideNavSetup(){
+      const waitForAuth = () => new Promise(resolve => {
+        if (window.firebase && window.firebase.auth) return resolve();
+        const t = setInterval(()=>{ if (window.firebase && window.firebase.auth) { clearInterval(t); resolve(); } }, 50);
+      });
+
+      waitForAuth().then(()=>{
+        const navToggle = document.getElementById('navToggle');
+        const sideNav = document.getElementById('sideNav');
+        const closeSide = document.getElementById('closeSide');
+        const sideLinks = document.getElementById('sideLinks');
+        const sideBackdrop = document.getElementById('sideBackdrop');
+
+        function openSide() { sideNav.classList.add('open'); sideNav.setAttribute('aria-hidden','false'); if(sideBackdrop) sideBackdrop.classList.add('open'); }
+        function closeSideNav() { sideNav.classList.remove('open'); sideNav.setAttribute('aria-hidden','true'); if(sideBackdrop) sideBackdrop.classList.remove('open'); }
+
+        if (navToggle) navToggle.addEventListener('click', (e)=>{ e.preventDefault(); openSide(); });
+        if (closeSide) closeSide.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+        if (sideBackdrop) sideBackdrop.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+        document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeSideNav(); });
+
+        // Build normalized links and ensure canonical navigation items exist
+        const headerLinks = Array.from(document.querySelectorAll('header .nav-links a'));
+        let normalized = headerLinks.map(a => ({ href: a.getAttribute('href') || '#', text: (a.textContent||a.innerText||'').trim() }));
+        normalized = normalized.filter(n => !n.text.toLowerCase().includes('player'));
+
+        const urlParams = new URLSearchParams(window.location.search || '');
+        const playerParam = urlParams.get('player');
+        const profileHref = playerParam ? `profile.html?player=${encodeURIComponent(playerParam)}` : 'profile.html';
+        const sessionsHref = playerParam ? `sessions.html?player=${encodeURIComponent(playerParam)}` : 'sessions.html';
+        const drillsHref = playerParam ? `drillList.html?player=${encodeURIComponent(playerParam)}` : 'drillList.html';
+
+        const required = [
+          { href: profileHref, text: 'Player Profile', icon: 'person' },
+          { href: 'coachesview.html', text: 'Player Roster', icon: 'people' },
+          { href: 'leaderboard.html', text: 'Leaderboards', icon: 'leaderboard' }
+        ];
+
+        required.slice().reverse().forEach(req => normalized.unshift({ href: req.href, text: req.text, icon: req.icon }));
+
+        normalized.forEach((a, idx) => {
+          const link = document.createElement('a'); link.href = a.href || '#'; link.className = 'side-link';
+          const icon = document.createElement('span'); icon.className = 'material-symbols-outlined'; icon.style.fontSize = '20px';
+          if (a.icon) icon.textContent = a.icon; else icon.textContent = 'link';
+          const spanText = document.createElement('span'); spanText.textContent = a.text || a.href || 'Link';
+          link.appendChild(icon); link.appendChild(spanText);
+          link.style.transitionDelay = (idx * 40) + 'ms';
+          link.addEventListener('click', ()=> closeSideNav());
+          sideLinks.appendChild(link);
+        });
+
+        // side profile is populated by user-badge.js (Firestore preferred)
+
+        const sideLogoutBtn = document.getElementById('sideLogout');
+        if (sideLogoutBtn) sideLogoutBtn.addEventListener('click', (e)=>{ e.preventDefault(); firebase.auth().signOut().then(()=> window.location.href = 'kickai.html'); });
+      });
+    })();
+
+
+    let poseType = 33;
+    let poseData = [];
+    let poseData2D = []; // extracted 2D from 3D for overlay/2D draw
+    let ballData = [];  
+    let currentFrame = 0;
+    let isPlaying = false;
+    let animationInterval = null;
+    let frameDelay = 100;
+    const MIN_DELAY = 20, MAX_DELAY = 1000, DELAY_STEP = 20;
+    let baseFrameDelay = 100;
+    let currentView = '2D'; // '2D' or '3D'
+    // Manual zoom and pan state (ported from StaticJumpPage)
+    let manualZoomBounds = null; // {leftX, rightX, topY, bottomY} in normalized coords
+    let isZoomSelecting = false;
+    let zoomStartX = 0, zoomStartY = 0;
+    let zoomCurrentX = 0, zoomCurrentY = 0;
+    let panOffsetX = 0, panOffsetY = 0;
+    let panStartX = 0, panStartY = 0;
+    let isPanning = false;
+    let isSelectingZoomCenter = false;
+    let zoomCenterX = 0.5, zoomCenterY = 0.5;
+
+    // Three.js 3D viewer state
+    let threeScene = null, threeCamera = null, threeRenderer = null, threeControls = null, threeSkeleton = null;
+    let threeInitialized = false;
+    let threeFixedCenterX = null, threeFixedCenterZ = null, threeFixedGroundY = null;
+    let threeReferenceFramesUsed = 0;
+    let threePoseFixed = true;
+    let highlightedAngle = null;
+    let highlightedKeypointIdx = null;
+
+    // Layout focus state ('pose' | 'video' | null)
+    let focusedContainer = null;
+
+    // Raw video frame-player state
+    let rawVideoEl = null;
+    let rawCanvas = null, rawCtx = null;
+    let rawDuration = 0;
+    let rawCurrentFrame = 0;
+    let frameStepSec = 1/30;
+    let rawFrameLabel = null;
+    
+    // Raw video joint selection and zoom state
+    let rawSelectedJoints = new Set();
+    let rawManualZoomBounds = null;
+    let rawIsZoomSelecting = false;
+    let rawZoomStartX = 0, rawZoomStartY = 0;
+    let rawZoomCurrentX = 0, rawZoomCurrentY = 0;
+    let rawPanOffsetX = 0, rawPanOffsetY = 0;
+    let rawPanStartX = 0, rawPanStartY = 0;
+    let rawIsPanning = false;
+    let rawIsSelectingZoomCenter = false;
+    let rawZoomCenterX = 0.5, rawZoomCenterY = 0.5;
+  let rawPlayTimer = null;
+  // Decoder-driven playback helpers (rVFC + fallbacks) to reduce stutter
+  let rawRvfcHandle = null;         // handle returned by requestVideoFrameCallback
+  let rawTimeHandler = null;        // stored 'timeupdate' handler so we can remove it
+  let rawPlayFallbackInterval = null; // interval fallback when no rVFC/timeupdate
+  let rawIsPlaying = false;
+    const SPEED_OPTIONS = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
+    let rawSpeedIdx = 5; // 1x
+    let baseIntervalMs = 1000/30; // derived from frameStepSec after metadata
+    let rawMaxFrame = 0;
+
+    // ---- Pose overlay state ----
+    // If you already have a global `poseData`, remove the next line.
+    let poseLoaded = false;
+    let isPoseVisible = false;
+    let overlayPoseData = null; // optional second rep to draw as shadow
+    let overlayFrameShift = 0;
+    let overlayAlignMode = false;
+    let overlayAlignJointIndex = null;
+    let overlayAlignOffsetN = null; // {dx, dy} in normalized coords (one-time translation)
+    let poseSpeedIdx = 5; // 1x speed for pose graph
+  let overlayAlignOriginN = null; // normalized origin for scale transform (e.g., torso centroid)
+  let overlayScaleN = 1; // uniform scale for overlay alignment
+  let overlayAutoAlignEnabled = true;
+  let overlayNormalizeScaleEnabled = true;
+  let overlayAlignmentLocked = false; // when true, do not recompute per frame
+  let overlayAlignAnchorFrame = 0;   // frame index at which alignment is locked
+  const overlayCache = new Map(); // rep -> pose array
+
+    function recalcTiming() {
+      const dur = rawDuration || (rawVideoEl && rawVideoEl.duration) || 0;
+      const poseLen = Array.isArray(poseData2D) ? poseData2D.length : (Array.isArray(poseData) ? poseData.length : 0);
+      if (dur > 0 && poseLen > 1) {
+        frameStepSec = dur / (poseLen - 1);
+      }
+      baseIntervalMs = (frameStepSec > 0 ? 1000 * frameStepSec : 1000/30);
+      baseFrameDelay = baseIntervalMs;
+      rawMaxFrame = Math.max(0, timeToFrameIdx(Math.max(0, dur - 1e-3)));
+      const rawFrameSlider = document.getElementById('rawFrameSlider');
+      if (rawFrameSlider && rawMaxFrame > 0) rawFrameSlider.max = rawMaxFrame.toString();
+      const poseFrameSlider = document.getElementById('poseFrameSlider');
+      if (poseFrameSlider && poseLen > 0) poseFrameSlider.max = (poseLen - 1).toString();
+      if (rawIsPlaying) restartPlayTimer();
+    }
+
+    // --- Overlay alignment helpers ---
+    function getPointsByIdx(frame, idxs){
+      const pts = [];
+      if (!Array.isArray(frame)) return pts;
+      for (const i of idxs){ const p = frame[i]; if (p && Number.isFinite(p[0]) && Number.isFinite(p[1])) pts.push([p[0], p[1]]); }
+      return pts;
+    }
+    function centroidOf(points){
+      if (!points || !points.length) return null; let sx=0, sy=0; for (const p of points){ sx+=p[0]; sy+=p[1]; } return [sx/points.length, sy/points.length];
+    }
+    function distance(pA, pB){ return Math.hypot((pA[0]-pB[0])||0, (pA[1]-pB[1])||0); }
+
+    function recomputeOverlayAlignmentAt(idxMain){
+      if (!overlayPoseData || !overlayPoseData.length) return;
+      const i2 = Math.max(0, Math.min(idxMain + overlayFrameShift, overlayPoseData.length - 1));
+      const main = normalizePoseFrame(poseData2D?.[idxMain], true) || (normalizePoseFrame(poseData?.[idxMain], true) || []);
+      const over = normalizePoseFrame(overlayPoseData?.[i2], true) || [];
+      if (!Array.isArray(main) || !Array.isArray(over)) return;
+
+      // Prefer torso joints [11,12,23,24], fallback to any valid points
+      const mainTorso = getPointsByIdx(main, [11,12,23,24]);
+      const overTorso = getPointsByIdx(over, [11,12,23,24]);
+      const mainPoints = mainTorso.length ? mainTorso : main.filter(Boolean);
+      const overPoints = overTorso.length ? overTorso : over.filter(Boolean);
+      const cMain = centroidOf(mainPoints);
+      const cOver = centroidOf(overPoints);
+      if (!cMain || !cOver) return;
+
+      // Translation in normalized coords
+      const dx = cMain[0] - cOver[0];
+      const dy = cMain[1] - cOver[1];
+      overlayAlignOffsetN = { dx, dy };
+      overlayAlignOriginN = { x: cOver[0], y: cOver[1] };
+
+      // Scale based on shoulder and hip widths if available
+      let s = 1; let count = 0;
+      const pairs = [ [11,12], [23,24] ];
+      for (const [a,b] of pairs){
+        const pmA = main[a], pmB = main[b], poA = over[a], poB = over[b];
+        if (pmA && pmB && poA && poB){
+          const dm = distance(pmA, pmB); const doV = distance(poA, poB);
+          if (dm > 1e-6 && doV > 1e-6){ s += dm / doV; count++; }
+        }
+      }
+      overlayScaleN = (overlayNormalizeScaleEnabled && count > 0) ? (s / count) : 1;
+    }
+
+    function transformOverlayPointN(nx, ny){
+      // Apply uniform scale about overlay origin then translation in normalized space
+      const origin = overlayAlignOriginN || { x: 0, y: 0 };
+      const scale = overlayNormalizeScaleEnabled ? (overlayScaleN || 1) : 1;
+      const dx = overlayAlignOffsetN?.dx || 0;
+      const dy = overlayAlignOffsetN?.dy || 0;
+      const sx = (nx - origin.x) * scale + origin.x + dx;
+      const sy = (ny - origin.y) * scale + origin.y + dy;
+      return [sx, sy];
+    }
+
+    function findFirstValidMainIndex(){
+      const arr = (Array.isArray(poseData2D) && poseData2D.length) ? poseData2D : poseData;
+      const idx = findNearestValidFrameIndex(0, arr);
+      return (idx != null) ? idx : 0;
+    }
+    function lockOverlayAlignmentAt(idx){
+      recomputeOverlayAlignmentAt(idx);
+      overlayAlignmentLocked = true;
+      overlayAlignAnchorFrame = idx;
+    }
+    function unlockOverlayAlignment(){
+      overlayAlignmentLocked = false;
+    }
+
+    function getHipCenter(frame) {
+      if (!frame || !frame.length) return null;
+      const leftHipIdx = frame.length === 17 ? 11 : 23;
+      const rightHipIdx = frame.length === 17 ? 12 : 24;
+      const leftHip = frame[leftHipIdx];
+      const rightHip = frame[rightHipIdx];
+      if (!leftHip || !rightHip) return null;
+      const l = Array.isArray(leftHip) ? leftHip : [leftHip.x, leftHip.y, leftHip.z];
+      const r = Array.isArray(rightHip) ? rightHip : [rightHip.x, rightHip.y, rightHip.z];
+      if (l.length < 2 || r.length < 2) return null;
+      return [(l[0] + r[0]) / 2, (l[1] + r[1]) / 2, (l[2] + r[2]) / 2];
+    }
+    function getGroundReference(frame) {
+      if (!frame || !frame.length) return null;
+      const footIndices = frame.length === 17 ? [15, 16] : [27, 28, 29, 30, 31, 32];
+      const yValues = [];
+      footIndices.forEach(idx => {
+        const k = frame[idx];
+        if (k && (Array.isArray(k) ? k.length >= 2 : true)) {
+          const y = Array.isArray(k) ? k[1] : k.y;
+          if (Number.isFinite(y)) yValues.push(y);
+        }
+      });
+      return yValues.length ? Math.min(...yValues) : null;
+    }
+    function resetThreeJS() {
+      if (threeRenderer) { try { threeRenderer.dispose(); threeRenderer.forceContextLoss(); } catch(e){} }
+      if (threeControls) { try { threeControls.dispose(); } catch(e){} }
+      threeScene = null; threeCamera = null; threeRenderer = null; threeControls = null; threeSkeleton = null;
+      threeInitialized = false; threeFixedCenterX = null; threeFixedCenterZ = null; threeFixedGroundY = null; threeReferenceFramesUsed = 0;
+    }
+    function getReferencePose33() {
+      return [[0.5,0.10],[0.48,0.08],[0.47,0.08],[0.46,0.08],[0.52,0.08],[0.53,0.08],[0.54,0.08],[0.42,0.10],[0.58,0.10],[0.47,0.13],[0.53,0.13],[0.40,0.25],[0.60,0.25],[0.35,0.40],[0.65,0.40],[0.30,0.55],[0.70,0.55],[0.29,0.57],[0.71,0.57],[0.28,0.58],[0.72,0.58],[0.30,0.56],[0.70,0.56],[0.42,0.50],[0.58,0.50],[0.41,0.68],[0.59,0.68],[0.40,0.88],[0.60,0.88],[0.39,0.92],[0.61,0.92],[0.40,0.95],[0.60,0.95]];
+    }
+    function getReferenceCOCO17() { return [[.5,.12],[.53,.18],[.47,.18],[.58,.2],[.42,.2],[.62,.32],[.38,.32],[.64,.44],[.36,.44],[.58,.48],[.44,.48],[.58,.68],[.42,.68],[.59,.88],[.41,.88],[.61,.92],[.39,.92]]; }
+    function drawMiniPoseSelector() {
+      const miniCanvas = document.getElementById('miniPoseCanvas');
+      if (!miniCanvas) return;
+      const ctx = miniCanvas.getContext('2d');
+      const W = miniCanvas.width, H = miniCanvas.height;
+      ctx.clearRect(0, 0, W, H);
+      const numKeypoints = (poseData && poseData[0]) ? (Array.isArray(poseData[0][0]) ? poseData[0].length : 33) : 33;
+      const refPose = (numKeypoints === 17) ? getReferenceCOCO17() : getReferencePose33();
+      const connections = (numKeypoints === 17) ? COCO17_EDGES : POSE_CONNECTIONS;
+      ctx.strokeStyle = 'rgba(255,255,255,0.4)';
+      ctx.lineWidth = 1.5;
+      connections.forEach(([s, e]) => {
+        const p1 = refPose[s], p2 = refPose[e];
+        if (!p1 || !p2) return;
+        ctx.beginPath();
+        ctx.moveTo(p1[0] * W, p1[1] * H);
+        ctx.lineTo(p2[0] * W, p2[1] * H);
+        ctx.stroke();
+      });
+      refPose.forEach((kp, i) => {
+        if (!kp) return;
+        const isSelected = selectedJoints.has(i);
+        const x = kp[0] * W, y = kp[1] * H;
+        ctx.fillStyle = isSelected ? 'rgba(255,165,0,0.95)' : 'rgba(200,200,200,0.7)';
+        ctx.beginPath();
+        ctx.arc(x, y, 4, 0, Math.PI * 2);
+        ctx.fill();
+        if (isSelected) {
+          ctx.strokeStyle = 'rgba(255,200,0,0.95)';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          ctx.fillStyle = 'rgba(255,255,255,0.9)';
+          ctx.font = '9px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(i.toString(), x, y - 8);
+        }
+      });
+    }
+    function updateAngleHudPosition() {
+      try {
+        const hudDom = document.getElementById('angleHudDom');
+        const poseContainerEl = document.querySelector('.pose-container');
+        if (!hudDom || !poseContainerEl) return;
+        const isFs = !!document.fullscreenElement && (document.fullscreenElement === poseContainerEl || poseContainerEl.contains(document.fullscreenElement));
+        if (!isFs) {
+          hudDom.style.top = ''; hudDom.style.transform = ''; hudDom.style.right = '16px'; hudDom.style.bottom = '16px';
+          return;
+        }
+        const controls = poseContainerEl.querySelector('.nav-buttons');
+        if (!controls) return;
+        const contRect = poseContainerEl.getBoundingClientRect();
+        const ctrRect = controls.getBoundingClientRect();
+        const gap = 12;
+        const offsetBottom = Math.max(16, Math.round((contRect.bottom - ctrRect.top) + gap));
+        hudDom.style.bottom = offsetBottom + 'px';
+      } catch (_) {}
+    }
+    function getAngleJoints(angleType, poseLength) {
+      const is17 = poseLength === 17;
+      const joints = {
+        'shank-ground': is17 ? { joints: [13, 15], bones: [[13, 15]] } : { joints: [25, 27], bones: [[25, 27]] },
+        'thigh-shank': is17 ? { joints: [11, 13, 15], bones: [[11, 13], [13, 15]] } : { joints: [23, 25, 27], bones: [[23, 25], [25, 27]] },
+        'torso-thigh': is17 ? { joints: [5, 11, 13], bones: [[5, 11], [11, 13]] } : { joints: [11, 23, 25], bones: [[11, 23], [23, 25]] },
+        'upper-arm-torso': is17 ? { joints: [5, 7, 11], bones: [[5, 7], [5, 11]] } : { joints: [11, 13, 23], bones: [[11, 13], [11, 23]] },
+        'lower-arm-upper-arm': is17 ? { joints: [5, 7, 9], bones: [[5, 7], [7, 9]] } : { joints: [11, 13, 15], bones: [[11, 13], [13, 15]] }
+      };
+      return joints[angleType] || { joints: [], bones: [] };
+    }
+
+    function initThreeJS() {
+      if (threeInitialized) return;
+      const canvas = document.getElementById('pose3DCanvas');
+      if (!canvas) return;
+      const W = canvas.clientWidth || 480, H = canvas.clientHeight || 360;
+      threeScene = new THREE.Scene();
+      threeScene.background = new THREE.Color(0x1a3a2e);
+      threeCamera = new THREE.PerspectiveCamera(50, W / H, 0.1, 100);
+      threeCamera.position.set(2.5, 1.5, 2.5);
+      threeCamera.lookAt(0, 0, 0);
+      threeRenderer = new THREE.WebGLRenderer({ canvas, antialias: true });
+      threeRenderer.setSize(W, H);
+      threeRenderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+      threeScene.add(new THREE.AmbientLight(0xffffff, 0.6));
+      const dir = new THREE.DirectionalLight(0xffffff, 0.8);
+      dir.position.set(5, 5, 5);
+      threeScene.add(dir);
+      const grid = new THREE.GridHelper(2, 20, 0x888888, 0x444444);
+      grid.position.y = -1;
+      threeScene.add(grid);
+      threeSkeleton = new THREE.Group();
+      threeScene.add(threeSkeleton);
+      if (typeof THREE.OrbitControls !== 'undefined') {
+        threeControls = new THREE.OrbitControls(threeCamera, canvas);
+        threeControls.enableDamping = true;
+        threeControls.dampingFactor = 0.08;
+        threeControls.minDistance = 1;
+        threeControls.maxDistance = 15;
+        threeControls.target.set(0, 0, 0);
+        threeControls.update();
+        canvas.addEventListener('dblclick', () => {
+          threeCamera.position.set(2.5, 1.5, 2.5);
+          threeControls.target.set(0, 0, 0);
+          threeControls.update();
+        });
+      }
+      threeInitialized = true;
+      canvas.style.cursor = 'grab';
+      canvas.addEventListener('mousedown', () => { canvas.style.cursor = 'grabbing'; });
+      canvas.addEventListener('mouseup', () => { canvas.style.cursor = 'grab'; });
+      canvas.addEventListener('mouseleave', () => { canvas.style.cursor = 'grab'; });
+      if (!window.threeAnimId) {
+        function animate() {
+          if (threeRenderer && threeScene && threeCamera) {
+            if (threeControls) threeControls.update();
+            threeRenderer.render(threeScene, threeCamera);
+          }
+          window.threeAnimId = requestAnimationFrame(animate);
+        }
+        animate();
+      }
+      window.addEventListener('resize', () => {
+        if (!threeRenderer || !threeCamera || !canvas || canvas.style.display === 'none') return;
+        const w = canvas.clientWidth || 480, h = canvas.clientHeight || 360;
+        threeCamera.aspect = w / h;
+        threeCamera.updateProjectionMatrix();
+        threeRenderer.setSize(w, h, false);
+        if (threeScene) threeRenderer.render(threeScene, threeCamera);
+      });
+    }
+
+    function drawPose3D(frameIdx) {
+      if (!poseData || !poseData.length) return;
+      const total = poseData.length;
+      let idx = Math.max(0, Math.min(frameIdx, total - 1));
+      let rawFrame = poseData[idx];
+      let frame = normalizePoseFrame(rawFrame, false);
+      if (!Array.isArray(frame) || !frame.some(p => p && p.length >= 3)) return;
+      if (!threeInitialized) initThreeJS();
+      if (!threeScene || !threeCamera || !threeRenderer || !threeSkeleton) return;
+      while (threeSkeleton.children.length) threeSkeleton.remove(threeSkeleton.children[0]);
+      const highlightInfo = highlightedAngle ? getAngleJoints(highlightedAngle, frame.length) : { joints: [], bones: [] };
+      const jointGeom = new THREE.SphereGeometry(0.015, 16, 16);
+      const jointMat = new THREE.MeshPhongMaterial({ color: 0x4cff66 });
+      const selMat = new THREE.MeshPhongMaterial({ color: 0xffc800, emissive: 0xff9900, emissiveIntensity: 0.5 });
+      const hiMat = new THREE.MeshPhongMaterial({ color: 0xffaa00, emissive: 0xff8800, emissiveIntensity: 0.6 });
+      const hiGeom = new THREE.SphereGeometry(0.022, 16, 16);
+      const joints = [];
+      const hipCenter = getHipCenter(frame);
+      frame.forEach((p, i) => {
+        if (!p || p.length < 3) { joints.push(null); return; }
+        let x, y, z;
+        if (hipCenter) {
+          x = -((p[0] - hipCenter[0]) * 2.0);
+          y = -((p[1] - hipCenter[1]) * 2.0);
+          z = (p[2] - hipCenter[2]) * 0.8;
+        } else {
+          x = -(p[0] - 0.5) * 2.0;
+          y = -(p[1] - 0.5) * 2.0;
+          z = (p[2] - 0.5) * 0.8;
+        }
+        const geom = highlightInfo.joints.includes(i) ? hiGeom : jointGeom;
+        const mat = highlightInfo.joints.includes(i) ? hiMat : (selectedJoints.has(i) ? selMat : jointMat);
+        const sphere = new THREE.Mesh(geom, mat);
+        sphere.position.set(x, y, z);
+        threeSkeleton.add(sphere);
+        joints.push(sphere.position);
+      });
+      if (joints.some(j => j) && threeFixedCenterX === null && threeFixedCenterZ === null && threeFixedGroundY === null) {
+        let firstHipX = null, firstHipZ = null, minFootY = Infinity;
+        for (let i = 0; i < poseData.length; i++) {
+          const sf = normalizePoseFrame(poseData[i], false);
+          if (!sf) continue;
+          const hc = getHipCenter(sf);
+          if (hc && firstHipX === null) {
+            firstHipX = -(hc[0] - 0.5) * 2.0;
+            firstHipZ = (hc[2] - 0.5) * 0.8;
+          }
+          const gr = getGroundReference(sf);
+          if (gr != null) {
+            const fy = -(gr - 0.5) * 2.0;
+            if (fy < minFootY) minFootY = fy;
+          }
+        }
+        if (firstHipX != null && firstHipZ != null && minFootY !== Infinity) {
+          threeFixedCenterX = firstHipX;
+          threeFixedCenterZ = firstHipZ;
+          threeFixedGroundY = minFootY;
+        }
+      }
+      if (joints.some(j => j) && threeFixedCenterX != null && threeFixedCenterZ != null && threeFixedGroundY != null) {
+        const curHip = getHipCenter(frame);
+        if (curHip) {
+          const cx = -(curHip[0] - 0.5) * 2.0, cy = -(curHip[1] - 0.5) * 2.0, cz = (curHip[2] - 0.5) * 0.8;
+          const offY = cy - threeFixedGroundY - 1;
+          if (threePoseFixed) threeSkeleton.position.set(0, offY, 0);
+          else threeSkeleton.position.set(cx - threeFixedCenterX, offY, cz - threeFixedCenterZ);
+          threeSkeleton.rotation.set(0, 0, 0);
+        }
+      }
+      const edges = (poseType === 17 ? COCO17_EDGES : POSE_CONNECTIONS);
+      const boneMat = new THREE.LineBasicMaterial({ color: 0xffffff });
+      const hiBoneMat = new THREE.LineBasicMaterial({ color: 0xffaa00 });
+      edges.forEach(([s, e]) => {
+        const p1 = joints[s], p2 = joints[e];
+        if (!p1 || !p2) return;
+        const hi = highlightInfo.bones.some(([a, b]) => (a === s && b === e) || (a === e && b === s));
+        const geom = new THREE.BufferGeometry().setFromPoints([p1, p2]);
+        threeSkeleton.add(new THREE.Line(geom, hi ? hiBoneMat : boneMat));
+      });
+      if (threeRenderer && threeScene && threeCamera) threeRenderer.render(threeScene, threeCamera);
+      currentFrame = frameIdx;
+      updateFrameNumberDisplay();
+    }
+
+    function restartPlayTimer() {
+      if (rawMaxFrame == 0) { recalcTiming(); }
+
+      // Clean previous handlers/timers
+      stopRawPlaybackCleanup();
+
+      // Set playbackRate so underlying decoder can use hardware playback when possible
+      if (rawVideoEl) rawVideoEl.playbackRate = SPEED_OPTIONS[rawSpeedIdx] || 1;
+
+      // If browser supports requestVideoFrameCallback, use it for smooth decoded-frame drawing
+      if (rawVideoEl && typeof rawVideoEl.requestVideoFrameCallback === 'function') {
+        const onFrame = (now, metadata) => {
+          const t = rawVideoEl.currentTime || 0;
+          rawCurrentFrame = timeToFrameIdx(t);
+          rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+          drawRawFrameToCanvas();
+          const duration = rawDuration || rawVideoEl.duration || 0;
+          if (t >= duration - 1e-3) {
+            rawIsPlaying = false;
+            document.getElementById('rawPlayPauseBtn').textContent = '▶';
+            return;
+          }
+          rawRvfcHandle = rawVideoEl.requestVideoFrameCallback(onFrame);
+        };
+        try { rawVideoEl.play().catch(()=>{}); } catch (e) {}
+        rawRvfcHandle = rawVideoEl.requestVideoFrameCallback(onFrame);
+        return;
+      }
+
+      // Fallback: listen to timeupdate and use a small interval as backup
+      if (rawVideoEl) {
+        rawTimeHandler = () => {
+          const t = rawVideoEl.currentTime || 0;
+          rawCurrentFrame = timeToFrameIdx(t);
+          rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+          drawRawFrameToCanvas();
+        };
+        rawVideoEl.addEventListener('timeupdate', rawTimeHandler);
+        try { rawVideoEl.play().catch(()=>{}); } catch (e) {}
+      }
+
+      // Small interval backup to ensure UI updates if timeupdate is infrequent
+      rawPlayFallbackInterval = setInterval(()=>{
+        if (!rawVideoEl) return;
+        const t = rawVideoEl.currentTime || 0;
+        rawCurrentFrame = timeToFrameIdx(t);
+        rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+        drawRawFrameToCanvas();
+      }, Math.max(20, Math.round(baseIntervalMs / (SPEED_OPTIONS[rawSpeedIdx]||1))));
+    }
+
+    function stopRawPlaybackCleanup() {
+      // Cancel rVFC
+      try { if (rawRvfcHandle && rawVideoEl && typeof rawVideoEl.cancelVideoFrameCallback === 'function') rawVideoEl.cancelVideoFrameCallback(rawRvfcHandle); } catch(e){}
+      rawRvfcHandle = null;
+      // Remove timeupdate handler
+      try { if (rawTimeHandler && rawVideoEl) rawVideoEl.removeEventListener('timeupdate', rawTimeHandler); } catch(e){}
+      rawTimeHandler = null;
+      // Clear fallback interval
+      if (rawPlayFallbackInterval) { clearInterval(rawPlayFallbackInterval); rawPlayFallbackInterval = null; }
+      // Clear legacy interval
+      if (rawPlayTimer) { clearInterval(rawPlayTimer); rawPlayTimer = null; }
+      // Pause the underlying video (UI uses canvas draws)
+      try { if (rawVideoEl) rawVideoEl.pause(); } catch(e){}
+    }
+
+    // Size raw frame canvas to maintain the video's aspect ratio with DPR awareness
+    function sizeRawCanvas() {
+      if (!rawCanvas) return;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      
+      const videoContainer = document.querySelector('.video-container');
+      const isFullscreen = document.fullscreenElement === videoContainer;
+      
+      let cssW, cssH;
+      
+      if (isFullscreen) {
+        const vw = (rawVideoEl && rawVideoEl.videoWidth) ? rawVideoEl.videoWidth : 1920;
+        const vh = (rawVideoEl && rawVideoEl.videoHeight) ? rawVideoEl.videoHeight : 1080;
+        const videoAspect = vw / vh;
+        const screenAspect = window.innerWidth / window.innerHeight;
+        
+        if (screenAspect > videoAspect) {
+          cssH = window.innerHeight;
+          cssW = Math.round(cssH * videoAspect);
+        } else {
+          cssW = window.innerWidth;
+          cssH = Math.round(cssW / videoAspect);
+        }
+        rawCanvas.style.width = cssW + 'px';
+        rawCanvas.style.height = cssH + 'px';
+      } else {
+        cssW = rawCanvas.clientWidth || 480;
+        const vw = (rawVideoEl && rawVideoEl.videoWidth) ? rawVideoEl.videoWidth : 480;
+        const vh = (rawVideoEl && rawVideoEl.videoHeight) ? rawVideoEl.videoHeight : 270;
+        cssH = Math.round(cssW * (vh / vw));
+        rawCanvas.style.height = cssH + 'px';
+      }
+      
+      const targetW = Math.round(cssW * dpr);
+      const targetH = Math.round(cssH * dpr);
+      if (rawCanvas.width !== targetW || rawCanvas.height !== targetH) {
+        rawCanvas.width = targetW;
+        rawCanvas.height = targetH;
+      }
+      const ctx = rawCanvas.getContext('2d');
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    // Raw video zoom helper functions
+    function drawRawZoomSelection(W, H) {
+      if (!rawIsZoomSelecting) return;
+      const leftX = Math.min(rawZoomStartX, rawZoomCurrentX);
+      const rightX = Math.max(rawZoomStartX, rawZoomCurrentX);
+      const topY = Math.min(rawZoomStartY, rawZoomCurrentY);
+      const bottomY = Math.max(rawZoomStartY, rawZoomCurrentY);
+      rawCtx.save();
+      rawCtx.fillStyle = 'rgba(128,128,128,0.3)';
+      rawCtx.fillRect(leftX, topY, rightX - leftX, bottomY - topY);
+      rawCtx.strokeStyle = 'rgba(255,255,255,0.8)';
+      rawCtx.lineWidth = 2;
+      rawCtx.strokeRect(leftX, topY, rightX - leftX, bottomY - topY);
+      rawCtx.restore();
+    }
+
+    function rawResetZoomPan() {
+      rawManualZoomBounds = null;
+      rawPanOffsetX = 0;
+      rawPanOffsetY = 0;
+      rawIsZoomSelecting = false;
+      drawRawFrameToCanvas();
+    }
+
+    function rawZoomIn() {
+      if (!rawManualZoomBounds) {
+        rawIsSelectingZoomCenter = true;
+        rawCanvas.style.cursor = 'crosshair';
+        return;
+      }
+      const cx = rawZoomCenterX;
+      const cy = rawZoomCenterY;
+      const w = rawManualZoomBounds.rightX - rawManualZoomBounds.leftX;
+      const h = rawManualZoomBounds.bottomY - rawManualZoomBounds.topY;
+      const f = 0.8;
+      rawManualZoomBounds = {
+        leftX: cx - (w * f) / 2,
+        rightX: cx + (w * f) / 2,
+        topY: cy - (h * f) / 2,
+        bottomY: cy + (h * f) / 2
+      };
+      rawPanOffsetX = 0;
+      rawPanOffsetY = 0;
+      drawRawFrameToCanvas();
+    }
+
+    function rawZoomOut() {
+      if (!rawManualZoomBounds) return;
+      const cx = rawZoomCenterX;
+      const cy = rawZoomCenterY;
+      const w = rawManualZoomBounds.rightX - rawManualZoomBounds.leftX;
+      const h = rawManualZoomBounds.bottomY - rawManualZoomBounds.topY;
+      const f = 1.25;
+      const newW = Math.min(1, w * f);
+      const newH = Math.min(1, h * f);
+      if (newW >= 0.95 || newH >= 0.95) {
+        rawManualZoomBounds = null;
+        rawPanOffsetX = 0;
+        rawPanOffsetY = 0;
+        rawZoomCenterX = 0.5;
+        rawZoomCenterY = 0.5;
+      } else {
+        rawManualZoomBounds = {
+          leftX: Math.max(0, cx - newW / 2),
+          rightX: Math.min(1, cx + newW / 2),
+          topY: Math.max(0, cy - newH / 2),
+          bottomY: Math.min(1, cy + newH / 2)
+        };
+        rawPanOffsetX = 0;
+        rawPanOffsetY = 0;
+      }
+      drawRawFrameToCanvas();
+    }
+
+    // Draw the current decoded video frame to the canvas
+    function drawRawFrameToCanvas() {
+      if (!rawVideoEl || !rawCanvas) return;
+      // Ensure canvas is sized correctly for current layout and DPR
+      sizeRawCanvas();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      // Draw using CSS pixel coordinates (transform handles DPR)
+      const cssW = Math.round(rawCanvas.width / dpr);
+      const cssH = Math.round(rawCanvas.height / dpr);
+      
+      // Clear canvas first
+      rawCtx.clearRect(0, 0, cssW, cssH);
+      
+      // Calculate source rectangle from video based on zoom bounds
+      const vw = rawVideoEl.videoWidth || cssW;
+      const vh = rawVideoEl.videoHeight || cssH;
+      let sx = 0, sy = 0, sw = vw, sh = vh;
+      
+      if (rawManualZoomBounds) {
+        const viewWidthN = rawManualZoomBounds.rightX - rawManualZoomBounds.leftX;
+        const viewHeightN = rawManualZoomBounds.bottomY - rawManualZoomBounds.topY;
+        const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, rawManualZoomBounds.leftX + rawPanOffsetX));
+        const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, rawManualZoomBounds.topY + rawPanOffsetY));
+        
+        sx = adjustedLeftX * vw;
+        sy = adjustedTopY * vh;
+        sw = viewWidthN * vw;
+        sh = viewHeightN * vh;
+      }
+      
+      // Draw the zoomed portion of video to fill canvas
+      rawCtx.drawImage(rawVideoEl, sx, sy, sw, sh, 0, 0, cssW, cssH);
+
+      // Overlay pose if enabled
+      if (isPoseVisible) {
+        console.log("drawing the pose estimation stuff...");
+        drawPoseOverlay(rawCurrentFrame);
+      }
+      
+      // Draw zoom selection box in screen space
+      drawRawZoomSelection(cssW, cssH);
+    }
+
+    function drawPoseOverlay(frameIdx) {
+      const arr = (poseData2D && poseData2D.length) ? poseData2D : poseData;
+      if (!arr || !arr.length) return;
+      let idx = Math.max(0, Math.min(frameIdx, arr.length - 1));
+      let frame = (arr === poseData2D) ? (arr[idx] || []) : (normalizePoseFrame(arr[idx], true) || []);
+      if (!Array.isArray(frame) || !frame.some(p=>p)) {
+        const fallbackIdx = findNearestValidFrameIndex(idx, arr);
+        if (fallbackIdx != null) { idx = fallbackIdx; frame = (arr === poseData2D) ? (arr[idx] || []) : (normalizePoseFrame(arr[idx], true) || []); }
+      }
+      const pts = frame;
+      if (!Array.isArray(pts) || !pts.some(Boolean)) return;
+
+      const W = rawCanvas.clientWidth, H = rawCanvas.clientHeight;
+      let normalized = true;
+      for (let k = 0; k < Math.min(10, pts.length); k++) {
+        const pr = pts[k];
+        if (!pr) continue;
+        const sx = Array.isArray(pr) ? pr[0] : pr.x;
+        const sy = Array.isArray(pr) ? pr[1] : pr.y;
+        if (sx > 1.5 || sy > 1.5) { normalized = false; break; }
+      }
+
+      // Calculate zoom offset for coordinate mapping
+      let zoomOffsetX = 0, zoomOffsetY = 0, zoomScaleX = 1, zoomScaleY = 1;
+      if (rawManualZoomBounds) {
+        const viewWidthN = rawManualZoomBounds.rightX - rawManualZoomBounds.leftX;
+        const viewHeightN = rawManualZoomBounds.bottomY - rawManualZoomBounds.topY;
+        const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, rawManualZoomBounds.leftX + rawPanOffsetX));
+        const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, rawManualZoomBounds.topY + rawPanOffsetY));
+        zoomOffsetX = adjustedLeftX;
+        zoomOffsetY = adjustedTopY;
+        zoomScaleX = 1 / viewWidthN;
+        zoomScaleY = 1 / viewHeightN;
+      }
+
+      const getXY = (i) => {
+        const p = pts[i];
+        if (!p) return null;
+        const px = Array.isArray(p) ? p[0] : p.x;
+        const py = Array.isArray(p) ? p[1] : p.y;
+        if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
+        const adjX = (px - zoomOffsetX) * zoomScaleX;
+        const adjY = (py - zoomOffsetY) * zoomScaleY;
+        return [adjX * W, adjY * H];
+      };
+
+      // 1) Draw connections in white
+      rawCtx.save();
+      rawCtx.lineWidth = Math.max(2, Math.round(W / 500));
+      rawCtx.lineCap = 'round';
+      rawCtx.strokeStyle = 'rgba(255,255,255,0.95)';
+      rawCtx.beginPath();
+      const edges = (poseType === 17 ? COCO17_EDGES : POSE_CONNECTIONS);
+      for (const [a, b] of edges) {
+        const A = getXY(a), B = getXY(b);
+        if (!A || !B) continue;
+        rawCtx.moveTo(A[0], A[1]);
+        rawCtx.lineTo(B[0], B[1]);
+      }
+      rawCtx.stroke();
+      rawCtx.restore();
+
+      // 2) Draw keypoints with selection highlighting
+      rawCtx.save();
+      const r = Math.max(3, Math.round(W / 300));
+      for (let i = 0; i < pts.length; i++) {
+        const P = getXY(i);
+        if (!P) continue;
+        rawCtx.beginPath();
+        rawCtx.arc(P[0], P[1], r, 0, Math.PI * 2);
+        if (rawSelectedJoints.has(i)) {
+          rawCtx.fillStyle = 'yellow';
+          rawCtx.fill();
+          rawCtx.strokeStyle = 'orange';
+          rawCtx.lineWidth = 2;
+          rawCtx.stroke();
+        } else {
+          rawCtx.fillStyle = 'rgba(34,197,94,0.95)';
+          rawCtx.fill();
+        }
+      }
+      rawCtx.restore();
+
+      // 3) Draw angle overlay if joints selected
+      if (rawSelectedJoints.size === 2) {
+        const joints = Array.from(rawSelectedJoints);
+        const [i1, i2] = joints;
+        const P1 = getXY(i1), P2 = getXY(i2);
+        if (P1 && P2) {
+          // Draw line between joints
+          rawCtx.save();
+          rawCtx.strokeStyle = 'yellow';
+          rawCtx.lineWidth = 3;
+          rawCtx.beginPath();
+          rawCtx.moveTo(P1[0], P1[1]);
+          rawCtx.lineTo(P2[0], P2[1]);
+          rawCtx.stroke();
+          rawCtx.restore();
+          
+          // Calculate angle
+          const dx = P2[0] - P1[0];
+          const dy = P2[1] - P1[1];
+          const angle = Math.abs((Math.atan2(dx, dy) * 180 / Math.PI));
+          
+          // Draw angle display box
+          const angleText = `${angle.toFixed(1)}°`;
+          rawCtx.save();
+          rawCtx.font = '16px sans-serif';
+          rawCtx.textBaseline = 'middle';
+          const pad = 8;
+          const metrics = rawCtx.measureText(angleText);
+          const boxW = metrics.width + pad * 2;
+          const boxH = 28;
+          const x = pad;
+          const y = pad;
+          rawCtx.fillStyle = 'rgba(0,0,0,0.7)';
+          rawCtx.fillRect(x, y, boxW, boxH);
+          rawCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+          rawCtx.lineWidth = 1;
+          rawCtx.strokeRect(x, y, boxW, boxH);
+          rawCtx.fillStyle = '#ffffff';
+          rawCtx.fillText(angleText, x + pad, y + boxH / 2);
+          rawCtx.restore();
+        }
+      } else if (rawSelectedJoints.size === 3) {
+        const joints = Array.from(rawSelectedJoints);
+        const [i1, i2, i3] = joints;
+        const P1 = getXY(i1), P2 = getXY(i2), P3 = getXY(i3);
+        if (P1 && P2 && P3) {
+          // Draw lines
+          rawCtx.save();
+          rawCtx.strokeStyle = 'yellow';
+          rawCtx.lineWidth = 3;
+          rawCtx.beginPath();
+          rawCtx.moveTo(P1[0], P1[1]);
+          rawCtx.lineTo(P2[0], P2[1]);
+          rawCtx.lineTo(P3[0], P3[1]);
+          rawCtx.stroke();
+          rawCtx.restore();
+          
+          // Calculate 3-point angle
+          const v1 = { x: P1[0] - P2[0], y: P1[1] - P2[1] };
+          const v2 = { x: P3[0] - P2[0], y: P3[1] - P2[1] };
+          const dot = v1.x * v2.x + v1.y * v2.y;
+          const mag = Math.sqrt(v1.x * v1.x + v1.y * v1.y) * Math.sqrt(v2.x * v2.x + v2.y * v2.y);
+          const angle = mag > 0 ? Math.acos(Math.max(-1, Math.min(1, dot / mag))) * 180 / Math.PI : 0;
+          
+          // Draw angle display box
+          const angleText = `${angle.toFixed(1)}°`;
+          rawCtx.save();
+          rawCtx.font = '16px sans-serif';
+          rawCtx.textBaseline = 'middle';
+          const pad = 8;
+          const metrics = rawCtx.measureText(angleText);
+          const boxW = metrics.width + pad * 2;
+          const boxH = 28;
+          const x = pad;
+          const y = pad;
+          rawCtx.fillStyle = 'rgba(0,0,0,0.7)';
+          rawCtx.fillRect(x, y, boxW, boxH);
+          rawCtx.strokeStyle = 'rgba(255,255,255,0.3)';
+          rawCtx.lineWidth = 1;
+          rawCtx.strokeRect(x, y, boxW, boxH);
+          rawCtx.fillStyle = '#ffffff';
+          rawCtx.fillText(angleText, x + pad, y + boxH / 2);
+          rawCtx.restore();
+        }
+      }
+
+      // 4) Optional overlay pose (shadow) in amber
+      if (overlayPoseData && Array.isArray(overlayPoseData) && overlayPoseData.length) {
+        let i2 = Math.max(0, Math.min(idx + overlayFrameShift, overlayPoseData.length - 1));
+        let fr2Raw = overlayPoseData[i2];
+        let fr2 = normalizePoseFrame(fr2Raw, true);
+        if (!Array.isArray(fr2) || !fr2.some(p=>p)) {
+          const fb2 = findNearestValidFrameIndex(i2, overlayPoseData);
+          if (fb2 != null) { i2 = fb2; fr2Raw = overlayPoseData[i2]; fr2 = normalizePoseFrame(fr2Raw, true); }
+        }
+        const hasOverlay = Array.isArray(fr2) && fr2.some(p=>p);
+        console.log(`[RawOverlay] overlay requestedIdx=${idx} usedIdx=${i2} hasOverlay=${hasOverlay} len=${fr2?.length}`);
+        if (hasOverlay) {
+          // Auto-recompute alignment for the raw view if enabled
+          // Only align at the beginning; do not recompute per-frame when locked
+          if (overlayAutoAlignEnabled && !overlayAlignMode && !overlayAlignmentLocked) {
+            const arr = (poseData2D && poseData2D.length) ? poseData2D : poseData;
+            lockOverlayAlignmentAt(findNearestValidFrameIndex(idx, arr) ?? idx);
+          }
+          const getXY2 = (i) => {
+            const p = fr2[i];
+            if (!p) return null;
+            const px = Array.isArray(p) ? p[0] : p.x;
+            const py = Array.isArray(p) ? p[1] : p.y;
+            if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
+            const [tx, ty] = transformOverlayPointN(px, py);
+            const adjX = (tx - zoomOffsetX) * zoomScaleX;
+            const adjY = (ty - zoomOffsetY) * zoomScaleY;
+            return [adjX * W, adjY * H];
+          };
+          rawCtx.save();
+          rawCtx.globalAlpha = 0.5;
+          rawCtx.strokeStyle = '#ffaa00';
+          rawCtx.lineWidth = Math.max(1.5, Math.round(W / 700));
+          rawCtx.beginPath();
+          const edges2 = (Array.isArray(fr2) && fr2.length === 17) ? COCO17_EDGES : POSE_CONNECTIONS;
+          for (const [a, b] of edges2) {
+            const A = getXY2(a), B = getXY2(b);
+            if (!A || !B) continue;
+            rawCtx.moveTo(A[0], A[1]);
+            rawCtx.lineTo(B[0], B[1]);
+          }
+          rawCtx.stroke();
+          rawCtx.restore();
+        }
+      }
+    }
+
+    // Seek to a time (clamped), update frame index, then draw when 'seeked'
+    function seekAndDraw(targetTime) {
+      if (!rawVideoEl) return;
+      const duration = rawDuration || rawVideoEl.duration || 0;
+      const t = Math.max(0, Math.min(targetTime, isFinite(duration) ? duration : targetTime));
+      const delta = Math.abs((rawVideoEl.currentTime || 0) - t);
+
+      if (delta > 1e-4) {
+        rawVideoEl.currentTime = t; // will trigger 'seeked'
+      } else {
+        // Time didn’t change (e.g., seeking to 0) – draw immediately
+        drawRawFrameToCanvas();
+      }
+    }
+
+    // Convert a time to an integer frame index using current step
+    function timeToFrameIdx(t) {
+      return Math.max(0, Math.round(t / frameStepSec));
+    }
+
+    // Convert an integer frame index to time
+    function frameIdxToTime(fi) {
+      return Math.max(0, fi * frameStepSec);
+    }
+
+
+    let scale = 1;
+    let offsetX = 1;
+    let offsetY = 1;
+
+    let kickIds = [];          // e.g., ["kick1","kick2",...]
+    let currentKickId = null;  // active repetition
+
+    // track up to 3 selected joint indices
+    const selectedJoints = new Set();
+    // how close (in canvas pixels) a click must be to count
+    const JOINT_PICK_RADIUS = 12;
+
+    const POSE_CONNECTIONS = [
+      [11,12],[12,24],[24,23],[23,11],
+      [11,13],[13,15],[15,17],[15,19],[15,21],[17,19],
+      [12,14],[14,16],[16,18],[16,20],[16,22],[18,20],
+      [23,25],[25,27],[27,29],[27,31],[29,31],
+      [24,26],[26,28],[28,30],[28,32],[30,32]
+    ];
+
+    const COCO17_EDGES = [
+      [5,6],[5,7],[7,9],[6,8],[8,10], // arms & shoulders
+      [5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16], // torso & legs
+      [0,1],[0,2],[1,3],[2,4] // head
+    ];
+
+    // Legacy (MediaPipe 33) common edges (subset for clarity; extend if your legacy differs)
+    const MP33_EDGES = [
+      [11,12],[12,14],[14,16],[11,13],[13,15], // legs (hips=23/24 in some variants, but using 11/12 here for compatibility)
+      [12,24],[11,23],[23,24], // pelvis
+      [12,14],[14,16],[11,13],[13,15], // knees/ankles
+      [12,26],[26,28],[28,32],[11,25],[25,27],[27,31], // feet (approx)
+      [0,1],[1,2],[2,3],[3,7],[0,4],[4,5],[5,6], // head/eyes/ears
+      [11,12],[12,24],[24,23],[23,11], // torso box
+      [12,14],[14,16],[11,13],[13,15], // arms/legs dup for robustness
+    ];
+
+    function normalizePoseFrame(raw, extract2D = false) {
+      if (!raw) return null;
+      if (!Array.isArray(raw)) {
+        if (Array.isArray(raw.keypoints)) return normalizePoseFrame(raw.keypoints, extract2D);
+        if (Array.isArray(raw.points)) return normalizePoseFrame(raw.points, extract2D);
+        return null;
+      }
+      return raw.map(p => {
+        if (!p) return null;
+        if (Array.isArray(p)) {
+          if (p.length >= 3) {
+            const x = p[0], y = p[1], z = p[2];
+            if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+            if (extract2D) return [x, y];
+            return (Number.isFinite(z)) ? [x, y, z] : [x, y];
+          }
+          const x = p[0], y = p[1];
+          return (Number.isFinite(x) && Number.isFinite(y)) ? [x, y] : null;
+        }
+        if (typeof p === 'object') {
+          const x = p.x, y = p.y, z = p.z;
+          if (extract2D) return (Number.isFinite(x) && Number.isFinite(y)) ? [x, y] : null;
+          if (Number.isFinite(z)) return (Number.isFinite(x) && Number.isFinite(y) && Number.isFinite(z)) ? [x, y, z] : null;
+          return (Number.isFinite(x) && Number.isFinite(y)) ? [x, y] : null;
+        }
+        return null;
+      });
+    }
+
+    function findNearestValidFrameIndex(idx, dataArray) {
+      if (!Array.isArray(dataArray) || dataArray.length === 0) return null;
+      const max = dataArray.length - 1;
+      const clamped = Math.min(Math.max(0, idx), max);
+      if (normalizePoseFrame(dataArray[clamped])?.some(p=>p)) return clamped;
+      for (let d = 1; d <= max; d++) {
+        const i1 = clamped - d;
+        if (i1 >= 0) {
+          const fr1 = normalizePoseFrame(dataArray[i1]);
+          if (Array.isArray(fr1) && fr1.some(p=>p)) return i1;
+        }
+        const i2 = clamped + d;
+        if (i2 <= max) {
+          const fr2 = normalizePoseFrame(dataArray[i2]);
+          if (Array.isArray(fr2) && fr2.some(p=>p)) return i2;
+        }
+      }
+      return null;
+    }
+
+    // Try a list of storage paths and return the first JSON found
+    async function fetchJSONFromCandidates(paths) {
+      for (const p of paths) {
+        try {
+          const url = await storage.ref(p).getDownloadURL();
+          const res = await fetch(url, { cache: 'no-store' });
+          if (!res.ok) throw new Error(`HTTP ${res.status}`);
+          console.log(`[fetchJSONFromCandidates] Loaded: ${p}`);
+          return await res.json();
+        } catch (err) {
+          console.warn(`[fetchJSONFromCandidates] Not found or failed: ${p}`, err?.message || err);
+        }
+      }
+      throw new Error(`None of the JSON candidates were found. Tried: ${paths.join(', ')}`);
+    }
+
+    auth.onAuthStateChanged(async user => {
+      if (!user) {
+        window.location.href = 'kickai.html';
+        return;
+      }
+      await initRepsBar();          // build the top bar and set currentKickId
+      await loadAllForCurrentRep(); // load video/pose/ball for the selected rep (or fallback)
+      
+      // Initialize frame number display
+      updateFrameNumberDisplay();
+    });
+
+    function getUrlBits() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        player: params.get("player"),
+        session: params.get("session")
+      };
+    }
+
+    async function loadFreeRecordVideo() {
+      const { player, session } = getUrlBits();
+      if (!player || !session) return;
+
+      // Prefer per-kick .mov if present
+      if (currentKickId) {
+        try {
+          const folderRef = storage.ref(`${player}/freeRecord/${session}/${currentKickId}`);
+          const listResult = await folderRef.listAll();
+          const movRef = listResult.items.find(item => item.name.toLowerCase().endsWith('.mov'));
+          if (movRef) {
+            rawVideoEl.src = await movRef.getDownloadURL();
+            return;
+          }
+        } catch (e) {
+          console.warn('Kick video lookup failed, falling back to session root:', e);
+        }
+      }
+
+      // Fallback: session-root free_record_video.mov
+      try {
+        const path = `${player}/freeRecord/${session}/free_record_video.mov`;
+        rawVideoEl.src = await storage.ref(path).getDownloadURL();
+      } catch (err) {
+        console.error('Failed to load session-root video:', err);
+      }
+    }
+
+    // Build the pills from storage prefixes under .../freeRecord/{session}/
+    async function initRepsBar() {
+      const { player, session } = getUrlBits();
+      if (!player || !session) return;
+
+      const repsBar = document.getElementById('repsBar');
+      repsBar.innerHTML = '';
+
+      try {
+        const sessionRef = storage.ref(`${player}/freeRecord/${session}/`);
+        const list = await sessionRef.listAll();
+
+        // Kick folders are in prefixes; store and sort by natural order if named kickN
+        kickIds = list.prefixes.map(p => p.name)
+          .sort((a,b) => {
+            const na = parseInt(a.replace(/\D+/g,'')) || 0;
+            const nb = parseInt(b.replace(/\D+/g,'')) || 0;
+            return na - nb || a.localeCompare(b);
+          });
+
+        // If we have kicks, select first by default
+        if (kickIds.length > 0) {
+          currentKickId = kickIds[0];
+        } else {
+          currentKickId = null; // will use fallback session-root files
+        }
+
+        // Render pills
+        if (kickIds.length > 0) {
+          kickIds.forEach((kid, idx) => {
+            const btn = document.createElement('button');
+            btn.className = 'rep-pill' + (idx === 0 ? ' active' : '');
+            btn.textContent = kid.replace(/^kick/i, 'Kick ');
+            btn.onclick = async () => {
+              // activate UI
+              Array.from(repsBar.children).forEach(el => el.classList.remove('active'));
+              btn.classList.add('active');
+
+              // change rep & reload
+              currentKickId = kid;
+              await loadAllForCurrentRep();
+            };
+            repsBar.appendChild(btn);
+          });
+        } else {
+          // Optional: show "No repetitions" hint (leave empty if you prefer)
+          const hint = document.createElement('div');
+          hint.style.opacity = '0.8';
+          hint.textContent = 'No repetitions detected — showing session files';
+          repsBar.appendChild(hint);
+        }
+      } catch (err) {
+        console.error('Failed to build reps bar:', err);
+      }
+    }
+
+    function clearAllCanvases() {
+      const poseCanvas = document.getElementById('poseCanvas');
+      const pose3DEl = document.getElementById('pose3DCanvas');
+      const rawCanvas = document.getElementById('rawFrameCanvas');
+      if (poseCanvas) {
+        const ctx = poseCanvas.getContext('2d');
+        const W = poseCanvas.width, H = poseCanvas.height;
+        ctx.clearRect(0, 0, W, H);
+        ctx.fillStyle = '#1a3a2e';
+        ctx.fillRect(0, 0, W, H);
+      }
+      if (pose3DEl) {
+        resetThreeJS();
+        pose3DEl.style.display = 'none';
+      }
+      if (rawVideoEl) { rawVideoEl.pause(); rawVideoEl.src = ''; rawVideoEl.load(); }
+      if (rawCanvas) {
+        const ctx = rawCanvas.getContext('2d');
+        ctx.clearRect(0, 0, rawCanvas.width, rawCanvas.height);
+        ctx.fillStyle = '#1a3a2e';
+        ctx.fillRect(0, 0, rawCanvas.width, rawCanvas.height);
+      }
+    }
+
+    async function loadAllForCurrentRep() {
+      clearAllCanvases();
+      
+      // Clear zoom/pan and selection state for raw video
+      rawManualZoomBounds = null;
+      rawPanOffsetX = 0;
+      rawPanOffsetY = 0;
+      rawSelectedJoints.clear();
+      rawIsZoomSelecting = false;
+      
+      // Clear zoom/pan state for pose graph
+      manualZoomBounds = null;
+      panOffsetX = 0;
+      panOffsetY = 0;
+      isZoomSelecting = false;
+      isPanning = false;
+      
+      // Reset playback state
+      rawCurrentFrame = 0;
+      currentFrame = 0;
+      
+      await loadFreeRecordVideo(); // will use rep path if present, otherwise fallback
+      await loadPoseData();
+      await loadBallData();
+      await populateOverlayRepSelect();
+      // redraw current pose frame with whatever just loaded
+      drawPose(currentFrame);
+    }
+
+    async function populateOverlayRepSelect() {
+      try {
+        const { player, session } = getUrlBits();
+        if (!player || !session) return;
+        const sessionRef = storage.ref(`${player}/freeRecord/${session}/`);
+        const list = await sessionRef.listAll();
+        const kicks = list.prefixes.map(p => p.name);
+        const sel = document.getElementById('overlayRepSelect');
+        if (!sel) return;
+        sel.innerHTML = '<option value="none">No Overlay</option>';
+        kicks.forEach(k => {
+          if (k !== currentKickId) {
+            const opt = document.createElement('option');
+            opt.value = k;
+            opt.textContent = k.replace(/^kick/i, 'Kick ');
+            sel.appendChild(opt);
+          }
+        });
+      } catch (err) {
+        console.warn('Failed to populate overlay rep select:', err);
+      }
+    }
+
+    async function loadPoseData() {
+      const { player, session } = getUrlBits();
+      if (!player || !session){ poseData=null; return; }
+
+      // Prefer per-kick pose.json; fallback to session-root
+      try {
+        const candidates = currentKickId
+          ? [
+              `${player}/freeRecord/${session}/${currentKickId}/pose.json`,
+              `${player}/freeRecord/${session}/pose.json`
+            ]
+          : [ `${player}/freeRecord/${session}/pose.json` ];
+        poseData = await fetchJSONFromCandidates(candidates);
+        console.log(`[PoseLoad] Loaded pose frames=${Array.isArray(poseData)?poseData.length:'(not array)'}`);
+        if (Array.isArray(poseData)) {
+          poseData2D = poseData.map(f => normalizePoseFrame(f, true));
+          const firstRaw = poseData.find(f => f != null);
+          const firstNorm = normalizePoseFrame(firstRaw, true);
+          if (Array.isArray(firstNorm)) poseType = firstNorm.length;
+          console.log(`[PoseLoad] poseType=${poseType}, firstNormLen=${firstNorm?.length}`);
+          currentFrame = Math.min(Math.max(0, currentFrame), Math.max(0, poseData.length - 1));
+          updateFrameNumberDisplay();
+        } else { poseData = null; poseData2D = null; }
+      } catch (err) {
+        console.error('Failed to load pose data:', err);
+        poseData = null; poseData2D = null;
+      }
+
+      // After pose loads, recompute stepping to align raw frames with pose length
+      try { recalcTiming(); } catch {}
+    }
+
+    async function loadBallData() {
+      const { player, session } = getUrlBits();
+      if (!player || !session) return;
+
+      // Prefer kick folder ball_detections.json
+      if (currentKickId) {
+        try {
+          const url = await storage.ref(`${player}/freeRecord/${session}/${currentKickId}/ball_detections.json`).getDownloadURL();
+          ballData = await (await fetch(url)).json();
+          return;
+        } catch (e) {
+          console.warn('Kick ball_detections.json missing — falling back to session-root ball_detections.json');
+        }
+      }
+
+      // Fallback: session-root ball_detections.json
+      try {
+        const url = await storage.ref(`${player}/freeRecord/${session}/ball_detections.json`).getDownloadURL();
+        ballData = await (await fetch(url)).json();
+      } catch (err) {
+        console.error('Failed to load ball detections:', err);
+      }
+    }
+
+    // helper to convert radians → degrees
+    function toDeg(rad) {
+      return rad * 180 / Math.PI;
+    }
+
+    // Transform functions (ported from sprintworkpage)
+    function applyManualZoomTransform(ctx, W, H) {
+      if (!manualZoomBounds) return null;
+      
+      const { leftX, rightX, topY, bottomY } = manualZoomBounds;
+      const viewWidthN = rightX - leftX;
+      const viewHeightN = bottomY - topY;
+      
+      // Apply pan offset
+      const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, leftX + panOffsetX));
+      const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, topY + panOffsetY));
+      
+      // Non-uniform scaling to map viewport to full canvas
+      const sx = 1 / viewWidthN;
+      const sy = 1 / viewHeightN;
+      const leftPx = adjustedLeftX * W;
+      const topPx = adjustedTopY * H;
+
+      // Apply transform with DPR awareness
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      ctx.save();
+      ctx.setTransform(dpr * sx, 0, 0, dpr * sy, dpr * (-sx * leftPx), dpr * (-sy * topPx));
+      
+      return { leftX: adjustedLeftX, rightX: adjustedLeftX + viewWidthN, topY: adjustedTopY, bottomY: adjustedTopY + viewHeightN, sx, sy };
+    }
+
+    function restoreTransform(ctx){
+      ctx.restore();
+      // reset to device pixel ratio scaling
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    // Map a normalized point (0..1) to canvas pixels under current pose zoom/pan
+    function mapPosePointToCanvas(nx, ny, W, H) {
+      if (!manualZoomBounds) {
+        return [nx * W, ny * H];
+      }
+      const leftX = manualZoomBounds.leftX;
+      const rightX = manualZoomBounds.rightX;
+      const topY = manualZoomBounds.topY;
+      const bottomY = manualZoomBounds.bottomY;
+      const viewWidthN = rightX - leftX;
+      const viewHeightN = bottomY - topY;
+      const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, leftX + panOffsetX));
+      const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, topY + panOffsetY));
+      const sx = 1 / Math.max(viewWidthN, 1e-6);
+      const sy = 1 / Math.max(viewHeightN, 1e-6);
+      const x = (nx - adjustedLeftX) * (W * sx);
+      const y = (ny - adjustedTopY) * (H * sy);
+      return [x, y];
+    }
+
+    function drawAngleHUD(ctx, W, H, text, position) {
+      if (!text) return;
+      const canvas = ctx.canvas;
+      const displayW = canvas.clientWidth || W;
+      const displayH = canvas.clientHeight || H;
+      const scale = W / displayW;
+      ctx.save();
+      ctx.font = '14px sans-serif';
+      ctx.textBaseline = 'middle';
+      const pad = 10 * scale;
+      const boxPadX = 10 * scale, boxPadY = 7 * scale;
+      const metrics = ctx.measureText(text);
+      const textW = metrics.width;
+      const boxW = Math.ceil(textW + boxPadX * 2);
+      const boxH = 28 * scale;
+      let x, y;
+      const pos = (position || 'bottom-right');
+      switch (pos) {
+        case 'top-left': x = pad; y = pad; break;
+        case 'top-right': x = W - pad - boxW; y = pad; break;
+        case 'bottom-left': x = pad; y = H - pad - boxH; break;
+        default: x = W - pad - boxW; y = H - pad - boxH;
+      }
+      ctx.fillStyle = 'rgba(0,0,0,0.55)';
+      ctx.strokeStyle = 'rgba(255,255,255,0.25)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.rect(x, y, boxW, boxH);
+      ctx.fill();
+      ctx.stroke();
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText(text, x + boxPadX, y + boxH / 2);
+      ctx.restore();
+    }
+
+    function drawZoomSelection(W, H) {
+      if (!isZoomSelecting) return;
+      
+      const leftX = Math.min(zoomStartX, zoomCurrentX);
+      const rightX = Math.max(zoomStartX, zoomCurrentX);
+      const topY = Math.min(zoomStartY, zoomCurrentY);
+      const bottomY = Math.max(zoomStartY, zoomCurrentY);
+      
+      const canvas = document.getElementById('poseCanvas');
+      const ctx = canvas.getContext('2d');
+      ctx.save();
+      ctx.fillStyle = "rgba(128, 128, 128, 0.3)";
+      ctx.fillRect(leftX, topY, rightX - leftX, bottomY - topY);
+      ctx.strokeStyle = "rgba(255, 255, 255, 0.8)";
+      ctx.lineWidth = 2;
+      ctx.strokeRect(leftX, topY, rightX - leftX, bottomY - topY);
+      ctx.restore();
+    }
+
+    // Reset zoom and pan
+    function resetZoomPan() {
+      manualZoomBounds = null;
+      panOffsetX = 0;
+      panOffsetY = 0;
+      isZoomSelecting = false;
+      isPanning = false;
+      isSelectingZoomCenter = false;
+      zoomCenterX = 0.5;
+      zoomCenterY = 0.5;
+      console.log("[Zoom/Pan] Reset");
+    }
+
+    // Zoom in/out functions
+    function zoomIn() {
+      if (!manualZoomBounds) {
+        // First zoom: prompt user to select center
+        isSelectingZoomCenter = true;
+        const prompt = document.getElementById('alignPrompt');
+        if (prompt) {
+          prompt.textContent = 'Click graph';
+          prompt.classList.add('flashing');
+          prompt.style.display = 'block';
+        }
+        const poseCanvas = document.getElementById('poseCanvas');
+        if (poseCanvas) poseCanvas.style.cursor = 'crosshair';
+        return;
+      }
+      // Subsequent zooms: use stored center
+      const cx = zoomCenterX;
+      const cy = zoomCenterY;
+      const w = manualZoomBounds.rightX - manualZoomBounds.leftX;
+      const h = manualZoomBounds.bottomY - manualZoomBounds.topY;
+      const f = 0.8;
+      manualZoomBounds = {
+        leftX: cx - (w * f) / 2,
+        rightX: cx + (w * f) / 2,
+        topY: cy - (h * f) / 2,
+        bottomY: cy + (h * f) / 2
+      };
+      panOffsetX = 0;
+      panOffsetY = 0;
+      drawPose(currentFrame);
+    }
+
+    function zoomOut() {
+      if (!manualZoomBounds) return;
+      const cx = zoomCenterX;
+      const cy = zoomCenterY;
+      const w = manualZoomBounds.rightX - manualZoomBounds.leftX;
+      const h = manualZoomBounds.bottomY - manualZoomBounds.topY;
+      const f = 1.25;
+      const newW = Math.min(1, w * f);
+      const newH = Math.min(1, h * f);
+      if (newW >= 0.95 || newH >= 0.95) {
+        manualZoomBounds = null;
+        panOffsetX = 0;
+        panOffsetY = 0;
+        zoomCenterX = 0.5;
+        zoomCenterY = 0.5;
+      } else {
+        manualZoomBounds = {
+          leftX: Math.max(0, cx - newW / 2),
+          rightX: Math.min(1, cx + newW / 2),
+          topY: Math.max(0, cy - newH / 2),
+          bottomY: Math.min(1, cy + newH / 2)
+        };
+        panOffsetX = 0;
+        panOffsetY = 0;
+      }
+      
+      drawPose(currentFrame);
+    }
+
+    // Layout focus functions
+    function focusContainer(container) {
+      const containerEl = document.querySelector('.container');
+      
+      // Remove any existing focus classes
+      containerEl.classList.remove('focused-pose');
+      containerEl.classList.remove('focused-video');
+      
+      if (container === 'pose') {
+        containerEl.classList.add('focused-pose');
+        focusedContainer = 'pose';
+      } else if (container === 'video') {
+        containerEl.classList.add('focused-video');
+        focusedContainer = 'video';
+      } else {
+        focusedContainer = null;
+      }
+    }
+
+    function toggleContainerFocus(container) {
+      if (focusedContainer === container) {
+        // If already focused, unfocus
+        focusContainer(null);
+      } else {
+        // Focus the specified container
+        focusContainer(container);
+      }
+    }
+
+    function updateVerticalHeightDisplay() {
+      const overlay = document.getElementById('jumpHeightOverlay');
+      if (!overlay) return;
+      const poseContainer = document.querySelector('.pose-container');
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+      const isPoseFullscreen = poseContainer && (fsEl === poseContainer);
+      if (isPoseFullscreen) { overlay.style.display = 'none'; return; }
+      const valueEl = overlay.querySelector('.value');
+      overlay.style.display = 'block';
+      if (valueEl) valueEl.textContent = '--';
+    }
+    function updateFrameNumberDisplay() {
+      const frameDisplay = document.getElementById('frameNumberDisplay');
+      if (frameDisplay) frameDisplay.textContent = `Frame: ${currentFrame}`;
+      updateVerticalHeightDisplay();
+    }
+
+    function drawPose(frameIdx) {
+      const canvas2D = document.getElementById('poseCanvas');
+      const canvas3D = document.getElementById('pose3DCanvas');
+      const toggle3DBtn = document.getElementById('toggle3DFixedBtn');
+      if (currentView === '3D') {
+        if (canvas2D) canvas2D.style.display = 'none';
+        if (toggle3DBtn) toggle3DBtn.style.display = 'inline-flex';
+        if (canvas3D) {
+          canvas3D.style.display = 'block';
+          setTimeout(() => {
+            if (threeRenderer && threeCamera) {
+              const W = canvas3D.clientWidth || 480, H = canvas3D.clientHeight || 360;
+              threeCamera.aspect = W / H;
+              threeCamera.updateProjectionMatrix();
+              threeRenderer.setSize(W, H, false);
+            }
+          }, 10);
+        }
+        drawPose3D(frameIdx);
+        return;
+      }
+      if (canvas2D) canvas2D.style.display = 'block';
+      if (canvas3D) canvas3D.style.display = 'none';
+      if (toggle3DBtn) toggle3DBtn.style.display = 'none';
+
+      const dataArr = (Array.isArray(poseData2D) && poseData2D.length) ? poseData2D : poseData;
+      const total = Array.isArray(dataArr) ? dataArr.length : 0;
+      let idx = Math.max(0, Math.min(frameIdx, Math.max(0, total - 1)));
+      let frame = (dataArr === poseData2D ? poseData2D?.[idx] : normalizePoseFrame(poseData?.[idx], true)) ?? null;
+      if (!Array.isArray(frame) || !frame.some(p=>p)) {
+        const fallbackIdx = findNearestValidFrameIndex(idx, dataArr);
+        if (fallbackIdx != null) {
+          idx = fallbackIdx;
+          frame = dataArr === poseData2D ? poseData2D[idx] : normalizePoseFrame(poseData[idx], true);
+        }
+      }
+      const hasPose = Array.isArray(frame) && frame.some(p=>p);
+
+      const canvas = canvas2D;
+      const ctx = canvas.getContext('2d');
+      // Use CSS pixel size for consistent input mapping and drawing
+      const W = canvas.clientWidth, H = canvas.clientHeight;
+      // Ensure DPR-aware baseline transform is applied when not zoomed
+      (function ensureBaseTransform(){
+        const dpr = Math.min(window.devicePixelRatio || 1, 2);
+        // If canvas backing store doesn't match CSS, size it and set transform
+        const targetW = Math.round(W * dpr);
+        const targetH = Math.round(H * dpr);
+        if (canvas.width !== targetW || canvas.height !== targetH) {
+          canvas.width = targetW;
+          canvas.height = targetH;
+        }
+        ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      })();
+
+      // --- clear, background & grid ---
+      ctx.clearRect(0,0,W,H);
+      ctx.fillStyle = '#1a3a2e';
+      ctx.fillRect(0,0,W,H);
+      if(!dataArr||dataArr.length===0){ ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='16px Inter, sans-serif'; ctx.textAlign='center'; ctx.fillText('No pose data available for this rep', W/2, H/2); updateFrameNumberDisplay(); return; }
+      ctx.strokeStyle = 'rgba(76,140,106,0.2)';
+      ctx.lineWidth = 0.5;
+      for (let i=0;i<=10;i++){
+        const x = i*(W/10), y = i*(H/10);
+        ctx.beginPath();
+        ctx.moveTo(x,0); ctx.lineTo(x,H);
+        ctx.moveTo(0,y); ctx.lineTo(W,y);
+        ctx.stroke();
+      }
+
+      // Draw zoom selection overlay
+      drawZoomSelection(W, H);
+
+      // Apply manual zoom transform if active
+      let tx = null;
+      if (manualZoomBounds) {
+        tx = applyManualZoomTransform(ctx, W, H);
+      }
+
+      // --- draw skeleton connections (pose optional) ---
+      if (hasPose) {
+        // If zoomed, the context is scaled by (sx,sy). Keep visual thickness constant
+        const baseStroke = 5.5;
+        let scalePx = 1;
+        if (manualZoomBounds) {
+          // tx was set above when manual zoom applied
+          // Use the larger axis scale to keep width from ballooning under non-uniform scale
+          const { leftX, rightX, topY, bottomY } = manualZoomBounds;
+          const viewWidthN = rightX - leftX;
+          const viewHeightN = bottomY - topY;
+          const sx = 1 / Math.max(viewWidthN, 1e-6);
+          const sy = 1 / Math.max(viewHeightN, 1e-6);
+          scalePx = 1 / Math.max(sx, sy);
+        }
+        ctx.strokeStyle = '#ffffff';
+        ctx.lineWidth = baseStroke * scalePx;
+        if (poseType == 17) {
+          COCO17_EDGES.forEach(([s,e])=>{
+            const p1=frame[s], p2=frame[e];
+            if (!p1||!p2) return;
+            const x1=p1[0]*W, y1=p1[1]*H;
+            const x2=p2[0]*W, y2=p2[1]*H;
+            ctx.beginPath();
+            ctx.moveTo(x1,y1);
+            ctx.lineTo(x2,y2);
+            ctx.stroke();
+          });
+        } else {
+          POSE_CONNECTIONS.forEach(([s,e])=>{
+            const p1=frame[s], p2=frame[e];
+            if (!p1||!p2) return;
+            const x1=p1[0]*W, y1=p1[1]*H;
+            const x2=p2[0]*W, y2=p2[1]*H;
+            ctx.beginPath();
+            ctx.moveTo(x1,y1);
+            ctx.lineTo(x2,y2);
+            ctx.stroke();
+          });
+        }
+
+        // --- draw joints ---
+        const baseRadius = 4;
+        frame.forEach((p,idx)=>{
+          if (!p) return;
+          const x=p[0]*W, y=p[1]*H;
+          ctx.beginPath();
+          ctx.arc(x,y,baseRadius * (manualZoomBounds ? scalePx : 1),0,2*Math.PI);
+          if (selectedJoints.has(idx)){
+            ctx.fillStyle='yellow';
+            ctx.strokeStyle='orange';
+            ctx.lineWidth=2 * (manualZoomBounds ? scalePx : 1);
+            ctx.fill(); ctx.stroke();
+          } else {
+            ctx.fillStyle='#00ff66';
+            ctx.fill();
+          }
+        });
+
+        // Draw overlay pose on pose canvas as well (semi-transparent amber)
+        if (overlayPoseData && Array.isArray(overlayPoseData) && overlayPoseData.length) {
+          let i2 = Math.max(0, Math.min(idx + overlayFrameShift, overlayPoseData.length - 1));
+          let fr2Raw = overlayPoseData[i2];
+          let fr2 = normalizePoseFrame(fr2Raw);
+          if (!Array.isArray(fr2) || !fr2.some(p=>p)) {
+            const fb2 = findNearestValidFrameIndex(i2, overlayPoseData);
+            console.warn(`[PoseCanvas] Missing/invalid overlay at idx=${i2}; fb2=${fb2}`);
+            if (fb2 != null) { i2 = fb2; fr2Raw = overlayPoseData[i2]; fr2 = normalizePoseFrame(fr2Raw); }
+          }
+          const hasOverlay = Array.isArray(fr2) && fr2.some(p=>p);
+          console.log(`[PoseCanvas] overlay active=${true} requestedIdx=${idx} usedIdx=${i2} hasOverlay=${hasOverlay} len=${fr2?.length}`);
+          if (hasOverlay) {
+            // Auto alignment and optional scale normalization
+            // Only align at the beginning; do not recompute per-frame when locked
+            if (overlayAutoAlignEnabled && !overlayAlignMode && !overlayAlignmentLocked) {
+              lockOverlayAlignmentAt(findNearestValidFrameIndex(idx, dataArr) ?? idx);
+            }
+            ctx.save();
+            ctx.globalAlpha = 0.6;
+            ctx.strokeStyle = 'rgba(200,200,200,0.9)';
+            ctx.lineWidth = (baseStroke * 0.65) * (manualZoomBounds ? scalePx : 1);
+            const edges2 = (fr2.length === 17) ? COCO17_EDGES : POSE_CONNECTIONS;
+            edges2.forEach(([s,e])=>{
+              const p1=fr2[s], p2=fr2[e];
+              if (!p1||!p2) return;
+              const t1 = transformOverlayPointN(p1[0], p1[1]);
+              const t2 = transformOverlayPointN(p2[0], p2[1]);
+              const x1=t1[0]*W, y1=t1[1]*H; const x2=t2[0]*W, y2=t2[1]*H;
+              ctx.beginPath();
+              ctx.moveTo(x1,y1);
+              ctx.lineTo(x2,y2);
+              ctx.stroke();
+            });
+            // draw overlay joints (darker green)
+            ctx.fillStyle = 'rgba(12,150,70,0.85)';
+            const rOv = baseRadius * 0.9 * (manualZoomBounds ? scalePx : 1);
+            fr2.forEach(p=>{
+              if (!p) return;
+              const tp = transformOverlayPointN(p[0], p[1]);
+              ctx.beginPath();
+              ctx.arc(tp[0]*W, tp[1]*H, rOv, 0, Math.PI*2);
+              ctx.fill();
+            });
+            ctx.restore();
+          }
+        }
+      }
+
+      // --- draw ball detection (always, independent of pose) ---
+      const bbox = ballData?.[idx];
+      if (bbox) {
+        const [x1,y1,x2,y2] = bbox;
+        const cx = ((x1+x2)/2)*W;
+        const cy = ((y1+y2)/2)*H;
+        const r  = ((x2-x1)*W)/2;
+        ctx.strokeStyle='red';
+        ctx.lineWidth=2;
+        ctx.beginPath();
+        ctx.arc(cx,cy,r,0,2*Math.PI);
+        ctx.stroke();
+      }
+
+      // Draw mini pose selector
+      drawMiniPoseSelector();
+
+      // Restore transform before drawing angle overlay (angle overlay is in screen-space)
+      if (manualZoomBounds) {
+        restoreTransform(ctx);
+      }
+
+      // --- angle overlay: compute in screen-space so labels remain readable ---
+      let angleOverlay = null;
+      if (hasPose) {
+        const sel = Array.from(selectedJoints);
+        if (sel.length === 2) {
+          const [iA, iB] = sel;
+          const pA = frame[iA], pB = frame[iB];
+          if (pA && pB) {
+            const mA = mapPosePointToCanvas(pA[0], pA[1], W, H);
+            const mB = mapPosePointToCanvas(pB[0], pB[1], W, H);
+            const dx = mB[0] - mA[0], dy = mB[1] - mA[1];
+            let ang = toDeg(Math.atan2(dx, dy));
+            ang = Math.abs(ang);
+            angleOverlay = { type: 'line', a: mA, b: mB, ang };
+          }
+        } else if (sel.length === 3) {
+          const [i1, i2, i3] = sel;
+          const P1 = frame[i1], P2 = frame[i2], P3 = frame[i3];
+          if (P1 && P2 && P3) {
+            const m1 = mapPosePointToCanvas(P1[0], P1[1], W, H);
+            const m2 = mapPosePointToCanvas(P2[0], P2[1], W, H);
+            const m3 = mapPosePointToCanvas(P3[0], P3[1], W, H);
+            const vBA = { x: m1[0] - m2[0], y: m1[1] - m2[1] };
+            const vBC = { x: m3[0] - m2[0], y: m3[1] - m2[1] };
+            const dot = vBA.x * vBC.x + vBA.y * vBC.y;
+            const mag = Math.hypot(vBA.x, vBA.y) * Math.hypot(vBC.x, vBC.y);
+            if (mag > 0) {
+              let ang = toDeg(Math.acos(Math.max(-1, Math.min(1, dot / mag))));
+              angleOverlay = { type: 'angle', a: m1, b: m2, c: m3, ang };
+            }
+          }
+        }
+      }
+
+      // Draw angle overlay in screen-space (after restoring transform)
+      let angleHUDText = null;
+      if (angleOverlay) {
+        if (angleOverlay.type === 'line') {
+          const xA = angleOverlay.a[0], yA = angleOverlay.a[1];
+          const xB = angleOverlay.b[0], yB = angleOverlay.b[1];
+          ctx.strokeStyle = 'yellow';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(xA, yA);
+          ctx.lineTo(xB, yB);
+          ctx.stroke();
+          angleHUDText = `${angleOverlay.ang.toFixed(1)}°`;
+        } else if (angleOverlay.type === 'angle') {
+          const x1 = angleOverlay.a[0], y1 = angleOverlay.a[1];
+          const x2 = angleOverlay.b[0], y2 = angleOverlay.b[1];
+          const x3 = angleOverlay.c[0], y3 = angleOverlay.c[1];
+          ctx.strokeStyle = 'yellow';
+          ctx.lineWidth = 2;
+          ctx.beginPath();
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
+          ctx.lineTo(x3, y3);
+          ctx.stroke();
+          angleHUDText = `${angleOverlay.ang.toFixed(1)}°`;
+        }
+        if (angleHUDText) {
+          const poseContainerEl = document.querySelector('.pose-container');
+          const hudDom = document.getElementById('angleHudDom');
+          const isFs = document.fullscreenElement && poseContainerEl && (document.fullscreenElement === poseContainerEl || poseContainerEl.contains(document.fullscreenElement));
+          if (isFs && hudDom) {
+            hudDom.textContent = angleHUDText;
+            hudDom.style.display = 'block';
+            updateAngleHudPosition();
+          } else {
+            if (hudDom) hudDom.style.display = 'none';
+            // Draw in box at bottom-right when not in fullscreen
+            drawAngleHUD(ctx, W, H, angleHUDText, 'bottom-right');
+          }
+        }
+      } else {
+        const hudDom = document.getElementById('angleHudDom');
+        if (hudDom) hudDom.style.display = 'none';
+      }
+
+      // Update labels and external chart for this frame
+      currentFrame = idx;
+      updateFrameNumberDisplay();
+    }
+
+
+    function stepFrame(dir) {
+      const len = currentView === '3D' ? (poseData ? poseData.length : 0) : (poseData2D ? poseData2D.length : (poseData ? poseData.length : 0));
+      currentFrame = Math.min(Math.max(0, currentFrame + dir), Math.max(0, len - 1));
+      const poseFrameSlider = document.getElementById('poseFrameSlider');
+      const poseFrameSliderValue = document.getElementById('poseFrameSliderValue');
+      if (poseFrameSlider) poseFrameSlider.value = currentFrame.toString();
+      if (poseFrameSliderValue) poseFrameSliderValue.textContent = currentFrame.toString();
+      drawPose(currentFrame);
+      updateFrameNumberDisplay();
+    }
+    function togglePlayPause() {
+      const btn = document.getElementById('playPauseBtn');
+      isPlaying = !isPlaying;
+      if (isPlaying) {
+        btn.textContent = '⏸';
+        const delay = Math.round(baseFrameDelay / (SPEED_OPTIONS[poseSpeedIdx] || 1));
+        animationInterval = setInterval(() => stepFrame(1), delay);
+      } else {
+        btn.textContent = '▶';
+        clearInterval(animationInterval);
+      }
+    }
+    function speedUp()   { frameDelay=Math.max(MIN_DELAY,frameDelay-DELAY_STEP);}    
+    function speedDown() { frameDelay=Math.min(MAX_DELAY,frameDelay+DELAY_STEP);}
+    // These functions are now defined above with the new zoom/pan implementation    
+    function resetView() { 
+      resetZoomPan(); 
+      currentFrame = 0;
+      selectedJoints.clear();
+      const dataExists = currentView === '3D' ? (poseData && poseData.length > 0) : (poseData2D && poseData2D.length > 0);
+      if (dataExists) currentFrame = 0;
+      drawPose(currentFrame);
+      updateFrameNumberDisplay();
+    }
+    const poseCanvas = document.getElementById('poseCanvas');
+    poseCanvas.addEventListener('click', e => {
+      const rect = poseCanvas.getBoundingClientRect();
+      // convert click to canvas coords
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      const W = poseCanvas.clientWidth;
+      const H = poseCanvas.clientHeight;
+
+      // Handle zoom center selection
+      if (isSelectingZoomCenter) {
+        zoomCenterX = clickX / W;
+        zoomCenterY = clickY / H;
+        isSelectingZoomCenter = false;
+        poseCanvas.style.cursor = '';
+        const prompt = document.getElementById('alignPrompt');
+        if (prompt) {
+          prompt.style.display = 'none';
+          prompt.classList.remove('flashing');
+        }
+        
+        // Now perform initial zoom centered on selected point
+        const f = 0.8;
+        manualZoomBounds = {
+          leftX: zoomCenterX - (f / 2),
+          rightX: zoomCenterX + (f / 2),
+          topY: zoomCenterY - (f / 2),
+          bottomY: zoomCenterY + (f / 2)
+        };
+        panOffsetX = 0;
+        panOffsetY = 0;
+        drawPose(currentFrame);
+        return;
+      }
+
+      if (overlayAlignMode && Array.isArray(poseData2D) && poseData2D.length) {
+        const frame = poseData2D[currentFrame] || [];
+        let bestIdx = null;
+        let bestDistSq = Infinity;
+        frame.forEach((kp, idx) => {
+          if (!kp) return;
+          const cx = kp[0]*W, cy = kp[1]*H;
+          const dx = cx - clickX, dy = cy - clickY;
+          const d2 = dx*dx + dy*dy;
+          if (d2 < bestDistSq) { bestDistSq = d2; bestIdx = idx; }
+        });
+        if (bestIdx != null) {
+          overlayAlignJointIndex = bestIdx;
+          console.log(`[Align] Selected joint index=${bestIdx}`);
+          // compute one-time translation offset in normalized coords using current frame
+          if (overlayPoseData && overlayPoseData.length) {
+            const i2 = Math.max(0, Math.min(currentFrame + overlayFrameShift, overlayPoseData.length - 1));
+            const over = normalizePoseFrame(overlayPoseData[i2], true) || [];
+            const pMain = frame[bestIdx];
+            const pOver = over[bestIdx];
+            if (pMain && pOver) {
+              overlayAlignOffsetN = { dx: pMain[0] - pOver[0], dy: pMain[1] - pOver[1] };
+              console.log('[Align] Stored normalized offset', overlayAlignOffsetN, 'at frame', currentFrame, 'overlayIdx', i2);
+            }
+          }
+          const prompt = document.getElementById('alignPrompt');
+          if (prompt) prompt.style.display = 'none';
+          overlayAlignMode = false;
+          drawPose(currentFrame);
+          return;
+        }
+      }
+
+  // find closest joint (normalized canvas coords)
+      let hitIdx = null;
+      let bestDistSq = JOINT_PICK_RADIUS * JOINT_PICK_RADIUS;
+      const frame = (poseData2D && poseData2D.length) ? (poseData2D[currentFrame] || []) : (normalizePoseFrame(poseData?.[currentFrame], true) || []);
+      frame.forEach((kp, idx) => {
+        if (!kp) return;
+        const [nx, ny] = kp;
+        // map normalized → canvas
+        const cx = nx * W;
+        const cy = ny * H;
+        //console.log(`keypoint at x: ${cx} and at y: ${cy}`);
+        const dx = cx - clickX;
+        const dy = cy - clickY;
+        const distSq = dx*dx + dy*dy;
+        // console.log(`squared distance is: ${distSq}`);
+        if (distSq < bestDistSq) {
+          bestDistSq = distSq;
+          hitIdx = idx;
+        }
+      });
+
+      if (hitIdx !== null) {
+        if (selectedJoints.has(hitIdx)) {
+          selectedJoints.delete(hitIdx);
+        } else if (selectedJoints.size < 3) {
+          selectedJoints.add(hitIdx);
+        }
+        // re‐draw to show updated highlight
+        drawPose(currentFrame);
+      }
+    });
+
+    // Mouse event handlers for zoom and pan (ported from sprintworkpage)
+    poseCanvas.addEventListener("mousedown", (e) => {
+      if (isSelectingZoomCenter) return; // Don't start selection during zoom center mode
+      
+      const rect = poseCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      if (e.button === 0) { // Left click - start zoom selection
+        isZoomSelecting = true;
+        zoomStartX = x;
+        zoomStartY = y;
+        zoomCurrentX = x;
+        zoomCurrentY = y;
+        console.log("[Zoom] Started selection at:", x, y);
+      } else if (e.button === 2) { // Right click - start pan
+        e.preventDefault();
+        isZoomSelecting = false;
+        isPanning = true;
+        panStartX = x;
+        panStartY = y;
+        console.log("[Pan] Started at:", x, y, "Current offset:", panOffsetX.toFixed(4), panOffsetY.toFixed(4));
+      }
+    });
+
+    poseCanvas.addEventListener("mousemove", (e) => {
+      const rect = poseCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      if (isZoomSelecting) {
+        zoomCurrentX = x;
+        zoomCurrentY = y;
+        try {
+          drawPose(currentFrame);
+        } catch (e) {
+          console.error("[Zoom] Render failed during selection:", e);
+        }
+      } else if (e.buttons === 2 && isPanning) { // Right mouse button held and we're panning
+        e.preventDefault();
+        const deltaX = (x - panStartX) / poseCanvas.clientWidth;
+        const deltaY = (y - panStartY) / poseCanvas.clientHeight;
+        // Invert panning direction: mouse movement should move view in opposite direction
+        panOffsetX -= deltaX;
+        panOffsetY -= deltaY;
+        panStartX = x;
+        panStartY = y;
+        console.log("[Pan] Delta:", deltaX.toFixed(4), deltaY.toFixed(4), "Total offset:", panOffsetX.toFixed(4), panOffsetY.toFixed(4));
+        try {
+          drawPose(currentFrame);
+          console.log("[Pan] Render completed");
+        } catch (e) {
+          console.error("[Pan] Render failed:", e);
+        }
+      }
+    });
+
+    poseCanvas.addEventListener("mouseup", (e) => {
+      const rect = poseCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      
+      if (e.button === 0 && isZoomSelecting) { // Left click release - finish zoom selection
+        isZoomSelecting = false;
+        const leftX = Math.min(zoomStartX, x) / poseCanvas.clientWidth;
+        const rightX = Math.max(zoomStartX, x) / poseCanvas.clientWidth;
+        const topY = Math.min(zoomStartY, y) / poseCanvas.clientHeight;
+        const bottomY = Math.max(zoomStartY, y) / poseCanvas.clientHeight;
+        
+        const widthPx = Math.abs(x - zoomStartX);
+        const heightPx = Math.abs(y - zoomStartY);
+        const minSize = 20; // Minimum 20 pixels in each dimension
+        
+        if (widthPx >= minSize && heightPx >= minSize) {
+          // Calculate aspect ratio preserving bounds
+          const canvasAspect = poseCanvas.clientWidth / poseCanvas.clientHeight;
+          const selectionAspect = widthPx / heightPx;
+          
+          let finalLeftX = leftX;
+          let finalRightX = rightX;
+          let finalTopY = topY;
+          let finalBottomY = bottomY;
+          
+          if (selectionAspect > canvasAspect) {
+            // Selection is wider than canvas aspect - trim width
+            const centerX = (leftX + rightX) / 2;
+            const targetWidth = (bottomY - topY) * canvasAspect;
+            finalLeftX = centerX - targetWidth / 2;
+            finalRightX = centerX + targetWidth / 2;
+          } else {
+            // Selection is taller than canvas aspect - trim height
+            const centerY = (topY + bottomY) / 2;
+            const targetHeight = (rightX - leftX) / canvasAspect;
+            finalTopY = centerY - targetHeight / 2;
+            finalBottomY = centerY + targetHeight / 2;
+          }
+          
+          manualZoomBounds = { leftX: finalLeftX, rightX: finalRightX, topY: finalTopY, bottomY: finalBottomY };
+          // Update zoom center to center of selection for subsequent zoom operations
+          zoomCenterX = (finalLeftX + finalRightX) / 2;
+          zoomCenterY = (finalTopY + finalBottomY) / 2;
+          panOffsetX = 0;
+          panOffsetY = 0;
+          console.log("[Zoom] Applied aspect-preserving bounds:", manualZoomBounds);
+          console.log("[Zoom] Original selection:", widthPx.toFixed(1), "x", heightPx.toFixed(1), "pixels");
+          console.log("[Zoom] Aspect ratio:", selectionAspect.toFixed(3), "vs canvas:", canvasAspect.toFixed(3));
+          try {
+            drawPose(currentFrame);
+            console.log("[Zoom] Render completed successfully");
+          } catch (e) {
+            console.error("[Zoom] Render failed:", e);
+          }
+        } else {
+          console.log("[Zoom] Selection too small:", widthPx.toFixed(1), "x", heightPx.toFixed(1), "pixels (minimum:", minSize, "px)");
+          try {
+            drawPose(currentFrame);
+            console.log("[Zoom] Render completed after failed selection");
+          } catch (e) {
+            console.error("[Zoom] Render failed after failed selection:", e);
+          }
+        }
+      }
+      
+      if (e.button === 2 && isPanning) { // Right click release - stop panning
+        isPanning = false;
+        console.log("[Pan] Stopped. Final offset:", panOffsetX.toFixed(4), panOffsetY.toFixed(4));
+      }
+    });
+
+    poseCanvas.addEventListener("contextmenu", (e) => {
+      e.preventDefault();
+    });
+
+    const miniPoseCanvas = document.getElementById('miniPoseCanvas');
+    if (miniPoseCanvas) {
+      miniPoseCanvas.addEventListener('click', (e) => {
+        const rect = miniPoseCanvas.getBoundingClientRect();
+        const clickX = (e.clientX - rect.left) / miniPoseCanvas.clientWidth;
+        const clickY = (e.clientY - rect.top) / miniPoseCanvas.clientHeight;
+        const numKeypoints = (poseData && poseData[0]) ? (Array.isArray(poseData[0][0]) ? poseData[0].length : 33) : 33;
+        const refPose = (numKeypoints === 17) ? getReferenceCOCO17() : getReferencePose33();
+        let bestIdx = null, bestDistSq = Infinity;
+        const th = 0.08;
+        refPose.forEach((kp, idx) => {
+          if (!kp) return;
+          const d2 = (kp[0] - clickX) ** 2 + (kp[1] - clickY) ** 2;
+          if (d2 < th * th && d2 < bestDistSq) { bestDistSq = d2; bestIdx = idx; }
+        });
+        if (bestIdx != null) {
+          if (selectedJoints.has(bestIdx)) selectedJoints.delete(bestIdx);
+          else if (selectedJoints.size < 3) selectedJoints.add(bestIdx);
+          drawMiniPoseSelector();
+          drawPose(currentFrame);
+        }
+      });
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      const miniSel = document.getElementById('miniPoseSelector');
+      if (miniSel) miniSel.style.display = 'none';
+
+      document.getElementById('prevBtn').onclick = () => { stepFrame(-1); updateFrameNumberDisplay(); };
+      document.getElementById('nextBtn').onclick = () => { stepFrame(1); updateFrameNumberDisplay(); };
+      document.getElementById('playPauseBtn').onclick = togglePlayPause;
+      document.getElementById('zoomInBtn').onclick = zoomIn;
+      document.getElementById('zoomOutBtn').onclick = zoomOut;
+      document.getElementById('resetViewBtn').onclick = resetView;
+
+      const toggleMiniBtn = document.getElementById('toggleMiniPoseBtn');
+      if (toggleMiniBtn) {
+        toggleMiniBtn.onclick = () => {
+          const el = document.getElementById('miniPoseSelector');
+          if (!el) return;
+          const hidden = el.style.display === 'none';
+          el.style.display = hidden ? 'block' : 'none';
+          toggleMiniBtn.style.background = hidden ? 'rgba(255,255,255,0.2)' : '';
+          toggleMiniBtn.title = hidden ? 'Hide Joint Selector' : 'Show Joint Selector';
+          if (hidden) drawMiniPoseSelector();
+        };
+      }
+      const toggle3DBtn = document.getElementById('toggle3DFixedBtn');
+      if (toggle3DBtn) {
+        toggle3DBtn.onclick = () => {
+          threePoseFixed = !threePoseFixed;
+          toggle3DBtn.style.background = threePoseFixed ? '' : 'rgba(255,255,255,0.2)';
+          toggle3DBtn.title = threePoseFixed ? 'Switch to Unfixed Mode' : 'Switch to Fixed Mode';
+          if (currentView === '3D' && poseData && poseData.length) drawPose3D(currentFrame);
+        };
+      }
+      const view2DBtn = document.getElementById('view2DBtn');
+      const view3DBtn = document.getElementById('view3DBtn');
+      if (view2DBtn) {
+        view2DBtn.onclick = () => {
+          currentView = '2D';
+          view2DBtn.classList.add('active'); view3DBtn.classList.remove('active');
+          drawPose(currentFrame);
+          updateFrameNumberDisplay();
+        };
+      }
+      if (view3DBtn) {
+        view3DBtn.onclick = () => {
+          currentView = '3D';
+          view3DBtn.classList.add('active'); view2DBtn.classList.remove('active');
+          drawPose(currentFrame);
+          updateFrameNumberDisplay();
+        };
+      }
+
+      const videoContainer = document.querySelector('.video-container');
+      const poseContainer = document.querySelector('.pose-container');
+      const videoFsBtn = document.getElementById('videoFullscreenBtn');
+      const poseFsBtn = document.getElementById('poseFullscreenBtn');
+      function reqFs(el) { if (el && el.requestFullscreen) el.requestFullscreen(); else if (el && el.webkitRequestFullscreen) el.webkitRequestFullscreen(); else if (el && el.msRequestFullscreen) el.msRequestFullscreen(); }
+      function exitFs() { if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); else if (document.msExitFullscreen) document.msExitFullscreen(); }
+      function isFs(el) { const fs = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement; return fs === el; }
+      if (poseFsBtn) poseFsBtn.onclick = () => { if (isFs(poseContainer)) exitFs(); else reqFs(poseContainer); };
+      if (videoFsBtn) videoFsBtn.onclick = () => { if (isFs(videoContainer)) exitFs(); else reqFs(videoContainer); };
+
+      ['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(evt => {
+        document.addEventListener(evt, () => {
+          try {
+            const fs = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+            const sum = document.getElementById('summaryContainer');
+            if (sum) sum.style.display = (fs === poseContainer) ? 'none' : '';
+          } catch (_) {}
+          try { sizeRawCanvas(); } catch (_) {}
+          try { drawRawFrameToCanvas(); } catch (_) {}
+          if (currentView === '3D' && threeRenderer && threeCamera) {
+            setTimeout(() => {
+              const c = document.getElementById('pose3DCanvas');
+              if (c && c.style.display !== 'none') {
+                const W = c.clientWidth || 480, H = c.clientHeight || 360;
+                threeCamera.aspect = W / H;
+                threeCamera.updateProjectionMatrix();
+                threeRenderer.setSize(W, H, false);
+                if (threeScene) threeRenderer.render(threeScene, threeCamera);
+              }
+            }, 50);
+          }
+        });
+      });
+
+      sizeRawCanvas();
+      window.addEventListener('resize', sizeRawCanvas);
+
+      // Overlay rep selection handler
+      const overlaySelect = document.getElementById('overlayRepSelect');
+      if (overlaySelect) {
+        overlaySelect.addEventListener('change', async (e) => {
+          const v = e.target.value;
+          if (v === 'none') {
+            overlayPoseData = null;
+            drawRawFrameToCanvas();
+            drawPose(currentFrame);
+            return;
+          }
+          try {
+            const { player, session } = getUrlBits();
+            const overlayCandidates = [ `${player}/freeRecord/${session}/${v}/pose.json` ];
+            if (overlayCache.has(v)) {
+              overlayPoseData = overlayCache.get(v);
+            } else {
+              overlayPoseData = await fetchJSONFromCandidates(overlayCandidates);
+              overlayCache.set(v, overlayPoseData);
+            }
+            console.log(`[OverlayLoad] Loaded overlay rep=${v} frames=${Array.isArray(overlayPoseData)?overlayPoseData.length:'(not array)'} `);
+            // update shift slider bounds
+            const maxShift = Math.max(0, (overlayPoseData?.length||0) - 1);
+            const slider = document.getElementById('overlayShiftSlider');
+            const label = document.getElementById('overlayShiftValue');
+            if (slider) {
+              slider.min = String(-maxShift);
+              slider.max = String(maxShift);
+              overlayFrameShift = 0; // start both at the same time by default
+              slider.value = String(overlayFrameShift);
+            }
+            if (label) label.textContent = String(overlayFrameShift);
+            // Reset alignment so it recomputes for this overlay
+            overlayAlignOffsetN = null; overlayAlignOriginN = null; overlayScaleN = 1; overlayAlignmentLocked = false;
+            // Ensure both start together from frame 0 and lock alignment at beginning
+            currentFrame = 0;
+            if (overlayAutoAlignEnabled) {
+              const anchor = findFirstValidMainIndex();
+              lockOverlayAlignmentAt(anchor);
+            }
+            drawRawFrameToCanvas();
+            drawPose(currentFrame);
+          } catch (err) {
+            console.error('Failed to load overlay pose:', err);
+            overlayPoseData = null;
+          }
+        });
+      }
+
+      // Align overlay button
+      const alignBtn = document.getElementById('alignOverlayBtn');
+      if (alignBtn) {
+        alignBtn.addEventListener('click', () => {
+          if (!overlayPoseData || !overlayPoseData.length) {
+            console.warn('[Align] No overlay loaded.');
+            return;
+          }
+          overlayAlignMode = true;
+          const prompt = document.getElementById('alignPrompt');
+          if (prompt) prompt.style.display = 'block';
+          drawPose(currentFrame);
+        });
+      }
+
+      // Frame shift slider
+      const overlaySlider = document.getElementById('overlayShiftSlider');
+      const overlayLabel = document.getElementById('overlayShiftValue');
+      if (overlaySlider) {
+        let rafId = null;
+        const scheduleRedraw = () => { if (rafId) return; rafId = requestAnimationFrame(() => { rafId = null; drawRawFrameToCanvas(); drawPose(currentFrame); }); };
+        overlaySlider.addEventListener('input', () => {
+          overlayFrameShift = parseInt(overlaySlider.value, 10) || 0;
+          if (overlayLabel) overlayLabel.textContent = String(overlayFrameShift);
+          // Keep initial alignment; do not re-align mid-play
+          scheduleRedraw();
+        });
+      }
+
+      // Auto-align and scale toggles
+      const autoAlignToggle = document.getElementById('autoAlignToggle');
+      const normalizeScaleToggle = document.getElementById('normalizeScaleToggle');
+      if (autoAlignToggle) {
+        overlayAutoAlignEnabled = !!autoAlignToggle.checked;
+        autoAlignToggle.addEventListener('change', () => {
+          overlayAutoAlignEnabled = !!autoAlignToggle.checked;
+          // If enabling auto-align, recompute and lock at beginning
+          if (overlayAutoAlignEnabled) {
+            overlayAlignOffsetN = null; overlayAlignOriginN = null; overlayScaleN = 1; overlayAlignmentLocked = false;
+            const anchor = findFirstValidMainIndex();
+            lockOverlayAlignmentAt(anchor);
+          }
+          drawRawFrameToCanvas();
+          drawPose(currentFrame);
+        });
+      }
+      if (normalizeScaleToggle) {
+        overlayNormalizeScaleEnabled = !!normalizeScaleToggle.checked;
+        normalizeScaleToggle.addEventListener('change', () => {
+          overlayNormalizeScaleEnabled = !!normalizeScaleToggle.checked;
+          if (overlayAutoAlignEnabled) recomputeOverlayAlignmentAt(currentFrame);
+          drawRawFrameToCanvas();
+          drawPose(currentFrame);
+        });
+      }
+    });
+
+    // Raw player element refs
+    rawVideoEl     = document.getElementById('rawVideo');
+    rawCanvas      = document.getElementById('rawFrameCanvas');
+    rawCtx         = rawCanvas.getContext('2d');
+    rawFrameLabel  = document.getElementById('rawFrameLabel');
+
+    // Buttons: only prev/next are active now
+    let rawFastTimer = null;
+    const FAST_STEP_MS = 80;
+    const startFast = (dir)=>{
+      if (rawFastTimer) clearInterval(rawFastTimer);
+      rawFastTimer = setInterval(()=>{
+        let next = rawCurrentFrame + dir;
+        next = Math.max(0, Math.min(rawMaxFrame, next));
+        if (next === rawCurrentFrame) return;
+        rawCurrentFrame = next;
+        rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+        seekAndDraw(frameIdxToTime(rawCurrentFrame));
+      }, FAST_STEP_MS);
+    };
+    const stopFast = ()=>{ if (rawFastTimer) { clearInterval(rawFastTimer); rawFastTimer=null; } };
+
+    const rawPrevBtn = document.getElementById('rawPrevBtn');
+    const rawNextBtn = document.getElementById('rawNextBtn');
+
+    rawPrevBtn.onmousedown = (e)=>{ if (e.button===0) startFast(-1); };
+    rawNextBtn.onmousedown = (e)=>{ if (e.button===0) startFast(1); };
+    rawPrevBtn.onmouseup = stopFast; rawPrevBtn.onmouseleave = stopFast;
+    rawNextBtn.onmouseup = stopFast; rawNextBtn.onmouseleave = stopFast;
+
+    rawPrevBtn.onclick = () => {
+      rawCurrentFrame = Math.max(0, rawCurrentFrame - 1);
+      seekAndDraw(frameIdxToTime(rawCurrentFrame));
+      rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+      const rawFrameSlider = document.getElementById('rawFrameSlider');
+      const rawFrameSliderValue = document.getElementById('rawFrameSliderValue');
+      if (rawFrameSlider) rawFrameSlider.value = rawCurrentFrame.toString();
+      if (rawFrameSliderValue) rawFrameSliderValue.textContent = rawCurrentFrame;
+    };
+    rawNextBtn.onclick = () => {
+      // Clamp to computed max based on duration/pose alignment
+      rawCurrentFrame = Math.min(rawMaxFrame, rawCurrentFrame + 1);
+      seekAndDraw(frameIdxToTime(rawCurrentFrame));
+      rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+      const rawFrameSlider = document.getElementById('rawFrameSlider');
+      const rawFrameSliderValue = document.getElementById('rawFrameSliderValue');
+      if (rawFrameSlider) rawFrameSlider.value = rawCurrentFrame.toString();
+      if (rawFrameSliderValue) rawFrameSliderValue.textContent = rawCurrentFrame;
+    };
+
+    document.getElementById('rawRestartBtn').onclick = () => {
+      if (rawIsPlaying) {
+        stopRawPlaybackCleanup();
+        rawIsPlaying = false;
+        document.getElementById('rawPlayPauseBtn').textContent = '▶';
+      }
+      rawCurrentFrame = 0;
+      rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+      seekAndDraw(0);
+      rawResetZoomPan();
+      drawRawFrameToCanvas();
+      const rsl = document.getElementById('rawFrameSlider');
+      const rsv = document.getElementById('rawFrameSliderValue');
+      if (rsl) { rsl.value = '0'; }
+      if (rsv) { rsv.textContent = '0'; }
+    };
+
+    const playBtn = document.getElementById('rawPlayPauseBtn');
+    const showPoseBtn  = document.getElementById('rawShowPoseBtn');
+    const rawZoomInBtn = document.getElementById('rawZoomInBtn');
+    const rawZoomOutBtn = document.getElementById('rawZoomOutBtn');
+    
+    // Speed slider for raw video
+    const rawSpeedSlider = document.getElementById('rawSpeedSlider');
+    const rawSpeedValue = document.getElementById('rawSpeedValue');
+    if (rawSpeedSlider) {
+      rawSpeedSlider.addEventListener('input', () => {
+        rawSpeedIdx = parseInt(rawSpeedSlider.value, 10);
+        if (rawSpeedValue) rawSpeedValue.textContent = SPEED_OPTIONS[rawSpeedIdx] + 'x';
+        if (rawIsPlaying) restartPlayTimer();
+      });
+    }
+
+    // Zoom controls
+    if (rawZoomInBtn) rawZoomInBtn.onclick = rawZoomIn;
+    if (rawZoomOutBtn) rawZoomOutBtn.onclick = rawZoomOut;
+
+    // Frame sliders
+    const rawFrameSlider = document.getElementById('rawFrameSlider');
+    const rawFrameSliderValue = document.getElementById('rawFrameSliderValue');
+    const poseFrameSlider = document.getElementById('poseFrameSlider');
+    const poseFrameSliderValue = document.getElementById('poseFrameSliderValue');
+    
+    if (rawFrameSlider) {
+      rawFrameSlider.addEventListener('input', (e) => {
+        rawCurrentFrame = parseInt(e.target.value, 10);
+        seekAndDraw(frameIdxToTime(rawCurrentFrame));
+        rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+        if (rawFrameSliderValue) rawFrameSliderValue.textContent = rawCurrentFrame;
+      });
+    }
+    
+    if (poseFrameSlider) {
+      poseFrameSlider.addEventListener('input', (e) => {
+        currentFrame = parseInt(e.target.value, 10);
+        drawPose(currentFrame);
+        if (poseFrameSliderValue) poseFrameSliderValue.textContent = currentFrame;
+      });
+    }
+    
+    // Speed slider for pose graph
+    const poseSpeedSlider = document.getElementById('poseSpeedSlider');
+    const poseSpeedValue = document.getElementById('poseSpeedValue');
+    if (poseSpeedSlider) {
+      poseSpeedSlider.addEventListener('input', () => {
+        poseSpeedIdx = parseInt(poseSpeedSlider.value, 10);
+        const speed = SPEED_OPTIONS[poseSpeedIdx];
+        if (poseSpeedValue) poseSpeedValue.textContent = speed + 'x';
+        if (isPlaying) {
+          clearInterval(animationInterval);
+          const actualDelay = Math.round(baseFrameDelay / speed);
+          animationInterval = setInterval(() => stepFrame(1), actualDelay);
+        }
+      });
+    }
+
+    // Play / Pause
+    playBtn.onclick = () => {
+      rawIsPlaying = !rawIsPlaying;
+      if (rawIsPlaying) {
+        playBtn.textContent = '⏸';
+        restartPlayTimer();
+      } else {
+        playBtn.textContent = '▶';
+        stopRawPlaybackCleanup();
+      }
+    };
+
+    // Speed controls
+    speedDownBtn.onclick = () => {
+      if (speedStepIdx > 0) speedStepIdx--;
+      if (rawIsPlaying) restartPlayTimer();
+    };
+    speedUpBtn.onclick = () => {
+      if (speedStepIdx < SPEED_STEPS.length - 1) speedStepIdx++;
+      if (rawIsPlaying) restartPlayTimer();
+    };
+
+    // Show Pose toggle
+    showPoseBtn.onclick = async () => {
+      isPoseVisible = !isPoseVisible;
+      showPoseBtn.classList.toggle('active', isPoseVisible);
+      if (isPoseVisible && !poseLoaded) {
+        await loadPoseIfNeeded();
+      }
+      // Redraw current frame with overlay state applied
+      drawRawFrameToCanvas();
+    };
+
+    // Draw when the seek completes
+    rawVideoEl.addEventListener('seeked', () => {
+      drawRawFrameToCanvas();
+    });
+
+    // On metadata, cache duration and draw first frame
+    rawVideoEl.addEventListener('loadedmetadata', () => {
+      rawDuration = rawVideoEl.duration || 0;
+      rawCurrentFrame = 0;
+      // Optional: infer step from filename like "..._60.mov"
+      // This does nothing if name not found; safe default remains 1/30 s.
+      try {
+        const src = rawVideoEl.currentSrc || '';
+        const m = src.match(/_(\d{2})\.mov/i);
+        if (m) frameStepSec = 1 / parseInt(m[1], 10);
+      } catch {}
+      // Recompute timing; if pose is loaded we'll align to its length
+      recalcTiming();
+      // Size canvas to match intrinsic aspect ratio
+      sizeRawCanvas();
+      seekAndDraw(0);
+      rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'ArrowLeft')  { startFast(-1); }
+      if (e.key === 'ArrowRight') { startFast(1); }
+    });
+    document.addEventListener('keyup', (e) => {
+      if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') stopFast();
+    });
+
+    // Raw canvas click handler for joint selection
+    rawCanvas.addEventListener('click', (e) => {
+      const rect = rawCanvas.getBoundingClientRect();
+      const clickX = e.clientX - rect.left;
+      const clickY = e.clientY - rect.top;
+      const W = rawCanvas.clientWidth;
+      const H = rawCanvas.clientHeight;
+      
+      // Handle zoom center selection (works without pose overlay)
+      if (rawIsSelectingZoomCenter) {
+        rawZoomCenterX = clickX / W;
+        rawZoomCenterY = clickY / H;
+        rawIsSelectingZoomCenter = false;
+        rawCanvas.style.cursor = '';
+        
+        // Now perform initial zoom centered on selected point
+        const f = 0.8;
+        const halfW = 0.1 * f, halfH = 0.1 * f;
+        rawManualZoomBounds = {
+          leftX: Math.max(0, rawZoomCenterX - halfW),
+          rightX: Math.min(1, rawZoomCenterX + halfW),
+          topY: Math.max(0, rawZoomCenterY - halfH),
+          bottomY: Math.min(1, rawZoomCenterY + halfH)
+        };
+        rawPanOffsetX = 0;
+        rawPanOffsetY = 0;
+        drawRawFrameToCanvas();
+        return;
+      }
+      
+      const arr = (poseData2D && poseData2D.length) ? poseData2D : poseData;
+      if (!isPoseVisible || !arr || !arr.length) return;
+      let idx = Math.max(0, Math.min(rawCurrentFrame, arr.length - 1));
+      let frame = (arr === poseData2D) ? (arr[idx] || []) : (normalizePoseFrame(arr[idx], true) || []);
+      if (!Array.isArray(frame) || !frame.some(p => p)) {
+        const fallbackIdx = findNearestValidFrameIndex(idx, arr);
+        if (fallbackIdx != null) {
+          idx = fallbackIdx;
+          frame = (arr === poseData2D) ? (arr[idx] || []) : (normalizePoseFrame(arr[idx], true) || []);
+        }
+      }
+      if (!Array.isArray(frame)) return;
+      
+      // Determine if normalized
+      let normalized = true;
+      for (let k = 0; k < Math.min(10, frame.length); k++) {
+        const pr = frame[k];
+        if (!pr) continue;
+        const sx = Array.isArray(pr) ? pr[0] : pr.x;
+        const sy = Array.isArray(pr) ? pr[1] : pr.y;
+        if (sx > 1.5 || sy > 1.5) { normalized = false; break; }
+      }
+      const sx = normalized ? W : (W / (rawVideoEl?.videoWidth || W));
+      const sy = normalized ? H : (H / (rawVideoEl?.videoHeight || H));
+      
+      // Find closest joint within threshold
+      let closestIdx = -1;
+      let minDist = 20; // pixel threshold
+      for (let i = 0; i < frame.length; i++) {
+        const p = frame[i];
+        if (!p) continue;
+        const px = (Array.isArray(p) ? p[0] : p.x) * sx;
+        const py = (Array.isArray(p) ? p[1] : p.y) * sy;
+        if (!Number.isFinite(px) || !Number.isFinite(py)) continue;
+        const dist = Math.sqrt((px - clickX) ** 2 + (py - clickY) ** 2);
+        if (dist < minDist) {
+          minDist = dist;
+          closestIdx = i;
+        }
+      }
+      
+      if (closestIdx >= 0) {
+        if (rawSelectedJoints.has(closestIdx)) {
+          rawSelectedJoints.delete(closestIdx);
+        } else {
+          rawSelectedJoints.add(closestIdx);
+          if (rawSelectedJoints.size > 3) {
+            const first = rawSelectedJoints.values().next().value;
+            rawSelectedJoints.delete(first);
+          }
+        }
+        drawRawFrameToCanvas();
+      }
+    });
+
+    // Raw canvas mouse handlers for zoom/pan (use global state)
+    rawCanvas.addEventListener('mousedown', (e) => {
+      if (rawIsSelectingZoomCenter) return;
+      e.preventDefault();
+      const rect = rawCanvas.getBoundingClientRect();
+      const x = e.clientX - rect.left;
+      const y = e.clientY - rect.top;
+      if (e.button === 2 && rawManualZoomBounds) {
+        rawIsPanning = true;
+        rawPanStartX = x;
+        rawPanStartY = y;
+        rawCanvas.style.cursor = 'grabbing';
+      } else if (e.button === 0 && !rawManualZoomBounds) {
+        rawIsZoomSelecting = true;
+        rawZoomStartX = rawZoomCurrentX = x;
+        rawZoomStartY = rawZoomCurrentY = y;
+        rawCanvas.style.cursor = 'crosshair';
+      }
+    });
+
+    rawCanvas.addEventListener('mousemove', (e) => {
+      if (rawIsPanning && rawManualZoomBounds) {
+        const rect = rawCanvas.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const W = rawCanvas.clientWidth;
+        const H = rawCanvas.clientHeight;
+        const viewWidthN = rawManualZoomBounds.rightX - rawManualZoomBounds.leftX;
+        const viewHeightN = rawManualZoomBounds.bottomY - rawManualZoomBounds.topY;
+        const dx = -(x - rawPanStartX) / W * viewWidthN;
+        const dy = -(y - rawPanStartY) / H * viewHeightN;
+        rawPanOffsetX += dx;
+        rawPanOffsetY += dy;
+        rawPanStartX = x;
+        rawPanStartY = y;
+        drawRawFrameToCanvas();
+      } else if (rawIsZoomSelecting) {
+        rawZoomCurrentX = e.clientX - rawCanvas.getBoundingClientRect().left;
+        rawZoomCurrentY = e.clientY - rawCanvas.getBoundingClientRect().top;
+        drawRawFrameToCanvas();
+      }
+    });
+
+    rawCanvas.addEventListener('mouseup', (e) => {
+      if (rawIsPanning) {
+        rawIsPanning = false;
+        rawCanvas.style.cursor = '';
+      } else if (rawIsZoomSelecting) {
+        const rect = rawCanvas.getBoundingClientRect();
+        const x2 = e.clientX - rect.left;
+        const y2 = e.clientY - rect.top;
+        const W = rawCanvas.clientWidth;
+        const H = rawCanvas.clientHeight;
+        const x1 = Math.min(rawZoomStartX, x2) / W;
+        const x2n = Math.max(rawZoomStartX, x2) / W;
+        const y1 = Math.min(rawZoomStartY, y2) / H;
+        const y2n = Math.max(rawZoomStartY, y2) / H;
+        
+        if (Math.abs(x2n - x1) > 0.05 && Math.abs(y2n - y1) > 0.05) {
+          rawManualZoomBounds = { leftX: x1, rightX: x2n, topY: y1, bottomY: y2n };
+          // Update zoom center to center of selection for subsequent zoom operations
+          rawZoomCenterX = (x1 + x2n) / 2;
+          rawZoomCenterY = (y1 + y2n) / 2;
+          rawPanOffsetX = 0;
+          rawPanOffsetY = 0;
+        }
+        rawIsZoomSelecting = false;
+        rawCanvas.style.cursor = '';
+        drawRawFrameToCanvas();
+      }
+    });
+
+    rawCanvas.addEventListener('mouseleave', () => {
+      if (rawIsPanning) { rawIsPanning = false; rawCanvas.style.cursor = ''; }
+    });
+
+    rawCanvas.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    async function loadPoseIfNeeded() {
+      if (poseLoaded) return;
+      try {
+        const { player, session } = getUrlBits();
+        const path = `${player}/freeRecord/${session}/pose.json`;
+        const url = await storage.ref(path).getDownloadURL();
+        const res = await fetch(url, { cache: 'no-store' });
+        poseData = await res.json();
+        poseLoaded = Array.isArray(poseData) && poseData.length > 0;
+        if (poseLoaded) poseData2D = poseData.map(f => normalizePoseFrame(f, true));
+        else poseData2D = [];
+        if (!poseLoaded) console.warn('pose.json loaded but empty/unexpected format');
+      } catch (e) {
+        console.error('Failed to load pose.json:', e);
+      }
+    }
+
+  </script>
+  <!-- Reusable user badge (reads email from Firestore users/{uid}) -->
+  <script src="user-badge.js"></script>
+</body>
+</html>

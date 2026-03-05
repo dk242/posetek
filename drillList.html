@@ -1,0 +1,375 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Drill List | PoseTek</title>
+  <!-- Use Inter for body and Poppins for headings to match site style -->
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+  <style>
+    :root{
+      --primary:#1a3a2e;
+      --accent:#4c8c6a;
+      --text-light:#ffffff;
+      --card-bg:rgba(255,255,255,0.08);
+      --card-border:rgba(255,255,255,0.1);
+      --transition:all .3s cubic-bezier(.165,.84,.44,1);
+    }
+    *{margin:0;padding:0;box-sizing:border-box}
+    body{
+      font-family:'Inter',sans-serif;
+      background:var(--primary);
+      color:var(--text-light);
+      min-height:100vh;
+      display:flex;
+      flex-direction:column;
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
+    }
+    header{
+      display:flex;justify-content:space-between;align-items:center;
+      padding:1rem 2rem;background:rgba(0,0,0,.2);backdrop-filter:blur(10px)
+    }
+  .logo{font-family:'Poppins','Inter',sans-serif;font-size:1.9rem;font-weight:700;letter-spacing:-0.6px}
+  /* Side nav and action button styling (standardized) */
+  .nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;cursor:pointer;transition:var(--transition)}
+  .nav-toggle:hover{transform:translateY(-2px)}
+  .side-nav{position:fixed;top:0;left:-320px;width:320px;height:100%;background:linear-gradient(180deg, rgba(15,38,33,0.98), rgba(12,34,30,0.98));box-shadow:6px 0 30px rgba(0,0,0,0.45);z-index:1200;padding:2rem 1.25rem;transition:left 0.32s cubic-bezier(.2,.9,.2,1);display:flex;flex-direction:column;gap:1rem}
+  .side-nav.open{left:0}
+  .side-nav .close-side{margin-left:auto;background:none;border:none;color:var(--text-light);font-size:1.25rem;cursor:pointer;opacity:0.85}
+  .side-nav .side-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.85rem;border-radius:10px;color:var(--text-light);text-decoration:none;font-weight:600;transition:var(--transition)}
+  .side-nav .side-link:hover{background:rgba(255,255,255,0.03);transform:translateX(4px)}
+  .side-divider{height:1px;background:var(--card-border);margin:0.75rem 0}
+  .side-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1100;opacity:0;visibility:hidden;transition:opacity 200ms ease}
+  .side-backdrop.open{opacity:1;visibility:visible}
+  .side-link .material-symbols-outlined{font-variation-settings:'wght' 400;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;line-height:24px;vertical-align:middle;color:var(--text-light)}
+  .side-link span:first-of-type{margin-right:6px}
+  .action-btn{padding:0.6rem 1.2rem;background-color:var(--accent);border:none;border-radius:50px;color:var(--text-light);font-weight:600;cursor:pointer;transition:var(--transition)}
+  .action-btn:hover{background-color:#2d5e4a;transform:translateY(-2px)}
+    .nav-links a{color:var(--text-light);text-decoration:none;margin-left:1.5rem;font-weight:500}
+
+  /* Hide the top-right header links so only the hamburger/side-nav is visible */
+  header .nav-links { display: none !important; }
+
+  /* Full-page panel */
+    .sheet{
+      flex:1;
+      padding:1.25rem 1.25rem 2rem;
+    }
+    .panel{
+      width:100%;
+      min-height:calc(100vh - 88px); /* header ~88px tall incl. padding */
+      background:var(--card-bg);
+      border:1px solid var(--card-border);
+      border-radius:16px;
+      padding:1.25rem;
+      display:flex;flex-direction:column;gap:1rem;
+    }
+    .panel-header{
+      display:flex;justify-content:space-between;align-items:center;gap:1rem;
+    }
+    .panel-title{
+      font-family:'SF Pro Display',sans-serif;
+      font-size:1.4rem;font-weight:600;opacity:.95;
+    }
+    .panel-actions a, .panel-actions button{
+      border:none;border-radius:10px;padding:.55rem .8rem;cursor:pointer;
+      background:var(--accent);color:#fff;text-decoration:none;font-weight:600;
+    }
+
+    .drill-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fill,minmax(280px,1fr));
+      gap:1rem;
+      align-content:start;
+    }
+    .drill-card{
+      background:rgba(255,255,255,0.06);
+      border:1px solid var(--card-border);
+      border-radius:14px;
+      padding:1rem;
+      display:flex;flex-direction:column;gap:.7rem;
+      transition:var(--transition);
+    }
+    .drill-card:hover{transform:translateY(-2px)}
+    .drill-name{
+      font-weight:800;letter-spacing:.2px;
+    }
+    .badges{
+      display:flex;flex-wrap:wrap;gap:.4rem;
+    }
+    .badge{
+      display:inline-flex;align-items:center;gap:.4rem;
+      padding:.25rem .5rem;border-radius:999px;
+      background:rgba(255,255,255,0.08);
+      border:1px solid var(--card-border);
+      font-weight:600;
+    }
+    .meta{
+      display:flex;gap:.5rem;flex-wrap:wrap;
+    }
+    .meta .chip{
+      padding:.25rem .5rem;border-radius:8px;
+      background:rgba(255,255,255,0.08);
+      border:1px solid var(--card-border);
+      font-weight:600;
+    }
+    .desc{opacity:.95;line-height:1.4}
+
+    /* highlight effect for "just added" */
+    .added{
+      border-color:#fff !important;
+      box-shadow:0 0 0 2px #fff inset, 0 8px 28px rgba(0,0,0,.35);
+      animation:flash 2.4s ease-in-out;
+    }
+    @keyframes flash{
+      0%{transform:scale(1);background:rgba(255,255,255,0.12)}
+      25%{transform:scale(1.01);background:rgba(255,255,255,0.2)}
+      50%{transform:scale(1);background:rgba(255,255,255,0.12)}
+      75%{transform:scale(1.01);background:rgba(255,255,255,0.2)}
+      100%{transform:scale(1);background:rgba(255,255,255,0.06)}
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button id="navToggle" class="nav-toggle" aria-label="Open navigation">☰</button>
+  <div class="logo">PoseTek</div>
+    </div>
+    <nav class="nav-links">
+      <a href="drillList.html" id="assignedDrillsLink">Assigned Drills</a>
+      <a href="profile.html" id="playerProfileLink">Player Profile</a>
+      <a href="drillcreation.html">Create Drill</a>
+    </nav>
+  </header>
+
+  <!-- Side navigation panel -->
+  <aside id="sideNav" class="side-nav" aria-hidden="true">
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <div style="font-weight:700;font-size:1.25rem;">Menu</div>
+      <button class="close-side" id="closeSide">✕</button>
+    </div>
+    <div class="side-divider"></div>
+    <div id="sideProfile" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+      <div id="profileAvatar" style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem">C</div>
+      <div style="display:flex;flex-direction:column;">
+        <div id="profileName" style="font-weight:700">Coach</div>
+        <div id="profileEmail" style="font-size:0.85rem;opacity:0.85">email@example.com</div>
+      </div>
+    </div>
+    <div class="side-divider"></div>
+    <div id="sideLinks" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+    <div class="side-divider"></div>
+    <div style="margin-top:auto">
+      <button class="action-btn" id="sideLogout">Logout</button>
+    </div>
+  </aside>
+  <div id="sideBackdrop" class="side-backdrop" tabindex="-1"></div>
+
+  <main class="sheet">
+    <section class="panel" aria-label="Drills">
+      <div class="panel-header">
+        <div class="panel-title">Drills</div>
+        <div class="panel-actions">
+          <a href="drillcreation.html">+ New Drill</a>
+        </div>
+      </div>
+
+      <div id="drillGrid" class="drill-grid" role="list"></div>
+    </section>
+  </main>
+
+  <script>
+    // Firebase SDKs
+    const scriptApp = document.createElement('script'); scriptApp.src = 'https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js'; document.head.appendChild(scriptApp);
+    const scriptAuth = document.createElement('script'); scriptAuth.src = 'https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js'; document.head.appendChild(scriptAuth);
+    const scriptFs = document.createElement('script'); scriptFs.src = 'https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js'; document.head.appendChild(scriptFs);
+
+    scriptFs.onload = async () => {
+      // wait for auth SDK to initialize
+      await new Promise((resolve) => {
+        if (window.firebase && typeof window.firebase.auth === 'function') return resolve();
+        const t = setInterval(() => { if (window.firebase && typeof window.firebase.auth === 'function') { clearInterval(t); resolve(); } }, 50);
+      });
+      const firebaseConfig = {
+        apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+        authDomain: "kickai-69dd0.firebaseapp.com",
+        projectId: "kickai-69dd0",
+        storageBucket: "kickai-69dd0.firebasestorage.app",
+        messagingSenderId: "839600313930",
+        appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+        measurementId: "G-RX99K62ZEH"
+      };
+      if (!window.firebase.apps?.length) firebase.initializeApp(firebaseConfig);
+      const db = firebase.firestore();
+      const auth = firebase.auth();
+
+      const grid = document.getElementById('drillGrid');
+      const params = new URLSearchParams(location.search);
+      const playerParam = params.get('player');
+      const newId = params.get('new');
+
+      let coachMembers = [];
+
+      auth.onAuthStateChanged(async (user) => {
+        // If user is coach, load their members for the assign UI
+        if (user) {
+          try {
+            const coachDoc = await db.collection('coaches').where('userUID','==',user.uid).limit(1).get();
+            if (!coachDoc.empty) {
+              const coachData = coachDoc.docs[0].data();
+              const memberIds = coachData.members || [];
+              // Resolve player doc ids to names
+              const resolved = [];
+              for (const pid of memberIds) {
+                try {
+                  const pdoc = await db.collection('players').doc(pid).get();
+                  if (pdoc.exists) {
+                    const pd = pdoc.data();
+                    resolved.push({ docId: pid, firstName: pd.firstName || '', lastName: pd.lastName || '' });
+                  }
+                } catch (e) { /* ignore individual failures */ }
+              }
+              coachMembers = resolved;
+            }
+          } catch (err) { console.error('Failed to load coach members', err); }
+        }
+        loadDrills();
+      });
+
+      async function assignDrillTo(drillId, playerId, cardEl) {
+        try {
+          await db.collection('drills').doc(drillId).update({ assignedTo: playerId });
+          // Visually mark
+          cardEl.classList.add('added'); setTimeout(()=>cardEl.classList.remove('added'),2500);
+          loadDrills();
+        } catch (err) { console.error('Failed to assign drill', err); alert('Failed to assign drill'); }
+      }
+
+      async function loadDrills(){
+        grid.innerHTML = '';
+        try{
+          let q;
+          if (playerParam) {
+            q = db.collection('drills').where('assignedTo','==', playerParam).orderBy('createdAtClient','desc');
+          } else {
+            q = db.collection('drills').orderBy('createdAtClient','desc').limit(100);
+          }
+          const snap = await q.get();
+          if (snap.empty) { grid.innerHTML = '<div class="empty-state">No drills found.</div>'; return; }
+          // Collect then sort by createdAtClient || createdAt
+          const rows = [];
+          snap.forEach(doc=> rows.push({ id: doc.id, data: doc.data() }));
+          rows.sort((a,b)=>{
+            const atA = a.data.createdAtClient ? a.data.createdAtClient.toMillis() : (a.data.createdAt ? a.data.createdAt.toMillis() : 0);
+            const atB = b.data.createdAtClient ? b.data.createdAtClient.toMillis() : (b.data.createdAt ? b.data.createdAt.toMillis() : 0);
+            return atB - atA;
+          });
+          for (const row of rows) {
+            const docId = row.id; const d = row.data;
+            const card = document.createElement('article');
+            card.className = 'drill-card';
+            card.setAttribute('role','listitem');
+            const assignedTo = d.assignedTo || '';
+            card.innerHTML = `
+              <div class="drill-name">${d.name || 'Untitled'}</div>
+              <div class="badges" aria-label="Equipment">
+                <span class="badge" title="Equipment">⚙️</span>
+              </div>
+              <div class="meta" aria-label="Prescription">
+                <span class="chip">Reps: ${d.reps || ''}</span>
+                <span class="chip">Rest: ${d.rest || ''}</span>
+              </div>
+              <p class="desc">${d.summary || ''}</p>
+            `;
+            // If coachMembers available, add assign UI
+            if (coachMembers && coachMembers.length) {
+              const sel = document.createElement('select');
+              sel.innerHTML = `<option value="">Assign to...</option>` + coachMembers.map(m=>`<option value="${m.docId}">${m.firstName} ${m.lastName}</option>`).join('');
+              const btn = document.createElement('button'); btn.textContent = 'Assign'; btn.className = 'panel-actions'; btn.style.marginLeft = '.5rem';
+              const wrapper = document.createElement('div'); wrapper.style.marginTop = '.6rem'; wrapper.appendChild(sel); wrapper.appendChild(btn);
+              card.appendChild(wrapper);
+              btn.addEventListener('click', ()=>{
+                const pid = sel.value; if (!pid) return alert('Select a player');
+                assignDrillTo(docId, pid, card);
+              });
+            }
+
+            if (docId === newId) { card.classList.add('added'); setTimeout(()=>card.classList.remove('added'),2500); }
+            grid.appendChild(card);
+          }
+        }catch(err){
+          console.error('Failed to load drills:',err);
+          grid.innerHTML = '<div class="empty-state">Failed to load drills.</div>';
+        }
+      }
+
+      // initial load if not using auth flow
+      if (!window.firebase.auth) document.addEventListener('DOMContentLoaded', loadDrills);
+    };
+  </script>
+    <script>
+      // Side nav wiring (standardized)
+      (function sideNavSetup(){
+        const waitForAuth = () => new Promise(resolve => {
+          if (window.firebase && window.firebase.auth) return resolve();
+          const t = setInterval(()=>{ if (window.firebase && window.firebase.auth) { clearInterval(t); resolve(); } }, 50);
+        });
+
+        waitForAuth().then(()=>{
+          const navToggle = document.getElementById('navToggle');
+          const sideNav = document.getElementById('sideNav');
+          const closeSide = document.getElementById('closeSide');
+          const sideLinks = document.getElementById('sideLinks');
+          const sideBackdrop = document.getElementById('sideBackdrop');
+
+          function openSide() { sideNav.classList.add('open'); sideNav.setAttribute('aria-hidden','false'); if(sideBackdrop) sideBackdrop.classList.add('open'); }
+          function closeSideNav() { sideNav.classList.remove('open'); sideNav.setAttribute('aria-hidden','true'); if(sideBackdrop) sideBackdrop.classList.remove('open'); }
+
+          if (navToggle) navToggle.addEventListener('click', (e)=>{ e.preventDefault(); openSide(); });
+          if (closeSide) closeSide.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+          if (sideBackdrop) sideBackdrop.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+          document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeSideNav(); });
+
+          // Build links: ensure Player Roster (coachesview) and Leaderboard are present
+          const headerLinks = Array.from(document.querySelectorAll('header .nav-links a'));
+          const normalized = headerLinks.map(a => ({ href: a.getAttribute('href') || '#', text: (a.textContent||a.innerText||'').trim() }));
+          const required = [ { href: 'coachesview.html', text: 'Player Roster', icon: 'people' }, { href: 'leaderboard.html', text: 'Leaderboard', icon: 'leaderboard' } ];
+          required.reverse().forEach(req => {
+            const exists = normalized.some(n => n.text.toLowerCase().includes(req.text.split(' ')[0].toLowerCase()));
+            if (!exists) normalized.unshift({ href: req.href, text: req.text, icon: req.icon });
+          });
+
+          normalized.forEach((a, idx) => {
+            const link = document.createElement('a'); link.href = a.href || '#'; link.className = 'side-link';
+            const icon = document.createElement('span'); icon.className = 'material-symbols-outlined'; icon.style.fontSize = '20px';
+            if (a.icon) icon.textContent = a.icon;
+            else if ((a.text||'').toLowerCase().includes('drill')) icon.textContent = 'assignment';
+            else icon.textContent = 'link';
+            const spanText = document.createElement('span'); spanText.textContent = a.text || a.href || 'Link';
+            link.appendChild(icon); link.appendChild(spanText);
+            link.style.transitionDelay = (idx * 40) + 'ms';
+            link.addEventListener('click', ()=> closeSideNav());
+            sideLinks.appendChild(link);
+          });
+
+          // populate profile area if auth present
+          const user = firebase.auth().currentUser;
+          if (user) {
+            const profileNameEl = document.getElementById('profileName');
+            const profileEmailEl = document.getElementById('profileEmail');
+            const profileAvatarEl = document.getElementById('profileAvatar');
+            profileNameEl.textContent = user.displayName || (user.email ? user.email.split('@')[0] : 'Coach');
+            profileEmailEl.textContent = user.email || '';
+            profileAvatarEl.textContent = (user.displayName || user.email || 'C').split(' ').map(s=>s[0]).slice(0,2).join('').toUpperCase();
+          }
+
+          const sideLogoutBtn = document.getElementById('sideLogout');
+          if (sideLogoutBtn) sideLogoutBtn.addEventListener('click', (e)=>{ e.preventDefault(); firebase.auth().signOut().then(()=> window.location.href = 'kickai.html'); });
+        });
+      })();
+    </script>
+</body>
+</html>

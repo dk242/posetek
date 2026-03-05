@@ -1,0 +1,1716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Back Kick View | PoseTek</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+  <style>
+    :root { --primary:#1a3a2e; --secondary:#2d5e4a; --accent:#4c8c6a; --text-light:#ffffff; --text-muted:rgba(255,255,255,0.7); --text-dark:#121212; --card-bg:rgba(255,255,255,0.08); --card-border:rgba(255,255,255,0.1); --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); }
+    *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color: rgba(76, 140, 106, 0.3);} 
+    body{font-family:'Inter',sans-serif;background-color:var(--primary);color:var(--text-light);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-overflow-scrolling:touch}
+    header{display:flex;justify-content:space-between;align-items:center;padding:1.5rem 2rem;background:linear-gradient(135deg, rgba(0,0,0,0.25), rgba(0,0,0,0.15));position:sticky;top:0;z-index:100;backdrop-filter:blur(15px);border-bottom:1px solid var(--card-border);box-shadow:0 4px 12px rgba(0,0,0,0.1)}
+    .logo{font-family:'Poppins','Inter',sans-serif;font-size:1.9rem;font-weight:700;letter-spacing:-0.6px;color:var(--text-light)}
+    .nav-links a{color:var(--text-light);text-decoration:none;font-weight:500;font-size:0.95rem;transition:var(--transition);position:relative}
+    .nav-links a:hover{color:var(--accent)}
+    .nav-links a::after{content:'';position:absolute;bottom:-5px;left:0;width:0;height:2px;background-color:var(--accent);transition:var(--transition)}
+    .nav-links a:hover::after{width:100%}
+    .container{max-width:1200px;margin:0 auto;padding:2rem}
+    .frames-container{display:flex;gap:1rem;align-items:flex-start;justify-content:space-between;flex-wrap:nowrap;padding:0 1rem}
+    .video-container,.pose-container,#summaryContainer{flex:1 1 calc((100% - 2rem)/3);min-width:280px}
+    .video-container{background:linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25));border:1px solid var(--card-border);border-radius:12px;padding:1rem;position:relative;width:100%;max-width:40%;backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28)}
+    .video-container video,#rawFrameCanvas{width:100%;max-width:100%;height:auto;aspect-ratio:16/9;border-radius:8px}
+    .pose-container{background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));border:1px solid var(--card-border);border-radius:12px;position:relative;overflow:hidden;width:480px;z-index:5;backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28);max-width:40%}
+    .pose-container canvas,#summaryCanvas{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/3;background-color:#1a3a2e}
+    .nav-buttons{display:flex;flex-direction:column;gap:0.6rem;padding:0.6rem;background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));border:1px solid var(--card-border);border-radius:12px;backdrop-filter:blur(10px);box-shadow:0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)}
+    .btn-row{display:flex;gap:0.5rem;justify-content:center}
+    .icon-btn{width:44px;height:44px;border:1px solid var(--card-border);border-radius:12px;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);color:#fff;font-size:1.1rem;cursor:pointer;transition:transform 200ms ease, box-shadow 200ms ease, background 200ms ease, opacity 200ms ease;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(76,140,106,0.3), inset 0 1px 0 rgba(255,255,255,0.2);touch-action:manipulation;-webkit-user-select:none;user-select:none}
+    .icon-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(76,140,106,0.4), 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%)}
+    .icon-btn:active{transform:translateY(0) scale(0.95)}
+    .icon-btn.active{background:linear-gradient(135deg, var(--secondary), #2b5a47);box-shadow:0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)}
+    .reps-bar{display:flex;gap:.5rem;align-items:center;padding:.75rem 0 1.25rem 0;overflow-x:auto}
+    .rep-pill{flex:0 0 auto;padding:.45rem .95rem;border-radius:999px;border:1px solid var(--card-border);background:linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.04));color:var(--text-light);font-weight:600;user-select:none;transition:transform 200ms ease, box-shadow 200ms ease, background 200ms ease, opacity 200ms ease;box-shadow:0 6px 16px rgba(0,0,0,0.18)}
+    .rep-pill:hover{transform:translateY(-2px);box-shadow:0 10px 22px rgba(0,0,0,0.24)}
+    .rep-pill.active{background:linear-gradient(180deg, rgba(76,140,106,0.95), rgba(76,140,106,0.85));border-color:var(--accent);box-shadow:0 10px 24px rgba(76,140,106,0.35)}
+    .fullscreen-btn{position:absolute;top:10px;right:10px;width:34px;height:34px;border:1px solid var(--card-border);border-radius:10px;background:linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.55));color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:var(--transition);z-index:10;backdrop-filter:blur(8px);box-shadow:0 6px 16px rgba(0,0,0,0.25)}
+    .fullscreen-btn:hover{background:linear-gradient(180deg, rgba(0,0,0,0.78), rgba(0,0,0,0.68));transform:translateY(-1px) scale(1.03);box-shadow:0 10px 24px rgba(0,0,0,0.3)}
+    .frame-number{position:absolute;top:10px;left:10px;background:linear-gradient(180deg, rgba(0,0,0,0.65), rgba(0,0,0,0.55));color:white;padding:4px 9px;border-radius:8px;font-size:12px;font-weight:700;z-index:10;border:1px solid var(--card-border);backdrop-filter:blur(8px)}
+    .container.focused-pose .video-container{display:none}
+    .container.focused-pose .pose-container{max-width:800px;width:100%;margin:0 auto}
+    .container.focused-pose .pose-container canvas{width:100%;height:auto;aspect-ratio:4/3}
+    .container.focused-video .pose-container{display:none}
+    .container.focused-video .video-container{max-width:900px;width:100%;margin:0 auto}
+    .container.focused-video .video-container canvas{width:100%;height:auto;aspect-ratio:16/9}
+    .align-prompt{position:absolute;left:50%;top:20%;transform:translateX(-50%);background:rgba(255,230,0,0.9);color:#1a1a1a;font-weight:700;padding:10px 20px;text-align:center;font-size:16px;z-index:9;display:none;border-radius:8px;box-shadow:0 4px 12px rgba(0,0,0,0.3)}
+    .align-prompt.flashing{animation:flashPrompt 1s infinite}
+    @keyframes flashPrompt{0%,100%{background:rgba(255,230,0,0.9);opacity:1}50%{background:rgba(255,230,0,0.6);opacity:0.85}}
+    /* Summary container */
+    .summary-container{margin-top:0;background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));border:1px solid var(--card-border);border-radius:12px;padding:0.75rem;display:flex;gap:0.75rem;align-items:stretch;justify-content:center;flex-wrap:wrap;flex-direction:column;position:relative;z-index:5;backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28)}
+    .summary-left{width:100%;max-width:720px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0.5rem;padding:0.25rem}
+    .summary-zoom-controls{display:flex;gap:.5rem;align-items:center;justify-content:center}
+    .summary-stats{width:100%;display:flex;gap:0.5rem;align-items:center;justify-content:center;flex-wrap:wrap;padding-top:0.5rem}
+    .stat{flex:0 1 auto;min-width:120px;background:linear-gradient(135deg, rgba(255,255,255,0.08), rgba(255,255,255,0.04));border-radius:10px;padding:0.5rem 0.75rem;border:1px solid var(--card-border);text-align:center;box-shadow:0 2px 6px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05);backdrop-filter:blur(5px);width:100%}
+    .stat-label{font-size:.85rem;opacity:.8;margin-bottom:.25rem}
+    .stat-value{font-size:1.5rem;font-weight:700;letter-spacing:.3px}
+    .muted{opacity:.7}
+    .small{font-size:.9rem}
+    /* Side nav */
+    .nav-toggle{display:inline-flex;align-items:center;justify-content:center;width:44px;height:44px;background:var(--card-bg);border:1px solid var(--card-border);border-radius:8px;cursor:pointer;transition:var(--transition);touch-action:manipulation;-webkit-user-select:none;user-select:none}
+    .nav-toggle:hover{transform:translateY(-2px)}
+    .nav-toggle:active{transform:scale(0.95)}
+    .side-nav{position:fixed;top:0;left:-320px;width:320px;height:100%;background:linear-gradient(180deg, rgba(15,38,33,0.98), rgba(12,34,30,0.98));box-shadow:6px 0 30px rgba(0,0,0,0.45);z-index:1200;padding:2rem 1.25rem;transition:left 0.32s cubic-bezier(.2,.9,.2,1);display:flex;flex-direction:column;gap:1rem}
+    .side-nav.open{left:0}
+    .side-nav .close-side{margin-left:auto;background:none;border:none;color:var(--text-light);font-size:1.25rem;cursor:pointer;opacity:0.85;touch-action:manipulation;-webkit-user-select:none;user-select:none;min-width:44px;min-height:44px}
+    .side-nav .close-side:active{transform:scale(0.9)}
+    .side-nav .side-link{display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0.85rem;border-radius:10px;color:var(--text-light);text-decoration:none;font-weight:600;transition:var(--transition);min-height:44px;touch-action:manipulation;-webkit-user-select:none;user-select:none}
+    .side-nav .side-link:hover{background:rgba(255,255,255,0.03);transform:translateX(4px)}
+    .side-nav .side-link:active{background:rgba(255,255,255,0.06);transform:translateX(2px) scale(0.98)}
+    .side-divider{height:1px;background:var(--card-border);margin:0.75rem 0}
+    .side-backdrop{position:fixed;inset:0;background:rgba(0,0,0,0.35);z-index:1100;opacity:0;visibility:hidden;transition:opacity 200ms ease}
+    .side-backdrop.open{opacity:1;visibility:visible}
+    .side-link .material-symbols-outlined{font-variation-settings:'wght' 400;display:inline-flex;align-items:center;justify-content:center;width:24px;height:24px;line-height:24px;vertical-align:middle;color:var(--text-light)}
+    .side-link span:first-of-type{margin-right:6px}
+    .action-btn{padding:0.6rem 1.2rem;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);border:none;border-radius:50px;color:var(--text-light);font-weight:600;cursor:pointer;transition:var(--transition);min-height:44px;touch-action:manipulation;-webkit-user-select:none;user-select:none;box-shadow:0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)}
+    .action-btn:hover{background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%);transform:translateY(-2px);box-shadow:0 6px 16px rgba(76, 140, 106, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2)}
+    .action-btn:active{transform:translateY(0) scale(0.98)}
+    header .nav-links{display:none !important}
+    /* Fullscreen adjustments */
+    .video-container:fullscreen,.pose-container:fullscreen{width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;border-radius:0!important;margin:0!important;padding:0!important;box-shadow:none!important;border:none!important}
+    .video-container:fullscreen{display:flex;align-items:center;justify-content:center;background:#000}
+  /* Let JS control canvas sizing in fullscreen; keep video constrained if visible */
+  .video-container:fullscreen video{max-width:100vw!important;max-height:100vh!important}
+    .pose-container:fullscreen #poseCanvas,.summary-container:fullscreen #summaryCanvas{width:100%!important;height:auto!important;max-width:100%!important}
+    .video-container:fullscreen .nav-buttons{position:absolute;left:12px;right:12px;bottom:12px;z-index:1000;margin:0;padding:0.6rem;background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.45));border:1px solid var(--card-border);border-radius:12px;backdrop-filter:blur(8px)}
+    .pose-container:fullscreen .nav-buttons{position:absolute;right:16px;bottom:16px;z-index:1000;width:auto;max-width:48vw;margin:0;padding:0.6rem;background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.45));border:1px solid var(--card-border);border-radius:12px;backdrop-filter:blur(8px)}
+    .video-container:fullscreen .fullscreen-btn,.pose-container:fullscreen .fullscreen-btn,.pose-container:fullscreen .frame-number{top:16px;right:16px;left:16px;z-index:1000}
+  /* Angle HUD overlay (DOM) */
+  .pose-container .angle-hud{position:absolute;bottom:16px;right:16px;z-index:2000;padding:6px 12px;border-radius:8px;background:rgba(0,0,0,0.55);border:1px solid rgba(255,255,255,0.25);color:#fff;font-weight:700;letter-spacing:.3px;pointer-events:none;}
+  /* Fullscreen: JS computes dynamic bottom to sit above controls; keep only right alignment here */
+  .pose-container:fullscreen .angle-hud{right:16px;}
+  /* Pose overlay controls polish */
+  #overlayRepSelect{border-radius:10px;background:rgba(255,255,255,0.06);border:1px solid var(--card-border);color:var(--text-light);padding:.55rem .75rem;outline:none;transition:border-color 200ms ease, box-shadow 200ms ease}
+  #overlayRepSelect:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(76,140,106,0.25)}
+  input[type="checkbox"]{accent-color:#4c8c6a}
+  .btn{display:inline-flex;align-items:center;justify-content:center;padding:.55rem 1rem;border:1px solid var(--card-border);border-radius:10px;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);color:#fff;font-weight:600;cursor:pointer;transition:transform 200ms ease, box-shadow 200ms ease, background 200ms ease;text-decoration:none;box-shadow:0 4px 12px rgba(76,140,106,0.3), inset 0 1px 0 rgba(255,255,255,0.2)}
+  .btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(76,140,106,0.4), 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%)}
+  .btn:active{transform:translateY(0) scale(0.98)}
+    /* Mini pose selector for side-view joint selection */
+    .mini-pose-selector{position:absolute;top:12px;left:12px;width:140px;height:180px;background:rgba(0,0,0,0.75);border:1px solid rgba(255,255,255,0.2);border-radius:8px;z-index:100;backdrop-filter:blur(4px);padding:4px;cursor:pointer}
+    .mini-pose-label{position:absolute;top:4px;left:4px;right:4px;text-align:center;font-size:10px;color:rgba(255,255,255,0.8);font-weight:600;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,0.8);z-index:1}
+    #miniPoseCanvas{display:block;width:100%;height:100%;}
+    .mini-pose-label{position:absolute;top:4px;left:4px;right:4px;text-align:center;font-size:10px;color:rgba(255,255,255,0.8);font-weight:600;pointer-events:none;text-shadow:0 1px 2px rgba(0,0,0,0.8)}
+    @media (max-width:980px){.frames-container{flex-direction:column;gap:0.75rem;padding:0.5rem}.video-container,.pose-container,#summaryContainer{width:100%;max-width:100%;flex:none}header{padding:1.25rem 1.5rem}.logo{font-size:1.6rem}.container{padding:1.5rem}.icon-btn{width:48px;height:48px;font-size:1.3rem}.reps-bar{overflow-x:auto;-webkit-overflow-scrolling:touch;padding-bottom:0.5rem}}
+    @media (max-width:480px){header{padding:1rem 1.25rem}.logo{font-size:1.4rem}.container{padding:1.25rem}.frames-container{padding:0.25rem;gap:0.5rem}.video-container,.pose-container{padding:0.75rem;border-radius:10px}.icon-btn{width:48px;height:48px}.fullscreen-btn{width:36px;height:36px;font-size:14px}}
+  </style>
+</head>
+<body>
+  <header>
+    <div style="display:flex;align-items:center;gap:0.75rem;">
+      <button id="navToggle" class="nav-toggle" aria-label="Open navigation">☰</button>
+      <div class="logo">PoseTek</div>
+    </div>
+    <a href="coachesview.html" class="home-btn" title="Home" style="display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: 8px; text-decoration: none; transition: var(--transition);" onmouseover="this.style.transform='translateY(-2px)'; this.style.background='rgba(255,255,255,0.12)';" onmouseout="this.style.transform=''; this.style.background='var(--card-bg)';">
+      <span class="material-symbols-outlined" style="color: var(--text-light); font-size: 1.4rem;">home</span>
+    </a>
+  </header>
+  <aside id="sideNav" class="side-nav" aria-hidden="true">
+    <div style="display:flex;align-items:center;gap:0.5rem;">
+      <div style="font-weight:700;font-size:1.25rem;">Menu</div>
+      <button class="close-side" id="closeSide">✕</button>
+    </div>
+    <div class="side-divider"></div>
+    <div id="sideProfile" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+      <div id="profileAvatar" style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem">C</div>
+      <div style="display:flex;flex-direction:column;">
+        <div id="profileName" style="font-weight:700">Coach</div>
+        <div id="profileEmail" style="font-size:0.85rem;opacity:0.85">email@example.com</div>
+      </div>
+    </div>
+    <div class="side-divider"></div>
+    <div id="sideLinks" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+    <div class="side-divider"></div>
+    <div style="margin-top:auto">
+      <button class="action-btn" id="sideLogout">Logout</button>
+    </div>
+  </aside>
+  <div id="sideBackdrop" class="side-backdrop" tabindex="-1"></div>
+
+  <div class="container">
+    <div id="repsBar" class="reps-bar" aria-label="Repetitions"></div>
+    <div class="frames-container">
+      <div class="video-container">
+        <video id="rawVideo" preload="metadata" playsinline muted style="display:none" crossorigin="anonymous"></video>
+        <canvas id="rawFrameCanvas" width="480" height="270" style="width:100%;height:auto;border-radius:8px;background:#000"></canvas>
+        <button id="videoFullscreenBtn" class="fullscreen-btn" title="Fullscreen Video">⛶</button>
+        <div class="nav-buttons" style="margin-top:.5rem">
+          <div class="btn-row">
+            <button id="rawPrevBtn" class="icon-btn" title="Previous frame">←</button>
+            <button id="rawPlayPauseBtn" class="icon-btn" title="Play/Pause">▶</button>
+            <button id="rawNextBtn" class="icon-btn" title="Next frame">→</button>
+            <button id="rawShowPoseBtn" class="icon-btn" title="Show Pose">🦵</button>
+          </div>
+          <div class="btn-row">
+            <button id="rawRestartBtn" class="icon-btn" title="Restart">⟲</button>
+            <button id="rawZoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
+            <button id="rawZoomInBtn" class="icon-btn" title="Zoom In">+</button>
+            <span id="rawFrameLabel" style="align-self:center;font-weight:600;opacity:.85">Frame: 0</span>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Frame</span>
+              <span id="rawFrameSliderValue" style="font-size:0.75rem;font-weight:600;">0</span>
+            </div>
+            <input id="rawFrameSlider" type="range" min="0" max="0" step="1" value="0" style="width:100%;cursor:pointer;"/>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Speed</span>
+              <span id="rawSpeedValue" style="font-size:0.75rem;font-weight:600;">1.0x</span>
+            </div>
+            <input id="rawSpeedSlider" type="range" min="0" max="8" step="1" value="5" list="rawSpeedMarkers" style="width:100%;cursor:pointer;"/>
+            <datalist id="rawSpeedMarkers">
+              <option value="0" label="0.05x"></option>
+              <option value="1" label="0.1x"></option>
+              <option value="2" label="0.25x"></option>
+              <option value="3" label="0.5x"></option>
+              <option value="4" label="0.75x"></option>
+              <option value="5" label="1x"></option>
+              <option value="6" label="1.25x"></option>
+              <option value="7" label="1.5x"></option>
+              <option value="8" label="2x"></option>
+            </datalist>
+          </div>
+        </div>
+        <div id="videoWarning" style="display:none;margin-top:0.5rem;padding:0.5rem 0.75rem;border:1px solid rgba(255,255,255,0.2);border-radius:8px;background:rgba(255,230,0,0.15);color:#fff;font-size:0.9rem;">
+          This browser may not be able to play .mov (HEVC) videos. If the video does not display, please upload or provide an MP4 (H.264) version.
+        </div>
+      </div>
+
+      <div class="pose-container">
+        <div id="frameNumberDisplay" class="frame-number">Frame: 0</div>
+        <button id="poseFullscreenBtn" class="fullscreen-btn" title="Fullscreen Pose">⛶</button>
+        
+        <!-- Mini pose selector for side-view joint selection -->
+        <div class="mini-pose-selector" id="miniPoseSelector">
+          <div class="mini-pose-label">Joint Selector</div>
+          <canvas id="miniPoseCanvas" width="132" height="172"></canvas>
+        </div>
+        
+        <canvas id="poseCanvas" width="480" height="360"></canvas>
+    <div id="angleHudDom" class="angle-hud" style="display:none">0.0°</div>
+  <div id="alignPrompt" class="align-prompt">Select the joint to overlay from</div>
+        <div class="nav-buttons">
+          <div class="btn-row">
+            <button id="prevBtn" class="icon-btn" title="Previous">←</button>
+            <button id="playPauseBtn" class="icon-btn" title="Play/Pause">▶</button>
+            <button id="nextBtn" class="icon-btn" title="Next">→</button>
+            <button id="resetViewBtn" class="icon-btn" title="Reset View">⟲</button>
+            <button id="toggleMiniPoseBtn" class="icon-btn" title="Toggle Joint Selector">◉</button>
+          </div>
+          <div class="btn-row" style="margin-top:0.5rem;">
+            <button id="toContactBtn" class="btn" style="padding:.5rem 1rem;width:100%;border-radius:8px;background:var(--card-bg);border:1px solid var(--card-border);color:#fff;cursor:pointer;transition:var(--transition);">To Contact Frame</button>
+          </div>
+          <div class="btn-row">
+            <button id="zoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
+            <button id="zoomInBtn" class="icon-btn" title="Zoom In">+</button>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Frame</span>
+              <span id="poseFrameSliderValue" style="font-size:0.75rem;font-weight:600;">0</span>
+            </div>
+            <input id="poseFrameSlider" type="range" min="0" max="0" step="1" value="0" style="width:100%;cursor:pointer;"/>
+          </div>
+          <div style="margin-top:0.5rem;padding:0 0.5rem;">
+            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
+              <span style="font-size:0.75rem;opacity:0.7;">Speed</span>
+              <span id="poseSpeedValue" style="font-size:0.75rem;font-weight:600;">1.0x</span>
+            </div>
+            <input id="poseSpeedSlider" type="range" min="0" max="8" step="1" value="5" list="poseSpeedMarkers" style="width:100%;cursor:pointer;"/>
+            <datalist id="poseSpeedMarkers">
+              <option value="0" label="0.05x"></option>
+              <option value="1" label="0.1x"></option>
+              <option value="2" label="0.25x"></option>
+              <option value="3" label="0.5x"></option>
+              <option value="4" label="0.75x"></option>
+              <option value="5" label="1x"></option>
+              <option value="6" label="1.25x"></option>
+              <option value="7" label="1.5x"></option>
+              <option value="8" label="2x"></option>
+            </datalist>
+          </div>
+          <div style="margin-top:.5rem;font-size:.75rem;color:rgba(255,255,255,0.7);text-align:center">
+            <div>Zoom: Click and drag to select area</div>
+            <div>Pan: Right-click and drag to move view</div>
+          </div>
+          <div style="margin-top:.5rem;">
+            <select id="overlayRepSelect" class="btn" style="width:100%;border-radius:8px;background:var(--card-bg);border:1px solid var(--card-border);padding:.5rem .75rem;color:#fff">
+              <option value="none">No Overlay</option>
+            </select>
+          </div>
+          <div class="btn-row" style="margin-top:.5rem;">
+            <button id="alignOverlayBtn" class="btn" style="padding:.5rem 1rem;">Align Overlay with Joints</button>
+          </div>
+          <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;justify-content:center;">
+            <label style="opacity:.85;">
+              <input id="flipAlignmentCheckbox" type="checkbox" style="margin-right:0.3rem;"/>
+              Flip Alignment
+            </label>
+          </div>
+          <div style="margin-top:.5rem;display:flex;flex-direction:column;gap:.5rem;padding:0 0.5rem;">
+            <label style="opacity:.85;display:flex;align-items:center;">
+              <input id="showGroundLineCheckbox" type="checkbox" checked style="margin-right:0.3rem;"/>
+              Show Ground Line
+            </label>
+            <label style="opacity:.85;display:flex;align-items:center;">
+              <input id="showCOMLineCheckbox" type="checkbox" checked style="margin-right:0.3rem;"/>
+              Show COM (Center of Mass)
+            </label>
+            <label style="opacity:.85;display:flex;align-items:center;">
+              <input id="showCOMToGroundCheckbox" type="checkbox" checked style="margin-right:0.3rem;"/>
+              Show COM to Ground Distance
+            </label>
+          </div>
+        </div>
+      </div>
+      <div id="summaryContainer" class="summary-container" aria-label="Kick summary" style="width:480px;max-width:100%;margin-top:0">
+        <div class="summary-left">
+          <canvas id="summaryCanvas" width="480" height="360" style="width:100%;height:auto;background:#0f2a21;border-radius:8px"></canvas>
+          <div class="summary-zoom-controls" aria-label="Zoom controls">
+            <button id="summaryZoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
+            <button id="summaryZoomInBtn" class="icon-btn" title="Zoom In">+</button>
+          </div>
+          <div class="small muted" style="text-align:center;margin-top:.25rem">Zoom: click-and-drag to box an area, or use +/–. Pan: right-click and drag. Click joints to highlight and measure angles.</div>
+          <div class="summary-stats" aria-label="Kick stats">
+            <div class="stat">
+              <div class="stat-label">Ball Speed</div>
+              <div class="stat-value"><span id="statSpeedMs">–</span> m/s <div class="muted">(<span id="statSpeedMph">–</span> mph)</div></div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Launch Angle</div>
+              <div class="stat-value"><span id="statLaunchAngle">–</span> °</div>
+            </div>
+            <div class="stat">
+              <div class="stat-label">Contact Frame</div>
+              <div class="stat-value"><span id="statContactFrame">–</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+  <script>
+    const firebaseConfig={ apiKey:"AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs", authDomain:"kickai-69dd0.firebaseapp.com", projectId:"kickai-69dd0", storageBucket:"kickai-69dd0.firebasestorage.app", messagingSenderId:"839600313930", appId:"1:839600313930:web:13b1e94c2c540561e3f8b3" };
+    firebase.initializeApp(firebaseConfig);
+    const auth=firebase.auth();
+    const db = firebase.firestore();
+    const storage=firebase.storage();
+
+    // --- Side nav wiring (standardized) ---
+    (function sideNavSetup(){
+      const waitForAuth = () => new Promise(resolve => {
+        if (window.firebase && window.firebase.auth) return resolve();
+        const t = setInterval(()=>{ if (window.firebase && window.firebase.auth) { clearInterval(t); resolve(); } }, 50);
+      });
+
+      waitForAuth().then(()=>{
+        const navToggle = document.getElementById('navToggle');
+        const sideNav = document.getElementById('sideNav');
+        const closeSide = document.getElementById('closeSide');
+        const sideLinks = document.getElementById('sideLinks');
+        const sideBackdrop = document.getElementById('sideBackdrop');
+
+        function openSide() { sideNav.classList.add('open'); sideNav.setAttribute('aria-hidden','false'); if(sideBackdrop) sideBackdrop.classList.add('open'); }
+        function closeSideNav() { sideNav.classList.remove('open'); sideNav.setAttribute('aria-hidden','true'); if(sideBackdrop) sideBackdrop.classList.remove('open'); }
+
+        if (navToggle) navToggle.addEventListener('click', (e)=>{ e.preventDefault(); openSide(); });
+        if (closeSide) closeSide.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+        if (sideBackdrop) sideBackdrop.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+        document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeSideNav(); });
+
+        const headerLinks = Array.from(document.querySelectorAll('header .nav-links a'));
+        let normalized = headerLinks.map(a => ({ href: a.getAttribute('href') || '#', text: (a.textContent||a.innerText||'').trim() }));
+        normalized = normalized.filter(n => !n.text.toLowerCase().includes('player'));
+
+        const urlParams = new URLSearchParams(window.location.search || '');
+        const playerParam = urlParams.get('player');
+        const profileHref = playerParam ? `profile.html?player=${encodeURIComponent(playerParam)}` : 'profile.html';
+        const sessionsHref = playerParam ? `sessions.html?player=${encodeURIComponent(playerParam)}` : 'sessions.html';
+        const drillsHref = playerParam ? `drillList.html?player=${encodeURIComponent(playerParam)}` : 'drillList.html';
+
+        const required = [
+          { href: profileHref, text: 'Player Profile', icon: 'person' },
+          { href: 'coachesview.html', text: 'Player Roster', icon: 'people' },
+          { href: 'leaderboard.html', text: 'Leaderboards', icon: 'leaderboard' }
+        ];
+        required.slice().reverse().forEach(req => normalized.unshift({ href: req.href, text: req.text, icon: req.icon }));
+
+        normalized.forEach((a, idx) => {
+          const link = document.createElement('a'); link.href = a.href || '#'; link.className = 'side-link';
+          const icon = document.createElement('span'); icon.className = 'material-symbols-outlined'; icon.style.fontSize = '20px';
+          if (a.icon) icon.textContent = a.icon; else icon.textContent = 'link';
+          const spanText = document.createElement('span'); spanText.textContent = a.text || a.href || 'Link';
+          link.appendChild(icon); link.appendChild(spanText);
+          link.style.transitionDelay = (idx * 40) + 'ms';
+          link.addEventListener('click', ()=> closeSideNav());
+          sideLinks.appendChild(link);
+        });
+
+        const sideLogoutBtn = document.getElementById('sideLogout');
+        if (sideLogoutBtn) sideLogoutBtn.addEventListener('click', (e)=>{ e.preventDefault(); firebase.auth().signOut().then(()=> window.location.href = 'kickai.html'); });
+      });
+    })();
+
+    let poseType=33; let poseData=[]; let ballData=[]; let ballInfo=null; let currentFrame=0; let isPlaying=false; let animationInterval=null; let frameDelay=100; let baseFrameDelay=100; let poseSpeedIdx=5; const MIN_DELAY=20, MAX_DELAY=1000, DELAY_STEP=20;
+    let manualZoomBounds=null; let isZoomSelecting=false; let zoomStartX=0,zoomStartY=0; let zoomCurrentX=0,zoomCurrentY=0; let panOffsetX=0,panOffsetY=0; let panStartX=0,panStartY=0; let isPanning=false; let focusedContainer=null;
+    let isSelectingZoomCenter=false; let zoomCenterX=0.5; let zoomCenterY=0.5;
+    let rawVideoEl=null, rawCanvas=null, rawCtx=null; let rawDuration=0; let rawCurrentFrame=0; let frameStepSec=1/30; let rawFrameLabel=null; let rawPlayTimer=null; let rawIsPlaying=false; const SPEED_OPTIONS=[0.05,0.1,0.25,0.5,0.75,1,1.25,1.5,2]; let rawSpeedIdx=5; let baseIntervalMs=1000/30; let rawMaxFrame=0;
+    let poseLoaded=false; let isPoseVisible=false; let overlayPoseData=null; let overlayBallData=null; let overlayBallInfo=null; let overlayAlignMode=false; let overlayAlignJointIndex=null; let overlayAlignOffsetN=null; let overlayScale=1.0; let overlayFlipX=false;
+    let kickIds=[]; let currentKickId=null; const selectedJoints=new Set(); const JOINT_PICK_RADIUS=12;
+    
+    // Raw video zoom/pan/selection state (separate from pose canvas to avoid conflicts)
+    const rawSelectedJoints=new Set();
+    let rawManualZoomBounds=null;
+    let rawIsZoomSelecting=false;
+    let rawZoomStartX=0, rawZoomStartY=0;
+    let rawZoomCurrentX=0, rawZoomCurrentY=0;
+    let rawPanOffsetX=0, rawPanOffsetY=0;
+    let rawPanStartX=0, rawPanStartY=0;
+    let rawIsPanning=false;
+    let rawZoomCenterX=0.5, rawZoomCenterY=0.5;
+    let rawIsSelectingZoomCenter=false;
+    const POSE_CONNECTIONS=[[11,12],[12,24],[24,23],[23,11],[11,13],[13,15],[15,17],[15,19],[15,21],[17,19],[12,14],[14,16],[16,18],[16,20],[16,22],[18,20],[23,25],[25,27],[27,29],[27,31],[29,31],[24,26],[26,28],[28,30],[28,32],[30,32]];
+    const COCO17_EDGES=[[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16],[0,1],[0,2],[1,3],[2,4]];
+    
+    // Ground and COM display flags (enabled by default)
+    let showGroundLine=true;
+    let showCOMLine=true;
+    let showCOMToGroundDistance=true;
+    
+    const POSE33_LR_SWAP={11:12,12:11,13:14,14:13,15:16,16:15,17:18,18:17,19:20,20:19,21:22,22:21,23:24,24:23,25:26,26:25,27:28,28:27,29:30,30:29,31:32,32:31};
+    
+    function getFlippedJointIndex(idx){
+      if(overlayFlipX && POSE33_LR_SWAP[idx]!==undefined){
+        return POSE33_LR_SWAP[idx];
+      }
+      return idx;
+    }
+    
+    function getFlippedPose(poseArray){
+      if(!overlayFlipX || !Array.isArray(poseArray)) return poseArray;
+      const flipped=new Array(poseArray.length);
+      for(let i=0; i<poseArray.length; i++){
+        const targetIdx=POSE33_LR_SWAP[i]!==undefined ? POSE33_LR_SWAP[i] : i;
+        flipped[targetIdx]=poseArray[i];
+      }
+      return flipped;
+    }
+    
+    /**
+     * Calculate ground line Y position from foot keypoints (lowest point)
+     * MediaPipe Pose foot keypoints: 27=left_ankle, 28=right_ankle, 29=left_heel, 30=right_heel, 31=left_foot_index, 32=right_foot_index
+     * Returns normalized Y coordinate [0-1]
+     */
+    function calculateGroundY(poseFrame){
+      if(!Array.isArray(poseFrame)) return null;
+      const footIndices=[27,28,29,30,31,32];
+      let lowestY=-Infinity;
+      let found=false;
+      for(const idx of footIndices){
+        const kp=poseFrame[idx];
+        if(kp && Number.isFinite(kp[1])){
+          const y=kp[1]; // Keep in normalized coordinates
+          if(y>lowestY){
+            lowestY=y;
+            found=true;
+          }
+        }
+      }
+      return found ? lowestY : null;
+    }
+    
+    /**
+     * Calculate Center of Mass (COM) position from body keypoints
+     * Uses simplified biomechanical weights: torso ~50%, legs ~30%, arms ~20%
+     * Returns [x,y] in normalized coordinates [0-1]
+     */
+    function calculateCOM(poseFrame){
+      if(!Array.isArray(poseFrame)) return null;
+      
+      // Define body segments with weights (simplified biomechanics model)
+      const segments=[
+        // Torso/trunk (50% body mass) - shoulders, hips
+        {indices:[11,12,23,24], weight:0.50},
+        // Upper legs (15% body mass) - hips to knees
+        {indices:[23,24,25,26], weight:0.15},
+        // Lower legs (15% body mass) - knees to ankles
+        {indices:[25,26,27,28], weight:0.15},
+        // Upper arms (10% body mass) - shoulders to elbows
+        {indices:[11,12,13,14], weight:0.10},
+        // Lower arms (10% body mass) - elbows to wrists
+        {indices:[13,14,15,16], weight:0.10}
+      ];
+      
+      let totalX=0, totalY=0, totalWeight=0;
+      
+      for(const seg of segments){
+        let segX=0, segY=0, segCount=0;
+        for(const idx of seg.indices){
+          const kp=poseFrame[idx];
+          if(kp && Number.isFinite(kp[0]) && Number.isFinite(kp[1])){
+            segX+=kp[0];
+            segY+=kp[1];
+            segCount++;
+          }
+        }
+        if(segCount>0){
+          const avgX=segX/segCount;
+          const avgY=segY/segCount;
+          totalX+=avgX*seg.weight;
+          totalY+=avgY*seg.weight;
+          totalWeight+=seg.weight;
+        }
+      }
+      
+      if(totalWeight>0){
+        return [totalX/totalWeight, totalY/totalWeight];
+      }
+      return null;
+    }
+    
+    /**
+     * Estimate body height in normalized coordinates from pose keypoints
+     * Measures from nose (keypoint 0) to lowest foot point
+     * Returns normalized height value, or null if insufficient data
+     */
+    function estimateBodyHeightNormalized(poseFrame){
+      if(!Array.isArray(poseFrame)) return null;
+      
+      // Get head position (use nose as top reference)
+      const nose=poseFrame[0];
+      if(!nose || !Number.isFinite(nose[1])) return null;
+      
+      // Get lowest foot position
+      const footIndices=[27,28,29,30,31,32];
+      let lowestY=-Infinity;
+      let foundFoot=false;
+      
+      for(const idx of footIndices){
+        const kp=poseFrame[idx];
+        if(kp && Number.isFinite(kp[1])){
+          if(kp[1]>lowestY){
+            lowestY=kp[1];
+            foundFoot=true;
+          }
+        }
+      }
+      
+      if(!foundFoot) return null;
+      
+      // Return height as normalized distance
+      return Math.abs(lowestY - nose[1]);
+    }
+    
+    /**
+     * Convert normalized distance to meters
+     * Assumes average human height of 1.75m (adjustable)
+     * @param normalizedDistance - distance in normalized coordinates [0-1]
+     * @param bodyHeightNorm - estimated body height in normalized coordinates
+     * @param assumedHeightMeters - assumed real-world height in meters (default 1.75m)
+     */
+    function normalizedToMeters(normalizedDistance, bodyHeightNorm, assumedHeightMeters=1.75){
+      if(!bodyHeightNorm || bodyHeightNorm<=0) return null;
+      const pixelsPerMeter=bodyHeightNorm/assumedHeightMeters;
+      return normalizedDistance/pixelsPerMeter;
+    }
+
+    function recalcTiming(){ const dur=rawDuration||rawVideoEl.duration||0; if(dur>0 && Array.isArray(poseData) && poseData.length>1){ frameStepSec=dur/(poseData.length-1);} baseIntervalMs=(frameStepSec>0 ? 1000*frameStepSec : 1000/30); rawMaxFrame=Math.max(0, timeToFrameIdx(Math.max(0, dur-1e-3))); if(rawIsPlaying) restartPlayTimer(); }
+    // Decoder-driven playback state
+    let rawRvfcHandle=null; let rawTimeHandler=null; let rawPlayFallbackInterval=null;
+    function stopRawPlaybackCleanup(){ try{ if(rawRvfcHandle && rawVideoEl && typeof rawVideoEl.cancelVideoFrameCallback==='function') rawVideoEl.cancelVideoFrameCallback(rawRvfcHandle); }catch{} rawRvfcHandle=null; try{ if(rawTimeHandler && rawVideoEl) rawVideoEl.removeEventListener('timeupdate', rawTimeHandler); }catch{} rawTimeHandler=null; if(rawPlayFallbackInterval){ clearInterval(rawPlayFallbackInterval); rawPlayFallbackInterval=null; } if(rawPlayTimer){ clearInterval(rawPlayTimer); rawPlayTimer=null; } try{ if(rawVideoEl) rawVideoEl.pause(); }catch{} }
+    function restartPlayTimer(){
+      if(rawMaxFrame==0){ recalcTiming(); }
+      // Clear previous
+      stopRawPlaybackCleanup();
+      // Set playback rate based on slider
+      try{ rawVideoEl.playbackRate=SPEED_OPTIONS[rawSpeedIdx]||1; }catch{}
+      // Primary: requestVideoFrameCallback
+      if(rawVideoEl && typeof rawVideoEl.requestVideoFrameCallback==='function'){
+        const onFrame=(now, metadata)=>{
+          const t=rawVideoEl.currentTime||0;
+          rawCurrentFrame=timeToFrameIdx(t);
+          if(rawFrameLabel) rawFrameLabel.textContent=`Frame: ${rawCurrentFrame}`;
+          const rawFrameSlider=document.getElementById('rawFrameSlider'); const rawFrameSliderValue=document.getElementById('rawFrameSliderValue');
+          if(rawFrameSlider) rawFrameSlider.value=rawCurrentFrame.toString();
+          if(rawFrameSliderValue) rawFrameSliderValue.textContent=rawCurrentFrame.toString();
+          try{ drawRawFrameToCanvas(); }catch(e){ console.warn('drawRawFrameToCanvas failed', e); }
+          const duration=rawDuration||rawVideoEl.duration||0;
+          if(t>=duration-1e-3){ rawIsPlaying=false; const btn=document.getElementById('rawPlayPauseBtn'); if(btn) btn.textContent='▶'; return; }
+          rawRvfcHandle=rawVideoEl.requestVideoFrameCallback(onFrame);
+        };
+        try{ rawVideoEl.play().catch(()=>{}); }catch{}
+        rawRvfcHandle=rawVideoEl.requestVideoFrameCallback(onFrame);
+        return;
+      }
+      // Fallback: timeupdate + small interval
+      if(rawVideoEl){
+        rawTimeHandler=()=>{
+          const t=rawVideoEl.currentTime||0;
+          rawCurrentFrame=timeToFrameIdx(t);
+          if(rawFrameLabel) rawFrameLabel.textContent=`Frame: ${rawCurrentFrame}`;
+          const rawFrameSlider=document.getElementById('rawFrameSlider'); const rawFrameSliderValue=document.getElementById('rawFrameSliderValue');
+          if(rawFrameSlider) rawFrameSlider.value=rawCurrentFrame.toString();
+          if(rawFrameSliderValue) rawFrameSliderValue.textContent=rawCurrentFrame.toString();
+          try{ drawRawFrameToCanvas(); }catch(e){ }
+        };
+        rawVideoEl.addEventListener('timeupdate', rawTimeHandler);
+        try{ rawVideoEl.play().catch(()=>{}); }catch{}
+      }
+      rawPlayFallbackInterval=setInterval(()=>{
+        if(!rawVideoEl) return;
+        const t=rawVideoEl.currentTime||0;
+        rawCurrentFrame=timeToFrameIdx(t);
+        if(rawFrameLabel) rawFrameLabel.textContent=`Frame: ${rawCurrentFrame}`;
+        try{ drawRawFrameToCanvas(); }catch(e){}
+      }, Math.max(20, Math.round(baseIntervalMs/(SPEED_OPTIONS[rawSpeedIdx]||1))));
+    }
+    function sizeRawCanvas(){ if(!rawCanvas) return; const dpr=Math.min(window.devicePixelRatio||1,2); const cssW=rawCanvas.clientWidth||480; const vw=(rawVideoEl&&rawVideoEl.videoWidth)?rawVideoEl.videoWidth:480; const vh=(rawVideoEl&&rawVideoEl.videoHeight)?rawVideoEl.videoHeight:270; const cssH=Math.round(cssW*(vh/vw)); rawCanvas.style.height=cssH+'px'; const targetW=Math.round(cssW*dpr); const targetH=Math.round(cssH*dpr); if(rawCanvas.width!==targetW||rawCanvas.height!==targetH){ rawCanvas.width=targetW; rawCanvas.height=targetH; } const ctx=rawCanvas.getContext('2d'); ctx.setTransform(dpr,0,0,dpr,0,0); }
+    
+    function applyRawZoomTransform(ctx,W,H){ if(!rawManualZoomBounds) return null; const {leftX,rightX,topY,bottomY}=rawManualZoomBounds; const viewWidthN=rightX-leftX; const viewHeightN=bottomY-topY; const adjustedLeftX=Math.max(0, Math.min(1-viewWidthN, leftX+rawPanOffsetX)); const adjustedTopY=Math.max(0, Math.min(1-viewHeightN, topY+rawPanOffsetY)); const sx=1/viewWidthN; const sy=1/viewHeightN; const leftPx=adjustedLeftX*W; const topPx=adjustedTopY*H; const dpr=Math.min(window.devicePixelRatio||1,2); ctx.save(); ctx.setTransform(dpr*sx,0,0,dpr*sy, dpr*(-sx*leftPx), dpr*(-sy*topPx)); return { leftX:adjustedLeftX, rightX:adjustedLeftX+viewWidthN, topY:adjustedTopY, bottomY:adjustedTopY+viewHeightN, sx, sy }; }
+    function restoreRawTransform(ctx){ ctx.restore(); const dpr=Math.min(window.devicePixelRatio||1,2); ctx.setTransform(dpr,0,0,dpr,0,0); }
+    function drawRawZoomSelection(W,H){ if(!rawIsZoomSelecting) return; const leftX=Math.min(rawZoomStartX, rawZoomCurrentX); const rightX=Math.max(rawZoomStartX, rawZoomCurrentX); const topY=Math.min(rawZoomStartY, rawZoomCurrentY); const bottomY=Math.max(rawZoomStartY, rawZoomCurrentY); rawCtx.save(); rawCtx.fillStyle='rgba(128,128,128,0.3)'; rawCtx.fillRect(leftX,topY,rightX-leftX,bottomY-topY); rawCtx.strokeStyle='rgba(255,255,255,0.8)'; rawCtx.lineWidth=2; rawCtx.strokeRect(leftX,topY,rightX-leftX,bottomY-topY); rawCtx.restore(); }
+    function rawZoomIn(){ if(!rawManualZoomBounds){ rawIsSelectingZoomCenter=true; rawCanvas.style.cursor='crosshair'; return; } const cx=rawZoomCenterX; const cy=rawZoomCenterY; const w=rawManualZoomBounds.rightX-rawManualZoomBounds.leftX; const h=rawManualZoomBounds.bottomY-rawManualZoomBounds.topY; const f=0.8; rawManualZoomBounds={ leftX:cx-(w*f)/2, rightX:cx+(w*f)/2, topY:cy-(h*f)/2, bottomY:cy+(h*f)/2 }; rawPanOffsetX=0; rawPanOffsetY=0; drawRawFrameToCanvas(); }
+    function rawZoomOut(){ if(!rawManualZoomBounds) return; const cx=rawZoomCenterX; const cy=rawZoomCenterY; const w=rawManualZoomBounds.rightX-rawManualZoomBounds.leftX; const h=rawManualZoomBounds.bottomY-rawManualZoomBounds.topY; const f=1.25; const newW=Math.min(1, w*f); const newH=Math.min(1,h*f); if(newW>=0.95||newH>=0.95){ rawManualZoomBounds=null; rawPanOffsetX=0; rawPanOffsetY=0; rawZoomCenterX=0.5; rawZoomCenterY=0.5; } else { rawManualZoomBounds={ leftX:Math.max(0, cx-newW/2), rightX:Math.min(1, cx+newW/2), topY:Math.max(0, cy-newH/2), bottomY:Math.min(1, cy+newH/2) }; rawPanOffsetX=0; rawPanOffsetY=0; } drawRawFrameToCanvas(); }
+    function rawResetZoomPan(){ rawManualZoomBounds=null; rawPanOffsetX=0; rawPanOffsetY=0; rawIsZoomSelecting=false; rawIsPanning=false; rawZoomCenterX=0.5; rawZoomCenterY=0.5; rawSelectedJoints.clear(); }
+    function drawRawFrameToCanvas(){ if(!rawVideoEl||!rawCanvas) return; sizeRawCanvas(); const dpr=Math.min(window.devicePixelRatio||1,2); const cssW=Math.round(rawCanvas.width/dpr); const cssH=Math.round(rawCanvas.height/dpr); 
+      // Clear canvas first
+      rawCtx.clearRect(0,0,cssW,cssH);
+      
+      // Calculate source rectangle from video based on zoom bounds
+      const vw=rawVideoEl.videoWidth||cssW;
+      const vh=rawVideoEl.videoHeight||cssH;
+      let sx=0, sy=0, sw=vw, sh=vh; // source rect in video coordinates
+      
+      if(rawManualZoomBounds){
+        // Apply pan offset
+        const viewWidthN=rawManualZoomBounds.rightX-rawManualZoomBounds.leftX;
+        const viewHeightN=rawManualZoomBounds.bottomY-rawManualZoomBounds.topY;
+        const adjustedLeftX=Math.max(0, Math.min(1-viewWidthN, rawManualZoomBounds.leftX+rawPanOffsetX));
+        const adjustedTopY=Math.max(0, Math.min(1-viewHeightN, rawManualZoomBounds.topY+rawPanOffsetY));
+        
+        sx=adjustedLeftX*vw;
+        sy=adjustedTopY*vh;
+        sw=viewWidthN*vw;
+        sh=viewHeightN*vh;
+      }
+      
+      // Draw the zoomed portion of video to fill canvas (no stretching)
+      rawCtx.drawImage(rawVideoEl, sx, sy, sw, sh, 0, 0, cssW, cssH);
+      
+      // Draw pose overlay with adjusted coordinates
+      if(isPoseVisible) drawPoseOverlay(rawCurrentFrame); 
+      
+      // Draw zoom selection box in screen space
+      drawRawZoomSelection(cssW,cssH); }
+    function drawPoseOverlay(frameIdx){ if(!poseData.length) return; let idx=Math.max(0,Math.min(frameIdx, poseData.length-1)); let rawFrame=poseData[idx]; let frame=normalizePoseFrame(rawFrame); if(!Array.isArray(frame)||!frame.some(p=>p)){ const fb=findNearestValidFrameIndex(idx, poseData); if(fb!=null){ idx=fb; rawFrame=poseData[idx]; frame=normalizePoseFrame(rawFrame);} } const pts=frame; const W=rawCanvas.clientWidth, H=rawCanvas.clientHeight; let normalized=true; for(let k=0;k<Math.min(10,pts.length);k++){ const pr=pts[k]; const sx=Array.isArray(pr)?pr[0]:pr?.x; const sy=Array.isArray(pr)?pr[1]:pr?.y; if(sx>1.5||sy>1.5){ normalized=false; break; } } 
+      // Calculate zoom offset for coordinate mapping
+      let zoomOffsetX=0, zoomOffsetY=0, zoomScaleX=1, zoomScaleY=1;
+      if(rawManualZoomBounds){
+        const viewWidthN=rawManualZoomBounds.rightX-rawManualZoomBounds.leftX;
+        const viewHeightN=rawManualZoomBounds.bottomY-rawManualZoomBounds.topY;
+        const adjustedLeftX=Math.max(0, Math.min(1-viewWidthN, rawManualZoomBounds.leftX+rawPanOffsetX));
+        const adjustedTopY=Math.max(0, Math.min(1-viewHeightN, rawManualZoomBounds.topY+rawPanOffsetY));
+        zoomOffsetX=adjustedLeftX;
+        zoomOffsetY=adjustedTopY;
+        zoomScaleX=1/viewWidthN;
+        zoomScaleY=1/viewHeightN;
+      }
+      const getXY=(i)=>{ const p=pts[i]; if(!p) return null; const px=Array.isArray(p)?p[0]:p.x; const py=Array.isArray(p)?p[1]:p.y; if(!Number.isFinite(px)||!Number.isFinite(py)) return null; const adjX=(px-zoomOffsetX)*zoomScaleX; const adjY=(py-zoomOffsetY)*zoomScaleY; return [adjX*W, adjY*H]; };
+      rawCtx.save(); rawCtx.lineWidth=Math.max(2, Math.round(W/500)); rawCtx.lineCap='round'; rawCtx.strokeStyle='rgba(255,255,255,0.95)'; rawCtx.beginPath(); const edges=(poseType===17?COCO17_EDGES:POSE_CONNECTIONS); for(const [a,b] of edges){ const A=getXY(a), B=getXY(b); if(!A||!B) continue; rawCtx.moveTo(A[0],A[1]); rawCtx.lineTo(B[0],B[1]); } rawCtx.stroke(); rawCtx.restore(); rawCtx.save(); const r=Math.max(3, Math.round(W/300)); for(let i=0;i<pts.length;i++){ const P=getXY(i); if(!P) continue; rawCtx.beginPath(); rawCtx.arc(P[0],P[1],r,0,Math.PI*2); if(rawSelectedJoints.has(i)){ rawCtx.fillStyle='yellow'; rawCtx.fill(); rawCtx.strokeStyle='orange'; rawCtx.lineWidth=2; rawCtx.stroke(); } else { rawCtx.fillStyle='rgba(34,197,94,0.95)'; rawCtx.fill(); } } rawCtx.restore();
+      const sel=Array.from(rawSelectedJoints); let angleText=null; if(sel.length===2){ const [iA,iB]=sel; const pA=getXY(iA), pB=getXY(iB); if(pA&&pB){ const xA=pA[0], yA=pA[1]; const xB=pB[0], yB=pB[1]; rawCtx.save(); rawCtx.strokeStyle='yellow'; rawCtx.lineWidth=3; rawCtx.beginPath(); rawCtx.moveTo(xA,yA); rawCtx.lineTo(xB,yB); rawCtx.stroke(); rawCtx.restore(); const dx=xB-xA, dy=yB-yA; let ang=toDeg(Math.atan2(dx,dy)); ang=Math.abs(ang); angleText=`${ang.toFixed(1)}°`; } } else if(sel.length===3){ const [i1,i2,i3]=sel; const p1=getXY(i1), p2=getXY(i2), p3=getXY(i3); if(p1&&p2&&p3){ const x1=p1[0], y1=p1[1]; const x2=p2[0], y2=p2[1]; const x3=p3[0], y3=p3[1]; rawCtx.save(); rawCtx.strokeStyle='yellow'; rawCtx.lineWidth=3; rawCtx.beginPath(); rawCtx.moveTo(x1,y1); rawCtx.lineTo(x2,y2); rawCtx.lineTo(x3,y3); rawCtx.stroke(); rawCtx.restore(); const vBA={x:x1-x2, y:y1-y2}; const vBC={x:x3-x2, y:y3-y2}; const dot=vBA.x*vBC.x + vBA.y*vBC.y; const mag=Math.hypot(vBA.x,vBA.y)*Math.hypot(vBC.x,vBC.y); if(mag>0){ let ang=toDeg(Math.acos(Math.max(-1, Math.min(1, dot/mag)))); angleText=`${ang.toFixed(1)}°`; } } }
+      if(angleText){ rawCtx.save(); rawCtx.font='16px sans-serif'; rawCtx.textBaseline='middle'; const pad=8; const metrics=rawCtx.measureText(angleText); const boxW=metrics.width+pad*2; const boxH=28; const x=pad; const y=pad; rawCtx.fillStyle='rgba(0,0,0,0.7)'; rawCtx.fillRect(x,y,boxW,boxH); rawCtx.strokeStyle='rgba(255,255,255,0.3)'; rawCtx.lineWidth=1; rawCtx.strokeRect(x,y,boxW,boxH); rawCtx.fillStyle='#ffffff'; rawCtx.fillText(angleText, x+pad, y+boxH/2); rawCtx.restore(); } }
+    function seekAndDraw(targetTime){ if(!rawVideoEl) return; const duration=rawDuration||rawVideoEl.duration||0; const t=Math.max(0, Math.min(targetTime, isFinite(duration)?duration:targetTime)); const delta=Math.abs((rawVideoEl.currentTime||0)-t); if(delta>1e-4){ rawVideoEl.currentTime=t; } else { drawRawFrameToCanvas(); } }
+    function timeToFrameIdx(t){ return Math.max(0, Math.round(t / frameStepSec)); }
+    function frameIdxToTime(fi){ return Math.max(0, fi * frameStepSec); }
+
+    function getUrlBits(){ const p=new URLSearchParams(window.location.search); return { player:p.get('player'), session:p.get('session') }; }
+    async function fetchJSONFromCandidates(paths){ for(const p of paths){ try{ const url=await storage.ref(p).getDownloadURL(); const res=await fetch(url,{cache:'no-store'}); if(!res.ok) throw new Error(`HTTP ${res.status}`); return await res.json(); } catch(err){ console.warn('Missing JSON:', p); } } throw new Error('No JSON found'); }
+
+    auth.onAuthStateChanged(async user=>{ if(!user){ window.location.href='kickai.html'; return; } await initRepsBar(); await loadAllForCurrentRep(); updateFrameNumberDisplay(); });
+    async function initRepsBar(){ const {player,session}=getUrlBits(); if(!player||!session) return; const repsBar=document.getElementById('repsBar'); repsBar.innerHTML=''; try{ const sessionRef=storage.ref(`${player}/deadballShot/${session}/`); const list=await sessionRef.listAll(); kickIds=list.prefixes.map(p=>p.name).sort((a,b)=>{ const na=parseInt(a.replace(/\D+/g,''))||0; const nb=parseInt(b.replace(/\D+/g,''))||0; return na-nb || a.localeCompare(b); }); if(kickIds.length>0){ currentKickId=kickIds[0]; kickIds.forEach((kid,idx)=>{ const btn=document.createElement('button'); btn.className='rep-pill'+(idx===0?' active':''); btn.textContent=kid.replace(/^kick/i,'Kick '); btn.onclick=async()=>{ Array.from(repsBar.children).forEach(el=>el.classList.remove('active')); btn.classList.add('active'); currentKickId=kid; await loadAllForCurrentRep(); }; repsBar.appendChild(btn); }); } else { currentKickId=null; const hint=document.createElement('div'); hint.style.opacity='0.8'; hint.textContent='No repetitions detected — showing session files'; repsBar.appendChild(hint); } } catch(err){ console.error('Reps bar failed:', err); } }
+    function clearAllCanvases(){ const poseCanvas=document.getElementById('poseCanvas'); const summaryCanvas=document.getElementById('summaryCanvas'); const rawVideoEl=document.getElementById('rawVideo'); const rawCanvas=document.getElementById('rawFrameCanvas'); if(poseCanvas){ const ctx=poseCanvas.getContext('2d'); const W=poseCanvas.width, H=poseCanvas.height; ctx.clearRect(0,0,W,H); ctx.fillStyle='#1a3a2e'; ctx.fillRect(0,0,W,H); } if(summaryCanvas){ const ctx=summaryCanvas.getContext('2d'); const W=summaryCanvas.width, H=summaryCanvas.height; ctx.clearRect(0,0,W,H); ctx.fillStyle='#0f2a21'; ctx.fillRect(0,0,W,H); } if(rawVideoEl){ rawVideoEl.pause(); rawVideoEl.src=''; rawVideoEl.load(); } if(rawCanvas){ const ctx=rawCanvas.getContext('2d'); ctx.clearRect(0,0,rawCanvas.width,rawCanvas.height); ctx.fillStyle='#1a3a2e'; ctx.fillRect(0,0,rawCanvas.width,rawCanvas.height); } }
+    async function loadAllForCurrentRep(){ clearAllCanvases(); await loadBackVideo(); await loadPoseData(); await loadBallData(); await loadBallInformation(); await populateOverlayRepSelect(); drawPose(currentFrame); drawContactRecreation(); }
+    function canLikelyPlayMov(){
+      try {
+        const ua = navigator.userAgent || '';
+        const isSafari = /Safari\//.test(ua) && !/Chrome\//.test(ua);
+        const v=document.createElement('video');
+        const canQt = v.canPlayType('video/quicktime');
+        const canHvc = v.canPlayType('video/mp4; codecs="hvc1"') || v.canPlayType('video/quicktime; codecs="hvc1"');
+        const canAvc = v.canPlayType('video/quicktime; codecs="avc1.42E01E"');
+        return isSafari || canHvc==='probably' || canHvc==='maybe' || canAvc==='probably' || canQt==='probably';
+      } catch { return false; }
+    }
+    async function loadBackVideo(){
+      const {player,session}=getUrlBits();
+      if(!player||!session) return;
+
+      const trySetVideoFromPath=async(path)=>{
+        try{
+          rawVideoEl.src=await storage.ref(path).getDownloadURL();
+          try{ rawVideoEl.load(); }catch{}
+          return true;
+        }catch(_){
+          return false;
+        }
+      };
+
+      const findPreferredInList=async(listRef, label)=>{
+        try{
+          const list=await listRef.listAll();
+          // Prefer MP4 over MOV for maximum browser compatibility
+          const prioritized=['back_kick_fps.mp4','back_kick_fps.mov'];
+          for(const filename of prioritized){
+            const match=list.items.find(item=>item.name.toLowerCase()===filename);
+            if(match){
+              rawVideoEl.src=await match.getDownloadURL();
+              try{ rawVideoEl.load(); }catch{}
+              // Show/hide MOV support warning based on chosen extension
+              const warn=document.getElementById('videoWarning');
+              if(/\.mov$/i.test(match.name)){
+                if(warn) warn.style.display = canLikelyPlayMov() ? 'none' : 'block';
+              } else { if(warn) warn.style.display='none'; }
+              return true;
+            }
+          }
+          // Fallback: choose numbered back_kick_###, prefer MP4 first
+          const fallbackMp4=list.items.find(item=>/back_kick_\d+\.mp4$/i.test(item.name));
+          const fallbackMov=list.items.find(item=>/back_kick_\d+\.mov$/i.test(item.name));
+          const fallback = fallbackMp4 || fallbackMov || list.items.find(item=>/back_kick_\d+\.(mov|mp4)$/i.test(item.name));
+          if(fallback){
+            rawVideoEl.src=await fallback.getDownloadURL();
+            try{ rawVideoEl.load(); }catch{}
+            const warn=document.getElementById('videoWarning');
+            if(/\.mov$/i.test(fallback.name)){
+              if(warn) warn.style.display = canLikelyPlayMov() ? 'none' : 'block';
+            } else { if(warn) warn.style.display='none'; }
+            return true;
+          }
+        }catch(err){
+          console.warn(`${label} video lookup failed:`, err);
+        }
+        return false;
+      };
+
+      const directCandidates=[];
+      if(currentKickId){
+        directCandidates.push(
+          `${player}/deadballShot/${session}/${currentKickId}/back_kick_fps.mp4`,
+          `${player}/deadballShot/${session}/${currentKickId}/back_kick_fps.mov`
+        );
+      }
+      directCandidates.push(
+        `${player}/deadballShot/${session}/back_kick_fps.mp4`,
+        `${player}/deadballShot/${session}/back_kick_fps.mov`
+      );
+
+      for(const candidate of directCandidates){
+        if(await trySetVideoFromPath(candidate)){
+          const warn=document.getElementById('videoWarning');
+          if(/\.mov$/i.test(candidate)){
+            if(warn) warn.style.display = canLikelyPlayMov() ? 'none' : 'block';
+          } else { if(warn) warn.style.display='none'; }
+          return;
+        }
+      }
+
+      if(currentKickId){
+        const kickFolder=storage.ref(`${player}/deadballShot/${session}/${currentKickId}`);
+        if(await findPreferredInList(kickFolder,'Kick')) return;
+      }
+
+      const sessionFolder=storage.ref(`${player}/deadballShot/${session}`);
+      const success=await findPreferredInList(sessionFolder,'Session');
+      if(!success){ console.warn('No video found for current rep'); rawVideoEl.src=''; }
+    }
+    async function populateOverlayRepSelect(){ try{ const {player,session}=getUrlBits(); if(!player||!session) return; const sessionRef=storage.ref(`${player}/deadballShot/${session}/`); const list=await sessionRef.listAll(); const kicks=list.prefixes.map(p=>p.name); const sel=document.getElementById('overlayRepSelect'); if(!sel) return; sel.innerHTML='<option value="none">No Overlay</option>'; kicks.forEach(k=>{ if(k!==currentKickId){ const opt=document.createElement('option'); opt.value=k; opt.textContent=k.replace(/^kick/i,'Kick '); sel.appendChild(opt); } }); } catch(err){ console.warn('Populate overlay failed:', err); } }
+    async function loadPoseData(){ const {player,session}=getUrlBits(); if(!player||!session){ poseData=null; return; } try{ const candidates=currentKickId?[ `${player}/deadballShot/${session}/${currentKickId}/pose.json`, `${player}/deadballShot/${session}/pose.json` ] : [ `${player}/deadballShot/${session}/pose.json` ]; poseData=await fetchJSONFromCandidates(candidates); if(Array.isArray(poseData)){ const firstRaw=poseData.find(f=>f!=null); const firstNorm=normalizePoseFrame(firstRaw); if(Array.isArray(firstNorm)) poseType=firstNorm.length; currentFrame=Math.min(Math.max(0,currentFrame), Math.max(0, poseData.length-1)); updateFrameNumberDisplay(); const poseFrameSlider=document.getElementById('poseFrameSlider'); const poseFrameSliderValue=document.getElementById('poseFrameSliderValue'); if(poseFrameSlider){ poseFrameSlider.max=(poseData.length-1).toString(); poseFrameSlider.value=currentFrame.toString(); } if(poseFrameSliderValue) poseFrameSliderValue.textContent=currentFrame.toString(); } else { poseData=null; } } catch(err){ console.error('Pose load failed:', err); poseData=null; } try{ recalcTiming(); } catch{}
+    }
+    async function loadBallData(){ console.log('[Ball Data] Loading...'); const {player,session}=getUrlBits(); if(!player||!session){ console.warn('[Ball Data] Missing player/session'); return; } if(currentKickId){ try{ const path=`${player}/deadballShot/${session}/${currentKickId}/ball_boxes.json`; console.log('[Ball Data] Trying kick-specific path:', path); const url=await storage.ref(path).getDownloadURL(); ballData=await (await fetch(url)).json(); console.log('[Ball Data] Loaded from kick folder. Length:', ballData?.length, 'Sample:', ballData?.[0]); return; } catch(e){ console.warn('[Ball Data] Kick ball_boxes missing, fallback to session-root'); } } try{ const path=`${player}/deadballShot/${session}/ball_boxes.json`; console.log('[Ball Data] Trying session path:', path); const url=await storage.ref(path).getDownloadURL(); ballData=await (await fetch(url)).json(); console.log('[Ball Data] Loaded from session. Length:', ballData?.length, 'Sample:', ballData?.[0]); } catch(err){ console.error('[Ball Data] Ball boxes load failed:', err); }
+    }
+  async function loadBallInformation(){ const {player,session}=getUrlBits(); if(!player||!session) return; const paths=currentKickId?[ `${player}/deadballShot/${session}/${currentKickId}/ball_information.json`, `${player}/deadballShot/${session}/ball_information.json` ] : [ `${player}/deadballShot/${session}/ball_information.json` ]; for(const p of paths){ try{ const url=await storage.ref(p).getDownloadURL(); const data=await (await fetch(url)).json(); ballInfo=data; break; } catch(_){} } if(ballInfo){ const ms=document.getElementById('statSpeedMs'); const mph=document.getElementById('statSpeedMph'); const ang=document.getElementById('statLaunchAngle'); const cf=document.getElementById('statContactFrame'); if(ms) ms.textContent=(ballInfo.ball_speed_ms ?? '--').toFixed ? ballInfo.ball_speed_ms.toFixed(2) : String(ballInfo.ball_speed_ms ?? '--'); if(mph) mph.textContent=(ballInfo.ball_speed_mph ?? '--').toFixed ? ballInfo.ball_speed_mph.toFixed(2) : String(ballInfo.ball_speed_mph ?? '--'); if(ang) ang.textContent=(ballInfo.launch_angle ?? '--').toFixed ? ballInfo.launch_angle.toFixed(2) : String(ballInfo.launch_angle ?? '--'); if(cf && Number.isFinite(ballInfo.contact_frame)) cf.textContent = String(ballInfo.contact_frame); }
+    }
+
+    function toDeg(rad){ return rad*180/Math.PI; }
+    function drawAngleHUD(ctx, W, H, text, position){ if(!text) return; const canvas=ctx.canvas; const displayW=canvas.clientWidth||W; const displayH=canvas.clientHeight||H; const scale=W/displayW; ctx.save(); ctx.font='14px sans-serif'; ctx.textBaseline='middle'; const pad=10*scale; const boxPadX=10*scale, boxPadY=7*scale; const metrics=ctx.measureText(text); const textW=metrics.width; const boxW=Math.ceil(textW+boxPadX*2); const boxH=28*scale; let x,y; const pos=(position||'bottom-right'); switch(pos){ case 'top-left': x=pad; y=pad; break; case 'top-right': x=W - pad - boxW; y=pad; break; case 'bottom-left': x=pad; y=H - pad - boxH; break; default: x=W - pad - boxW; y=H - pad - boxH; } ctx.fillStyle='rgba(0,0,0,0.55)'; ctx.strokeStyle='rgba(255,255,255,0.25)'; ctx.lineWidth=1; ctx.beginPath(); ctx.rect(x,y,boxW,boxH); ctx.fill(); ctx.stroke(); ctx.fillStyle='#ffffff'; ctx.fillText(text, x+boxPadX, y+boxH/2); ctx.restore(); }
+    function applyManualZoomTransform(ctx,W,H){ if(!manualZoomBounds) return null; const {leftX,rightX,topY,bottomY}=manualZoomBounds; const viewWidthN=rightX-leftX; const viewHeightN=bottomY-topY; const adjustedLeftX=Math.max(0, Math.min(1-viewWidthN, leftX+panOffsetX)); const adjustedTopY=Math.max(0, Math.min(1-viewHeightN, topY+panOffsetY)); const sx=1/viewWidthN; const sy=1/viewHeightN; const leftPx=adjustedLeftX*W; const topPx=adjustedTopY*H; const dpr=Math.min(window.devicePixelRatio||1,2); ctx.save(); ctx.setTransform(dpr*sx,0,0,dpr*sy, dpr*(-sx*leftPx), dpr*(-sy*topPx)); return { leftX:adjustedLeftX, rightX:adjustedLeftX+viewWidthN, topY:adjustedTopY, bottomY:adjustedTopY+viewHeightN, sx, sy }; }
+    function restoreTransform(ctx){ ctx.restore(); const dpr=Math.min(window.devicePixelRatio||1,2); ctx.setTransform(dpr,0,0,dpr,0,0); }
+    function drawZoomSelection(W,H){ if(!isZoomSelecting) return; const leftX=Math.min(zoomStartX, zoomCurrentX); const rightX=Math.max(zoomStartX, zoomCurrentX); const topY=Math.min(zoomStartY, zoomCurrentY); const bottomY=Math.max(zoomStartY, zoomCurrentY); const canvas=document.getElementById('poseCanvas'); const ctx=canvas.getContext('2d'); ctx.save(); ctx.fillStyle='rgba(128,128,128,0.3)'; ctx.fillRect(leftX,topY,rightX-leftX,bottomY-topY); ctx.strokeStyle='rgba(255,255,255,0.8)'; ctx.lineWidth=2; ctx.strokeRect(leftX,topY,rightX-leftX,bottomY-topY); ctx.restore(); }
+    function resetZoomPan(){ manualZoomBounds=null; panOffsetX=0; panOffsetY=0; isZoomSelecting=false; isPanning=false; zoomCenterX=0.5; zoomCenterY=0.5; }
+    function zoomIn(){ 
+      if(!manualZoomBounds){
+        // First zoom: prompt user to select center
+        isSelectingZoomCenter=true;
+        const prompt=document.getElementById('alignPrompt');
+        if(prompt){
+          prompt.textContent='Click graph';
+          prompt.classList.add('flashing');
+          prompt.style.display='block';
+        }
+        poseCanvas.style.cursor='crosshair';
+        return;
+      }
+      // Subsequent zooms: use stored center
+      const cx=zoomCenterX;
+      const cy=zoomCenterY;
+      const w=manualZoomBounds.rightX-manualZoomBounds.leftX;
+      const h=manualZoomBounds.bottomY-manualZoomBounds.topY;
+      const f=0.8;
+      manualZoomBounds={ leftX:cx-(w*f)/2, rightX:cx+(w*f)/2, topY:cy-(h*f)/2, bottomY:cy+(h*f)/2 };
+      panOffsetX=0; panOffsetY=0;
+      drawPose(currentFrame); 
+    }
+    function zoomOut(){ if(!manualZoomBounds) return; const cx=zoomCenterX; const cy=zoomCenterY; const w=manualZoomBounds.rightX-manualZoomBounds.leftX; const h=manualZoomBounds.bottomY-manualZoomBounds.topY; const f=1.25; const newW=Math.min(1, w*f); const newH=Math.min(1,h*f); if(newW>=0.95||newH>=0.95){ manualZoomBounds=null; panOffsetX=0; panOffsetY=0; zoomCenterX=0.5; zoomCenterY=0.5; } else { manualZoomBounds={ leftX:Math.max(0, cx-newW/2), rightX:Math.min(1, cx+newW/2), topY:Math.max(0, cy-newH/2), bottomY:Math.min(1, cy+newH/2) }; panOffsetX=0; panOffsetY=0; } drawPose(currentFrame); }
+    function focusContainer(container){ const el=document.querySelector('.container'); el.classList.remove('focused-pose'); el.classList.remove('focused-video'); if(container==='pose'){ el.classList.add('focused-pose'); focusedContainer='pose'; } else if(container==='video'){ el.classList.add('focused-video'); focusedContainer='video'; } else { focusedContainer=null; } }
+    function toggleContainerFocus(container){ if(focusedContainer===container) focusContainer(null); else focusContainer(container); }
+
+    // Native fullscreen helpers (preserve selections and redraw on size changes)
+    function toggleFullscreenFor(el){
+      if(!el) return;
+      const isCurrentFs = document.fullscreenElement && (el===document.fullscreenElement || el.contains(document.fullscreenElement));
+      try{
+        if(isCurrentFs || document.fullscreenElement){
+          document.exitFullscreen().catch(()=>{});
+        } else if(el.requestFullscreen){
+          el.requestFullscreen().catch(()=>{});
+        }
+      }catch(_){ /* no-op */ }
+    }
+    function updateFrameNumberDisplay(){ const el=document.getElementById('frameNumberDisplay'); if(el) el.textContent=`Frame: ${currentFrame}`; }
+
+    // Compute angle HUD DOM position so it rests just above the controls in fullscreen
+    function updateAngleHudPosition(){
+      try{
+        const hudDom=document.getElementById('angleHudDom');
+        const poseContainerEl=document.querySelector('.pose-container');
+        if(!hudDom || !poseContainerEl) return;
+        const isFs=document.fullscreenElement && (document.fullscreenElement===poseContainerEl || poseContainerEl.contains(document.fullscreenElement));
+        if(!isFs){
+          // Default bottom-right position
+          hudDom.style.top='';
+          hudDom.style.transform='';
+          hudDom.style.right='16px';
+          hudDom.style.bottom='16px';
+          return;
+        }
+        // In fullscreen, place just above controls, dynamically based on controls height
+        const controls=poseContainerEl.querySelector('.nav-buttons');
+        if(!controls){
+          hudDom.style.top='';
+          hudDom.style.transform='';
+          hudDom.style.right='16px';
+          hudDom.style.bottom='16px';
+          return;
+        }
+        const contRect=poseContainerEl.getBoundingClientRect();
+        const ctrRect=controls.getBoundingClientRect();
+        const gap=12; // gap above controls
+        const offsetBottom=Math.max(16, Math.round((contRect.bottom - ctrRect.top) + gap));
+        hudDom.style.top='';
+        hudDom.style.transform='';
+        hudDom.style.right='16px';
+        hudDom.style.bottom=offsetBottom+'px';
+      }catch(_){ /* ignore */ }
+    }
+
+    function normalizePoseFrame(raw){ if(!raw) return null; if(!Array.isArray(raw)){ if(Array.isArray(raw.keypoints)) return normalizePoseFrame(raw.keypoints); if(Array.isArray(raw.points)) return normalizePoseFrame(raw.points); return null; } return raw.map(p=>{ if(!p) return null; if(Array.isArray(p)){ const x=p[0], y=p[1]; return (Number.isFinite(x)&&Number.isFinite(y))?[x,y]:null; } else if(typeof p==='object'){ const x=p.x, y=p.y; return (Number.isFinite(x)&&Number.isFinite(y))?[x,y]:null; } return null; }); }
+    
+    function calculateSkeletonScale(mainPose, overlayPose){
+      if(!mainPose||!overlayPose){
+        console.warn('[Scale Calc] Missing pose data');
+        return 1.0;
+      }
+      const connections=POSE_CONNECTIONS;
+      let totalMainLen=0, totalOverlayLen=0, count=0;
+      for(const [a,b] of connections){
+        const p1=mainPose[a], p2=mainPose[b];
+        const o1=overlayPose[a], o2=overlayPose[b];
+        if(!p1||!p2||!o1||!o2) continue;
+        const mainLen=Math.sqrt((p2[0]-p1[0])**2 + (p2[1]-p1[1])**2);
+        const overlayLen=Math.sqrt((o2[0]-o1[0])**2 + (o2[1]-o1[1])**2);
+        if(mainLen>0.001 && overlayLen>0.001){
+          totalMainLen+=mainLen;
+          totalOverlayLen+=overlayLen;
+          count++;
+        }
+      }
+      const scale=count>0 ? totalMainLen/totalOverlayLen : 1.0;
+      console.log('[Scale Calc] Bone count:', count, 'Total main:', totalMainLen.toFixed(3), 'Total overlay:', totalOverlayLen.toFixed(3), 'Scale:', scale.toFixed(3));
+      return scale;
+    }
+    
+    function getBallCenter(ballBounds){
+      if(!ballBounds||!Array.isArray(ballBounds)||ballBounds.length<4) return null;
+      const [x1,y1,x2,y2]=ballBounds;
+      return [(x1+x2)/2, (y1+y2)/2];
+    }
+    
+    function computeOverlayAlignment(){
+      console.log('[Overlay Alignment] Starting computation... Flip enabled:', overlayFlipX);
+      if(!poseData||!overlayPoseData){
+        console.warn('[Overlay Alignment] Missing pose data:', {poseData: !!poseData, overlayPoseData: !!overlayPoseData});
+        return;
+      }
+      if(!ballInfo||!overlayBallInfo){
+        console.warn('[Overlay Alignment] Missing ball info:', {ballInfo: !!ballInfo, overlayBallInfo: !!overlayBallInfo});
+        return;
+      }
+      const mainContactFrame=ballInfo.contact_frame;
+      const overlayContactFrame=overlayBallInfo.contact_frame;
+      console.log('[Overlay Alignment] Contact frames:', {mainContactFrame, overlayContactFrame});
+      if(!Number.isFinite(mainContactFrame)||!Number.isFinite(overlayContactFrame)){
+        console.warn('[Overlay Alignment] Invalid contact frames');
+        return;
+      }
+      const mainIdx=Math.max(0,Math.min(Math.round(mainContactFrame), poseData.length-1));
+      const overlayIdx=Math.max(0,Math.min(Math.round(overlayContactFrame), overlayPoseData.length-1));
+      console.log('[Overlay Alignment] Using frame indices:', {mainIdx, overlayIdx});
+      const mainPose=normalizePoseFrame(poseData[mainIdx]);
+      const overlayPose=normalizePoseFrame(overlayPoseData[overlayIdx]);
+      if(!mainPose||!overlayPose){
+        console.warn('[Overlay Alignment] Failed to normalize poses');
+        return;
+      }
+      overlayScale=calculateSkeletonScale(mainPose, overlayPose);
+      console.log('[Overlay Alignment] Calculated scale:', overlayScale);
+      const mainBall=ballData?.[mainIdx];
+      const overlayBall=overlayBallData?.[overlayIdx];
+      let mainBallCenter=getBallCenter(mainBall);
+      let overlayBallCenter=getBallCenter(overlayBall);
+      console.log('[Overlay Alignment] Raw ball centers:', {mainBallCenter, overlayBallCenter});
+      if(mainBallCenter && overlayBallCenter){
+        let overlayBallX=overlayBallCenter[0];
+        if(overlayFlipX){
+          overlayBallX=1.0-overlayBallX;
+          console.log('[Overlay Alignment] Flipped overlay ball X from', overlayBallCenter[0], 'to', overlayBallX);
+        }
+        overlayAlignOffsetN={
+          dx: mainBallCenter[0] - overlayBallX,
+          dy: mainBallCenter[1] - overlayBallCenter[1]
+        };
+        console.log('[Overlay Alignment] Final offset (after flip):', overlayAlignOffsetN);
+      }
+      console.log('[Overlay Alignment] Complete! Scale:', overlayScale, 'Offset:', overlayAlignOffsetN, 'Flip:', overlayFlipX);
+    }
+    function findNearestValidFrameIndex(idx, dataArray){ if(!Array.isArray(dataArray)||dataArray.length===0) return null; const max=dataArray.length-1; const clamped=Math.min(Math.max(0,idx),max); if(normalizePoseFrame(dataArray[clamped])?.some(p=>p)) return clamped; for(let d=1; d<=max; d++){ const i1=clamped-d; if(i1>=0){ const fr1=normalizePoseFrame(dataArray[i1]); if(Array.isArray(fr1)&&fr1.some(p=>p)) return i1; } const i2=clamped+d; if(i2<=max){ const fr2=normalizePoseFrame(dataArray[i2]); if(Array.isArray(fr2)&&fr2.some(p=>p)) return i2; } } return null; }
+    function drawPose(frameIdx){ const total=Array.isArray(poseData)?poseData.length:0; let idx=frameIdx; let rawFrame=poseData?.[idx]??null; let frame=normalizePoseFrame(rawFrame); if(!Array.isArray(frame)||!frame.some(p=>p)){ const fb=findNearestValidFrameIndex(idx, poseData); if(fb!=null){ idx=fb; rawFrame=poseData[idx]; frame=normalizePoseFrame(rawFrame);} } const hasPose=Array.isArray(frame)&&frame.some(p=>p); const canvas=document.getElementById('poseCanvas'); const ctx=canvas.getContext('2d'); const W=canvas.clientWidth, H=canvas.clientHeight; (function(){ const dpr=Math.min(window.devicePixelRatio||1,2); const tW=Math.round(W*dpr), tH=Math.round(H*dpr); if(canvas.width!==tW||canvas.height!==tH){ canvas.width=tW; canvas.height=tH; } ctx.setTransform(dpr,0,0,dpr,0,0); })(); ctx.clearRect(0,0,W,H); ctx.fillStyle='#1a3a2e'; ctx.fillRect(0,0,W,H); if(!poseData||poseData.length===0){ ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='16px Inter, sans-serif'; ctx.textAlign='center'; ctx.fillText('No pose data available for this rep', W/2, H/2); updateFrameNumberDisplay(); return; } ctx.strokeStyle='rgba(76,140,106,0.2)'; ctx.lineWidth=0.5; for(let i=0;i<=10;i++){ const x=i*(W/10), y=i*(H/10); ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); } drawZoomSelection(W,H); let tx=null; if(manualZoomBounds){ tx=applyManualZoomTransform(ctx,W,H); }
+      if(hasPose){ const baseStroke=5.5; let scalePx=1; if(manualZoomBounds){ const vw=manualZoomBounds.rightX-manualZoomBounds.leftX; const vh=manualZoomBounds.bottomY-manualZoomBounds.topY; const sx=1/Math.max(vw,1e-6); const sy=1/Math.max(vh,1e-6); scalePx=1/Math.max(sx,sy); }
+        ctx.strokeStyle='#ffffff'; ctx.lineWidth=baseStroke*scalePx; POSE_CONNECTIONS.forEach(([s,e])=>{ const p1=frame[s], p2=frame[e]; if(!p1||!p2) return; const x1=p1[0]*W, y1=p1[1]*H; const x2=p2[0]*W, y2=p2[1]*H; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.stroke(); }); const baseRadius=4; frame.forEach((p,idx)=>{ if(!p) return; const x=p[0]*W, y=p[1]*H; ctx.beginPath(); ctx.arc(x,y,baseRadius*(manualZoomBounds?scalePx:1),0,Math.PI*2); if(selectedJoints.has(idx)){ ctx.fillStyle='yellow'; ctx.strokeStyle='orange'; ctx.lineWidth=2*(manualZoomBounds?scalePx:1); ctx.fill(); ctx.stroke(); } else { ctx.fillStyle='#00ff66'; ctx.fill(); } }); if(overlayPoseData && Array.isArray(overlayPoseData) && overlayPoseData.length){ const mainContactFrame=ballInfo?.contact_frame; const overlayContactFrame=overlayBallInfo?.contact_frame; let i2=idx; if(Number.isFinite(mainContactFrame) && Number.isFinite(overlayContactFrame)){ const frameOffset=idx-Math.round(mainContactFrame); i2=Math.max(0, Math.min(Math.round(overlayContactFrame)+frameOffset, overlayPoseData.length-1)); } else { i2=Math.max(0, Math.min(idx, overlayPoseData.length-1)); } let fr2Raw=overlayPoseData[i2]; let fr2=normalizePoseFrame(fr2Raw); if(!Array.isArray(fr2)||!fr2.some(p=>p)){ const fb2=findNearestValidFrameIndex(i2, overlayPoseData); if(fb2!=null){ i2=fb2; fr2Raw=overlayPoseData[i2]; fr2=normalizePoseFrame(fr2Raw);} } fr2=getFlippedPose(fr2); const hasOverlay=Array.isArray(fr2)&&fr2.some(p=>p); if(hasOverlay){ let dxPx=0, dyPx=0; if(overlayAlignOffsetN){ dxPx=overlayAlignOffsetN.dx*W; dyPx=overlayAlignOffsetN.dy*H; } const transformPoint=(p)=>{ if(!p) return null; let x=p[0], y=p[1]; if(overlayFlipX){ x=1.0-x; } const cx=0.5; const cy=0.5; const sx=(x-cx)*overlayScale + cx; const sy=(y-cy)*overlayScale + cy; return [sx*W + dxPx, sy*H + dyPx]; }; ctx.save(); ctx.globalAlpha=0.6; ctx.strokeStyle='rgba(200,200,200,0.9)'; ctx.lineWidth=(baseStroke*0.65)*(manualZoomBounds?scalePx:1); const edges2=(fr2.length===17)?COCO17_EDGES:POSE_CONNECTIONS; edges2.forEach(([s,e])=>{ const p1t=transformPoint(fr2[s]); const p2t=transformPoint(fr2[e]); if(!p1t||!p2t) return; ctx.beginPath(); ctx.moveTo(p1t[0],p1t[1]); ctx.lineTo(p2t[0],p2t[1]); ctx.stroke(); }); ctx.fillStyle='rgba(12,150,70,0.85)'; const rOv=baseRadius*0.9*(manualZoomBounds?scalePx:1); fr2.forEach(p=>{ const pt=transformPoint(p); if(!pt) return; ctx.beginPath(); ctx.arc(pt[0], pt[1], rOv, 0, Math.PI*2); ctx.fill(); }); if(overlayBallData && overlayBallData[i2]){ const oBall=overlayBallData[i2]; const oBallCenter=getBallCenter(oBall); if(oBallCenter){ const oBallPt=transformPoint(oBallCenter); if(oBallPt){ const [bx1,by1,bx2,by2]=oBall; const rBall=((bx2-bx1)*overlayScale*W)/2; ctx.strokeStyle='rgba(255,100,100,0.7)'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(oBallPt[0], oBallPt[1], Math.max(1,rBall), 0, Math.PI*2); ctx.stroke(); } } } ctx.restore(); } } }
+      const bbox=ballData?.[idx]; if(bbox){ console.log('[Ball Draw] Frame:', idx, 'BBox:', bbox, 'Canvas W:', W, 'H:', H); const [x1,y1,x2,y2]=bbox; const cx=((x1+x2)/2)*W; const cy=((y1+y2)/2)*H; const r=((x2-x1)*W)/2; console.log('[Ball Draw] Center:', {cx, cy}, 'Radius:', r); ctx.strokeStyle='red'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,Math.max(1,r),0,Math.PI*2); ctx.stroke(); } else { if(idx%30===0) console.log('[Ball Draw] No ball data for frame:', idx, 'ballData length:', ballData?.length); }
+      
+      // Draw ground line if enabled (in normalized coordinates, works with zoom)
+      if(hasPose && showGroundLine){
+        const groundYNorm=calculateGroundY(frame);
+        if(groundYNorm!==null){
+          const groundY=groundYNorm*H;
+          ctx.save();
+          let scalePx=1;
+          if(manualZoomBounds){
+            const vw=manualZoomBounds.rightX-manualZoomBounds.leftX;
+            const vh=manualZoomBounds.bottomY-manualZoomBounds.topY;
+            const sx=1/Math.max(vw,1e-6);
+            const sy=1/Math.max(vh,1e-6);
+            scalePx=1/Math.max(sx,sy);
+          }
+          ctx.strokeStyle='rgba(255,200,0,0.85)';
+          ctx.lineWidth=2*(manualZoomBounds?scalePx:1);
+          ctx.setLineDash([10*scalePx,5*scalePx]);
+          ctx.beginPath();
+          ctx.moveTo(0, groundY);
+          ctx.lineTo(W, groundY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          ctx.restore();
+        }
+      }
+      
+      // Draw COM line if enabled (in normalized coordinates, works with zoom)
+      if(hasPose && showCOMLine){
+        const com=calculateCOM(frame);
+        if(com){
+          const comX=com[0]*W;
+          const comY=com[1]*H;
+          ctx.save();
+          let scalePx=1;
+          if(manualZoomBounds){
+            const vw=manualZoomBounds.rightX-manualZoomBounds.leftX;
+            const vh=manualZoomBounds.bottomY-manualZoomBounds.topY;
+            const sx=1/Math.max(vw,1e-6);
+            const sy=1/Math.max(vh,1e-6);
+            scalePx=1/Math.max(sx,sy);
+          }
+          // Vertical line through COM
+          ctx.strokeStyle='rgba(0,200,255,0.85)';
+          ctx.lineWidth=2*(manualZoomBounds?scalePx:1);
+          ctx.setLineDash([10*scalePx,5*scalePx]);
+          ctx.beginPath();
+          ctx.moveTo(comX, 0);
+          ctx.lineTo(comX, H);
+          ctx.stroke();
+          // Horizontal line through COM
+          ctx.beginPath();
+          ctx.moveTo(0, comY);
+          ctx.lineTo(W, comY);
+          ctx.stroke();
+          ctx.setLineDash([]);
+          // Draw COM marker
+          ctx.fillStyle='rgba(0,200,255,0.9)';
+          ctx.strokeStyle='rgba(255,255,255,0.9)';
+          ctx.lineWidth=2*(manualZoomBounds?scalePx:1);
+          ctx.beginPath();
+          ctx.arc(comX, comY, 6*scalePx, 0, Math.PI*2);
+          ctx.fill();
+          ctx.stroke();
+          ctx.restore();
+        }
+      }
+      
+      // Draw COM-to-ground distance if enabled
+      if(hasPose && showCOMToGroundDistance){
+        const com=calculateCOM(frame);
+        const groundYNorm=calculateGroundY(frame);
+        if(com && groundYNorm!==null){
+          const comX=com[0]*W;
+          const comY=com[1]*H;
+          const groundY=groundYNorm*H;
+          const distanceNorm=Math.abs(groundYNorm-com[1]);
+          const distancePx=Math.abs(groundY-comY);
+          
+          // Calculate distance in meters
+          const bodyHeightNorm=estimateBodyHeightNormalized(frame);
+          const distanceMeters=normalizedToMeters(distanceNorm, bodyHeightNorm, 1.75);
+          
+          ctx.save();
+          let scalePx=1;
+          if(manualZoomBounds){
+            const vw=manualZoomBounds.rightX-manualZoomBounds.leftX;
+            const vh=manualZoomBounds.bottomY-manualZoomBounds.topY;
+            const sx=1/Math.max(vw,1e-6);
+            const sy=1/Math.max(vh,1e-6);
+            scalePx=1/Math.max(sx,sy);
+          }
+          
+          // Draw vertical line from COM to ground
+          ctx.strokeStyle='rgba(255,100,255,0.85)';
+          ctx.lineWidth=3*(manualZoomBounds?scalePx:1);
+          ctx.setLineDash([]);
+          ctx.beginPath();
+          ctx.moveTo(comX, comY);
+          ctx.lineTo(comX, groundY);
+          ctx.stroke();
+          
+          // Draw arrow endpoints
+          const arrowSize=8*scalePx;
+          ctx.fillStyle='rgba(255,100,255,0.9)';
+          // Top arrow
+          ctx.beginPath();
+          ctx.moveTo(comX, comY);
+          ctx.lineTo(comX-arrowSize/2, comY+arrowSize);
+          ctx.lineTo(comX+arrowSize/2, comY+arrowSize);
+          ctx.closePath();
+          ctx.fill();
+          // Bottom arrow
+          ctx.beginPath();
+          ctx.moveTo(comX, groundY);
+          ctx.lineTo(comX-arrowSize/2, groundY-arrowSize);
+          ctx.lineTo(comX+arrowSize/2, groundY-arrowSize);
+          ctx.closePath();
+          ctx.fill();
+          
+          // Draw distance label
+          const labelText=distanceMeters!==null ? `${distanceMeters.toFixed(2)}m` : `${(distanceNorm*100).toFixed(1)}%`;
+          ctx.font=`bold ${Math.round(14*scalePx)}px Inter, sans-serif`;
+          ctx.textAlign='left';
+          ctx.textBaseline='middle';
+          const metrics=ctx.measureText(labelText);
+          const labelX=comX+12*scalePx;
+          const labelY=(comY+groundY)/2;
+          const padding=6*scalePx;
+          
+          // Label background
+          ctx.fillStyle='rgba(255,100,255,0.85)';
+          ctx.fillRect(labelX-padding, labelY-12*scalePx, metrics.width+padding*2, 24*scalePx);
+          
+          // Label text
+          ctx.fillStyle='#ffffff';
+          ctx.fillText(labelText, labelX, labelY);
+          
+          ctx.restore();
+        }
+      }
+      
+      if(hasPose){
+        const sel=Array.from(selectedJoints);
+        let angleHUDText=null;
+        if(sel.length===2){
+          const [iA,iB]=sel;
+          const pA=frame[iA], pB=frame[iB];
+          if(pA && pB){
+            const xA=pA[0]*W, yA=pA[1]*H;
+            const xB=pB[0]*W, yB=pB[1]*H;
+            ctx.strokeStyle='yellow';
+            ctx.lineWidth=2*(manualZoomBounds?scalePx:1);
+            ctx.beginPath();
+            ctx.moveTo(xA,yA);
+            ctx.lineTo(xB,yB);
+            ctx.stroke();
+            const dx=xB-xA, dy=yB-yA;
+            let ang=toDeg(Math.atan2(dx,dy));
+            ang=Math.abs(ang);
+            angleHUDText=`${ang.toFixed(1)}°`;
+          }
+        } else if(sel.length===3){
+          const [i1,i2,i3]=sel;
+          const P1=frame[i1], P2=frame[i2], P3=frame[i3];
+          if(P1 && P2 && P3){
+            const [x1,y1]=[P1[0]*W, P1[1]*H];
+            const [x2,y2]=[P2[0]*W, P2[1]*H];
+            const [x3,y3]=[P3[0]*W, P3[1]*H];
+            ctx.strokeStyle='yellow';
+            ctx.lineWidth=2*(manualZoomBounds?scalePx:1);
+            ctx.beginPath();
+            ctx.moveTo(x1,y1);
+            ctx.lineTo(x2,y2);
+            ctx.lineTo(x3,y3);
+            ctx.stroke();
+            const vBA={x:x1-x2, y:y1-y2};
+            const vBC={x:x3-x2, y:y3-y2};
+            const dot=vBA.x*vBC.x + vBA.y*vBC.y;
+            const mag=Math.hypot(vBA.x,vBA.y)*Math.hypot(vBC.x,vBC.y);
+            if(mag>0){
+              let ang=toDeg(Math.acos(Math.max(-1, Math.min(1, dot/mag))));
+              angleHUDText=`${ang.toFixed(1)}°`;
+            }
+          }
+        }
+        if(angleHUDText){
+          const poseContainerEl=document.querySelector('.pose-container');
+          const hudDom=document.getElementById('angleHudDom');
+          const isFs=document.fullscreenElement && poseContainerEl && (document.fullscreenElement===poseContainerEl || poseContainerEl.contains(document.fullscreenElement));
+          if(isFs && hudDom){
+            hudDom.textContent=angleHUDText;
+            hudDom.style.display='block';
+            updateAngleHudPosition();
+          } else {
+            if(hudDom) hudDom.style.display='none';
+            drawAngleHUD(ctx, W, H, angleHUDText, 'bottom-right');
+          }
+        } else {
+          const hudDom=document.getElementById('angleHudDom'); if(hudDom) hudDom.style.display='none';
+        }
+      }
+      
+      if(manualZoomBounds){ restoreTransform(ctx); }
+      updateFrameNumberDisplay();
+      
+      // Draw mini pose selector
+      drawMiniPoseSelector();
+    }
+    
+    // Mini pose selector functions
+    function drawMiniPoseSelector() {
+      const miniCanvas = document.getElementById('miniPoseCanvas');
+      if (!miniCanvas) return;
+      const ctx = miniCanvas.getContext('2d');
+      const W = miniCanvas.width;
+      const H = miniCanvas.height;
+      
+      // Clear with semi-transparent background
+      ctx.clearRect(0, 0, W, H);
+      
+      // Define a reference T-pose skeleton (33-point MediaPipe or 17-point COCO)
+      const referencePose = poseType === 17 ? getReferenceCOCO17() : getReferencePose33();
+      
+      // Draw skeleton
+      ctx.save();
+      
+      // Draw connections
+      ctx.strokeStyle = 'rgba(255,255,255,0.5)';
+      ctx.lineWidth = 1.5;
+      ctx.lineCap = 'round';
+      const edges = poseType === 17 ? COCO17_EDGES : POSE_CONNECTIONS;
+      ctx.beginPath();
+      for (const [a, b] of edges) {
+        const A = referencePose[a];
+        const B = referencePose[b];
+        if (!A || !B) continue;
+        const [xA, yA] = [A[0] * W, A[1] * H];
+        const [xB, yB] = [B[0] * W, B[1] * H];
+        ctx.moveTo(xA, yA);
+        ctx.lineTo(xB, yB);
+      }
+      ctx.stroke();
+      
+      // Draw keypoints with selection highlighting
+      const r = 4;
+      for (let i = 0; i < referencePose.length; i++) {
+        const pt = referencePose[i];
+        if (!pt) continue;
+        const [x, y] = [pt[0] * W, pt[1] * H];
+        
+        ctx.beginPath();
+        ctx.arc(x, y, r, 0, Math.PI * 2);
+        
+        if (selectedJoints.has(i)) {
+          ctx.fillStyle = 'yellow';
+          ctx.fill();
+          ctx.strokeStyle = 'orange';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+          // Draw joint index label for selected joints
+          ctx.fillStyle = 'rgba(255,255,255,0.95)';
+          ctx.font = '9px sans-serif';
+          ctx.textAlign = 'center';
+          ctx.textBaseline = 'middle';
+          ctx.fillText(i.toString(), x, y - 8);
+        } else {
+          ctx.fillStyle = 'rgba(76,140,106,0.9)';
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(255,255,255,0.3)';
+          ctx.lineWidth = 1;
+          ctx.stroke();
+        }
+      }
+      
+      ctx.restore();
+    }
+    
+    // Reference pose for mini selector (T-pose normalized coordinates)
+    function getReferencePose33() {
+      // MediaPipe 33-point reference pose (front-facing T-pose)
+      return [
+        [0.5, 0.10],   // 0: nose
+        [0.48, 0.08],  // 1: left eye inner
+        [0.47, 0.08],  // 2: left eye
+        [0.46, 0.08],  // 3: left eye outer
+        [0.52, 0.08],  // 4: right eye inner
+        [0.53, 0.08],  // 5: right eye
+        [0.54, 0.08],  // 6: right eye outer
+        [0.42, 0.10],  // 7: left ear
+        [0.58, 0.10],  // 8: right ear
+        [0.47, 0.13],  // 9: mouth left
+        [0.53, 0.13],  // 10: mouth right
+        [0.40, 0.25],  // 11: left shoulder
+        [0.60, 0.25],  // 12: right shoulder
+        [0.35, 0.40],  // 13: left elbow
+        [0.65, 0.40],  // 14: right elbow
+        [0.30, 0.55],  // 15: left wrist
+        [0.70, 0.55],  // 16: right wrist
+        [0.29, 0.57],  // 17: left pinky
+        [0.71, 0.57],  // 18: right pinky
+        [0.28, 0.58],  // 19: left index
+        [0.72, 0.58],  // 20: right index
+        [0.30, 0.56],  // 21: left thumb
+        [0.70, 0.56],  // 22: right thumb
+        [0.42, 0.50],  // 23: left hip
+        [0.58, 0.50],  // 24: right hip
+        [0.41, 0.68],  // 25: left knee
+        [0.59, 0.68],  // 26: right knee
+        [0.40, 0.88],  // 27: left ankle
+        [0.60, 0.88],  // 28: right ankle
+        [0.39, 0.92],  // 29: left heel
+        [0.61, 0.92],  // 30: right heel
+        [0.40, 0.95],  // 31: left foot index
+        [0.60, 0.95]   // 32: right foot index
+      ];
+    }
+    
+    function getReferenceCOCO17() {
+      // COCO 17-point reference pose (front-facing)
+      return [
+        [0.5, 0.15],   // 0: nose
+        [0.47, 0.12],  // 1: left eye
+        [0.53, 0.12],  // 2: right eye
+        [0.44, 0.14],  // 3: left ear
+        [0.56, 0.14],  // 4: right ear
+        [0.4, 0.3],    // 5: left shoulder
+        [0.6, 0.3],    // 6: right shoulder
+        [0.35, 0.5],   // 7: left elbow
+        [0.65, 0.5],   // 8: right elbow
+        [0.3, 0.7],    // 9: left wrist
+        [0.7, 0.7],    // 10: right wrist
+        [0.45, 0.55],  // 11: left hip
+        [0.55, 0.55],  // 12: right hip
+        [0.43, 0.75],  // 13: left knee
+        [0.57, 0.75],  // 14: right knee
+        [0.42, 0.92],  // 15: left ankle
+        [0.58, 0.92]   // 16: right ankle
+      ];
+    }
+  function drawContactRecreation(){ const canvas=document.getElementById('summaryCanvas'); if(!canvas) return; const ctx=canvas.getContext('2d'); const W=canvas.width, H=canvas.height; ctx.clearRect(0,0,W,H); ctx.fillStyle='#0f2a21'; ctx.fillRect(0,0,W,H); if(!poseData||poseData.length===0){ ctx.fillStyle='rgba(255,255,255,0.6)'; ctx.font='14px Inter, sans-serif'; ctx.textAlign='center'; ctx.fillText('No contact frame data available', W/2, H/2); return; } const cf=(ballInfo && Number.isFinite(ballInfo.contact_frame))? Math.max(0, Math.min(ballInfo.contact_frame, (poseData?.length||1)-1)) : currentFrame; const frame=normalizePoseFrame(poseData?.[cf]); if(Array.isArray(frame)){ ctx.strokeStyle='#ffffff'; ctx.lineWidth=4; POSE_CONNECTIONS.forEach(([s,e])=>{ const p1=frame[s], p2=frame[e]; if(!p1||!p2) return; ctx.beginPath(); ctx.moveTo(p1[0]*W,p1[1]*H); ctx.lineTo(p2[0]*W,p2[1]*H); ctx.stroke(); }); ctx.fillStyle='#00ff66'; frame.forEach(p=>{ if(!p) return; ctx.beginPath(); ctx.arc(p[0]*W,p[1]*H,3,0,Math.PI*2); ctx.fill(); }); } const bb=ballData?.[cf]; if(bb && Array.isArray(bb) && bb.length===4){ const [x1,y1,x2,y2]=bb; const cx=((x1+x2)/2)*W; const cy=((y1+y2)/2)*H; const r=((x2-x1)*W)/2; ctx.strokeStyle='#ff5252'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,Math.max(1,r),0,Math.PI*2); ctx.stroke(); ctx.fillStyle='rgba(255,82,82,0.25)'; ctx.beginPath(); ctx.arc(cx,cy,Math.max(1,r),0,Math.PI*2); ctx.fill(); } }
+    function stepFrame(dir){ currentFrame=Math.min(Math.max(0,currentFrame+dir), Math.max(0,(poseData?.length||1)-1)); const poseFrameSlider=document.getElementById('poseFrameSlider'); const poseFrameSliderValue=document.getElementById('poseFrameSliderValue'); if(poseFrameSlider) poseFrameSlider.value=currentFrame.toString(); if(poseFrameSliderValue) poseFrameSliderValue.textContent=currentFrame.toString(); drawPose(currentFrame); }
+    function togglePlayPause(){ const btn=document.getElementById('playPauseBtn'); isPlaying=!isPlaying; if(isPlaying){ btn.textContent='⏸'; const actualDelay=Math.round(baseFrameDelay/SPEED_OPTIONS[poseSpeedIdx]); animationInterval=setInterval(()=>stepFrame(1), actualDelay); } else { btn.textContent='▶'; clearInterval(animationInterval); } }
+    function speedUp(){ frameDelay=Math.max(MIN_DELAY, frameDelay-DELAY_STEP);} function speedDown(){ frameDelay=Math.min(MAX_DELAY, frameDelay+DELAY_STEP);} function resetView(){ manualZoomBounds=null; panOffsetX=0; panOffsetY=0; isZoomSelecting=false; isPanning=false; currentFrame=0; selectedJoints.clear(); drawPose(currentFrame); }
+
+    const poseCanvas=document.getElementById('poseCanvas');
+    poseCanvas.addEventListener('click', e=>{
+      const rect=poseCanvas.getBoundingClientRect();
+      const clickX=e.clientX-rect.left, clickY=e.clientY-rect.top;
+      const W=poseCanvas.clientWidth, H=poseCanvas.clientHeight;
+
+      // Handle zoom center selection
+      if(isSelectingZoomCenter){
+        zoomCenterX=clickX/W;
+        zoomCenterY=clickY/H;
+        isSelectingZoomCenter=false;
+        poseCanvas.style.cursor='';
+        const prompt=document.getElementById('alignPrompt');
+        if(prompt){
+          prompt.style.display='none';
+          prompt.classList.remove('flashing');
+        }
+        
+        // Now perform initial zoom centered on selected point
+        const f=0.8;
+        const halfW=0.1*f, halfH=0.1*f;
+        manualZoomBounds={
+          leftX:Math.max(0, zoomCenterX-halfW),
+          rightX:Math.min(1, zoomCenterX+halfW),
+          topY:Math.max(0, zoomCenterY-halfH),
+          bottomY:Math.min(1, zoomCenterY+halfH)
+        };
+        panOffsetX=0; panOffsetY=0;
+        drawPose(currentFrame);
+        return;
+      }
+
+      if(overlayAlignMode && Array.isArray(poseData) && poseData.length){
+        const rawFrame=poseData[currentFrame];
+        const currentPose=normalizePoseFrame(rawFrame)||[];
+        let bestIdx=null, bestDistSq=Infinity;
+        currentPose.forEach((kp,idx)=>{
+          if(!kp) return;
+          const cx=kp[0]*W, cy=kp[1]*H;
+          const dx=cx-clickX, dy=cy-clickY;
+          const d2=dx*dx+dy*dy;
+          if(d2<bestDistSq){
+            bestDistSq=d2;
+            bestIdx=idx;
+          }
+        });
+        if(bestIdx!=null){
+          overlayAlignJointIndex=bestIdx;
+          if(overlayPoseData && overlayPoseData.length){
+            const mainContactFrame=ballInfo?.contact_frame;
+            const overlayContactFrame=overlayBallInfo?.contact_frame;
+            let i2=currentFrame;
+            if(Number.isFinite(mainContactFrame) && Number.isFinite(overlayContactFrame)){
+              const frameOffset=currentFrame-Math.round(mainContactFrame);
+              i2=Math.max(0, Math.min(Math.round(overlayContactFrame)+frameOffset, overlayPoseData.length-1));
+            } else {
+              i2=Math.max(0, Math.min(currentFrame, overlayPoseData.length-1));
+            }
+            let over=normalizePoseFrame(overlayPoseData[i2])||[];
+            over=getFlippedPose(over);
+            const pMain=currentPose[bestIdx];
+            let pOver=over[bestIdx];
+            if(pMain && pOver){
+              let overX=pOver[0];
+              if(overlayFlipX) overX=1.0-overX;
+              overlayAlignOffsetN={ dx:pMain[0]-overX, dy:pMain[1]-pOver[1] };
+            }
+          }
+          const prompt=document.getElementById('alignPrompt');
+          if(prompt) prompt.style.display='none';
+          overlayAlignMode=false;
+          drawPose(currentFrame);
+          return;
+        }
+      }
+
+      let hitIdx=null;
+      let best=JOINT_PICK_RADIUS*JOINT_PICK_RADIUS;
+      const rawFramePoints=poseData[currentFrame]||[];
+      rawFramePoints.forEach((kp,idx)=>{
+        if(!kp) return;
+        const [nx,ny]=kp;
+        const cx=nx*W, cy=ny*H;
+        const dx=cx-clickX, dy=cy-clickY;
+        const distSq=dx*dx+dy*dy;
+        if(distSq<best){
+          best=distSq;
+          hitIdx=idx;
+        }
+      });
+      if(hitIdx!==null){
+        if(selectedJoints.has(hitIdx)) selectedJoints.delete(hitIdx);
+        else if(selectedJoints.size<3) selectedJoints.add(hitIdx);
+        drawPose(currentFrame);
+      }
+    });
+
+    // Mini pose selector click handler
+    const miniPoseCanvas=document.getElementById('miniPoseCanvas');
+    if(miniPoseCanvas){
+      miniPoseCanvas.addEventListener('click', e=>{
+        const rect=miniPoseCanvas.getBoundingClientRect();
+        const clickX=(e.clientX-rect.left)/miniPoseCanvas.clientWidth;
+        const clickY=(e.clientY-rect.top)/miniPoseCanvas.clientHeight;
+        
+        // Get reference pose based on current format
+        const numKeypoints=(poseData && poseData[0]) ? poseData[0].length : 33;
+        const refPose=(numKeypoints===17) ? getReferenceCOCO17() : getReferencePose33();
+        
+        // Find closest joint
+        let bestIdx=null, bestDistSq=Infinity;
+        const threshold=0.08; // 8% of canvas size
+        refPose.forEach((kp,idx)=>{
+          if(!kp) return;
+          const dx=kp[0]-clickX;
+          const dy=kp[1]-clickY;
+          const distSq=dx*dx+dy*dy;
+          if(distSq<threshold*threshold && distSq<bestDistSq){
+            bestDistSq=distSq;
+            bestIdx=idx;
+          }
+        });
+        
+        // Toggle selection
+        if(bestIdx!==null){
+          if(selectedJoints.has(bestIdx)) selectedJoints.delete(bestIdx);
+          else if(selectedJoints.size<3) selectedJoints.add(bestIdx);
+          drawPose(currentFrame);
+        }
+      });
+    }
+
+    poseCanvas.addEventListener('mousedown', (e)=>{ 
+      if(isSelectingZoomCenter) return; // Don't start selection during zoom center mode
+      const r=poseCanvas.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top; if(e.button===0){ isZoomSelecting=true; zoomStartX=x; zoomStartY=y; zoomCurrentX=x; zoomCurrentY=y; } else if(e.button===2){ e.preventDefault(); isZoomSelecting=false; isPanning=true; panStartX=x; panStartY=y; } });
+    poseCanvas.addEventListener('mousemove', (e)=>{ const r=poseCanvas.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top; if(isZoomSelecting){ zoomCurrentX=x; zoomCurrentY=y; drawPose(currentFrame); } else if(e.buttons===2 && isPanning){ e.preventDefault(); const dx=(x-panStartX)/poseCanvas.clientWidth; const dy=(y-panStartY)/poseCanvas.clientHeight; panOffsetX-=dx; panOffsetY-=dy; panStartX=x; panStartY=y; drawPose(currentFrame); } });
+    poseCanvas.addEventListener('mouseup', (e)=>{ const r=poseCanvas.getBoundingClientRect(); const x=e.clientX-r.left, y=e.clientY-r.top; if(e.button===0 && isZoomSelecting){ isZoomSelecting=false; const leftX=Math.min(zoomStartX,x)/poseCanvas.clientWidth; const rightX=Math.max(zoomStartX,x)/poseCanvas.clientWidth; const topY=Math.min(zoomStartY,y)/poseCanvas.clientHeight; const bottomY=Math.max(zoomStartY,y)/poseCanvas.clientHeight; const widthPx=Math.abs(x-zoomStartX); const heightPx=Math.abs(y-zoomStartY); const minSize=20; if(widthPx>=minSize && heightPx>=minSize){ const canvasAspect=poseCanvas.clientWidth/poseCanvas.clientHeight; const selectionAspect=widthPx/heightPx; let finalLeftX=leftX, finalRightX=rightX, finalTopY=topY, finalBottomY=bottomY; if(selectionAspect>canvasAspect){ const centerX=(leftX+rightX)/2; const targetWidth=(bottomY-topY)*canvasAspect; finalLeftX=centerX-targetWidth/2; finalRightX=centerX+targetWidth/2; } else { const centerY=(topY+bottomY)/2; const targetHeight=(rightX-leftX)/canvasAspect; finalTopY=centerY-targetHeight/2; finalBottomY=centerY+targetHeight/2; } manualZoomBounds={ leftX:finalLeftX, rightX:finalRightX, topY:finalTopY, bottomY:finalBottomY }; panOffsetX=0; panOffsetY=0; drawPose(currentFrame); } else { drawPose(currentFrame); } } if(e.button===2 && isPanning){ isPanning=false; } });
+    poseCanvas.addEventListener('contextmenu', (e)=>{ e.preventDefault(); });
+
+    // Hide mini pose selector by default
+    const miniPoseSelector=document.getElementById('miniPoseSelector');
+    if(miniPoseSelector) miniPoseSelector.style.display='none';
+
+    document.addEventListener('DOMContentLoaded', ()=>{
+      document.getElementById('prevBtn').onclick=()=>stepFrame(-1);
+      document.getElementById('nextBtn').onclick=()=>stepFrame(1);
+      document.getElementById('playPauseBtn').onclick=togglePlayPause;
+      document.getElementById('toContactBtn').onclick=()=>{ if(ballInfo && Number.isFinite(ballInfo.contact_frame)){ currentFrame=Math.max(0, Math.min(Math.round(ballInfo.contact_frame), (poseData?.length||1)-1)); drawPose(currentFrame); console.log('[To Contact] Jumped to frame:', currentFrame); } else { console.warn('[To Contact] No contact frame available'); } };
+      const poseSpeedSlider=document.getElementById('poseSpeedSlider'); const poseSpeedValue=document.getElementById('poseSpeedValue');
+      if(poseSpeedSlider){ poseSpeedSlider.addEventListener('input', ()=>{ poseSpeedIdx=parseInt(poseSpeedSlider.value,10); const speed=SPEED_OPTIONS[poseSpeedIdx]; if(poseSpeedValue) poseSpeedValue.textContent=speed+'x'; if(isPlaying){ clearInterval(animationInterval); const actualDelay=Math.round(baseFrameDelay/speed); animationInterval=setInterval(()=>stepFrame(1), actualDelay); } }); }
+      const poseFrameSlider=document.getElementById('poseFrameSlider'); const poseFrameSliderValue=document.getElementById('poseFrameSliderValue');
+      if(poseFrameSlider){ poseFrameSlider.addEventListener('input', ()=>{ const newFrame=parseInt(poseFrameSlider.value,10); if(newFrame!==currentFrame){ currentFrame=newFrame; if(poseFrameSliderValue) poseFrameSliderValue.textContent=currentFrame.toString(); drawPose(currentFrame); } }); }
+      document.getElementById('zoomInBtn').onclick=zoomIn;
+      document.getElementById('zoomOutBtn').onclick=zoomOut;
+      document.getElementById('resetViewBtn').onclick=resetView;
+      
+      // Toggle mini pose selector
+      document.getElementById('toggleMiniPoseBtn').onclick=()=>{
+        const miniPoseSelector=document.getElementById('miniPoseSelector');
+        if(miniPoseSelector){
+          const isHidden=miniPoseSelector.style.display==='none';
+          miniPoseSelector.style.display=isHidden?'block':'none';
+          const btn=document.getElementById('toggleMiniPoseBtn');
+          if(btn){
+            btn.style.background=isHidden?'rgba(255,255,255,0.2)':'';
+            btn.title=isHidden?'Hide Joint Selector':'Show Joint Selector';
+          }
+        }
+      };
+  // Fullscreen buttons now use native fullscreen for better expansion
+  const poseContainerEl=document.querySelector('.pose-container');
+  const videoContainerEl=document.querySelector('.video-container');
+  document.getElementById('poseFullscreenBtn').onclick=()=>toggleFullscreenFor(poseContainerEl);
+  document.getElementById('videoFullscreenBtn').onclick=()=>toggleFullscreenFor(videoContainerEl);
+
+  // Also allow double-click on pose canvas to toggle fullscreen
+  const poseCanvasEl=document.getElementById('poseCanvas');
+  if(poseCanvasEl){ poseCanvasEl.addEventListener('dblclick', ()=>toggleFullscreenFor(poseContainerEl)); }
+  sizeRawCanvas();
+  window.addEventListener('resize', ()=>{ sizeRawCanvas(); drawPose(currentFrame); updateAngleHudPosition(); });
+  // Observe nav-buttons changes for dynamic HUD positioning
+  try{
+    const poseContainerEl=document.querySelector('.pose-container');
+    const controls=poseContainerEl? poseContainerEl.querySelector('.nav-buttons') : null;
+    if(controls && window.ResizeObserver){
+      const roHud=new ResizeObserver(()=>{ updateAngleHudPosition(); });
+      roHud.observe(controls);
+    }
+  }catch(_){ }
+      const overlaySelect=document.getElementById('overlayRepSelect'); if(overlaySelect){ overlaySelect.addEventListener('change', async (e)=>{ const v=e.target.value; if(v==='none'){ overlayPoseData=null; overlayBallData=null; overlayBallInfo=null; overlayAlignOffsetN=null; overlayScale=1.0; drawRawFrameToCanvas(); drawPose(currentFrame); return; } try{ const {player,session}=getUrlBits(); const overlayCandidates=[ `${player}/deadballShot/${session}/${v}/pose.json` ]; overlayPoseData=await fetchJSONFromCandidates(overlayCandidates); try{ const ballUrl=await storage.ref(`${player}/deadballShot/${session}/${v}/ball_boxes.json`).getDownloadURL(); overlayBallData=await (await fetch(ballUrl)).json(); console.log('[Overlay Ball] Loaded. Length:', overlayBallData?.length); } catch(e){ console.warn('Overlay ball_boxes missing'); overlayBallData=null; } try{ const ballInfoUrl=await storage.ref(`${player}/deadballShot/${session}/${v}/ball_information.json`).getDownloadURL(); overlayBallInfo=await (await fetch(ballInfoUrl)).json(); } catch(e){ console.warn('Overlay ball_information missing'); overlayBallInfo=null; } computeOverlayAlignment(); drawRawFrameToCanvas(); drawPose(currentFrame); } catch(err){ console.error('Overlay load failed:', err); overlayPoseData=null; overlayBallData=null; overlayBallInfo=null; } }); }
+      const alignBtn=document.getElementById('alignOverlayBtn'); if(alignBtn){ alignBtn.addEventListener('click', ()=>{ if(!overlayPoseData||!overlayPoseData.length){ console.warn('[Align] No overlay loaded'); return; } overlayAlignMode=true; const prompt=document.getElementById('alignPrompt'); if(prompt) prompt.style.display='block'; drawPose(currentFrame); }); }
+      const flipCheckbox=document.getElementById('flipAlignmentCheckbox'); if(flipCheckbox){ flipCheckbox.addEventListener('change', ()=>{ overlayFlipX=flipCheckbox.checked; console.log('[Flip Toggle] Flip changed to:', overlayFlipX); computeOverlayAlignment(); drawPose(currentFrame); }); }
+      
+      // Wire up ground and COM line toggles
+      const groundCheckbox=document.getElementById('showGroundLineCheckbox');
+      if(groundCheckbox){
+        groundCheckbox.addEventListener('change', ()=>{
+          showGroundLine=groundCheckbox.checked;
+          console.log('[Ground Line] Toggle:', showGroundLine);
+          drawPose(currentFrame);
+        });
+      }
+      
+      const comCheckbox=document.getElementById('showCOMLineCheckbox');
+      if(comCheckbox){
+        comCheckbox.addEventListener('change', ()=>{
+          showCOMLine=comCheckbox.checked;
+          console.log('[COM Line] Toggle:', showCOMLine);
+          drawPose(currentFrame);
+        });
+      }
+      
+      const comToGroundCheckbox=document.getElementById('showCOMToGroundCheckbox');
+      if(comToGroundCheckbox){
+        comToGroundCheckbox.addEventListener('change', ()=>{
+          showCOMToGroundDistance=comToGroundCheckbox.checked;
+          console.log('[COM to Ground] Toggle:', showCOMToGroundDistance);
+          drawPose(currentFrame);
+        });
+      }
+    });
+
+    // Redraw on fullscreen changes to preserve crisp rendering and selections
+    document.addEventListener('fullscreenchange', ()=>{
+      try{ sizeRawCanvas(); drawRawFrameToCanvas(); }catch{}
+      try{ drawPose(currentFrame); updateAngleHudPosition(); }catch{}
+    });
+
+  rawVideoEl=document.getElementById('rawVideo'); rawCanvas=document.getElementById('rawFrameCanvas'); rawCtx=rawCanvas.getContext('2d'); rawFrameLabel=document.getElementById('rawFrameLabel');
+  try{ rawVideoEl.crossOrigin = 'anonymous'; }catch{}
+    let rawFastTimer=null; const FAST_STEP_MS=80; const startFast=(dir)=>{ if(rawFastTimer) clearInterval(rawFastTimer); rawFastTimer=setInterval(()=>{ let next=rawCurrentFrame+dir; next=Math.max(0, Math.min(rawMaxFrame,next)); if(next===rawCurrentFrame) return; rawCurrentFrame=next; rawFrameLabel.textContent=`Frame: ${rawCurrentFrame}`; const rawFrameSlider=document.getElementById('rawFrameSlider'); const rawFrameSliderValue=document.getElementById('rawFrameSliderValue'); if(rawFrameSlider) rawFrameSlider.value=rawCurrentFrame.toString(); if(rawFrameSliderValue) rawFrameSliderValue.textContent=rawCurrentFrame.toString(); seekAndDraw(frameIdxToTime(rawCurrentFrame)); }, FAST_STEP_MS); }; const stopFast=()=>{ if(rawFastTimer){ clearInterval(rawFastTimer); rawFastTimer=null; } };
+    const rawPrevBtn=document.getElementById('rawPrevBtn'); const rawNextBtn=document.getElementById('rawNextBtn'); rawPrevBtn.onmousedown=(e)=>{ if(e.button===0) startFast(-1); }; rawNextBtn.onmousedown=(e)=>{ if(e.button===0) startFast(1); }; rawPrevBtn.onmouseup=stopFast; rawPrevBtn.onmouseleave=stopFast; rawNextBtn.onmouseup=stopFast; rawNextBtn.onmouseleave=stopFast;
+  rawPrevBtn.onclick=()=>{ rawIsPlaying=false; playBtn.textContent='▶'; stopRawPlaybackCleanup(); rawCurrentFrame=Math.max(0, rawCurrentFrame-1); seekAndDraw(frameIdxToTime(rawCurrentFrame)); rawFrameLabel.textContent=`Frame: ${rawCurrentFrame}`; const rawFrameSlider=document.getElementById('rawFrameSlider'); const rawFrameSliderValue=document.getElementById('rawFrameSliderValue'); if(rawFrameSlider) rawFrameSlider.value=rawCurrentFrame.toString(); if(rawFrameSliderValue) rawFrameSliderValue.textContent=rawCurrentFrame.toString(); };
+  rawNextBtn.onclick=()=>{ rawIsPlaying=false; playBtn.textContent='▶'; stopRawPlaybackCleanup(); rawCurrentFrame=Math.min(rawMaxFrame, rawCurrentFrame+1); seekAndDraw(frameIdxToTime(rawCurrentFrame)); rawFrameLabel.textContent=`Frame: ${rawCurrentFrame}`; const rawFrameSlider=document.getElementById('rawFrameSlider'); const rawFrameSliderValue=document.getElementById('rawFrameSliderValue'); if(rawFrameSlider) rawFrameSlider.value=rawCurrentFrame.toString(); if(rawFrameSliderValue) rawFrameSliderValue.textContent=rawCurrentFrame.toString(); };
+  document.getElementById('rawRestartBtn').onclick=()=>{ rawIsPlaying=false; playBtn.textContent='▶'; stopRawPlaybackCleanup(); rawCurrentFrame=0; rawFrameLabel.textContent=`Frame: ${rawCurrentFrame}`; seekAndDraw(0); rawResetZoomPan(); drawRawFrameToCanvas(); const rawFrameSlider=document.getElementById('rawFrameSlider'); const rawFrameSliderValue=document.getElementById('rawFrameSliderValue'); if(rawFrameSlider) rawFrameSlider.value='0'; if(rawFrameSliderValue) rawFrameSliderValue.textContent='0'; };
+    const playBtn=document.getElementById('rawPlayPauseBtn'); const showPoseBtn=document.getElementById('rawShowPoseBtn');
+    const rawSpeedSlider=document.getElementById('rawSpeedSlider'); const rawSpeedValue=document.getElementById('rawSpeedValue');
+    
+    // Wire up zoom buttons
+    document.getElementById('rawZoomInBtn').onclick=()=>{ rawZoomIn(); };
+    document.getElementById('rawZoomOutBtn').onclick=()=>{ rawZoomOut(); };
+    playBtn.onclick=()=>{
+      rawIsPlaying=!rawIsPlaying;
+      if(rawIsPlaying){
+        playBtn.textContent='⏸';
+        restartPlayTimer();
+      } else {
+        playBtn.textContent='▶';
+        // Fully stop any playback loops and pause the underlying video
+        stopRawPlaybackCleanup();
+      }
+    };
+    if(rawSpeedSlider){ rawSpeedSlider.addEventListener('input', ()=>{ rawSpeedIdx=parseInt(rawSpeedSlider.value,10); if(rawSpeedValue) rawSpeedValue.textContent=SPEED_OPTIONS[rawSpeedIdx]+'x'; if(rawIsPlaying) restartPlayTimer(); }); }
+    const rawFrameSlider=document.getElementById('rawFrameSlider'); const rawFrameSliderValue=document.getElementById('rawFrameSliderValue');
+    let rawFrameSliderSeeking=false;
+    if(rawFrameSlider){ 
+      rawFrameSlider.addEventListener('input', ()=>{ 
+        const newFrame=parseInt(rawFrameSlider.value,10); 
+        if(newFrame!==rawCurrentFrame){ 
+          rawCurrentFrame=newFrame; 
+          if(rawFrameLabel) rawFrameLabel.textContent=`Frame: ${rawCurrentFrame}`; 
+          if(rawFrameSliderValue) rawFrameSliderValue.textContent=rawCurrentFrame.toString(); 
+          const targetTime=frameIdxToTime(rawCurrentFrame); 
+          if(rawVideoEl){ 
+            rawFrameSliderSeeking=true;
+            rawVideoEl.currentTime=targetTime; 
+          }
+          // Immediately draw pose overlay (which updates instantly)
+          if(isPoseVisible) drawPoseOverlay(rawCurrentFrame);
+        } 
+      }); 
+    }
+    showPoseBtn.onclick=async()=>{ isPoseVisible=!isPoseVisible; showPoseBtn.classList.toggle('active', isPoseVisible); if(isPoseVisible && !poseLoaded){ await loadPoseIfNeeded(); } drawRawFrameToCanvas(); };
+    
+    // Raw canvas mouse event handlers for joint selection, zoom, and pan
+    rawCanvas.addEventListener('click', e=>{
+      const rect=rawCanvas.getBoundingClientRect();
+      const clickX=e.clientX-rect.left;
+      const clickY=e.clientY-rect.top;
+      const W=rawCanvas.clientWidth, H=rawCanvas.clientHeight;
+      
+      // Handle zoom center selection (works without pose overlay)
+      if(rawIsSelectingZoomCenter){
+        rawZoomCenterX=clickX/W;
+        rawZoomCenterY=clickY/H;
+        rawIsSelectingZoomCenter=false;
+        rawCanvas.style.cursor='';
+        
+        // Now perform initial zoom centered on selected point
+        const f=0.8;
+        const halfW=0.1*f, halfH=0.1*f;
+        rawManualZoomBounds={
+          leftX:Math.max(0, rawZoomCenterX-halfW),
+          rightX:Math.min(1, rawZoomCenterX+halfW),
+          topY:Math.max(0, rawZoomCenterY-halfH),
+          bottomY:Math.min(1, rawZoomCenterY+halfH)
+        };
+        rawPanOffsetX=0; rawPanOffsetY=0;
+        drawRawFrameToCanvas();
+        return;
+      }
+      
+      // Joint selection logic (only when pose is visible)
+      if(!isPoseVisible || !poseData.length) return;
+      const idx=Math.max(0,Math.min(rawCurrentFrame, poseData.length-1));
+      const rawFrame=poseData[idx];
+      const frame=normalizePoseFrame(rawFrame)||[];
+      
+      // Transform click coordinates to normalized space accounting for zoom
+      let clickNormX=clickX/W;
+      let clickNormY=clickY/H;
+      if(rawManualZoomBounds){
+        const viewWidthN=rawManualZoomBounds.rightX-rawManualZoomBounds.leftX;
+        const viewHeightN=rawManualZoomBounds.bottomY-rawManualZoomBounds.topY;
+        const adjustedLeftX=Math.max(0, Math.min(1-viewWidthN, rawManualZoomBounds.leftX+rawPanOffsetX));
+        const adjustedTopY=Math.max(0, Math.min(1-viewHeightN, rawManualZoomBounds.topY+rawPanOffsetY));
+        clickNormX=adjustedLeftX + clickNormX*viewWidthN;
+        clickNormY=adjustedTopY + clickNormY*viewHeightN;
+      }
+      
+      let bestIdx=null;
+      let bestDistSq=Infinity;
+      const pickRadius=JOINT_PICK_RADIUS;
+      
+      frame.forEach((kp,i)=>{
+        if(!kp) return;
+        // Compare in normalized space
+        const dx=(kp[0]-clickNormX)*W;
+        const dy=(kp[1]-clickNormY)*H;
+        const d2=dx*dx + dy*dy;
+        if(d2<pickRadius*pickRadius && d2<bestDistSq){
+          bestDistSq=d2;
+          bestIdx=i;
+        }
+      });
+      
+      if(bestIdx!==null){
+        if(rawSelectedJoints.has(bestIdx)){
+          rawSelectedJoints.delete(bestIdx);
+        } else {
+          rawSelectedJoints.add(bestIdx);
+          if(rawSelectedJoints.size>3){
+            const arr=Array.from(rawSelectedJoints);
+            rawSelectedJoints.delete(arr[0]);
+          }
+        }
+        drawRawFrameToCanvas();
+      }
+    });
+    
+    rawCanvas.addEventListener('mousedown', e=>{
+      if(rawIsSelectingZoomCenter) return;
+      const rect=rawCanvas.getBoundingClientRect();
+      const x=e.clientX-rect.left, y=e.clientY-rect.top;
+      if(e.button===0){
+        rawIsZoomSelecting=true;
+        rawZoomStartX=x; rawZoomStartY=y;
+        rawZoomCurrentX=x; rawZoomCurrentY=y;
+      } else if(e.button===2){
+        e.preventDefault();
+        rawIsZoomSelecting=false;
+        rawIsPanning=true;
+        rawPanStartX=x; rawPanStartY=y;
+      }
+    });
+    
+    rawCanvas.addEventListener('mousemove', e=>{
+      const rect=rawCanvas.getBoundingClientRect();
+      const x=e.clientX-rect.left, y=e.clientY-rect.top;
+      if(rawIsZoomSelecting){
+        rawZoomCurrentX=x;
+        rawZoomCurrentY=y;
+        drawRawFrameToCanvas();
+      } else if(e.buttons===2 && rawIsPanning){
+        e.preventDefault();
+        const dx=(x-rawPanStartX)/rawCanvas.clientWidth;
+        const dy=(y-rawPanStartY)/rawCanvas.clientHeight;
+        rawPanOffsetX-=dx;
+        rawPanOffsetY-=dy;
+        rawPanStartX=x;
+        rawPanStartY=y;
+        drawRawFrameToCanvas();
+      }
+    });
+    
+    rawCanvas.addEventListener('mouseup', e=>{
+      const rect=rawCanvas.getBoundingClientRect();
+      const x=e.clientX-rect.left, y=e.clientY-rect.top;
+      if(e.button===0 && rawIsZoomSelecting){
+        rawIsZoomSelecting=false;
+        const leftX=Math.min(rawZoomStartX,x)/rawCanvas.clientWidth;
+        const rightX=Math.max(rawZoomStartX,x)/rawCanvas.clientWidth;
+        const topY=Math.min(rawZoomStartY,y)/rawCanvas.clientHeight;
+        const bottomY=Math.max(rawZoomStartY,y)/rawCanvas.clientHeight;
+        const widthPx=Math.abs(x-rawZoomStartX);
+        const heightPx=Math.abs(y-rawZoomStartY);
+        const minSize=20;
+        if(widthPx>=minSize && heightPx>=minSize){
+          const canvasAspect=rawCanvas.clientWidth/rawCanvas.clientHeight;
+          const selectionAspect=widthPx/heightPx;
+          let finalLeftX=leftX, finalRightX=rightX, finalTopY=topY, finalBottomY=bottomY;
+          if(selectionAspect>canvasAspect){
+            const centerX=(leftX+rightX)/2;
+            const targetWidth=(bottomY-topY)*canvasAspect;
+            finalLeftX=centerX-targetWidth/2;
+            finalRightX=centerX+targetWidth/2;
+          } else {
+            const centerY=(topY+bottomY)/2;
+            const targetHeight=(rightX-leftX)/canvasAspect;
+            finalTopY=centerY-targetHeight/2;
+            finalBottomY=centerY+targetHeight/2;
+          }
+          rawManualZoomBounds={
+            leftX:finalLeftX, rightX:finalRightX,
+            topY:finalTopY, bottomY:finalBottomY
+          };
+          rawPanOffsetX=0; rawPanOffsetY=0;
+          drawRawFrameToCanvas();
+        } else {
+          drawRawFrameToCanvas();
+        }
+      }
+      if(e.button===2 && rawIsPanning){
+        rawIsPanning=false;
+      }
+    });
+    
+    rawCanvas.addEventListener('contextmenu', e=>{ e.preventDefault(); });
+    
+    rawVideoEl.addEventListener('seeked', ()=>{ try{ drawRawFrameToCanvas(); }catch(e){} });
+    rawVideoEl.addEventListener('loadeddata', ()=>{ try{ drawRawFrameToCanvas(); }catch(e){} });
+    rawVideoEl.addEventListener('error', ()=>{
+      const err = rawVideoEl.error;
+      console.error('[Video] Error event', err);
+      const warn=document.getElementById('videoWarning');
+      if(warn) warn.style.display='block';
+    });
+  rawVideoEl.addEventListener('loadedmetadata', ()=>{ rawDuration=rawVideoEl.duration||0; rawCurrentFrame=0; try{ const src=rawVideoEl.currentSrc||''; const m=src.match(/back_kick_(?:fps_)?(\d+)\.(mov|mp4)/i); if(m){ const fps=parseInt(m[1],10); if(Number.isFinite(fps) && fps>0 && fps<1000){ frameStepSec=1/fps; baseIntervalMs=1000/fps; baseFrameDelay=Math.round(1000/fps); frameDelay=baseFrameDelay; } } } catch(e){ console.warn('FPS parse failed', e); } if(!Number.isFinite(frameStepSec) || frameStepSec<=0){ frameStepSec=1/30; baseIntervalMs=1000/30; } recalcTiming(); sizeRawCanvas(); seekAndDraw(0); rawFrameLabel.textContent=`Frame: ${rawCurrentFrame}`; const rawFrameSlider=document.getElementById('rawFrameSlider'); const rawFrameSliderValue=document.getElementById('rawFrameSliderValue'); if(rawFrameSlider){ rawFrameSlider.max=rawMaxFrame>0?rawMaxFrame.toString():'0'; rawFrameSlider.value='0'; } if(rawFrameSliderValue) rawFrameSliderValue.textContent='0'; });
+    document.addEventListener('keydown', (e)=>{ 
+      if(e.key==='Escape' && isSelectingZoomCenter){
+        isSelectingZoomCenter=false;
+        poseCanvas.style.cursor='';
+        const prompt=document.getElementById('alignPrompt');
+        if(prompt){
+          prompt.style.display='none';
+          prompt.classList.remove('flashing');
+        }
+      }
+      if(e.key==='ArrowLeft') startFast(-1); if(e.key==='ArrowRight') startFast(1); }); document.addEventListener('keyup', (e)=>{ if(e.key==='ArrowLeft'||e.key==='ArrowRight') stopFast(); });
+    async function loadPoseIfNeeded(){ if(poseLoaded) return; try{ const {player,session}=getUrlBits(); const path=`${player}/deadballShot/${session}/pose.json`; const url=await storage.ref(path).getDownloadURL(); const res=await fetch(url,{cache:'no-store'}); poseData=await res.json(); poseLoaded=Array.isArray(poseData)&&poseData.length>0; } catch(e){ console.error('pose.json load failed:', e); } }
+  </script>
+  <script src="user-badge.js"></script>
+</body>
+</html>
+
+

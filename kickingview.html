@@ -1,0 +1,4174 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>Performance Dashboard | PoseTek</title>
+    <!-- Use Inter for body and Poppins for headings to match site style -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --accent-light: #5ea87e;
+            --accent-passing: #4c6a8c;
+            --accent-longballs: #8c6a4c;
+            --accent-instep: #6a4c8c;
+            --accent-sprint: #6a8c4c;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --text-dark: #121212;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            /* Improve touch scrolling on mobile */
+            -webkit-tap-highlight-color: rgba(76, 140, 106, 0.2);
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            color: var(--text-light);
+            background-color: var(--primary);
+            line-height: 1.6;
+            -webkit-font-smoothing:antialiased;
+            -moz-osx-font-smoothing:grayscale;
+            /* Smooth scrolling for mobile */
+            -webkit-overflow-scrolling: touch;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 80% 60% at 20% 10%, rgba(76, 140, 106, 0.08), transparent),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(76, 140, 106, 0.05), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(15, 31, 27, 0.85);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo {
+            font-family: 'Poppins', 'SF Pro Display', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links { display: none !important; }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        .nav-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+        .nav-toggle:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-1px); }
+
+        .home-btn-style {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+        .home-btn-style:hover { background: rgba(255, 255, 255, 0.12); transform: translateY(-1px); }
+
+        .header-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.85rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+        .header-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-light);
+            transform: translateY(-1px);
+        }
+        .header-nav-btn .material-symbols-outlined { font-size: 1.05rem; }
+
+        .side-nav {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(15,38,33,0.98), rgba(12,34,30,0.98));
+            box-shadow: 6px 0 30px rgba(0,0,0,0.45);
+            z-index: 1200;
+            padding: 2rem 1.25rem;
+            transition: left 0.32s cubic-bezier(.2,.9,.2,1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .side-nav.open { left: 0; }
+
+        .side-nav .close-side {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.25rem;
+            cursor: pointer;
+            opacity: 0.85;
+            min-width: 44px;
+            min-height: 44px;
+        }
+        .side-nav .close-side:active { transform: scale(0.9); }
+
+        .side-nav .side-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 0.85rem;
+            border-radius: 10px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            min-height: 44px;
+        }
+
+        .side-link .material-symbols-outlined {
+            font-variation-settings: 'wght' 400;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            vertical-align: middle;
+            color: var(--text-light);
+        }
+
+        .side-link span:first-of-type { margin-right: 6px; }
+
+        .side-nav .side-link:hover { background: rgba(255,255,255,0.03); transform: translateX(4px); }
+
+        .side-nav .side-link:active { transform: scale(0.98); }
+
+        .side-nav .side-divider { height: 1px; background: var(--card-border); margin: 0.75rem 0; }
+
+        .side-link { opacity: 0; transform: translateX(-8px); transition: opacity 260ms ease, transform 260ms ease; }
+        .side-nav.open .side-link { opacity: 1; transform: translateX(0); }
+
+        .side-backdrop { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 1100; opacity: 0; visibility: hidden; transition: opacity 200ms ease; }
+        .side-backdrop.open { opacity: 1; visibility: visible; }
+
+        .action-btn {
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);
+            border: none;
+            border-radius: 50px;
+            color: var(--text-light);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 44px;
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+        .action-btn:hover { transform: translateY(-2px); }
+
+        @media (max-width: 720px) {
+            .side-nav { width: 100%; left: -100%; }
+            .side-nav.open { left: 0; }
+            header { padding-left: 0.75rem; padding-right: 0.75rem; }
+            .nav-toggle { width:40px; height:40px; }
+        }
+
+        h1 {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-size: 2.2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 20px;
+            padding: 2rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        .card-title {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-light);
+        }
+
+        .tab-container {
+            display: flex;
+            gap: 0.75rem;
+            margin-bottom: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .tab-container button {
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-weight: 600;
+            padding: 0.7rem 1.4rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            border-radius: 10px;
+            transition: var(--transition);
+            min-height: 44px;
+            letter-spacing: 0.2px;
+        }
+
+        /* Clean time filter pill design */
+        .time-filter {
+            padding: 0.4rem 0.9rem;
+            border: 1px solid rgba(255, 255, 255, 0.15);
+            background: rgba(255, 255, 255, 0.05);
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-weight: 500;
+            font-size: 0.85rem;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            min-height: unset;
+            white-space: nowrap;
+        }
+
+        .time-filter:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: rgba(255, 255, 255, 0.25);
+            color: var(--text-light);
+            transform: translateY(-1px);
+        }
+
+        .time-filter.active {
+            background: var(--accent);
+            border-color: var(--accent);
+            color: #ffffff;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(76, 140, 106, 0.4);
+        }
+
+        .time-filter.active:hover {
+            background: #5a9b77;
+            transform: translateY(-1px);
+        }
+
+        .chart-stats-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1.5rem;
+        }
+
+        @media (max-width: 768px) {
+            .chart-stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .chart-container {
+            position: relative;
+            min-height: 300px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .stat-item {
+            text-align: center;
+        }
+
+        .stat-value {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--accent);
+            font-family: 'Poppins', 'Inter', sans-serif;
+        }
+
+        .stat-label {
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            margin-top: 0.25rem;
+        }
+
+        .best-jump-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            margin-bottom: 1rem;
+        }
+
+        @media (max-width: 768px) {
+            .best-jump-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        .pose-container {
+            background: #1a3a2e;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .keyframe-container {
+            margin-bottom: 1rem;
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            header {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            .nav-links {
+                flex-direction: column;
+                gap: 1rem;
+            }
+            
+            h1 {
+                font-size: 1.8rem;
+            }
+            
+            .card {
+                padding: 1.5rem;
+            }
+        }
+
+        /* Sessions-specific styles */
+        .kick-type-tabs {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.06), rgba(255, 255, 255, 0.03));
+            border-radius: 16px;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.08);
+            padding: 0.6rem;
+        }
+
+        .session-tab-btn {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid var(--card-border);
+            color: var(--text-muted);
+            font-family: 'Poppins', 'Inter', sans-serif;
+            font-weight: 600;
+            padding: 0.65rem 1.2rem;
+            cursor: pointer;
+            font-size: 0.9rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: var(--transition);
+            min-height: 44px;
+        }
+
+        .session-tab-btn:hover {
+            background: rgba(255, 255, 255, 0.08);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
+        }
+
+        .session-tab-btn.active {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1));
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: var(--text-light);
+            font-weight: 700;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .session-tab-btn.active[data-session-tab="all"] {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .session-tab-btn.active[data-session-tab="deadball"] {
+            border-color: var(--accent);
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .session-tab-btn.active[data-session-tab="freerecord"] {
+            border-color: var(--accent-passing);
+            box-shadow: 0 4px 12px rgba(76, 106, 140, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .session-tab-btn.active[data-session-tab="longball"] {
+            border-color: var(--accent-longballs);
+            box-shadow: 0 4px 12px rgba(140, 106, 76, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .session-tab-btn.active[data-session-tab="instep"] {
+            border-color: var(--accent-instep);
+            box-shadow: 0 4px 12px rgba(106, 76, 140, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .session-tab-btn.active[data-session-tab="sprint"],
+        .session-tab-btn.active[data-session-tab="jump"] {
+            border-color: var(--accent-sprint);
+            box-shadow: 0 4px 12px rgba(106, 140, 76, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .sessions-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .session-card {
+            background: linear-gradient(135deg, rgba(255, 255, 255, 0.1), rgba(255, 255, 255, 0.05));
+            border-radius: 16px;
+            padding: 1.5rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        .session-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 24px rgba(0, 0, 0, 0.2), 0 6px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        }
+
+        .session-card:active {
+            transform: translateY(-2px) scale(0.98);
+        }
+
+        .session-card.deadball:hover {
+            border-color: var(--accent);
+        }
+
+        .session-card.passing:hover {
+            border-color: var(--accent-passing);
+        }
+
+        .session-card.longball:hover {
+            border-color: var(--accent-longballs);
+        }
+
+        .session-card.instep:hover {
+            border-color: var(--accent-instep);
+        }
+
+        .session-card.sprint:hover,
+        .session-card.jump:hover {
+            border-color: var(--accent-sprint);
+        }
+
+        .session-date {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            margin-bottom: 0.8rem;
+        }
+
+        .session-title {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.2rem;
+            font-weight: 600;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+        }
+
+        .session-stats {
+            display: flex;
+            gap: 1.5rem;
+            font-size: 0.9rem;
+        }
+
+        .session-stat {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .stat-icon {
+            color: var(--accent);
+            font-weight: bold;
+        }
+
+        .session-card.passing .stat-icon {
+            color: var(--accent-passing);
+        }
+
+        .session-card.longball .stat-icon {
+            color: var(--accent-longballs);
+        }
+
+        .session-card.instep .stat-icon {
+            color: var(--accent-instep);
+        }
+
+        .session-card.sprint .stat-icon,
+        .session-card.jump .stat-icon {
+            color: var(--accent-sprint);
+        }
+
+        .badge {
+            display: inline-flex;
+            align-items: center;
+            padding: 0.3rem 0.9rem;
+            border-radius: 50px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            margin-top: 1rem;
+            box-shadow: 0 2px 6px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .badge.deadball {
+            background-color: var(--accent);
+        }
+
+        .badge.passing {
+            background-color: var(--accent-passing);
+        }
+
+        .badge.longball {
+            background-color: var(--accent-longballs);
+        }
+
+        .badge.instep {
+            background-color: var(--accent-instep);
+        }
+
+        .badge.sprint,
+        .badge.jump {
+            background-color: var(--accent-sprint);
+        }
+
+        .loading-container {
+            text-align: center;
+            padding: 3rem;
+        }
+
+        .loading-spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            border-top-color: var(--accent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .loading-text {
+            color: var(--text-muted);
+            font-size: 1rem;
+        }
+
+        /* Running pose figure loader */
+        .loader {
+            width: 60px;
+            height: 60px;
+            position: relative;
+            z-index: 10;
+            pointer-events: none;
+        }
+        
+        /* Stick figure runner */
+        .loader::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background: transparent;
+        }
+        
+        /* Head */
+        .loader::after {
+            content: '';
+            position: absolute;
+            width: 12px;
+            height: 12px;
+            background: var(--accent);
+            border-radius: 50%;
+            top: 2px;
+            left: 24px;
+            box-shadow: 0 0 8px rgba(76, 140, 106, 0.4);
+        }
+        
+        /* Body, arms, and legs */
+        .loader-body {
+            position: absolute;
+            top: 14px;
+            left: 29px;
+            width: 2px;
+            height: 18px;
+            background: var(--accent);
+            transform-origin: top center;
+            animation: runBody 0.6s ease-in-out infinite;
+        }
+        
+        .loader-arm-left, .loader-arm-right {
+            position: absolute;
+            width: 2px;
+            height: 14px;
+            background: var(--accent);
+            top: 16px;
+            transform-origin: top center;
+        }
+        
+        .loader-arm-left {
+            left: 22px;
+            animation: runArmLeft 0.6s ease-in-out infinite;
+        }
+        
+        .loader-arm-right {
+            left: 36px;
+            animation: runArmRight 0.6s ease-in-out infinite;
+        }
+        
+        .loader-leg-left, .loader-leg-right {
+            position: absolute;
+            width: 2px;
+            height: 16px;
+            background: var(--accent);
+            top: 32px;
+            transform-origin: top center;
+        }
+        
+        .loader-leg-left {
+            left: 26px;
+            animation: runLegLeft 0.6s ease-in-out infinite;
+        }
+        
+        .loader-leg-right {
+            left: 32px;
+            animation: runLegRight 0.6s ease-in-out infinite;
+        }
+        
+        @keyframes runBody {
+            0%, 100% { transform: rotate(5deg); }
+            50% { transform: rotate(-5deg); }
+        }
+        
+        @keyframes runArmLeft {
+            0%, 100% { transform: rotate(45deg); }
+            50% { transform: rotate(-30deg); }
+        }
+        
+        @keyframes runArmRight {
+            0%, 100% { transform: rotate(-30deg); }
+            50% { transform: rotate(45deg); }
+        }
+        
+        @keyframes runLegLeft {
+            0%, 100% { transform: rotate(-35deg); }
+            50% { transform: rotate(25deg); }
+        }
+        
+        @keyframes runLegRight {
+            0%, 100% { transform: rotate(25deg); }
+            50% { transform: rotate(-35deg); }
+        }
+
+        /* Premium lock — session card overlay */
+        .session-card-locked {
+            position: relative;
+            pointer-events: none;
+            cursor: default;
+        }
+
+        .session-card-locked > * {
+            visibility: hidden;
+        }
+
+        .session-card-locked::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 16px;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 5;
+        }
+
+        .session-card-locked .lock-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 6;
+            pointer-events: none;
+            gap: 0.4rem;
+            visibility: visible;
+        }
+
+        .session-card-locked .lock-overlay .material-symbols-outlined {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .session-card-locked .lock-overlay span:last-child {
+            font-size: 0.8rem;
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .session-card-locked:hover {
+            transform: none;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        }
+
+        /* Premium lock — technique section overlay */
+        .technique-section-locked {
+            position: relative;
+            pointer-events: none;
+            user-select: none;
+            min-height: 120px;
+        }
+
+        .technique-section-locked > * {
+            visibility: hidden;
+        }
+
+        .technique-section-locked::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 10;
+        }
+
+        .technique-section-locked .lock-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 11;
+            pointer-events: none;
+            gap: 0.5rem;
+            visibility: visible;
+        }
+
+        .technique-section-locked .lock-overlay .material-symbols-outlined {
+            font-size: 2.5rem;
+            color: rgba(255, 255, 255, 0.85);
+        }
+
+        .technique-section-locked .lock-overlay .lock-label {
+            font-size: 0.9rem;
+            color: rgba(255, 255, 255, 0.7);
+            font-weight: 500;
+            text-align: center;
+            max-width: 280px;
+        }
+
+        .lock-overlay .unlock-btn {
+            pointer-events: auto;
+            cursor: pointer;
+            margin-top: 0.5rem;
+            padding: 0.5rem 1.2rem;
+            background: var(--accent, #4c8c6a);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            transition: background 0.2s;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .lock-overlay .unlock-btn:hover {
+            background: var(--accent-light, #5ea87e);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+            <button id="navToggle" class="nav-toggle" aria-label="Open navigation">&#9776;</button>
+            <div class="logo">PoseTek</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <a id="leaderboardBtn" href="leaderboard.html" class="header-nav-btn" title="Leaderboards">
+                <span class="material-symbols-outlined">leaderboard</span>
+                <span>Leaderboard</span>
+            </a>
+            <a href="coachesview.html" class="home-btn home-btn-style" title="Home">
+                <span class="material-symbols-outlined" style="color:var(--text-light);font-size:1.3rem;">home</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Side navigation panel -->
+    <aside id="sideNav" class="side-nav" aria-hidden="true">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div style="font-weight:700;font-size:1.25rem;">Menu</div>
+            <button class="close-side" id="closeSide">✕</button>
+        </div>
+        <div class="side-divider"></div>
+        <!-- Compact profile area (will be populated from auth) -->
+        <div id="sideProfile" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+            <div id="profileAvatar" style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem">P</div>
+            <div style="display:flex;flex-direction:column;">
+                <div id="profileName" style="font-weight:700">Player</div>
+                <div id="profileEmail" style="font-size:0.85rem;opacity:0.85">email@example.com</div>
+            </div>
+        </div>
+        <div class="side-divider"></div>
+        <!-- Links will be cloned here from header nav -->
+        <div id="sideLinks" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+        <div class="side-divider"></div>
+        <div style="margin-top:auto">
+            <button class="action-btn" id="sideLogout">Logout</button>
+        </div>
+    </aside>
+    <div id="sideBackdrop" class="side-backdrop" tabindex="-1"></div>
+
+    <div class="container">
+        <h1>Performance Dashboard</h1>
+        
+        <div class="card">
+            <!-- Main Activity Type Tabs -->
+            <div class="tab-container" style="margin-bottom: 1rem;">
+                <button class="rep-type-tab active" data-rep-type="jump" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1)); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 700; padding: 0.7rem 1.4rem; cursor: pointer; font-size: 0.95rem; box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); transition: var(--transition); min-height: 44px;">
+                    Jump
+                </button>
+                <button class="rep-type-tab" data-rep-type="kick" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.7rem 1.4rem; cursor: pointer; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition); min-height: 44px;">
+                    Kick
+                </button>
+                <button class="rep-type-tab" data-rep-type="sprint" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.7rem 1.4rem; cursor: pointer; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition); min-height: 44px;">
+                    Sprint
+                </button>
+                <button class="rep-type-tab" data-rep-type="freerecord" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.7rem 1.4rem; cursor: pointer; font-size: 0.95rem; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition); min-height: 44px;">
+                    Free Record
+                </button>
+            </div>
+
+            <!-- Collapsible Sessions Section -->
+            <div id="sessionsCollapsible" style="margin-bottom: 1.5rem; border: 1px solid var(--card-border); border-radius: 12px; overflow: hidden; background: rgba(255, 255, 255, 0.03);">
+                <button id="sessionsToggleBtn" style="width: 100%; padding: 1rem 1.5rem; background: rgba(255, 255, 255, 0.05); border: none; color: var(--text-light); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; font-size: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: space-between; transition: var(--transition);">
+                    <span style="display: flex; align-items: center; gap: 0.5rem;">
+                        <span style="font-size: 1.2rem;">📋</span>
+                        <span>Sessions</span>
+                        <span id="sessionCount" style="background: var(--accent); padding: 0.2rem 0.6rem; border-radius: 20px; font-size: 0.85rem; font-weight: 700;">0</span>
+                    </span>
+                    <span id="sessionsToggleIcon" style="font-size: 1.2rem; transition: transform 0.3s ease;">▼</span>
+                </button>
+                <div id="sessionsContent" style="max-height: 0; overflow: hidden; transition: max-height 0.3s ease;">
+                    <div style="padding: 1rem;">
+                        <div class="sessions-grid" id="sessionsGrid">
+                            <div class="loading-container">
+                                <div class="loading-spinner"></div>
+                                <p class="loading-text">Loading session data...</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Performance Dashboard View -->
+            <div id="performanceView">
+            
+            <!-- Time period selector -->
+            <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; margin-right: 0.25rem;">Period:</span>
+                <button class="time-filter" data-period="week">1W</button>
+                <button class="time-filter active" data-period="month">1M</button>
+                <button class="time-filter" data-period="6months">6M</button>
+                <button class="time-filter" data-period="year">1Y</button>
+                <button class="time-filter" data-period="all">All</button>
+            </div>
+
+            <!-- Jump height chart and stats side by side -->
+            <div class="chart-stats-grid">
+                <!-- Left: Chart -->
+                <div>
+                    <h3 id="chartTitle" style="font-size: 1rem; margin-bottom: 0.75rem;">Jump Height Over Time</h3>
+                    <div class="chart-container" style="height: 220px;">
+                        <canvas id="jumpHeightChart"></canvas>
+                    </div>
+                </div>
+                
+                <!-- Right: Stats -->
+                <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Statistics</h3>
+                    <div style="display: flex; flex-direction: column; gap: 0.65rem; flex: 1;">
+                        <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                            <div class="stat-value" id="avgJumpHeight">--</div>
+                            <div class="stat-label">Avg Jump Height (m)</div>
+                        </div>
+                        <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                            <div class="stat-value" id="maxJumpHeight">--</div>
+                            <div class="stat-label">Max Jump Height (m)</div>
+                        </div>
+                        <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                            <div class="stat-value" id="totalJumps">--</div>
+                            <div class="stat-label">Total Jumps</div>
+                        </div>
+                        <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                            <div class="stat-value" id="recentTrend">--</div>
+                            <div class="stat-label">Trend</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Jump Technique Breakdown -->
+            <div id="bestJumpSection" style="display: none; border-top: 1px solid var(--card-border); padding-top: 1rem; margin-top: 0.5rem;">
+                <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Jump Technique Breakdown</h3>
+                
+                <div class="best-jump-grid">
+                    <!-- Pose visualization with keyframe toggle -->
+                    <div>
+                        <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Pose at Key Frames</h4>
+                        <div class="tab-container keyframe-container">
+                            <button class="keyframe-btn active" data-keyframe="coil" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1)); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 700; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); transition: var(--transition);">Coil</button>
+                            <button class="keyframe-btn" data-keyframe="midextension" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Mid Ext</button>
+                            <button class="keyframe-btn" data-keyframe="takeoff" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Takeoff</button>
+                        </div>
+                        <div style="text-align: center; margin-bottom: 0.5rem;">
+                            <span id="poseViewIndicator" style="font-size: 0.8rem; color: #4c8c6a; font-weight: 600; padding: 0.25rem 0.75rem; background: rgba(76, 140, 106, 0.15); border-radius: 12px; display: inline-block;">Viewing: Best Jump</span>
+                            <label style="font-size: 0.75rem; color: var(--text-muted); margin-left: 1rem; cursor: pointer; user-select: none;">
+                                <input type="checkbox" id="overlayToggle" style="margin-right: 0.25rem; cursor: pointer;">
+                                Overlay Average
+                            </label>
+                        </div>
+                        <!-- Movement Trajectory - Full Width -->
+                        <div style="text-align: center;">
+                            <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600;">Movement Trajectory (5 Key Joints)</div>
+                            <div class="pose-container" style="height: 350px; display: flex; justify-content: center; align-items: center; background: #1a3a2e; border-radius: 8px; position: relative;">
+                                <div id="trajectoryLoader" class="loader" style="position: absolute;">
+                                    <div class="loader-body"></div>
+                                    <div class="loader-arm-left"></div>
+                                    <div class="loader-arm-right"></div>
+                                    <div class="loader-leg-left"></div>
+                                    <div class="loader-leg-right"></div>
+                                </div>
+                                <canvas id="trajectoryCanvas" width="500" height="350" style="max-width: 100%;"></canvas>
+                            </div>
+                        </div>
+                        <!-- Hidden canvas for pose detail (kept for compatibility) -->
+                        <canvas id="bestJumpPoseCanvas" width="1" height="1" style="display: none;"></canvas>
+                        <div id="poseLoader" class="loader" style="display: none;">
+                            <div class="loader-body"></div>
+                            <div class="loader-arm-left"></div>
+                            <div class="loader-arm-right"></div>
+                            <div class="loader-leg-left"></div>
+                            <div class="loader-leg-right"></div>
+                        </div>
+                    </div>
+
+                    <!-- Angle comparison chart -->
+                    <div>
+                        <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Joint Angles: Best vs Average</h4>
+                        <div class="chart-container" style="height: 300px; position: relative;">
+                            <div id="chartLoader" class="loader" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);">
+                                <div class="loader-body"></div>
+                                <div class="loader-arm-left"></div>
+                                <div class="loader-arm-right"></div>
+                                <div class="loader-leg-left"></div>
+                                <div class="loader-leg-right"></div>
+                            </div>
+                            <canvas id="angleComparisonChart" style="width: 100%; height: 100%;"></canvas>
+                        </div>
+                    </div>
+                </div>
+
+                <div style="text-align: center; margin-top: 1rem;">
+                    <a href="#" id="viewBestJumpLink" style="display: inline-flex; align-items: center; justify-content: center; padding: 0.7rem 1.6rem; border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 12px; background: linear-gradient(135deg, var(--accent) 0%, #56a07a 100%); color: #fff; font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; font-size: 0.95rem; text-decoration: none; cursor: pointer; transition: var(--transition); box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); min-height: 44px;">View Full Analysis →</a>
+                </div>
+            </div>
+
+            <div id="noJumpData" style="text-align: center; padding: 2rem; color: var(--text-muted);">
+                <h3>No jump data available</h3>
+                <p>Complete jump sessions to see your performance metrics here</p>
+            </div>
+
+            </div>
+
+            <!-- SPRINT CONTENT SECTION -->
+            <div id="sprintContent" style="display: none;">
+                <!-- Time period selector for sprint -->
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; margin-right: 0.25rem;">Period:</span>
+                    <button class="time-filter sprint-time-filter active" data-period="week">1W</button>
+                    <button class="time-filter sprint-time-filter" data-period="month">1M</button>
+                    <button class="time-filter sprint-time-filter" data-period="6months">6M</button>
+                    <button class="time-filter sprint-time-filter" data-period="year">1Y</button>
+                    <button class="time-filter sprint-time-filter" data-period="all">All</button>
+                </div>
+
+                <!-- Sprint chart and stats -->
+                <div class="chart-stats-grid">
+                    <div>
+                        <h3 id="sprintChartTitle" style="font-size: 1rem; margin-bottom: 0.75rem;">Top Speed Over Time</h3>
+                        <div class="chart-container" style="height: 220px;">
+                            <canvas id="sprintSpeedChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                        <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Statistics</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.65rem; flex: 1;">
+                            <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                                <div class="stat-value" id="avgSprintSpeed">--</div>
+                                <div class="stat-label">Avg Top Speed (mph)</div>
+                            </div>
+                            <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                                <div class="stat-value" id="maxSprintSpeed">--</div>
+                                <div class="stat-label">Max Top Speed (mph)</div>
+                            </div>
+                            <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                                <div class="stat-value" id="totalSprints">--</div>
+                                <div class="stat-label">Total Sprints</div>
+                            </div>
+                            <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                                <div class="stat-value" id="sprintTrend">--</div>
+                                <div class="stat-label">Trend</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Sprint Technique Breakdown -->
+                <div id="sprintTechniqueSection" style="border-top: 1px solid var(--card-border); padding-top: 1rem; margin-top: 0.5rem;">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Sprint Technique Breakdown</h3>
+                    
+                    <div class="best-jump-grid">
+                        <div>
+                            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Pose at Key Frames</h4>
+                            <div class="tab-container keyframe-container">
+                                <button class="sprint-keyframe-btn active" data-keyframe="propulsion" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1)); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 700; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); transition: var(--transition);">Propulsion</button>
+                                <button class="sprint-keyframe-btn" data-keyframe="midflight" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Mid-Flight</button>
+                                <button class="sprint-keyframe-btn" data-keyframe="braking" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Braking</button>
+                            </div>
+                            <div style="text-align: center; margin-bottom: 0.5rem;">
+                                <span id="sprintPoseViewIndicator" style="font-size: 0.8rem; color: #4c8c6a; font-weight: 600; padding: 0.25rem 0.75rem; background: rgba(76, 140, 106, 0.15); border-radius: 12px; display: inline-block;">Viewing: Best Sprint</span>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600;">Movement Trajectory</div>
+                                <div class="pose-container" style="height: 350px; display: flex; justify-content: center; align-items: center; background: #1a3a2e; border-radius: 8px; position: relative;">
+                                    <div id="sprintTrajectoryLoader" class="loader" style="position: absolute; display: none;">
+                                        <div class="loader-body"></div>
+                                        <div class="loader-arm-left"></div>
+                                        <div class="loader-arm-right"></div>
+                                        <div class="loader-leg-left"></div>
+                                        <div class="loader-leg-right"></div>
+                                    </div>
+                                    <canvas id="sprintTrajectoryCanvas" width="500" height="350" style="max-width: 100%;"></canvas>
+                                    <div style="position: absolute; color: var(--text-muted); font-size: 0.9rem;">Data coming soon</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Joint Angles: Best vs Average</h4>
+                            <div class="chart-container" style="height: 300px; position: relative;">
+                                <canvas id="sprintAngleComparisonChart"></canvas>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-muted); font-size: 0.9rem;">Data coming soon</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="noSprintData" style="display: none; text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <h3>No sprint data available</h3>
+                    <p>Complete sprint sessions to see your performance metrics here</p>
+                </div>
+            </div>
+
+            <!-- KICK CONTENT SECTION -->
+            <div id="kickContent" style="display: none;">
+                <!-- Foot filter selector for kick -->
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; margin-right: 0.25rem;">Foot:</span>
+                    <button class="time-filter kick-foot-filter active" data-foot="all">All</button>
+                    <button class="time-filter kick-foot-filter" data-foot="left">Left</button>
+                    <button class="time-filter kick-foot-filter" data-foot="right">Right</button>
+                </div>
+
+                <!-- Time period selector for kick -->
+                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
+                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; margin-right: 0.25rem;">Period:</span>
+                    <button class="time-filter kick-time-filter" data-period="week">1W</button>
+                    <button class="time-filter kick-time-filter active" data-period="month">1M</button>
+                    <button class="time-filter kick-time-filter" data-period="6months">6M</button>
+                    <button class="time-filter kick-time-filter" data-period="year">1Y</button>
+                    <button class="time-filter kick-time-filter" data-period="all">All</button>
+                </div>
+
+                <!-- Kick chart and stats -->
+                <div class="chart-stats-grid">
+                    <div>
+                        <h3 id="kickChartTitle" style="font-size: 1rem; margin-bottom: 0.75rem;">Ball Speed Over Time</h3>
+                        <div class="chart-container" style="height: 220px;">
+                            <canvas id="kickSpeedChart"></canvas>
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+                        <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Statistics</h3>
+                        <div style="display: flex; flex-direction: column; gap: 0.65rem; flex: 1;">
+                            <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                                <div class="stat-value" id="avgLaunchAngle">--</div>
+                                <div class="stat-label">Avg Launch Angle</div>
+                            </div>
+                            <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                                <div class="stat-value" id="avgKickSpeed">--</div>
+                                <div class="stat-label">Avg Ball Speed (m/s)</div>
+                            </div>
+                            <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                                <div class="stat-value" id="maxKickSpeed">--</div>
+                                <div class="stat-label">Max Ball Speed (m/s)</div>
+                            </div>
+                            <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                                <div class="stat-value" id="totalKicks">--</div>
+                                <div class="stat-label">Total Kicks</div>
+                            </div>
+                            <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
+                                <div class="stat-value" id="kickTrend">--</div>
+                                <div class="stat-label">Trend</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Kick Technique Breakdown -->
+                <div id="kickTechniqueSection" style="border-top: 1px solid var(--card-border); padding-top: 1rem; margin-top: 0.5rem;">
+                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Kick Technique Breakdown</h3>
+                    
+                    <div class="best-jump-grid">
+                        <div>
+                            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Pose at Key Frames</h4>
+                            <div class="tab-container keyframe-container">
+                                <button class="kick-keyframe-btn active" data-keyframe="approach" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1)); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 700; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); transition: var(--transition);">Approach</button>
+                                <button class="kick-keyframe-btn" data-keyframe="backswing" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Backswing</button>
+                                <button class="kick-keyframe-btn" data-keyframe="impact" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Impact</button>
+                            </div>
+                            <div style="text-align: center; margin-bottom: 0.5rem;">
+                                <span id="kickPoseViewIndicator" style="font-size: 0.8rem; color: #4c8c6a; font-weight: 600; padding: 0.25rem 0.75rem; background: rgba(76, 140, 106, 0.15); border-radius: 12px; display: inline-block;">Viewing: Best Kick</span>
+                            </div>
+                            <div style="text-align: center;">
+                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600;">Movement Trajectory</div>
+                                <div class="pose-container" style="height: 350px; display: flex; justify-content: center; align-items: center; background: #1a3a2e; border-radius: 8px; position: relative;">
+                                    <div id="kickTrajectoryLoader" class="loader" style="position: absolute; display: none;">
+                                        <div class="loader-body"></div>
+                                        <div class="loader-arm-left"></div>
+                                        <div class="loader-arm-right"></div>
+                                        <div class="loader-leg-left"></div>
+                                        <div class="loader-leg-right"></div>
+                                    </div>
+                                    <canvas id="kickTrajectoryCanvas" width="500" height="350" style="max-width: 100%;"></canvas>
+                                    <div style="position: absolute; color: var(--text-muted); font-size: 0.9rem;">Data coming soon</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div>
+                            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Joint Angles: Best vs Average</h4>
+                            <div class="chart-container" style="height: 300px; position: relative;">
+                                <canvas id="kickAngleComparisonChart"></canvas>
+                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-muted); font-size: 0.9rem;">Data coming soon</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div id="noKickData" style="display: none; text-align: center; padding: 2rem; color: var(--text-muted);">
+                    <h3>No kick data available</h3>
+                    <p>Complete kicking sessions to see your performance metrics here</p>
+                </div>
+            </div>
+
+            <!-- FREE RECORD CONTENT SECTION (Sessions Only) -->
+            <div id="freeRecordContent" style="display: none;">
+                <div style="text-align: center; padding: 1rem; color: var(--text-muted);">
+                    <p style="font-size: 0.95rem;">Select a session from the dropdown above to view details</p>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    
+    <!-- Chart.js for visualizations -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+    <script>
+       const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        // Initialize Firebase
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const storage = firebase.storage();
+        
+        // Pose connections for visualization
+        const POSE_CONNECTIONS = [
+            [11, 12], [12, 24], [24, 23], [23, 11], // torso
+            [11, 13], [13, 15], [15, 17], [15, 19], [15, 21], [17, 19], // left arm
+            [12, 14], [14, 16], [16, 18], [16, 20], [16, 22], [18, 20], // right arm
+            [23, 25], [25, 27], [27, 29], [27, 31], [29, 31], // left leg
+            [24, 26], [26, 28], [28, 30], [28, 32], [30, 32]  // right leg
+        ];
+
+        // Global variables to store user info
+        let currentUserInfo = null;
+        let currentPlayerInfo = null;
+        let isViewingPlayer = false;
+        let isCoach = false;
+
+        // Authentication state observer
+        auth.onAuthStateChanged(async (user) => {
+            if (!user && !window.location.search.includes('player=')) {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            const urlParams = new URLSearchParams(window.location.search);
+            const playerDocId = urlParams.get('player');
+            const urlUserType = urlParams.get('userType');
+            console.log('[kickingview.html] userType from URL:', urlUserType || 'not provided');
+
+            if (user) {
+                // Load current user info first
+                currentUserInfo = await loadUserInfo(user.uid, urlUserType);
+                console.log('[kickingview.html] loadUserInfo returned:', currentUserInfo);
+                if (!currentUserInfo) {
+                    console.error('[kickingview.html] loadUserInfo returned null — user not found in any collection. Home button will not update.');
+                }
+                isCoach = currentUserInfo && currentUserInfo.type === 'coach';
+                console.log('[kickingview.html] Resolved user type:', isCoach ? 'coach' : 'player', '| isCoach:', isCoach);
+            }
+
+            // If viewing another player's profile (as coach) or direct link
+            if (playerDocId) {
+                isViewingPlayer = true;
+                currentPlayerInfo = await loadPlayerProfile(playerDocId);
+                
+                // If not authenticated and not a coach viewing a player, redirect
+                if (!user && !isCoach) {
+                    window.location.href = 'index.html';
+                    return;
+                }
+            } else if (user) {
+                // Regular player viewing their own profile
+                isViewingPlayer = false;
+                currentPlayerInfo = currentUserInfo;
+            } else {
+                window.location.href = 'index.html';
+                return;
+            }
+
+            populateSideLinks();
+
+            // Load all reps (jump, sprint, kick) in a single query
+            await loadAllReps();
+            
+            // Fetch all sessions once and cache them
+            try {
+                const targetPlayerDocId = currentPlayerInfo.docId;
+                const targetPlayerUid = currentPlayerInfo.uid || null;
+                cachedAllSessions = await fetchSessionsFromFirestore(targetPlayerUid, targetPlayerDocId);
+                console.log('Cached', cachedAllSessions.length, 'sessions at init');
+            } catch (err) {
+                console.error('Failed to fetch sessions at init:', err);
+                cachedAllSessions = [];
+            }
+
+            // Update session count from cache
+            updateSessionCountFromCache();
+
+            // Check premium content lock
+            if (currentPlayerInfo) {
+                const pDocId = currentPlayerInfo.docId;
+                if (pDocId) {
+                    try {
+                        const pDoc = await db.collection('players').doc(pDocId).get();
+                        if (pDoc.exists) {
+                            const locked = pDoc.data().premium_content_locked;
+                            // Players default to locked; coaches default to unlocked
+                            const shouldLock = isCoach ? (locked === true) : (locked !== false);
+                            if (shouldLock) {
+                                isPremiumLocked = true;
+                                applyTechniqueSectionLocks();
+                            }
+                        }
+                    } catch (e) {
+                        console.error('[PremiumLock] Error checking premium lock:', e);
+                    }
+                }
+            }
+
+            // Auto-expand sessions if fewer than 4 for current tab
+            autoExpandSessionsIfFew();
+        });
+
+        // Load user info from Firestore (for authenticated users)
+        // Helper: find a player doc by the auth UID, checking both field names used
+        // across signup flows (userUID = org/independent signup, authenticationUID = code signup)
+        async function findPlayerByAuthUID(userId) {
+            let snap = await db.collection('players').where('userUID', '==', userId).get();
+            if (!snap.empty) return snap.docs[0];
+            snap = await db.collection('players').where('authenticationUID', '==', userId).get();
+            if (!snap.empty) return snap.docs[0];
+            return null;
+        }
+
+        async function loadUserInfo(userId, userTypeHint) {
+            try {
+                console.log('[loadUserInfo] UID:', userId, '| userType hint:', userTypeHint || 'none');
+
+                // Fast path when userType hint is provided
+                if (userTypeHint === 'coach') {
+                    const coachDoc = await db.collection('coaches').doc(userId).get();
+                    if (coachDoc.exists) {
+                        console.log('[loadUserInfo] Found coach (fast path)');
+                        return { type: 'coach', uid: userId, docId: userId, ...coachDoc.data() };
+                    }
+                }
+
+                if (userTypeHint === 'player') {
+                    const playerDoc = await findPlayerByAuthUID(userId);
+                    if (playerDoc) {
+                        console.log('[loadUserInfo] Found player (fast path)');
+                        return { type: 'player', uid: userId, docId: playerDoc.id, ...playerDoc.data() };
+                    }
+                }
+
+                // Fallback: query both collections (isolated so a permission error on coaches
+                // does not prevent the player lookup from running)
+                console.log('[loadUserInfo] Falling back to full query');
+                try {
+                    const coachDoc = await db.collection('coaches').doc(userId).get();
+                    if (coachDoc.exists) {
+                        const coachData = coachDoc.data();
+                        return { type: 'coach', uid: userId, docId: userId, ...coachData };
+                    }
+                } catch (coachErr) {
+                    console.warn('[loadUserInfo] Could not read coaches collection (likely a player):', coachErr.code || coachErr.message);
+                }
+
+                const playerDoc = await findPlayerByAuthUID(userId);
+                if (playerDoc) {
+                    return { type: 'player', uid: userId, docId: playerDoc.id, ...playerDoc.data() };
+                }
+
+                console.error('User not found in coaches or players collections');
+                return null;
+            } catch (error) {
+                console.error('Error loading user info:', error);
+                return null;
+            }
+        }
+
+        // Load player profile (when viewing specific player)
+        async function loadPlayerProfile(playerDocId) {
+            try {
+                const playerDoc = await db.collection('players').doc(playerDocId).get();
+                if (playerDoc.exists) {
+                    const data = playerDoc.data();
+                    return {
+                        type: 'player',
+                        docId: playerDocId,
+                        uid: data.uid,
+                        ...data
+                    };
+                }
+                console.error('Player document not found:', playerDocId);
+                return null;
+            } catch (error) {
+                console.error('Error loading player profile:', error);
+                return null;
+            }
+        }
+
+        // ============ PERFORMANCE DASHBOARD FUNCTIONS ============
+        let jumpHeightChart = null;
+        let angleComparisonChart = null;
+        let sprintSpeedChart = null;
+        let currentTimePeriod = 'month';
+        let currentSprintTimePeriod = 'month';
+        let currentRepType = 'jump'; // Current selected rep type (jump, kick, sprint)
+        let allJumpReps = [];
+        let bestJumpRep = null;
+        let allSprintReps = [];
+        let bestSprintRep = null;
+        let allKickReps = [];
+        let bestKickRep = null;
+        let currentKickTimePeriod = 'week';
+        let currentFootFilter = 'all'; // 'all', 'left', or 'right'
+        let kickSpeedChart = null;
+        let cachedAllSessions = null; // Fetched once at init, reused for count + cards
+        let isPremiumLocked = false;
+        let isSessionsExpanded = false;
+
+        // Collapsible sessions toggle
+        document.addEventListener('DOMContentLoaded', () => {
+            const sessionsToggleBtn = document.getElementById('sessionsToggleBtn');
+            const sessionsContent = document.getElementById('sessionsContent');
+            const sessionsToggleIcon = document.getElementById('sessionsToggleIcon');
+
+            sessionsToggleBtn.addEventListener('click', () => {
+                isSessionsExpanded = !isSessionsExpanded;
+                
+                if (isSessionsExpanded) {
+                    // Set a large max-height to allow content to expand while loading
+                    sessionsContent.style.maxHeight = '5000px';
+                    sessionsToggleIcon.style.transform = 'rotate(180deg)';
+                    sessionsToggleBtn.style.background = 'rgba(255, 255, 255, 0.08)';
+                    
+                    // Display sessions for current rep type from cache
+                    displaySessionsForCurrentType();
+                } else {
+                    sessionsContent.style.maxHeight = '0';
+                    sessionsToggleIcon.style.transform = 'rotate(0deg)';
+                    sessionsToggleBtn.style.background = 'rgba(255, 255, 255, 0.05)';
+                }
+            });
+
+            // Switch between rep types
+            const repTypeTabs = document.querySelectorAll('.rep-type-tab');
+
+            function activateRepTypeTab(repType) {
+                const target = document.querySelector(`.rep-type-tab[data-rep-type="${repType}"]`);
+                if (target) target.click();
+            }
+
+            repTypeTabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    const repType = tab.dataset.repType;
+                    
+                    // Update active state with clean styling
+                    repTypeTabs.forEach(t => {
+                        t.classList.remove('active');
+                        t.style.background = 'rgba(255, 255, 255, 0.05)';
+                        t.style.border = '1px solid var(--card-border)';
+                        t.style.color = 'var(--text-muted)';
+                        t.style.fontWeight = '600';
+                        t.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                    });
+                    tab.classList.add('active');
+                    tab.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1))';
+                    tab.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                    tab.style.color = 'var(--text-light)';
+                    tab.style.fontWeight = '700';
+                    tab.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+                    
+                    // Update current rep type and reload data
+                    currentRepType = repType;
+                    console.log('Switched to rep type:', repType);
+                    
+                    // Show correct content section (data already loaded by loadAllReps)
+                    showContentForRepType(repType);
+                    
+                    // Update session count from cache
+                    updateSessionCountFromCache();
+                    
+                    // Re-render sessions from cache if expanded
+                    if (isSessionsExpanded) {
+                        displaySessionsForCurrentType();
+                    }
+                });
+                
+                // Add hover effects
+                tab.addEventListener('mouseenter', () => {
+                    if (!tab.classList.contains('active')) {
+                        tab.style.background = 'rgba(255, 255, 255, 0.08)';
+                        tab.style.transform = 'translateY(-2px)';
+                        tab.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                    }
+                });
+                
+                tab.addEventListener('mouseleave', () => {
+                    if (!tab.classList.contains('active')) {
+                        tab.style.background = 'rgba(255, 255, 255, 0.05)';
+                        tab.style.transform = 'translateY(0)';
+                        tab.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                    }
+                });
+            });
+
+            // Auto-switch to tab from URL param (e.g. ?tab=kick from leaderboard)
+            const initTabParam = new URLSearchParams(window.location.search).get('tab');
+            if (initTabParam) {
+                activateRepTypeTab(initTabParam);
+            }
+        });
+
+        // Show content for selected rep type
+        function showContentForRepType(repType) {
+            // Get all content sections
+            const performanceView = document.getElementById('performanceView');
+            const sprintContent = document.getElementById('sprintContent');
+            const kickContent = document.getElementById('kickContent');
+            const freeRecordContent = document.getElementById('freeRecordContent');
+            const noJumpData = document.getElementById('noJumpData');
+            const bestJumpSection = document.getElementById('bestJumpSection');
+            
+            // Hide all content sections first
+            if (performanceView) performanceView.style.display = 'none';
+            if (sprintContent) sprintContent.style.display = 'none';
+            if (kickContent) kickContent.style.display = 'none';
+            if (freeRecordContent) freeRecordContent.style.display = 'none';
+            
+            // Show appropriate section based on rep type
+            if (repType === 'jump') {
+                if (performanceView) performanceView.style.display = 'block';
+                updateJumpDashboard();
+            } else if (repType === 'sprint') {
+                if (sprintContent) sprintContent.style.display = 'block';
+                updateSprintDashboard();
+            } else if (repType === 'kick') {
+                if (kickContent) kickContent.style.display = 'block';
+                updateKickDashboard();
+            } else if (repType === 'freerecord') {
+                if (freeRecordContent) freeRecordContent.style.display = 'block';
+            }
+
+            if (isPremiumLocked) applyTechniqueSectionLocks();
+        }
+        
+        // Placeholder display for rep types not yet implemented (kept for compatibility)
+        function showPlaceholderForRepType(repType) {
+            showContentForRepType(repType);
+        }
+
+        // Load all reps from Firestore in a single query and sort into type-specific arrays
+        async function loadAllReps() {
+            if (!currentPlayerInfo || !currentPlayerInfo.docId) {
+                console.log('No player info available for reps data');
+                return;
+            }
+
+            try {
+                console.log('Loading all reps for player:', currentPlayerInfo.docId);
+                
+                // Single query — fetch every rep in one read
+                const repsRef = db.collection('players').doc(currentPlayerInfo.docId).collection('reps');
+                const snapshot = await repsRef.get();
+
+                allJumpReps = [];
+                allSprintReps = [];
+                allKickReps = [];
+
+                snapshot.forEach(doc => {
+                    const data = doc.data();
+                    const repType = data.repType;
+
+                    // Normalize createdAt timestamp (shared across all types)
+                    const createdAt = data.createdAt?.toDate ? data.createdAt.toDate() :
+                                      data.timestamp?.toDate ? data.timestamp.toDate() :
+                                      data.date ? new Date(data.date) : new Date();
+
+                    if (repType === 'jump') {
+                        allJumpReps.push({
+                            id: doc.id,
+                            ...data,
+                            createdAt
+                        });
+                    } else if (repType === 'sprint') {
+                        if (data.max_velocity != null) {
+                            allSprintReps.push({
+                                id: doc.id,
+                                ...data,
+                                maxVelocity: Number(data.max_velocity) || 0,
+                                createdAt
+                            });
+                        }
+                    } else if (repType === 'side_kick') {
+                        if (data.velocity != null) {
+                            allKickReps.push({
+                                id: doc.id,
+                                ...data,
+                                velocity: Number(data.velocity) || 0,
+                                launchAngle: Number(data.launch_angle) || 0,
+                                strikeFoot: (data.strike_foot || '').toLowerCase(),
+                                createdAt
+                            });
+                        }
+                    }
+                });
+
+                // Sort each array by createdAt descending
+                allJumpReps.sort((a, b) => b.createdAt - a.createdAt);
+                allSprintReps.sort((a, b) => b.createdAt - a.createdAt);
+                allKickReps.sort((a, b) => b.createdAt - a.createdAt);
+
+                console.log('Reps loaded — jump:', allJumpReps.length, 'sprint:', allSprintReps.length, 'kick:', allKickReps.length);
+
+                // Jump empty-state (jump tab is shown first)
+                if (allJumpReps.length > 0) {
+                    document.getElementById('noJumpData').style.display = 'none';
+                    updateJumpDashboard();
+                } else {
+                    document.getElementById('noJumpData').style.display = 'block';
+                    document.getElementById('bestJumpSection').style.display = 'none';
+                }
+
+                // Sprint empty-state
+                if (allSprintReps.length > 0) {
+                    document.getElementById('noSprintData').style.display = 'none';
+                } else {
+                    document.getElementById('noSprintData').style.display = 'block';
+                    document.getElementById('sprintTechniqueSection').style.display = 'none';
+                }
+
+                // Kick empty-state
+                if (allKickReps.length > 0) {
+                    document.getElementById('noKickData').style.display = 'none';
+                } else {
+                    document.getElementById('noKickData').style.display = 'block';
+                    document.getElementById('kickTechniqueSection').style.display = 'none';
+                }
+            } catch (error) {
+                console.error('Error loading reps data:', error);
+                document.getElementById('noJumpData').style.display = 'block';
+                document.getElementById('noSprintData').style.display = 'block';
+                document.getElementById('noKickData').style.display = 'block';
+            }
+        }
+
+        // Filter reps by time period
+        function filterRepsByPeriod(reps, period) {
+            const now = new Date();
+            const cutoffDate = new Date();
+
+            switch(period) {
+                case 'week':
+                    cutoffDate.setDate(now.getDate() - 7);
+                    break;
+                case 'month':
+                    cutoffDate.setMonth(now.getMonth() - 1);
+                    break;
+                case '6months':
+                    cutoffDate.setMonth(now.getMonth() - 6);
+                    break;
+                case 'year':
+                    cutoffDate.setFullYear(now.getFullYear() - 1);
+                    break;
+                case 'all':
+                    return reps;
+            }
+
+            return reps.filter(rep => rep.createdAt >= cutoffDate);
+        }
+
+        // Update jump dashboard with filtered data
+        function updateJumpDashboard() {
+            const filteredReps = filterRepsByPeriod(allJumpReps, currentTimePeriod);
+
+            // Update chart title to Jump
+            const chartTitle = document.getElementById('chartTitle');
+            if (chartTitle) {
+                chartTitle.textContent = 'Jump Height Over Time';
+            }
+
+            if (filteredReps.length === 0) {
+                document.getElementById('avgJumpHeight').textContent = '--';
+                document.getElementById('maxJumpHeight').textContent = '--';
+                document.getElementById('totalJumps').textContent = '0';
+                document.getElementById('recentTrend').textContent = '--';
+                document.getElementById('bestJumpSection').style.display = 'none';
+                return;
+            }
+
+            // Calculate statistics
+            const jumpHeights = filteredReps.map(r => r.jumpHeight || 0);
+            const avgHeight = (jumpHeights.reduce((a, b) => a + b, 0) / jumpHeights.length).toFixed(3);
+            const maxHeight = Math.max(...jumpHeights).toFixed(3);
+
+            // Find best jump overall (not just in period)
+            bestJumpRep = allJumpReps.reduce((best, current) => {
+                return (current.jumpHeight > (best.jumpHeight || 0)) ? current : best;
+            }, allJumpReps[0]);
+
+            // Calculate trend (compare first half vs second half)
+            const midPoint = Math.floor(filteredReps.length / 2);
+            const firstHalf = filteredReps.slice(midPoint);
+            const secondHalf = filteredReps.slice(0, midPoint);
+            const firstAvg = firstHalf.reduce((sum, r) => sum + (r.jumpHeight || 0), 0) / firstHalf.length;
+            const secondAvg = secondHalf.reduce((sum, r) => sum + (r.jumpHeight || 0), 0) / secondHalf.length;
+            const trendPercent = ((secondAvg - firstAvg) / firstAvg * 100).toFixed(1);
+            const trendText = trendPercent > 0 ? `↗ +${trendPercent}%` : trendPercent < 0 ? `↘ ${trendPercent}%` : '→ 0%';
+
+            // Update UI
+            document.getElementById('avgJumpHeight').textContent = avgHeight;
+            document.getElementById('maxJumpHeight').textContent = maxHeight;
+            document.getElementById('totalJumps').textContent = filteredReps.length;
+            document.getElementById('recentTrend').textContent = trendText;
+
+            // Update chart
+            updateJumpHeightChart(filteredReps);
+
+            // Show best jump section
+            document.getElementById('bestJumpSection').style.display = 'block';
+            loadBestJumpAnalysis();
+        }
+
+        // Update jump height chart
+        function updateJumpHeightChart(reps) {
+            const ctx = document.getElementById('jumpHeightChart');
+            if (!ctx) return;
+
+            // Sort by date
+            const sortedReps = [...reps].sort((a, b) => a.createdAt - b.createdAt);
+            
+            // Limit data points for performance (sample if more than 50 points)
+            let displayReps = sortedReps;
+            if (sortedReps.length > 50) {
+                const step = Math.ceil(sortedReps.length / 50);
+                displayReps = sortedReps.filter((_, i) => i % step === 0);
+            }
+
+            const labels = displayReps.map(r => r.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            const data = displayReps.map(r => r.jumpHeight || 0);
+
+            if (jumpHeightChart) {
+                jumpHeightChart.destroy();
+            }
+
+            jumpHeightChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Jump Height (m)',
+                        data: data,
+                        borderColor: '#4c8c6a',
+                        backgroundColor: 'rgba(76, 140, 106, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 400 },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Height: ' + context.parsed.y.toFixed(3) + ' m';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============ SPRINT DATA FUNCTIONS ============
+        
+        // Update sprint dashboard with filtered data
+        function updateSprintDashboard() {
+            const filteredReps = filterRepsByPeriod(allSprintReps, currentSprintTimePeriod);
+
+            // Update chart title
+            const chartTitle = document.getElementById('sprintChartTitle');
+            if (chartTitle) {
+                chartTitle.textContent = 'Top Speed Over Time';
+            }
+
+            if (filteredReps.length === 0) {
+                document.getElementById('avgSprintSpeed').textContent = '--';
+                document.getElementById('maxSprintSpeed').textContent = '--';
+                document.getElementById('totalSprints').textContent = '0';
+                document.getElementById('sprintTrend').textContent = '--';
+                document.getElementById('sprintTechniqueSection').style.display = 'none';
+                return;
+            }
+
+            // Calculate statistics using maxVelocity (from max_velocity field)
+            // Convert from m/s to mph (1 m/s = 2.23694 mph)
+            const MS_TO_MPH = 2.23694;
+            const speeds = filteredReps.map(r => (r.maxVelocity || 0) * MS_TO_MPH);
+            const avgSpeed = (speeds.reduce((a, b) => a + b, 0) / speeds.length).toFixed(1);
+            const maxSpeed = Math.max(...speeds).toFixed(1);
+
+            // Find best sprint overall (not just in period)
+            bestSprintRep = allSprintReps.reduce((best, current) => {
+                return (current.maxVelocity > (best.maxVelocity || 0)) ? current : best;
+            }, allSprintReps[0]);
+
+            // Calculate trend (compare first half vs second half)
+            const midPoint = Math.floor(filteredReps.length / 2);
+            const firstHalf = filteredReps.slice(midPoint);
+            const secondHalf = filteredReps.slice(0, midPoint);
+            const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((sum, r) => sum + (r.maxVelocity || 0), 0) / firstHalf.length : 0;
+            const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((sum, r) => sum + (r.maxVelocity || 0), 0) / secondHalf.length : 0;
+            const trendPercent = firstAvg > 0 ? ((secondAvg - firstAvg) / firstAvg * 100).toFixed(1) : 0;
+            const trendText = trendPercent > 0 ? `↗ +${trendPercent}%` : trendPercent < 0 ? `↘ ${trendPercent}%` : '→ 0%';
+
+            // Update UI
+            document.getElementById('avgSprintSpeed').textContent = avgSpeed;
+            document.getElementById('maxSprintSpeed').textContent = maxSpeed;
+            document.getElementById('totalSprints').textContent = filteredReps.length;
+            document.getElementById('sprintTrend').textContent = trendText;
+
+            // Update chart
+            updateSprintSpeedChart(filteredReps);
+
+            // Show technique section (even if data coming soon)
+            document.getElementById('sprintTechniqueSection').style.display = 'block';
+        }
+
+        // Update sprint speed chart
+        function updateSprintSpeedChart(reps) {
+            const ctx = document.getElementById('sprintSpeedChart');
+            if (!ctx) return;
+
+            // Sort by date
+            const sortedReps = [...reps].sort((a, b) => a.createdAt - b.createdAt);
+
+            // Convert from m/s to mph (1 m/s = 2.23694 mph)
+            const MS_TO_MPH = 2.23694;
+            const labels = sortedReps.map(r => r.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
+            const data = sortedReps.map(r => (r.maxVelocity || 0) * MS_TO_MPH);
+
+            if (sprintSpeedChart) {
+                sprintSpeedChart.destroy();
+            }
+
+            sprintSpeedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Top Speed (mph)',
+                        data: data,
+                        borderColor: '#ff6b6b',
+                        backgroundColor: 'rgba(255, 107, 107, 0.1)',
+                        tension: 0.4,
+                        fill: true,
+                        pointRadius: 4,
+                        pointHoverRadius: 6
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            callbacks: {
+                                label: function(context) {
+                                    return 'Speed: ' + context.parsed.y.toFixed(1) + ' mph';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // ============ KICK DATA FUNCTIONS ============
+        
+        // Filter kick reps by foot selection
+        function filterKickRepsByFoot(reps, footFilter) {
+            if (footFilter === 'all') return reps;
+            return reps.filter(rep => rep.strikeFoot === footFilter);
+        }
+
+        // Update kick dashboard with filtered data
+        function updateKickDashboard() {
+            // First filter by time period, then by foot
+            let filteredReps = filterRepsByPeriod(allKickReps, currentKickTimePeriod);
+            const footFilteredReps = filterKickRepsByFoot(filteredReps, currentFootFilter);
+
+            // Update chart title
+            const chartTitle = document.getElementById('kickChartTitle');
+            if (chartTitle) {
+                chartTitle.textContent = 'Ball Speed Over Time';
+            }
+
+            if (footFilteredReps.length === 0) {
+                document.getElementById('avgKickSpeed').textContent = '--';
+                document.getElementById('maxKickSpeed').textContent = '--';
+                document.getElementById('avgLaunchAngle').textContent = '--';
+                document.getElementById('totalKicks').textContent = '0';
+                document.getElementById('kickTrend').textContent = '--';
+                document.getElementById('kickTechniqueSection').style.display = 'none';
+                // Still draw chart with all data if foot filter gives no results
+                if (filteredReps.length > 0) {
+                    updateKickSpeedChart(filteredReps);
+                }
+                return;
+            }
+
+            // Calculate statistics
+            const speeds = footFilteredReps.map(r => r.velocity || 0);
+            const nonZeroSpeeds = speeds.filter(s => s > 0);
+            // Exclude reps with launch angle 180 ± 1 when computing avg launch angle
+            const angles = footFilteredReps
+                .map(r => r.launchAngle ?? 0)
+                .filter(a => Math.abs(a - 180) > 1);
+            const avgSpeed = nonZeroSpeeds.length > 0
+                ? (nonZeroSpeeds.reduce((a, b) => a + b, 0) / nonZeroSpeeds.length).toFixed(1)
+                : '--';
+            const maxSpeed = Math.max(...speeds).toFixed(1);
+            const avgAngle = angles.length > 0
+                ? (angles.reduce((a, b) => a + b, 0) / angles.length).toFixed(1)
+                : '--';
+
+            // Find best kick overall (not just in period)
+            bestKickRep = allKickReps.reduce((best, current) => {
+                return (current.velocity > (best.velocity || 0)) ? current : best;
+            }, allKickReps[0]);
+
+            // Calculate trend (compare first half vs second half)
+            const midPoint = Math.floor(footFilteredReps.length / 2);
+            const firstHalf = footFilteredReps.slice(midPoint);
+            const secondHalf = footFilteredReps.slice(0, midPoint);
+            const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((sum, r) => sum + (r.velocity || 0), 0) / firstHalf.length : 0;
+            const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((sum, r) => sum + (r.velocity || 0), 0) / secondHalf.length : 0;
+            const trendPercent = firstAvg > 0 ? ((secondAvg - firstAvg) / firstAvg * 100).toFixed(1) : 0;
+            const trendText = trendPercent > 0 ? `↗ +${trendPercent}%` : trendPercent < 0 ? `↘ ${trendPercent}%` : '→ 0%';
+
+            // Update UI
+            document.getElementById('avgKickSpeed').textContent = avgSpeed === '--' ? '--' : avgSpeed;
+            document.getElementById('maxKickSpeed').textContent = maxSpeed;
+            document.getElementById('avgLaunchAngle').textContent = avgAngle === '--' ? '--' : avgAngle + '°';
+            document.getElementById('totalKicks').textContent = footFilteredReps.length;
+            document.getElementById('kickTrend').textContent = trendText;
+
+            // Update chart with time-filtered data (shows both feet)
+            updateKickSpeedChart(filteredReps);
+
+            // Show technique section
+            document.getElementById('kickTechniqueSection').style.display = 'block';
+        }
+
+        // Update kick speed chart with dual lines for left/right foot
+        function updateKickSpeedChart(reps) {
+            const ctx = document.getElementById('kickSpeedChart');
+            if (!ctx) return;
+
+            // Sort by date
+            const sortedReps = [...reps].sort((a, b) => a.createdAt - b.createdAt);
+
+            // Separate by foot
+            const leftFootReps = sortedReps.filter(r => r.strikeFoot === 'left');
+            const rightFootReps = sortedReps.filter(r => r.strikeFoot === 'right');
+
+            // Create a unified set of dates for x-axis
+            const allDates = [...new Set(sortedReps.map(r => 
+                r.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+            ))];
+
+            // Create data arrays with null for missing dates
+            const leftData = allDates.map(date => {
+                const rep = leftFootReps.find(r => 
+                    r.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) === date
+                );
+                return rep ? rep.velocity : null;
+            });
+
+            const rightData = allDates.map(date => {
+                const rep = rightFootReps.find(r => 
+                    r.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) === date
+                );
+                return rep ? rep.velocity : null;
+            });
+
+            if (kickSpeedChart) {
+                kickSpeedChart.destroy();
+            }
+
+            const datasets = [];
+            
+            // Add left foot dataset if there's data
+            if (leftFootReps.length > 0) {
+                datasets.push({
+                    label: 'Left Foot',
+                    data: leftData,
+                    borderColor: '#4c6a8c',
+                    backgroundColor: 'rgba(76, 106, 140, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    spanGaps: true
+                });
+            }
+            
+            // Add right foot dataset if there's data
+            if (rightFootReps.length > 0) {
+                datasets.push({
+                    label: 'Right Foot',
+                    data: rightData,
+                    borderColor: '#ff9f43',
+                    backgroundColor: 'rgba(255, 159, 67, 0.1)',
+                    tension: 0.4,
+                    fill: false,
+                    pointRadius: 5,
+                    pointHoverRadius: 7,
+                    spanGaps: true
+                });
+            }
+
+            // If no foot-specific data, just show all as one line
+            if (datasets.length === 0) {
+                datasets.push({
+                    label: 'Ball Speed',
+                    data: sortedReps.map(r => r.velocity),
+                    borderColor: '#4c8c6a',
+                    backgroundColor: 'rgba(76, 140, 106, 0.1)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 4,
+                    pointHoverRadius: 6
+                });
+            }
+
+            kickSpeedChart = new Chart(ctx, {
+                type: 'line',
+                data: {
+                    labels: allDates.length > 0 ? allDates : sortedReps.map(r => 
+                        r.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
+                    ),
+                    datasets: datasets
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            title: {
+                                display: true,
+                                text: 'Speed (m/s)',
+                                color: 'rgba(255, 255, 255, 0.7)'
+                            },
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            display: datasets.length > 1,
+                            labels: { color: 'rgba(255, 255, 255, 0.8)' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + ' m/s';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        }
+
+        // Load best jump analysis with pose and angle comparison
+        let currentKeyframe = 'coil';
+        let bestJumpPoseData = null;
+        let bestJumpKeyFrames = null;
+        let averageAngles = null;
+        let averagePoseData = null;
+        let showingAveragePose = false;
+        let filteredTrajectoryData = null; // Average trajectory from filtered data
+        let bestJumpTrajectoryData = null; // Best jump's individual trajectory
+        let filteredAveragePoseData = null; // Average pose from filtered trajectory
+        let overlayAveragePose = false;
+
+        async function loadBestJumpAnalysis() {
+            if (!bestJumpRep || !currentPlayerInfo) {
+                console.log('Cannot load best jump analysis - missing data');
+                return;
+            }
+
+            try {
+                // Show loaders
+                const chartLoader = document.getElementById('chartLoader');
+                const poseLoader = document.getElementById('poseLoader');
+                const trajectoryLoader = document.getElementById('trajectoryLoader');
+                if (chartLoader) chartLoader.style.display = 'block';
+                if (poseLoader) poseLoader.style.display = 'block';
+                if (trajectoryLoader) trajectoryLoader.style.display = 'block';
+                
+                // Calculate average angles across all jumps (fast, no I/O)
+                averageAngles = calculateAverageAngles(allJumpReps);
+                
+                // Load data in parallel for better performance
+                const [poseDataResult, avgPoseResult] = await Promise.all([
+                    // Load best jump pose and keyframes
+                    (async () => {
+                        const posePath = `${currentPlayerInfo.docId}/jump/session${bestJumpRep.sessionNumber}/kick${bestJumpRep.repNumber}/pose.json`;
+                        const keyFramesPath = `${currentPlayerInfo.docId}/jump/session${bestJumpRep.sessionNumber}/kick${bestJumpRep.repNumber}/key_frames.json`;
+                        
+                        const [poseUrl, keyFramesUrl] = await Promise.all([
+                            storage.ref(posePath).getDownloadURL(),
+                            storage.ref(keyFramesPath).getDownloadURL()
+                        ]);
+                        
+                        const [poseData, keyFrames] = await Promise.all([
+                            fetch(poseUrl).then(r => r.json()),
+                            fetch(keyFramesUrl).then(r => r.json())
+                        ]);
+                        
+                        return { poseData, keyFrames };
+                    })(),
+                    // Calculate average pose (slower, requires multiple fetches)
+                    calculateAveragePose(allJumpReps)
+                ]);
+                
+                bestJumpPoseData = poseDataResult.poseData;
+                bestJumpKeyFrames = poseDataResult.keyFrames;
+                
+                console.log('Loaded pose data - frames:', bestJumpPoseData.length, 'keypoints per frame:', bestJumpPoseData[0]?.length);
+                console.log('Loaded keyframes:', bestJumpKeyFrames);
+
+                // Load filtered trajectory data - try multiple possible filenames
+                const possiblePaths = [
+                    `${currentPlayerInfo.docId}/jump/session${bestJumpRep.sessionNumber}/kick${bestJumpRep.repNumber}/Filtered_average_2d_positions.json`,
+                    `${currentPlayerInfo.docId}/jump/session${bestJumpRep.sessionNumber}/kick${bestJumpRep.repNumber}/filtered_average_2d_positions.json`,
+                    `${currentPlayerInfo.docId}/jump/session${bestJumpRep.sessionNumber}/kick${bestJumpRep.repNumber}/Filtered_average_2d_positions.npy.json`,
+                ];
+                
+                // Also try to load best jump's individual filtered trajectory
+                const bestJumpPaths = [
+                    `${currentPlayerInfo.docId}/jump/session${bestJumpRep.sessionNumber}/kick${bestJumpRep.repNumber}/Filtered_2d_positions.json`,
+                    `${currentPlayerInfo.docId}/jump/session${bestJumpRep.sessionNumber}/kick${bestJumpRep.repNumber}/filtered_2d_positions.json`,
+                ];
+                
+                filteredTrajectoryData = null;
+                bestJumpTrajectoryData = null;
+                
+                // Load trajectory data in parallel using Promise.race to get first successful result
+                const loadTrajectoryData = async (paths) => {
+                    const promises = paths.map(async (path) => {
+                        try {
+                            const trajectoryRef = storage.ref(path);
+                            const trajectoryUrl = await trajectoryRef.getDownloadURL();
+                            const trajectoryResponse = await fetch(trajectoryUrl);
+                            return await trajectoryResponse.json();
+                        } catch (err) {
+                            return null;
+                        }
+                    });
+                    const results = await Promise.all(promises);
+                    return results.find(r => r !== null) || null;
+                };
+                
+                // Load both trajectory types in parallel
+                [filteredTrajectoryData, bestJumpTrajectoryData] = await Promise.all([
+                    loadTrajectoryData(possiblePaths),
+                    loadTrajectoryData(bestJumpPaths)
+                ]);
+                
+                if (filteredTrajectoryData) {
+                    console.log('✓ Loaded average trajectory data, shape:', filteredTrajectoryData.length, 'time steps');
+                }
+                if (bestJumpTrajectoryData) {
+                    console.log('✓ Loaded best jump trajectory data');
+                }
+                
+                if (!filteredTrajectoryData) {
+                    console.warn('No trajectory data found in any location');
+                } else {
+                    // Convert filtered trajectory to 33-point pose format for overlay
+                    filteredAveragePoseData = convertFilteredToPose33(filteredTrajectoryData);
+                    if (filteredAveragePoseData) {
+                        console.log('Created filtered average pose data with', Object.keys(filteredAveragePoseData).length, 'keyframes');
+                    } else {
+                        console.warn('Failed to convert filtered trajectory to pose format');
+                    }
+                }
+
+                // Update view best jump link
+                const viewLink = document.getElementById('viewBestJumpLink');
+                if (viewLink) {
+                    viewLink.href = `StaticJumpPage.html?player=${currentPlayerInfo.docId}&session=session${bestJumpRep.sessionNumber}&kick=kick${bestJumpRep.repNumber}&userType=${isCoach ? 'coach' : 'player'}`;
+                }
+
+                // Draw initial pose (coil frame)
+                showingAveragePose = false;
+                currentKeyframe = 'coil'; // Ensure coil is selected
+                drawBestJumpPose();
+                drawTrajectory();
+                updateAngleComparison();
+                
+                // Hide loaders after initial render
+                setTimeout(() => {
+                    const poseLoader = document.getElementById('poseLoader');
+                    const trajectoryLoader = document.getElementById('trajectoryLoader');
+                    if (poseLoader) poseLoader.style.display = 'none';
+                    if (trajectoryLoader) trajectoryLoader.style.display = 'none';
+                }, 500);
+
+            } catch (error) {
+                console.error('Error loading best jump analysis:', error);
+                console.error('Error details:', error.message, error.stack);
+            }
+        }
+
+        // Convert filtered trajectory (6 joints) to 33-point pose format
+        function convertFilteredToPose33(filteredData) {
+            if (!filteredData || !Array.isArray(filteredData)) return null;
+            
+            // Mapping: filtered indices to MediaPipe 33-point indices
+            // Filtered order: [ankle, knee, hip, shoulder, elbow, wrist]
+            // MediaPipe: right ankle=28, right knee=26, right hip=24, right shoulder=12, right elbow=14, right wrist=16
+            const jointMapping = {
+                0: 28,  // ankle
+                1: 26,  // knee
+                2: 24,  // hip
+                3: 12,  // shoulder
+                4: 14,  // elbow
+                5: 16   // wrist
+            };
+            
+            const result = {};
+            
+            // Get keyframe indices from best jump
+            if (bestJumpKeyFrames && bestJumpKeyFrames.length === 3) {
+                const keyframeNames = ['coil', 'midextension', 'takeoff'];
+                
+                keyframeNames.forEach((name, idx) => {
+                    const frameIdx = bestJumpKeyFrames[idx];
+                    if (frameIdx >= 0 && frameIdx < filteredData.length) {
+                        const frame = filteredData[frameIdx];
+                        
+                        // Create 33-point array with nulls (not [0,0] - null means "skip this joint")
+                        const pose33 = new Array(33).fill(null);
+                        
+                        // Map the 6 filtered joints to their positions
+                        for (let i = 0; i < 6; i++) {
+                            if (frame[i] && frame[i].length >= 2) {
+                                const targetIdx = jointMapping[i];
+                                pose33[targetIdx] = [frame[i][0], frame[i][1]];
+                            }
+                        }
+                        
+                        result[name] = pose33;
+                    }
+                });
+            }
+            
+            return Object.keys(result).length > 0 ? result : null;
+        }
+
+        // Calculate average pose positions across all reps
+        async function calculateAveragePose(reps) {
+            console.log('Calculating average pose from', reps.length, 'reps');
+            averagePoseData = { coil: null, midextension: null, takeoff: null };
+            
+            const keyframeMapping = { 'coil': 0, 'midextension': 1, 'takeoff': 2 };
+            
+            for (const kfName of ['coil', 'midextension', 'takeoff']) {
+                const allPoses = [];
+                
+                // Load pose data for all reps in parallel (limit to 10 for performance)
+                const posePromises = reps.slice(0, 10).map(async (rep) => {
+                    try {
+                        const posePath = `${currentPlayerInfo.docId}/jump/session${rep.sessionNumber}/kick${rep.repNumber}/pose.json`;
+                        const keyFramesPath = `${currentPlayerInfo.docId}/jump/session${rep.sessionNumber}/kick${rep.repNumber}/key_frames.json`;
+                        
+                        const [poseUrl, keyFramesUrl] = await Promise.all([
+                            storage.ref(posePath).getDownloadURL(),
+                            storage.ref(keyFramesPath).getDownloadURL()
+                        ]);
+                        
+                        const [poseData, keyFrames] = await Promise.all([
+                            fetch(poseUrl).then(r => r.json()),
+                            fetch(keyFramesUrl).then(r => r.json())
+                        ]);
+                        
+                        const frameIdx = keyFrames[keyframeMapping[kfName]];
+                        if (frameIdx !== undefined && poseData[frameIdx]) {
+                            return poseData[frameIdx];
+                        }
+                    } catch (err) {
+                        console.warn('Failed to load pose for averaging:', err);
+                        return null;
+                    }
+                    return null;
+                });
+                
+                const poseResults = await Promise.all(posePromises);
+                allPoses.push(...poseResults.filter(p => p !== null));
+                
+                // Average the keypoints
+                if (allPoses.length > 0) {
+                    const numKeypoints = allPoses[0].length;
+                    const avgPose = [];
+                    
+                    for (let i = 0; i < numKeypoints; i++) {
+                        const validPoints = allPoses.map(p => p[i]).filter(p => p && Array.isArray(p) && p.length >= 2);
+                        if (validPoints.length > 0) {
+                            const avgX = validPoints.reduce((sum, p) => sum + p[0], 0) / validPoints.length;
+                            const avgY = validPoints.reduce((sum, p) => sum + p[1], 0) / validPoints.length;
+                            const avgZ = validPoints[0].length > 2 ? validPoints.reduce((sum, p) => sum + (p[2] || 0), 0) / validPoints.length : 0;
+                            avgPose.push(validPoints[0].length > 2 ? [avgX, avgY, avgZ] : [avgX, avgY]);
+                        } else {
+                            avgPose.push(null);
+                        }
+                    }
+                    
+                    averagePoseData[kfName] = avgPose;
+                    console.log(`Average pose calculated for ${kfName}:`, avgPose.length, 'keypoints');
+                }
+            }
+        }
+
+        // Calculate average angles across all reps
+        function calculateAverageAngles(reps) {
+            const keyframes = {
+                'coil': 'coilKeyAngles',
+                'midextension': 'midExtensionAngles',
+                'takeoff': 'takeoffAngles'
+            };
+            const averages = {};
+
+            Object.keys(keyframes).forEach(kf => {
+                const anglesKey = keyframes[kf];
+                const allAngles = reps
+                    .map(r => r[anglesKey])
+                    .filter(angles => Array.isArray(angles) && angles.length === 5);
+
+                if (allAngles.length === 0) {
+                    averages[kf] = [0, 0, 0, 0, 0];
+                    return;
+                }
+
+                // Average each angle
+                averages[kf] = [0, 1, 2, 3, 4].map(i => {
+                    const sum = allAngles.reduce((acc, angles) => acc + angles[i], 0);
+                    return sum / allAngles.length;
+                });
+            });
+
+            return averages;
+        }
+
+        // Draw best jump pose at selected keyframe
+        function drawBestJumpPose() {
+            const canvas = document.getElementById('bestJumpPoseCanvas');
+            if (!canvas) {
+                console.error('Canvas element not found!');
+                return;
+            }
+            
+            console.log('Canvas found, dimensions:', canvas.width, 'x', canvas.height);
+
+            // Update indicator
+            const indicator = document.getElementById('poseViewIndicator');
+            if (indicator) {
+                if (showingAveragePose) {
+                    indicator.textContent = 'Viewing: Average Pose';
+                    indicator.style.color = 'rgba(255, 255, 255, 0.8)';
+                    indicator.style.background = 'rgba(255, 255, 255, 0.15)';
+                } else {
+                    indicator.textContent = 'Viewing: Best Jump';
+                    indicator.style.color = '#4c8c6a';
+                    indicator.style.background = 'rgba(76, 140, 106, 0.15)';
+                }
+            }
+
+            // Decide which pose data to use
+            let poseDataToUse = null;
+            let frameIndex = null;
+            
+            if (showingAveragePose && averagePoseData && averagePoseData[currentKeyframe]) {
+                poseDataToUse = averagePoseData[currentKeyframe];
+                console.log('Drawing AVERAGE pose for keyframe:', currentKeyframe);
+            } else if (bestJumpPoseData && bestJumpKeyFrames) {
+                const keyframeMapping = {
+                    'coil': 0,
+                    'midextension': 1,
+                    'takeoff': 2
+                };
+                frameIndex = bestJumpKeyFrames[keyframeMapping[currentKeyframe]];
+                if (frameIndex !== undefined && frameIndex >= 0 && frameIndex < bestJumpPoseData.length) {
+                    poseDataToUse = bestJumpPoseData[frameIndex];
+                    console.log('Drawing BEST jump pose for keyframe:', currentKeyframe, 'frame:', frameIndex);
+                }
+            }
+            
+            if (!poseDataToUse) {
+                console.log('Missing data for drawing');
+                
+                // Still draw something to show canvas is working
+                const ctx = canvas.getContext('2d');
+                ctx.fillStyle = '#1a3a2e';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.font = '14px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('Loading pose data...', canvas.width / 2, canvas.height / 2);
+                return;
+            }
+
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width;
+            const H = canvas.height;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#1a3a2e';
+            ctx.fillRect(0, 0, W, H);
+
+            // Function to draw a single pose
+            const drawSinglePose = (poseData, isBest, isOverlay = false, mainPoseInfo = null) => {
+                let frame = poseData;
+                
+                // Normalize frame if needed (convert from 3D to 2D if necessary)
+                if (frame && frame.length > 0 && frame[0] && frame[0].length > 2) {
+                    frame = frame.map(p => p ? [p[0], p[1]] : null);
+                }
+                
+                if (!frame || !Array.isArray(frame) || frame.length === 0) {
+                    return;
+                }
+
+                // Determine pose type and connections
+                const poseType = frame.length;
+                let connections = POSE_CONNECTIONS; // Default 33-point
+                
+                if (poseType === 17) {
+                    connections = [
+                        [5, 6], [5, 7], [7, 9], [6, 8], [8, 10],
+                        [5, 11], [6, 12], [11, 12],
+                        [11, 13], [13, 15], [12, 14], [14, 16]
+                    ];
+                }
+
+                let scale, offsetX, offsetY;
+                
+                if (isOverlay && mainPoseInfo) {
+                    // Use the main pose's scale and align feet
+                    scale = mainPoseInfo.scale;
+                    
+                    // Get ankle positions (right ankle is index 27/28, use 28 for right)
+                    const mainAnkle = mainPoseInfo.frame[28];
+                    const overlayAnkle = frame[28];
+                    
+                    if (mainAnkle && overlayAnkle && Array.isArray(mainAnkle) && Array.isArray(overlayAnkle)) {
+                        // Calculate where the main ankle is on canvas
+                        const mainAnkleX = mainAnkle[0] * mainPoseInfo.scale + mainPoseInfo.offsetX;
+                        const mainAnkleY = mainAnkle[1] * mainPoseInfo.scale + mainPoseInfo.offsetY;
+                        
+                        // Calculate offset so overlay ankle matches main ankle position
+                        offsetX = mainAnkleX - overlayAnkle[0] * scale;
+                        offsetY = mainAnkleY - overlayAnkle[1] * scale;
+                    } else {
+                        // Fallback to main pose offsets if ankle not found
+                        offsetX = mainPoseInfo.offsetX;
+                        offsetY = mainPoseInfo.offsetY;
+                    }
+                } else {
+                    // Find bounds for centering and scaling (original behavior for main pose)
+                    let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+                    frame.forEach(p => {
+                        if (!p || !Array.isArray(p) || p.length < 2) return;
+                        minX = Math.min(minX, p[0]);
+                        maxX = Math.max(maxX, p[0]);
+                        minY = Math.min(minY, p[1]);
+                        maxY = Math.max(maxY, p[1]);
+                    });
+
+                    const poseWidth = maxX - minX;
+                    const poseHeight = maxY - minY;
+                    const padding = 40;
+                    scale = Math.min((W - padding * 2) / poseWidth, (H - padding * 2) / poseHeight);
+                    offsetX = (W - poseWidth * scale) / 2 - minX * scale;
+                    offsetY = (H - poseHeight * scale) / 2 - minY * scale;
+                }
+
+                // Draw bones - use different colors/opacity for overlay
+                if (isOverlay) {
+                    ctx.strokeStyle = 'rgba(136, 204, 255, 0.6)'; // Blue for average overlay
+                    ctx.lineWidth = 2;
+                } else {
+                    ctx.strokeStyle = isBest ? '#ffffff' : 'rgba(255, 255, 255, 0.8)';
+                    ctx.lineWidth = 2;
+                }
+
+                connections.forEach(([s, e]) => {
+                    const p1 = frame[s];
+                    const p2 = frame[e];
+                    
+                    if (!p1 || !p2 || !Array.isArray(p1) || !Array.isArray(p2)) return;
+                    if (p1.length < 2 || p2.length < 2) return;
+
+                    const x1 = p1[0] * scale + offsetX;
+                    const y1 = p1[1] * scale + offsetY;
+                    const x2 = p2[0] * scale + offsetX;
+                    const y2 = p2[1] * scale + offsetY;
+
+                    if (!isFinite(x1) || !isFinite(y1) || !isFinite(x2) || !isFinite(y2)) return;
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                });
+
+                // Draw joints - use different colors for best vs average
+                if (isOverlay) {
+                    ctx.fillStyle = '#88ccff'; // Blue for average overlay
+                } else {
+                    ctx.fillStyle = isBest ? '#00ff66' : '#88ccff';
+                }
+                
+                frame.forEach((p, idx) => {
+                    if (!p || !Array.isArray(p) || p.length < 2) return;
+                    
+                    const x = p[0] * scale + offsetX;
+                    const y = p[1] * scale + offsetY;
+                    
+                    if (!isFinite(x) || !isFinite(y)) return;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, isOverlay ? 2.5 : 3, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+
+                return { frame, scale, offsetX, offsetY, connections };
+            };
+
+            // Draw the main pose (best or average depending on toggle)
+            const mainPoseInfo = drawSinglePose(poseDataToUse, !showingAveragePose, false, null);
+            
+            // If overlay is enabled, draw average pose on top (aligned by feet)
+            // Prefer filtered average if available, otherwise use regular average
+            if (overlayAveragePose && !showingAveragePose) {
+                const overlayData = (filteredAveragePoseData && filteredAveragePoseData[currentKeyframe]) 
+                    || (averagePoseData && averagePoseData[currentKeyframe]);
+                
+                if (overlayData) {
+                    drawSinglePose(overlayData, false, true, mainPoseInfo);
+                }
+            }
+
+            if (!mainPoseInfo) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.font = '14px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('No pose data for this keyframe', W / 2, H / 2);
+                return;
+            }
+        }
+
+        // Angle to joint mapping (using 33-point pose model indices)
+        // MediaPipe 33: hip=23/24, knee=25/26, ankle=27/28, shoulder=11/12, elbow=13/14, wrist=15/16
+        const angleJointMap = {
+            'Shank→Ground': {
+                joints: [25, 27],  // Right knee to ankle
+                connections: [[25, 27]],
+                name: 'Shank → Ground'
+            },
+            'Thigh→Shank': {
+                joints: [23, 25, 27],  // Right hip, knee, ankle
+                connections: [[23, 25], [25, 27]],
+                name: 'Thigh → Shank'
+            },
+            'Torso→Thigh': {
+                joints: [11, 23, 25],  // Right shoulder, hip, knee
+                connections: [[11, 23], [23, 25]],
+                name: 'Torso → Thigh'
+            },
+            'Upper Arm→Torso': {
+                joints: [11, 13, 23],  // Right shoulder, elbow, hip
+                connections: [[11, 13], [11, 23]],
+                name: 'Upper Arm → Torso'
+            },
+            'Lower Arm→Upper': {
+                joints: [11, 13, 15],  // Right shoulder, elbow, wrist
+                connections: [[11, 13], [13, 15]],
+                name: 'Lower Arm → Upper Arm'
+            }
+        };
+
+        let currentHighlightedAngle = null;
+
+        // Highlight specific angle on pose
+        function highlightAngleOnPose(angleName) {
+            // Toggle off if clicking the same angle again
+            if (currentHighlightedAngle === angleName) {
+                currentHighlightedAngle = null;
+                drawBestJumpPose();
+                drawTrajectory();
+                return;
+            }
+            
+            currentHighlightedAngle = angleName;
+            
+            // Decide which pose data to use for highlighting based on current view
+            let poseDataForHighlight = null;
+            
+            if (showingAveragePose && averagePoseData && averagePoseData[currentKeyframe]) {
+                poseDataForHighlight = averagePoseData[currentKeyframe];
+                console.log('Highlighting on AVERAGE pose');
+            } else if (bestJumpPoseData && bestJumpKeyFrames) {
+                const keyframeMapping = {
+                    'coil': 0,
+                    'midextension': 1,
+                    'takeoff': 2
+                };
+                const frameIndex = bestJumpKeyFrames[keyframeMapping[currentKeyframe]];
+                if (frameIndex !== undefined && frameIndex >= 0 && frameIndex < bestJumpPoseData.length) {
+                    poseDataForHighlight = bestJumpPoseData[frameIndex];
+                    console.log('Highlighting on BEST jump pose');
+                }
+            }
+            
+            if (!poseDataForHighlight) {
+                console.log('No pose data available for highlighting');
+                return;
+            }
+
+            const canvas = document.getElementById('bestJumpPoseCanvas');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width;
+            const H = canvas.height;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#1a3a2e';
+            ctx.fillRect(0, 0, W, H);
+
+            // Use the pose data we already determined
+            let frame = poseDataForHighlight;
+            
+            // Normalize frame if needed (convert from 3D to 2D if necessary)
+            if (frame && frame.length > 0 && frame[0] && frame[0].length > 2) {
+                frame = frame.map(p => p ? [p[0], p[1]] : null);
+            }
+
+            if (!frame || !Array.isArray(frame) || frame.length === 0) {
+                console.log('Invalid frame data');
+                return;
+            }
+
+            // Determine connections based on number of keypoints
+            const poseType = frame.length;
+            let connections = POSE_CONNECTIONS; // Default 33-point
+            
+            if (poseType === 17) {
+                connections = [
+                    [5, 6], [5, 7], [7, 9], [6, 8], [8, 10],
+                    [5, 11], [6, 12], [11, 12],
+                    [11, 13], [13, 15], [12, 14], [14, 16]
+                ];
+            }
+
+            // Find bounds
+            let minX = Infinity, minY = Infinity;
+            let maxX = -Infinity, maxY = -Infinity;
+
+            frame.forEach(p => {
+                if (!p || !Array.isArray(p) || p.length < 2) return;
+                if (!isFinite(p[0]) || !isFinite(p[1])) return;
+                minX = Math.min(minX, p[0]);
+                maxX = Math.max(maxX, p[0]);
+                minY = Math.min(minY, p[1]);
+                maxY = Math.max(maxY, p[1]);
+            });
+
+            if (!isFinite(minX) || !isFinite(maxX) || !isFinite(minY) || !isFinite(maxY)) {
+                console.log('Could not compute bounds');
+                return;
+            }
+
+            const poseWidth = maxX - minX;
+            const poseHeight = maxY - minY;
+            const scaleX = (W * 0.8) / poseWidth;
+            const scaleY = (H * 0.8) / poseHeight;
+            const scale = Math.min(scaleX, scaleY);
+
+            const scaledWidth = poseWidth * scale;
+            const scaledHeight = poseHeight * scale;
+            const offsetX = (W - scaledWidth) / 2 - minX * scale;
+            const offsetY = (H - scaledHeight) / 2 - minY * scale;
+
+            // Get highlighted joints and connections
+            const angleMapping = angleJointMap[angleName];
+            const highlightedJoints = angleMapping ? angleMapping.joints : [];
+            const highlightedConnections = angleMapping ? angleMapping.connections : [];
+
+            // Draw all connections (dimmed)
+            ctx.strokeStyle = 'rgba(255, 255, 255, 0.3)';
+            ctx.lineWidth = 2;
+
+            connections.forEach(([s, e]) => {
+                const p1 = frame[s];
+                const p2 = frame[e];
+                
+                if (!p1 || !p2 || !Array.isArray(p1) || !Array.isArray(p2)) return;
+                if (p1.length < 2 || p2.length < 2) return;
+
+                const x1 = p1[0] * scale + offsetX;
+                const y1 = p1[1] * scale + offsetY;
+                const x2 = p2[0] * scale + offsetX;
+                const y2 = p2[1] * scale + offsetY;
+
+                if (!isFinite(x1) || !isFinite(y1) || !isFinite(x2) || !isFinite(y2)) return;
+
+                ctx.beginPath();
+                ctx.moveTo(x1, y1);
+                ctx.lineTo(x2, y2);
+                ctx.stroke();
+            });
+
+            // Draw all joints (dimmed) - color based on which pose we're showing
+            const dimmedJointColor = showingAveragePose 
+                ? 'rgba(136, 204, 255, 0.3)'  // Blue for average
+                : 'rgba(0, 255, 102, 0.3)';    // Green for best
+            ctx.fillStyle = dimmedJointColor;
+            frame.forEach((p, idx) => {
+                if (!p || !Array.isArray(p) || p.length < 2) return;
+                
+                const x = p[0] * scale + offsetX;
+                const y = p[1] * scale + offsetY;
+                
+                if (!isFinite(x) || !isFinite(y)) return;
+                
+                ctx.beginPath();
+                ctx.arc(x, y, 3, 0, 2 * Math.PI);
+                ctx.fill();
+            });
+
+            // Draw highlighted connections (bright)
+            if (highlightedConnections.length > 0) {
+                ctx.strokeStyle = '#ffff00';
+                ctx.lineWidth = 4;
+
+                highlightedConnections.forEach(([s, e]) => {
+                    const p1 = frame[s];
+                    const p2 = frame[e];
+                    
+                    if (!p1 || !p2 || !Array.isArray(p1) || !Array.isArray(p2)) return;
+                    if (p1.length < 2 || p2.length < 2) return;
+
+                    const x1 = p1[0] * scale + offsetX;
+                    const y1 = p1[1] * scale + offsetY;
+                    const x2 = p2[0] * scale + offsetX;
+                    const y2 = p2[1] * scale + offsetY;
+
+                    if (!isFinite(x1) || !isFinite(y1) || !isFinite(x2) || !isFinite(y2)) return;
+
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                });
+            }
+
+            // Draw highlighted joints (bright)
+            if (highlightedJoints.length > 0) {
+                ctx.fillStyle = '#ffff00';
+                highlightedJoints.forEach(idx => {
+                    const p = frame[idx];
+                    if (!p || !Array.isArray(p) || p.length < 2) return;
+                    
+                    const x = p[0] * scale + offsetX;
+                    const y = p[1] * scale + offsetY;
+                    
+                    if (!isFinite(x) || !isFinite(y)) return;
+                    
+                    ctx.beginPath();
+                    ctx.arc(x, y, 6, 0, 2 * Math.PI);
+                    ctx.fill();
+                });
+            }
+
+            // Draw label
+            if (angleMapping) {
+                ctx.fillStyle = '#ffff00';
+                ctx.font = '14px Arial';
+                ctx.fillText(angleMapping.name, 10, 20);
+            }
+            
+            // Also redraw trajectory with highlighting
+            drawTrajectory();
+        }
+
+        // Draw trajectory from filtered 5-joint data
+        function drawTrajectory() {
+            const canvas = document.getElementById('trajectoryCanvas');
+            if (!canvas) {
+                console.error('Trajectory canvas not found');
+                return;
+            }
+
+            const ctx = canvas.getContext('2d');
+            const W = canvas.width;
+            const H = canvas.height;
+
+            // Clear canvas
+            ctx.clearRect(0, 0, W, H);
+            ctx.fillStyle = '#1a3a2e';
+            ctx.fillRect(0, 0, W, H);
+
+            if (!filteredTrajectoryData || !Array.isArray(filteredTrajectoryData)) {
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+                ctx.font = '12px Inter';
+                ctx.textAlign = 'center';
+                ctx.fillText('No trajectory data available', W / 2, H / 2);
+                return;
+            }
+
+            console.log('Drawing trajectory with', filteredTrajectoryData.length, 'time steps');
+
+            // Joint order in filtered data: ankle, knee, hip, shoulder, elbow, wrist
+            const jointNames = ['ankle', 'knee', 'hip', 'shoulder', 'elbow', 'wrist'];
+            const jointColors = {
+                'ankle': '#FF6B6B',
+                'knee': '#4ECDC4', 
+                'hip': '#45B7D1',
+                'shoulder': '#FFA07A',
+                'elbow': '#98D8C8',
+                'wrist': '#F7DC6F'
+            };
+
+            // Extract all positions for bounds calculation
+            let minX = Infinity, maxX = -Infinity, minY = Infinity, maxY = -Infinity;
+            
+            for (let t = 0; t < filteredTrajectoryData.length; t++) {
+                const frame = filteredTrajectoryData[t];
+                if (!frame || frame.length < 6) continue;
+                
+                for (let j = 0; j < 6; j++) {
+                    const joint = frame[j];
+                    if (!joint || joint.length < 2) continue;
+                    minX = Math.min(minX, joint[0]);
+                    maxX = Math.max(maxX, joint[0]);
+                    minY = Math.min(minY, joint[1]);
+                    maxY = Math.max(maxY, joint[1]);
+                }
+            }
+
+            const poseWidth = maxX - minX;
+            const poseHeight = maxY - minY;
+            const padding = 40;
+            const scale = Math.min((W - padding * 2) / poseWidth, (H - padding * 2) / poseHeight);
+            const offsetX = (W - poseWidth * scale) / 2 - minX * scale;
+            const offsetY = (H - poseHeight * scale) / 2 - minY * scale;
+
+            // Get current keyframe position
+            let currentFrameIdx = null;
+            if (bestJumpKeyFrames && currentKeyframe) {
+                const keyframeMapping = { 'coil': 0, 'midextension': 1, 'takeoff': 2 };
+                currentFrameIdx = bestJumpKeyFrames[keyframeMapping[currentKeyframe]];
+            }
+
+            // Helper function to draw a skeleton
+            const drawSkeleton = (trajectoryData, isOverlay = false) => {
+                if (currentFrameIdx === null || currentFrameIdx >= trajectoryData.length) return null;
+                
+                const frame = trajectoryData[currentFrameIdx];
+                if (!frame || frame.length < 6) return null;
+                
+                // Extract joint positions
+                const ankle = frame[0];
+                const knee = frame[1];
+                const hip = frame[2];
+                const shoulder = frame[3];
+                const elbow = frame[4];
+                const wrist = frame[5];
+                
+                // Map angle names to relevant joints for highlighting
+                const angleToJoints = {
+                    'Shank→Ground': [ankle, knee],
+                    'Thigh→Shank': [ankle, knee, hip],
+                    'Torso→Thigh': [knee, hip, shoulder],
+                    'Upper Arm→Torso': [hip, shoulder, elbow],
+                    'Lower Arm→Upper': [shoulder, elbow, wrist]
+                };
+                
+                const drawLine = (j1, j2, isHighlighted = false) => {
+                    if (!j1 || !j2 || j1.length < 2 || j2.length < 2) return;
+                    const x1 = j1[0] * scale + offsetX;
+                    const y1 = j1[1] * scale + offsetY;
+                    const x2 = j2[0] * scale + offsetX;
+                    const y2 = j2[1] * scale + offsetY;
+                    
+                    if (!isFinite(x1) || !isFinite(y1) || !isFinite(x2) || !isFinite(y2)) return;
+                    
+                    if (isOverlay) {
+                        ctx.strokeStyle = 'rgba(136, 204, 255, 0.6)'; // Blue for overlay
+                        ctx.lineWidth = 2;
+                    } else {
+                        ctx.strokeStyle = isHighlighted ? '#ffff00' : '#ffffff';
+                        ctx.lineWidth = isHighlighted ? 4 : 3;
+                    }
+                    ctx.beginPath();
+                    ctx.moveTo(x1, y1);
+                    ctx.lineTo(x2, y2);
+                    ctx.stroke();
+                };
+                
+                // Check if we should highlight any connections
+                const highlightJoints = (currentHighlightedAngle && !isOverlay) ? angleToJoints[currentHighlightedAngle] : null;
+                const shouldHighlight = (j1, j2) => {
+                    if (!highlightJoints) return false;
+                    return highlightJoints.includes(j1) && highlightJoints.includes(j2);
+                };
+                
+                // Draw main body chain: ankle -> knee -> hip -> shoulder
+                drawLine(ankle, knee, shouldHighlight(ankle, knee));
+                drawLine(knee, hip, shouldHighlight(knee, hip));
+                drawLine(hip, shoulder, shouldHighlight(hip, shoulder));
+                
+                // Draw arm: shoulder -> elbow -> wrist
+                drawLine(shoulder, elbow, shouldHighlight(shoulder, elbow));
+                drawLine(elbow, wrist, shouldHighlight(elbow, wrist));
+                
+                // Draw joints as colored circles on top
+                const joints = [ankle, knee, hip, shoulder, elbow, wrist];
+                joints.forEach((joint, idx) => {
+                    if (!joint || joint.length < 2) return;
+                    
+                    const x = joint[0] * scale + offsetX;
+                    const y = joint[1] * scale + offsetY;
+                    
+                    if (!isFinite(x) || !isFinite(y)) return;
+                    
+                    // Check if this joint should be highlighted
+                    const isHighlighted = highlightJoints && highlightJoints.includes(joint);
+                    
+                    if (isOverlay) {
+                        ctx.fillStyle = '#88ccff'; // Blue for overlay
+                        ctx.beginPath();
+                        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+                        ctx.fill();
+                    } else {
+                        ctx.fillStyle = jointColors[jointNames[idx]];
+                        ctx.beginPath();
+                        ctx.arc(x, y, isHighlighted ? 8 : 6, 0, 2 * Math.PI);
+                        ctx.fill();
+                        
+                        // Add border (yellow if highlighted, white otherwise)
+                        ctx.strokeStyle = isHighlighted ? '#ffff00' : '#ffffff';
+                        ctx.lineWidth = isHighlighted ? 3 : 2;
+                        ctx.stroke();
+                    }
+                });
+                
+                return true;
+            };
+
+            // Draw main skeleton (best jump if available, otherwise average)
+            const mainData = bestJumpTrajectoryData || filteredTrajectoryData;
+            if (drawSkeleton(mainData, false)) {
+                // If overlay is enabled, draw average on top
+                if (overlayAveragePose && bestJumpTrajectoryData && filteredTrajectoryData) {
+                    drawSkeleton(filteredTrajectoryData, true);
+                }
+            }
+
+            // Draw legend in top-left
+            ctx.font = '9px Inter';
+            ctx.textAlign = 'left';
+            let legendY = 15;
+            jointNames.forEach((name, idx) => {
+                ctx.fillStyle = jointColors[name];
+                ctx.fillRect(5, legendY - 7, 10, 10);
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fillText(name, 18, legendY);
+                legendY += 12;
+            });
+        }
+
+        // Update angle comparison chart
+        function updateAngleComparison() {
+            if (!bestJumpRep || !averageAngles || !currentKeyframe) return;
+
+            const ctx = document.getElementById('angleComparisonChart');
+            if (!ctx) return;
+            
+            // Show loader while chart is being updated
+            const chartLoader = document.getElementById('chartLoader');
+            if (chartLoader) chartLoader.style.display = 'block';
+
+            // Map keyframe names to actual Firestore field names
+            const keyframeFieldMap = {
+                'coil': 'coilKeyAngles',
+                'midextension': 'midExtensionAngles',
+                'takeoff': 'takeoffAngles'
+            };
+
+            const anglesKey = keyframeFieldMap[currentKeyframe];
+            console.log('Updating angle comparison for keyframe:', currentKeyframe);
+            console.log('Looking for angles key:', anglesKey);
+            console.log('Best jump angles for this keyframe:', bestJumpRep[anglesKey]);
+            
+            const bestAngles = bestJumpRep[anglesKey] || [0, 0, 0, 0, 0];
+            const avgAngles = averageAngles[currentKeyframe] || [0, 0, 0, 0, 0];
+
+            console.log('Best angles array:', bestAngles);
+            console.log('Avg angles array:', avgAngles);
+
+            const angleLabels = ['Shank→Ground', 'Thigh→Shank', 'Torso→Thigh', 'Upper Arm→Torso', 'Lower Arm→Upper'];
+
+            if (angleComparisonChart) {
+                angleComparisonChart.destroy();
+            }
+
+            angleComparisonChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                    labels: angleLabels,
+                    datasets: [
+                        {
+                            label: 'Best Jump',
+                            data: bestAngles,
+                            backgroundColor: '#4c8c6a',
+                            borderColor: '#4c8c6a',
+                            borderWidth: 1
+                        },
+                        {
+                            label: 'Average',
+                            data: avgAngles,
+                            backgroundColor: 'rgba(255, 255, 255, 0.2)',
+                            borderColor: 'rgba(255, 255, 255, 0.5)',
+                            borderWidth: 1
+                        }
+                    ]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: {
+                        duration: 400,
+                        onComplete: () => {
+                            // Hide loader after chart animation completes
+                            const chartLoader = document.getElementById('chartLoader');
+                            if (chartLoader) chartLoader.style.display = 'none';
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            max: 180,
+                            ticks: { color: 'rgba(255, 255, 255, 0.7)' },
+                            grid: { color: 'rgba(255, 255, 255, 0.1)' }
+                        },
+                        x: {
+                            ticks: { 
+                                color: 'rgba(255, 255, 255, 0.7)',
+                                font: { size: 10 }
+                            },
+                            grid: { display: false }
+                        }
+                    },
+                    plugins: {
+                        legend: {
+                            labels: { color: 'rgba(255, 255, 255, 0.8)' }
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.8)',
+                            callbacks: {
+                                label: function(context) {
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + '°';
+                                }
+                            }
+                        }
+                    },
+                    onClick: (event, activeElements) => {
+                        if (activeElements.length > 0) {
+                            const datasetIndex = activeElements[0].datasetIndex;
+                            const index = activeElements[0].index;
+                            const angleName = angleLabels[index];
+                            
+                            // Toggle between best and average pose view
+                            if (datasetIndex === 0) {
+                                // Clicked on "Best Jump" bar
+                                showingAveragePose = false;
+                                console.log('Showing BEST jump pose');
+                            } else if (datasetIndex === 1) {
+                                // Clicked on "Average" bar
+                                showingAveragePose = true;
+                                console.log('Showing AVERAGE pose');
+                            }
+                            
+                            drawBestJumpPose();
+                            highlightAngleOnPose(angleName);
+                        }
+                    }
+                }
+            });
+        }
+
+        // Event listeners for jump time period filter (exclude sprint filters)
+        document.querySelectorAll('.time-filter:not(.sprint-time-filter)').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active state from all jump time filter buttons
+                document.querySelectorAll('.time-filter:not(.sprint-time-filter)').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'rgba(255, 255, 255, 0.05)';
+                    b.style.border = '1px solid var(--card-border)';
+                    b.style.color = 'var(--text-muted)';
+                    b.style.fontWeight = '600';
+                    b.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                });
+                // Add active state to clicked button
+                btn.classList.add('active');
+                btn.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1))';
+                btn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                btn.style.color = 'var(--text-light)';
+                btn.style.fontWeight = '700';
+                btn.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+                
+                currentTimePeriod = btn.dataset.period;
+                
+                // Update jump dashboard
+                if (currentRepType === 'jump') {
+                    updateJumpDashboard();
+                }
+            });
+            
+            // Add hover effects
+            btn.addEventListener('mouseenter', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.08)';
+                    btn.style.transform = 'translateY(-2px)';
+                    btn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                }
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                    btn.style.transform = 'translateY(0)';
+                    btn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                }
+            });
+        });
+
+        // Event listeners for sprint time period filter
+        document.querySelectorAll('.sprint-time-filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active state from all sprint time filter buttons
+                document.querySelectorAll('.sprint-time-filter').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'rgba(255, 255, 255, 0.05)';
+                    b.style.border = '1px solid var(--card-border)';
+                    b.style.color = 'var(--text-muted)';
+                    b.style.fontWeight = '600';
+                    b.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                });
+                // Add active state to clicked button
+                btn.classList.add('active');
+                btn.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1))';
+                btn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                btn.style.color = 'var(--text-light)';
+                btn.style.fontWeight = '700';
+                btn.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+                
+                currentSprintTimePeriod = btn.dataset.period;
+                
+                // Update sprint dashboard
+                if (currentRepType === 'sprint') {
+                    updateSprintDashboard();
+                }
+            });
+            
+            // Add hover effects
+            btn.addEventListener('mouseenter', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.08)';
+                    btn.style.transform = 'translateY(-2px)';
+                    btn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                }
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                    btn.style.transform = 'translateY(0)';
+                    btn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                }
+            });
+        });
+
+        // Event listeners for kick time period filter
+        document.querySelectorAll('.kick-time-filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active state from all kick time filter buttons
+                document.querySelectorAll('.kick-time-filter').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'rgba(255, 255, 255, 0.05)';
+                    b.style.border = '1px solid var(--card-border)';
+                    b.style.color = 'var(--text-muted)';
+                    b.style.fontWeight = '600';
+                    b.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                });
+                // Add active state to clicked button
+                btn.classList.add('active');
+                btn.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1))';
+                btn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                btn.style.color = 'var(--text-light)';
+                btn.style.fontWeight = '700';
+                btn.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+                
+                currentKickTimePeriod = btn.dataset.period;
+                
+                // Update kick dashboard
+                if (currentRepType === 'kick') {
+                    updateKickDashboard();
+                }
+            });
+            
+            // Add hover effects
+            btn.addEventListener('mouseenter', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.08)';
+                    btn.style.transform = 'translateY(-2px)';
+                    btn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                }
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                    btn.style.transform = 'translateY(0)';
+                    btn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                }
+            });
+        });
+
+        // Event listeners for kick foot filter
+        document.querySelectorAll('.kick-foot-filter').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active state from all kick foot filter buttons
+                document.querySelectorAll('.kick-foot-filter').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'rgba(255, 255, 255, 0.05)';
+                    b.style.border = '1px solid var(--card-border)';
+                    b.style.color = 'var(--text-muted)';
+                    b.style.fontWeight = '600';
+                    b.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                });
+                // Add active state to clicked button
+                btn.classList.add('active');
+                btn.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1))';
+                btn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                btn.style.color = 'var(--text-light)';
+                btn.style.fontWeight = '700';
+                btn.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+                
+                currentFootFilter = btn.dataset.foot;
+                
+                // Update kick dashboard
+                if (currentRepType === 'kick') {
+                    updateKickDashboard();
+                }
+            });
+            
+            // Add hover effects
+            btn.addEventListener('mouseenter', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.08)';
+                    btn.style.transform = 'translateY(-2px)';
+                    btn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                }
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                    btn.style.transform = 'translateY(0)';
+                    btn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                }
+            });
+        });
+
+        // Event listeners for keyframe toggle
+        document.querySelectorAll('.keyframe-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                // Remove active state from all buttons
+                document.querySelectorAll('.keyframe-btn').forEach(b => {
+                    b.classList.remove('active');
+                    b.style.background = 'rgba(255, 255, 255, 0.05)';
+                    b.style.border = '1px solid var(--card-border)';
+                    b.style.color = 'var(--text-muted)';
+                    b.style.fontWeight = '600';
+                    b.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                });
+                // Add active state to clicked button
+                btn.classList.add('active');
+                btn.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1))';
+                btn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                btn.style.color = 'var(--text-light)';
+                btn.style.fontWeight = '700';
+                btn.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+                
+                currentKeyframe = btn.dataset.keyframe;
+                drawBestJumpPose();
+                drawTrajectory();
+                updateAngleComparison();
+            });
+            
+            // Add hover effects
+            btn.addEventListener('mouseenter', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.08)';
+                    btn.style.transform = 'translateY(-2px)';
+                    btn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                }
+            });
+            
+            btn.addEventListener('mouseleave', () => {
+                if (!btn.classList.contains('active')) {
+                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                    btn.style.transform = 'translateY(0)';
+                    btn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                }
+            });
+        });
+
+        // Event listener for overlay toggle
+        const overlayToggle = document.getElementById('overlayToggle');
+        if (overlayToggle) {
+            overlayToggle.addEventListener('change', (e) => {
+                overlayAveragePose = e.target.checked;
+                console.log('Overlay average pose:', overlayAveragePose);
+                drawBestJumpPose();
+            });
+        }
+
+        // Generic keyframe button handler factory
+        function setupKeyframeButtons(selector) {
+            document.querySelectorAll(selector).forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active state from all buttons of this type
+                    document.querySelectorAll(selector).forEach(b => {
+                        b.classList.remove('active');
+                        b.style.background = 'rgba(255, 255, 255, 0.05)';
+                        b.style.border = '1px solid var(--card-border)';
+                        b.style.color = 'var(--text-muted)';
+                        b.style.fontWeight = '600';
+                        b.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                    });
+                    // Add active state to clicked button
+                    btn.classList.add('active');
+                    btn.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1))';
+                    btn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
+                    btn.style.color = 'var(--text-light)';
+                    btn.style.fontWeight = '700';
+                    btn.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+                    
+                    console.log('Selected keyframe:', btn.dataset.keyframe);
+                });
+                
+                // Add hover effects
+                btn.addEventListener('mouseenter', () => {
+                    if (!btn.classList.contains('active')) {
+                        btn.style.background = 'rgba(255, 255, 255, 0.08)';
+                        btn.style.transform = 'translateY(-2px)';
+                        btn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
+                    }
+                });
+                
+                btn.addEventListener('mouseleave', () => {
+                    if (!btn.classList.contains('active')) {
+                        btn.style.background = 'rgba(255, 255, 255, 0.05)';
+                        btn.style.transform = 'translateY(0)';
+                        btn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
+                    }
+                });
+            });
+        }
+        
+        // Setup sprint and kick keyframe buttons
+        setupKeyframeButtons('.sprint-keyframe-btn');
+        setupKeyframeButtons('.kick-keyframe-btn');
+
+        // Add hover effects to View Full Analysis button
+        const viewFullAnalysisBtn = document.getElementById('viewBestJumpLink');
+        if (viewFullAnalysisBtn) {
+            viewFullAnalysisBtn.addEventListener('mouseenter', () => {
+                viewFullAnalysisBtn.style.transform = 'translateY(-2px)';
+                viewFullAnalysisBtn.style.boxShadow = '0 6px 16px rgba(76, 140, 106, 0.4), 0 4px 12px rgba(0, 0, 0, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+                viewFullAnalysisBtn.style.background = 'linear-gradient(135deg, #56a07a 0%, var(--accent) 100%)';
+            });
+            
+            viewFullAnalysisBtn.addEventListener('mouseleave', () => {
+                viewFullAnalysisBtn.style.transform = 'translateY(0)';
+                viewFullAnalysisBtn.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
+                viewFullAnalysisBtn.style.background = 'linear-gradient(135deg, var(--accent) 0%, #56a07a 100%)';
+            });
+            
+            viewFullAnalysisBtn.addEventListener('mousedown', () => {
+                viewFullAnalysisBtn.style.transform = 'translateY(0) scale(0.98)';
+            });
+            
+            viewFullAnalysisBtn.addEventListener('mouseup', () => {
+                viewFullAnalysisBtn.style.transform = 'translateY(-2px)';
+            });
+        }
+
+        // --- Side nav wiring ---
+        const navToggle = document.getElementById('navToggle');
+        const sideNav = document.getElementById('sideNav');
+        const closeSide = document.getElementById('closeSide');
+        const sideLinks = document.getElementById('sideLinks');
+        const sideBackdrop = document.getElementById('sideBackdrop');
+
+        function openSide() { sideNav.classList.add('open'); sideNav.setAttribute('aria-hidden','false'); if(sideBackdrop) sideBackdrop.classList.add('open'); }
+        function closeSideNav() { sideNav.classList.remove('open'); sideNav.setAttribute('aria-hidden','true'); if(sideBackdrop) sideBackdrop.classList.remove('open'); }
+
+        if (navToggle) navToggle.addEventListener('click', (e)=>{ e.preventDefault(); openSide(); });
+        if (closeSide) closeSide.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+        if (sideBackdrop) sideBackdrop.addEventListener('click', (e)=>{ e.preventDefault(); closeSideNav(); });
+
+        // Close on escape
+        document.addEventListener('keydown', (e)=>{ if (e.key === 'Escape') closeSideNav(); });
+
+        function populateSideLinks(){
+            console.log('[populateSideLinks] Called. isCoach:', isCoach, '| currentPlayerInfo:', currentPlayerInfo);
+            const currentParams = new URLSearchParams(window.location.search);
+            const playerDocId = currentParams.get('player') || currentPlayerInfo?.docId;
+            const coachUID = currentPlayerInfo && currentPlayerInfo.coachUID;
+            const userTypeParam = isCoach ? 'coach' : 'player';
+            console.log('[populateSideLinks] playerDocId:', playerDocId, '| coachUID:', coachUID, '| userTypeParam:', userTypeParam);
+
+            const homeBtn = document.querySelector('.home-btn');
+            if (homeBtn) {
+                const newHref = isCoach
+                    ? `coachesview.html?userType=coach`
+                    : (playerDocId ? `profile.html?player=${playerDocId}&userType=player` : `profile.html?userType=player`);
+                console.log('[populateSideLinks] Setting home-btn href to:', newHref);
+                homeBtn.href = newHref;
+            } else {
+                console.warn('[populateSideLinks] home-btn element NOT found in DOM');
+            }
+
+            const sideLinksEl = document.getElementById('sideLinks');
+            if (!sideLinksEl) return;
+            sideLinksEl.innerHTML = '';
+
+            let leaderboardHref = 'leaderboard.html';
+            const lbParams = new URLSearchParams();
+            if (coachUID) lbParams.set('coach', coachUID);
+            if (playerDocId) lbParams.set('player', playerDocId);
+            lbParams.set('userType', userTypeParam);
+            leaderboardHref += '?' + lbParams.toString();
+
+            const lbBtn = document.getElementById('leaderboardBtn');
+            if (lbBtn) lbBtn.href = leaderboardHref;
+
+            const links = [
+                { href: `profile.html?userType=${userTypeParam}`, text: 'Profile', icon: 'person' }
+            ];
+            if (isCoach) {
+                links.push({ href: `coachesview.html?userType=coach`, text: 'Player Roster', icon: 'people' });
+            }
+            links.push({ href: leaderboardHref, text: 'Leaderboards', icon: 'leaderboard' });
+
+            links.forEach((a, idx) => {
+                const link = document.createElement('a');
+                let finalHref = a.href || '#';
+                if (playerDocId && !finalHref.includes('leaderboard') && !finalHref.includes('coachesview')) {
+                    const separator = finalHref.includes('?') ? '&' : '?';
+                    finalHref += separator + 'player=' + encodeURIComponent(playerDocId);
+                }
+                link.href = finalHref;
+                link.className = 'side-link';
+                const icon = document.createElement('span'); 
+                icon.className = 'material-symbols-outlined'; 
+                icon.style.fontSize = '20px';
+                icon.textContent = a.icon;
+                const spanText = document.createElement('span'); 
+                spanText.textContent = a.text;
+                link.appendChild(icon);
+                link.appendChild(spanText);
+                link.style.transitionDelay = (idx * 40) + 'ms';
+                link.addEventListener('click', ()=> closeSideNav());
+                sideLinksEl.appendChild(link);
+            });
+        }
+
+        // Wire logout in side nav
+        const sideLogoutBtn = document.getElementById('sideLogout');
+        if (sideLogoutBtn) sideLogoutBtn.addEventListener('click', (e) => {
+            e.preventDefault();
+            auth.signOut().then(() => {
+                window.location.href = 'kickai.html';
+            });
+        });
+
+        // ============ PREMIUM LOCK HELPERS ============
+
+        function autoExpandSessionsIfFew() {
+            if (!cachedAllSessions) return;
+            const sessionType = REP_TYPE_TO_SESSION_TYPE[currentRepType];
+            const count = cachedAllSessions.filter(s => s.type === sessionType).length;
+            if (count < 4) {
+                const sessionsContent = document.getElementById('sessionsContent');
+                const sessionsToggleIcon = document.getElementById('sessionsToggleIcon');
+                const sessionsToggleBtn = document.getElementById('sessionsToggleBtn');
+                if (sessionsContent && !isSessionsExpanded) {
+                    isSessionsExpanded = true;
+                    sessionsContent.style.maxHeight = '5000px';
+                    if (sessionsToggleIcon) sessionsToggleIcon.style.transform = 'rotate(180deg)';
+                    if (sessionsToggleBtn) sessionsToggleBtn.style.background = 'rgba(255, 255, 255, 0.08)';
+                    displaySessionsForCurrentType();
+                }
+            }
+        }
+
+        function applyTechniqueSectionLocks() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlUserType = urlParams.get('userType');
+            const playerDocId = urlParams.get('player') || currentPlayerInfo?.docId;
+
+            const sections = [
+                { id: 'bestJumpSection', text: 'Vertical jump analysis only available for premium members', sentFrom: 'kickingJumpAnalysis' },
+                { id: 'sprintTechniqueSection', text: 'Sprint technique analysis only available for premium members', sentFrom: 'kickingSprintTechnique' },
+                { id: 'kickTechniqueSection', text: 'Kick technique analysis only available for premium members', sentFrom: 'kickingKickTechnique' }
+            ];
+            sections.forEach(({ id, text, sentFrom }) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (el.classList.contains('technique-section-locked')) return;
+                el.classList.add('technique-section-locked');
+                const overlay = document.createElement('div');
+                overlay.className = 'lock-overlay';
+                overlay.innerHTML = `<span class="material-symbols-outlined">lock</span><span class="lock-label">${text}</span>`;
+                if (urlUserType === 'player' && playerDocId) {
+                    const btn = document.createElement('a');
+                    btn.className = 'unlock-btn';
+                    btn.textContent = 'Unlock Features';
+                    btn.href = 'premiumInfo.html?player=' + encodeURIComponent(playerDocId) + '&sentFrom=' + encodeURIComponent(sentFrom);
+                    overlay.appendChild(btn);
+                }
+                el.appendChild(overlay);
+            });
+        }
+
+        // ============ SESSIONS FUNCTIONALITY ============
+        let activeSessionTab = 'all';
+        const sessionsGrid = document.getElementById('sessionsGrid');
+        
+        // Kick type mappings
+        const KICK_TYPES = {
+            deadball: 'deadballShot',
+            freerecord: 'freeRecord',
+            longball: 'longballPass',
+            instep: 'instepPass',
+            sprint: 'sprint',
+            jump: 'jump',
+            kick: 'side_kick'
+        };
+
+        // Map rep types to KICK_TYPES for sessions filtering
+        const REP_TYPE_TO_SESSION_TYPE = {
+            'jump': 'jump',
+            'kick': 'deadballShot',
+            'sprint': 'sprint',
+            'freerecord': 'freeRecord'
+        };
+
+        // Update the session count badge from the cache (no query)
+        function updateSessionCountFromCache() {
+            const sessionCountEl = document.getElementById('sessionCount');
+            if (!sessionCountEl) return;
+
+            if (!cachedAllSessions) {
+                sessionCountEl.textContent = '0';
+                return;
+            }
+
+            const sessionType = REP_TYPE_TO_SESSION_TYPE[currentRepType];
+            const count = cachedAllSessions.filter(s => s.type === sessionType).length;
+            sessionCountEl.textContent = count;
+            console.log('Session count updated from cache:', count, 'for type:', sessionType);
+        }
+
+        // Render sessions for the currently selected rep type from the cache (no query)
+        function displaySessionsForCurrentType() {
+            const sessionsGrid = document.getElementById('sessionsGrid');
+
+            if (!cachedAllSessions) {
+                sessionsGrid.innerHTML = `
+                    <div class="loading-container">
+                        <h3>No ${getRepTypeDisplayName(currentRepType)} sessions found</h3>
+                        <p>Complete sessions to see them here</p>
+                    </div>
+                `;
+                return;
+            }
+
+            const sessionType = REP_TYPE_TO_SESSION_TYPE[currentRepType];
+            const filtered = cachedAllSessions
+                .filter(s => s.type === sessionType)
+                .sort((a, b) => b.date - a.date);
+
+            console.log('Displaying', filtered.length, 'cached sessions for type:', sessionType);
+
+            // Update session count badge
+            const sessionCountEl = document.getElementById('sessionCount');
+            if (sessionCountEl) sessionCountEl.textContent = filtered.length;
+
+            if (filtered.length === 0) {
+                sessionsGrid.innerHTML = `
+                    <div class="loading-container">
+                        <h3>No ${getRepTypeDisplayName(currentRepType)} sessions found</h3>
+                        <p>Complete sessions to see them here</p>
+                    </div>
+                `;
+            } else {
+                renderSessions(filtered);
+            }
+        }
+
+        // Get display name for rep type
+        function getRepTypeDisplayName(repType) {
+            const names = {
+                'jump': 'Jump',
+                'kick': 'Kick',
+                'sprint': 'Sprint',
+                'freerecord': 'Free Record'
+            };
+            return names[repType] || repType;
+        }
+
+        // Setup session tab switching (legacy - no longer used but keeping for compatibility)
+        function setupSessionTabs() {
+            const sessionTabButtons = document.querySelectorAll('.session-tab-btn');
+            sessionTabButtons.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Update active state
+                    sessionTabButtons.forEach(b => b.classList.remove('active'));
+                    btn.classList.add('active');
+                    
+                    activeSessionTab = btn.dataset.sessionTab;
+                    loadSessions();
+                });
+            });
+        }
+
+        // Helper functions for sessions
+        function parseSessionDate(dateStr, timeStr) {
+            try {
+                let cleanDate = (dateStr || '').trim();
+                if (cleanDate && timeStr) {
+                    const cleanTime = (timeStr || '').trim();
+                    cleanDate = `${cleanDate} ${cleanTime}`;
+                }
+                if (cleanDate) {
+                    const d = new Date(cleanDate);
+                    return isNaN(d.getTime()) ? new Date() : d;
+                }
+            } catch (_) {}
+            return new Date();
+        }
+
+        function pickNumberReps(data) {
+            const fields = ['numberReps','numberKicks','kickCount','repCount','numReps','numKicks','kicks','reps'];
+            for (const f of fields) {
+                if (data && Object.prototype.hasOwnProperty.call(data, f)) {
+                    const n = Number(data[f]);
+                    if (Number.isFinite(n) && n >= 0) return n;
+                }
+            }
+            return 0;
+        }
+
+        async function fetchSessionsFromFirestore(targetUid, targetDocId) {
+            try {
+                console.log('fetchSessionsFromFirestore called with UID:', targetUid, 'DocID:', targetDocId);
+                const coll = db.collection('sessions');
+                const queries = [];
+                if (targetUid) {
+                    console.log('Adding query for playerUID ==', targetUid);
+                    queries.push(coll.where('playerUID', '==', targetUid).get());
+                }
+                if (targetDocId && targetDocId !== targetUid) {
+                    console.log('Adding query for playerUID ==', targetDocId);
+                    queries.push(coll.where('playerUID', '==', targetDocId).get());
+                }
+
+                console.log('Executing', queries.length, 'Firestore queries...');
+                const snapshots = await Promise.allSettled(queries);
+                const byId = new Map();
+
+                for (const res of snapshots) {
+                    if (res.status !== 'fulfilled') {
+                        console.warn('Query failed:', res.reason);
+                        continue;
+                    }
+                    console.log('Query returned', res.value.size, 'documents');
+                    res.value.forEach((doc) => {
+                        const data = doc.data() || {};
+                        const sessionId = data.currentSession || doc.id;
+                        const type = data.drillType || data.type || '';
+                        const finalCount = pickNumberReps(data);
+                        const date = parseSessionDate(data.currentDate, data.currentTime);
+
+                        // One-line descriptor for each returned session doc (debugging)
+                        try {
+                            const createdAtIso =
+                                data.createdAt?.toDate ? data.createdAt.toDate().toISOString() :
+                                data.timestamp?.toDate ? data.timestamp.toDate().toISOString() :
+                                '';
+                            console.log(
+                                `[FS:sessions] docId=${doc.id} sessionId=${sessionId} playerUID=${data.playerUID ?? ''} drillType=${data.drillType ?? ''} type=${data.type ?? ''} normalizedType=${type} currentDate=${data.currentDate ?? ''} currentTime=${data.currentTime ?? ''} createdAt=${createdAtIso} count=${finalCount}`
+                            );
+                        } catch (e) {
+                            console.log(`[FS:sessions] docId=${doc.id} (descriptor failed)`, e);
+                        }
+
+                        const normalized = { id: sessionId, type, kickCount: finalCount, date };
+                        const mapKey = `${sessionId}_${type}`;
+                        const existing = byId.get(mapKey);
+                        if (!existing || (existing.kickCount === 0 && finalCount > 0)) {
+                            byId.set(mapKey, normalized);
+                        }
+                    });
+                }
+
+                console.log('Returning', byId.size, 'sessions from sessions collection');
+                return Array.from(byId.values());
+            } catch (err) {
+                console.warn('Firestore sessions fetch failed:', err);
+                return [];
+            }
+        }
+
+        async function loadSessions() {
+            if (!currentPlayerInfo || !currentPlayerInfo.docId) {
+                console.log('No player info for sessions');
+                return;
+            }
+
+            console.log('Loading sessions for player:', currentPlayerInfo.docId, 'UID:', currentPlayerInfo.uid);
+
+            sessionsGrid.innerHTML = `
+                <div class="loading-container">
+                    <div class="loading-spinner"></div>
+                    <p class="loading-text">Loading session data...</p>
+                </div>
+            `;
+
+            try {
+                const targetPlayerDocId = currentPlayerInfo.docId;
+                const targetPlayerUid = currentPlayerInfo.uid || null;
+
+                console.log('Fetching sessions from Firestore...');
+                // Try Firestore first
+                const firestoreSessions = await fetchSessionsFromFirestore(targetPlayerUid, targetPlayerDocId);
+                console.log('Firestore sessions found:', firestoreSessions.length, firestoreSessions);
+
+                // Filter by active tab
+                const typeFilter = activeSessionTab === 'all' ? null : KICK_TYPES[activeSessionTab];
+                let filtered = firestoreSessions.filter(s => !typeFilter || s.type === typeFilter);
+                console.log('Filtered sessions:', filtered.length, 'Active tab:', activeSessionTab, 'Type filter:', typeFilter);
+
+                console.log('Filtered sessions:', filtered.length, 'Active tab:', activeSessionTab, 'Type filter:', typeFilter);
+
+                if (filtered.length > 0) {
+                    filtered.sort((a, b) => b.date - a.date);
+                    console.log('Rendering', filtered.length, 'sessions');
+                    renderSessions(filtered);
+                    return;
+                }
+
+                console.log('No Firestore sessions found, trying Storage fallback...');
+                // Fallback to Storage
+                const sessions = [];
+                for (const [tabKey, kickType] of Object.entries(KICK_TYPES)) {
+                    if (activeSessionTab !== 'all' && activeSessionTab !== tabKey) continue;
+
+                    try {
+                        const kickTypeRef = storage.ref(`${targetPlayerDocId}/${kickType}`);
+                        const sessionFolders = await kickTypeRef.listAll();
+
+                        for (const sessionPrefix of sessionFolders.prefixes) {
+                            const sessionId = sessionPrefix.name;
+                            const kickList = await sessionPrefix.listAll();
+                            let metadataNumberReps = null;
+                            let kickCount = 0;
+                            let sessionDate = new Date();
+
+                            try {
+                                const metadataFileRef = sessionPrefix.child('metadata.json');
+                                const metadataUrl = await metadataFileRef.getDownloadURL();
+                                const response = await fetch(metadataUrl);
+                                const metadata = await response.json();
+                                if (metadata.timestamp) {
+                                    sessionDate = new Date(metadata.timestamp);
+                                }
+                                const mnr = Number(metadata.numberReps ?? metadata.numberKicks ?? metadata.kickCount ?? metadata.repCount ?? metadata.reps ?? metadata.kicks);
+                                if (Number.isFinite(mnr)) metadataNumberReps = mnr;
+                            } catch (_) {}
+
+                            if (!Number.isFinite(metadataNumberReps)) {
+                                if (kickType === 'deadballShot') {
+                                    const kickFolders = kickList.prefixes.filter(p => /^(kick|k)[ _-]?\d+/i.test(p.name));
+                                    if (kickFolders.length > 0) {
+                                        kickCount = kickFolders.length;
+                                    } else {
+                                        const unique = new Set();
+                                        for (const it of kickList.items) {
+                                            const m = it.name.match(/(?:^|[_-])(side|back)_kick_(\d+)\.(mov|mp4)$/i);
+                                            if (m) unique.add(m[2]);
+                                        }
+                                        kickCount = unique.size > 0 ? unique.size : kickList.prefixes.length;
+                                    }
+                                } else {
+                                    kickCount = kickList.prefixes.length;
+                                }
+                            }
+
+                            sessions.push({
+                                id: sessionId,
+                                type: kickType,
+                                kickCount: Number.isFinite(metadataNumberReps) ? metadataNumberReps : kickCount,
+                                date: sessionDate
+                            });
+                        }
+                    } catch (error) {
+                        if (error.code !== 'storage/object-not-found') {
+                            console.error(`Error loading ${kickType} sessions:`, error);
+                        }
+                    }
+                }
+
+                if (sessions.length === 0) {
+                    sessionsGrid.innerHTML = `
+                        <div class="loading-container">
+                            <h3>No sessions found</h3>
+                            <p>No recorded sessions yet</p>
+                        </div>
+                    `;
+                } else {
+                    sessions.sort((a, b) => b.date - a.date);
+                    renderSessions(sessions);
+                }
+            } catch (error) {
+                console.error('Error loading sessions:', error);
+                sessionsGrid.innerHTML = `
+                    <div class="loading-container">
+                        <h3>Error loading sessions</h3>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+
+        function extractSessionNumber(sessionId) {
+            if (!sessionId || typeof sessionId !== 'string') return null;
+            const m = sessionId.match(/session[_\-]?([0-9]+)/i);
+            if (m && m[1]) return parseInt(m[1], 10);
+            const digits = sessionId.match(/(\d+)/);
+            return digits ? parseInt(digits[1], 10) : null;
+        }
+
+        function renderSessions(sessions) {
+            if (sessions.length === 0) {
+                sessionsGrid.innerHTML = `
+                    <div class="loading-container">
+                        <h3>No sessions found</h3>
+                        <p>No sessions match the selected filter</p>
+                    </div>
+                `;
+                return;
+            }
+
+            sessionsGrid.innerHTML = '';
+
+            sessions.forEach(session => {
+                const sessionCard = document.createElement('div');
+                sessionCard.className = `session-card ${getSessionTypeClass(session.type)}`;
+                
+                const formattedDate = session.date.toLocaleDateString('en-US', {
+                    month: 'short',
+                    day: 'numeric',
+                    year: 'numeric'
+                });
+
+                const sessionNumber = extractSessionNumber(session.id);
+                const dateWithSession = sessionNumber ? `Session ${sessionNumber} • ${formattedDate}` : formattedDate;
+
+                const sessionTypeName = getSessionTypeName(session.type);
+                const sessionTypeBadge = getSessionTypeBadge(session.type);
+
+                sessionCard.innerHTML = `
+                    <div class="session-date">${dateWithSession}</div>
+                    <h3 class="session-title">${sessionTypeName} Session</h3>
+                    <div class="session-stats">
+                        <div class="session-stat">
+                            <span class="stat-icon">⚽</span>
+                            <span>${session.kickCount} ${session.type === 'sprint' ? 'sprints' : (session.type === 'jump' ? 'jumps' : (session.type === 'freeRecord' ? 'reps' : 'kicks'))}</span>
+                        </div>
+                    </div>
+                    ${sessionTypeBadge}
+                `;
+
+                // Session cards remain clickable for all users — premium lock is enforced on destination pages
+
+                sessionCard.addEventListener('click', async () => {
+                    let destinationPage = 'sessionsexpanded.html';
+                    if (session.type === 'freeRecord') {
+                        destinationPage = 'freeRecordPage.html';
+                    } else if (session.type === 'sprint') {
+                        destinationPage = 'sprintPage.html';
+                    } else if (session.type === 'jump') {
+                        destinationPage = 'StaticJumpPage.html';
+                    } else if (session.type === 'side_kick') {
+                        destinationPage = 'SideKickView.html';
+                    }
+
+                    // Detect side/back views for deadballShot
+                    if (session.type === 'deadballShot') {
+                        try {
+                            const playerDocId = currentPlayerInfo.docId;
+                            if (playerDocId) {
+                                const baseRef = storage.ref(`${playerDocId}/deadballShot/${session.id}`);
+                                const list = await baseRef.listAll();
+                                if (list.prefixes && list.prefixes.length > 0) {
+                                    const sorted = list.prefixes.sort((a,b)=>{
+                                        const na = parseInt(a.name.replace(/\D+/g,'')) || 0;
+                                        const nb = parseInt(b.name.replace(/\D+/g,'')) || 0;
+                                        return na - nb || a.name.localeCompare(b.name);
+                                    });
+                                    const firstKick = sorted[0];
+                                    const items = await firstKick.listAll();
+                                    const hasSide = items.items.some(it => /side_kick_\d+\.(mov|mp4)$/i.test(it.name));
+                                    const hasBack = items.items.some(it => /back_kick_\d+\.(mov|mp4)$/i.test(it.name));
+                                    if (hasSide) {
+                                        destinationPage = 'SideKickView.html';
+                                    } else if (hasBack) {
+                                        destinationPage = 'backKickView.html';
+                                    }
+                                }
+                            }
+                        } catch (err) {
+                            console.warn('Deadball view detection failed:', err);
+                        }
+                    }
+
+                    let url = `${destinationPage}?session=${session.id}&type=${session.type}`;
+                    const urlParams = new URLSearchParams(window.location.search);
+                    const playerDocId = urlParams.get('player') || currentPlayerInfo?.docId;
+                    if (playerDocId) {
+                        url += `&player=${playerDocId}`;
+                    }
+                    url += `&userType=${isCoach ? 'coach' : 'player'}`;
+                    window.location.href = url;
+                });
+
+                sessionsGrid.appendChild(sessionCard);
+            });
+        }
+
+        function getSessionTypeClass(type) {
+            const typeMap = {
+                'deadballShot': 'deadball',
+                'freeRecord': 'passing',
+                'longballPass': 'longball',
+                'instepPass': 'instep',
+                'sprint': 'sprint',
+                'jump': 'jump',
+                'side_kick': 'deadball'
+            };
+            return typeMap[type] || 'deadball';
+        }
+
+        function getSessionTypeName(type) {
+            const typeMap = {
+                'deadballShot': 'Dead Ball',
+                'freeRecord': 'Free Record',
+                'longballPass': 'Long Balls',
+                'instepPass': 'Instep Passing',
+                'sprint': 'Sprint Work',
+                'jump': 'Static Jump',
+                'side_kick': 'Side Kick'
+            };
+            return typeMap[type] || type;
+        }
+
+        function getSessionTypeBadge(type) {
+            const badges = {
+                'deadballShot': '<span class="badge deadball">Dead Ball</span>',
+                'freeRecord': '<span class="badge passing">Free Record</span>',
+                'longballPass': '<span class="badge longball">Long Ball</span>',
+                'instepPass': '<span class="badge instep">Instep Pass</span>',
+                'sprint': '<span class="badge sprint">Sprint</span>',
+                'jump': '<span class="badge jump">Jump</span>',
+                'side_kick': '<span class="badge deadball">Side Kick</span>'
+            };
+            return badges[type] || `<span class="badge">${type}</span>`;
+        }
+
+        function navigateToSession(sessionId, type) {
+            const playerDocId = currentPlayerInfo.docId;
+            const pages = {
+                'deadballShot': 'videopage.html',
+                'freeRecord': 'freeRecordPage.html',
+                'longballPass': 'videopage.html',
+                'instepPass': 'videopage.html',
+                'sprint': 'sprintPage.html',
+                'jump': 'StaticJumpPage.html',
+                'side_kick': 'SideKickView.html'
+            };
+            
+            const page = pages[type] || 'videopage.html';
+            window.location.href = `${page}?player=${playerDocId}&session=${sessionId}&userType=${isCoach ? 'coach' : 'player'}`;
+        }
+
+        // Initialize session tabs when DOM is ready
+        document.addEventListener('DOMContentLoaded', () => {
+            setupSessionTabs();
+        });
+    </script>
+
+    <!-- Reusable user badge (reads email from Firestore users/{uid}) -->
+    <script src="user-badge.js"></script>
+</body>
+</html>
