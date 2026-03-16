@@ -1486,7 +1486,7 @@
                     return {
                         type: 'player',
                         docId: playerDocId,
-                        uid: data.uid,
+                        uid: data.userUID || data.authenticationUID || data.uid,
                         ...data
                     };
                 }
@@ -3645,8 +3645,8 @@
 
         function autoExpandSessionsIfFew() {
             if (!cachedAllSessions) return;
-            const sessionType = REP_TYPE_TO_SESSION_TYPE[currentRepType];
-            const count = cachedAllSessions.filter(s => s.type === sessionType).length;
+            const sessionTypes = REP_TYPE_TO_SESSION_TYPE[currentRepType] || [];
+            const count = cachedAllSessions.filter(s => sessionTypes.includes(s.type)).length;
             if (count < 4) {
                 const sessionsContent = document.getElementById('sessionsContent');
                 const sessionsToggleIcon = document.getElementById('sessionsToggleIcon');
@@ -3705,12 +3705,14 @@
             kick: 'side_kick'
         };
 
-        // Map rep types to KICK_TYPES for sessions filtering
+        // Map rep types to session type(s) for filtering.
+        // kick sessions can be stored as 'deadballShot' OR 'side_kick' depending
+        // on the recording mode, so we match both.
         const REP_TYPE_TO_SESSION_TYPE = {
-            'jump': 'jump',
-            'kick': 'deadballShot',
-            'sprint': 'sprint',
-            'freerecord': 'freeRecord'
+            'jump': ['jump'],
+            'kick': ['deadballShot', 'side_kick'],
+            'sprint': ['sprint'],
+            'freerecord': ['freeRecord']
         };
 
         // Update the session count badge from the cache (no query)
@@ -3723,10 +3725,10 @@
                 return;
             }
 
-            const sessionType = REP_TYPE_TO_SESSION_TYPE[currentRepType];
-            const count = cachedAllSessions.filter(s => s.type === sessionType).length;
+            const sessionTypes = REP_TYPE_TO_SESSION_TYPE[currentRepType] || [];
+            const count = cachedAllSessions.filter(s => sessionTypes.includes(s.type)).length;
             sessionCountEl.textContent = count;
-            console.log('Session count updated from cache:', count, 'for type:', sessionType);
+            console.log('Session count updated from cache:', count, 'for types:', sessionTypes);
         }
 
         // Render sessions for the currently selected rep type from the cache (no query)
@@ -3743,24 +3745,21 @@
                 return;
             }
 
-            const sessionType = REP_TYPE_TO_SESSION_TYPE[currentRepType];
+            const sessionTypes = REP_TYPE_TO_SESSION_TYPE[currentRepType] || [];
             const filtered = cachedAllSessions
-                .filter(s => s.type === sessionType)
+                .filter(s => sessionTypes.includes(s.type))
                 .sort((a, b) => b.date - a.date);
 
-            console.log('Displaying', filtered.length, 'cached sessions for type:', sessionType);
+            console.log('Displaying', filtered.length, 'cached sessions for types:', sessionTypes);
 
             // Update session count badge
             const sessionCountEl = document.getElementById('sessionCount');
             if (sessionCountEl) sessionCountEl.textContent = filtered.length;
 
             if (filtered.length === 0) {
-                sessionsGrid.innerHTML = `
-                    <div class="loading-container">
-                        <h3>No ${getRepTypeDisplayName(currentRepType)} sessions found</h3>
-                        <p>Complete sessions to see them here</p>
-                    </div>
-                `;
+                // Nothing in Firestore cache for this type — try the full Storage fallback
+                console.log('No cached sessions for', sessionTypes, '— falling back to storage scan');
+                loadSessions();
             } else {
                 renderSessions(filtered);
             }
@@ -3823,14 +3822,38 @@
             try {
                 console.log('fetchSessionsFromFirestore called with UID:', targetUid, 'DocID:', targetDocId);
                 const coll = db.collection('sessions');
+                const seenUids = new Set();
                 const queries = [];
-                if (targetUid) {
-                    console.log('Adding query for playerUID ==', targetUid);
-                    queries.push(coll.where('playerUID', '==', targetUid).get());
-                }
-                if (targetDocId && targetDocId !== targetUid) {
-                    console.log('Adding query for playerUID ==', targetDocId);
-                    queries.push(coll.where('playerUID', '==', targetDocId).get());
+
+                const addQuery = (uid) => {
+                    if (uid && !seenUids.has(uid)) {
+                        seenUids.add(uid);
+                        console.log('Adding query for playerUID ==', uid);
+                        queries.push(coll.where('playerUID', '==', uid).get());
+                    }
+                };
+
+                addQuery(targetUid);
+                addQuery(targetDocId);
+
+                // If no auth UID was resolved (coach viewing a player), pull the player
+                // document and try every known UID field so we don't miss sessions that
+                // were saved under the player's auth UID rather than their doc ID.
+                if (!targetUid && targetDocId) {
+                    try {
+                        const playerDoc = await db.collection('players').doc(targetDocId).get();
+                        if (playerDoc.exists) {
+                            const d = playerDoc.data();
+                            const candidates = [
+                                d.userUID, d.authenticationUID, d.uid,
+                                d.playerUID, d.authUID, d.userId, d.user_id
+                            ];
+                            candidates.forEach(v => { if (v && typeof v === 'string') addQuery(v); });
+                            console.log('Resolved extra UIDs from player doc:', [...seenUids]);
+                        }
+                    } catch (e) {
+                        console.warn('Could not fetch player doc for UID resolution:', e);
+                    }
                 }
 
                 console.log('Executing', queries.length, 'Firestore queries...');
@@ -3904,12 +3927,11 @@
                 const firestoreSessions = await fetchSessionsFromFirestore(targetPlayerUid, targetPlayerDocId);
                 console.log('Firestore sessions found:', firestoreSessions.length, firestoreSessions);
 
-                // Filter by active tab
-                const typeFilter = activeSessionTab === 'all' ? null : KICK_TYPES[activeSessionTab];
-                let filtered = firestoreSessions.filter(s => !typeFilter || s.type === typeFilter);
-                console.log('Filtered sessions:', filtered.length, 'Active tab:', activeSessionTab, 'Type filter:', typeFilter);
-
-                console.log('Filtered sessions:', filtered.length, 'Active tab:', activeSessionTab, 'Type filter:', typeFilter);
+                // Filter by current rep type — currentRepType drives the tab UI (jump/kick/sprint/freerecord)
+                // activeSessionTab is a legacy 'all'/'kick'/etc filter; use currentRepType as the source of truth
+                const typeFilters = REP_TYPE_TO_SESSION_TYPE[currentRepType] || null;
+                let filtered = firestoreSessions.filter(s => !typeFilters || typeFilters.includes(s.type));
+                console.log('Filtered sessions:', filtered.length, 'currentRepType:', currentRepType, 'Type filters:', typeFilters);
 
                 if (filtered.length > 0) {
                     filtered.sort((a, b) => b.date - a.date);
@@ -3919,13 +3941,22 @@
                 }
 
                 console.log('No Firestore sessions found, trying Storage fallback...');
-                // Fallback to Storage
+                // Fallback to Storage — only scan folders that match currentRepType
+                const STORAGE_FOLDER_MAP = {
+                    'side_kick': 'deadballShot'
+                };
+                const typesToScan = REP_TYPE_TO_SESSION_TYPE[currentRepType] || [];
+                const scannedFolders = new Set();
                 const sessions = [];
-                for (const [tabKey, kickType] of Object.entries(KICK_TYPES)) {
-                    if (activeSessionTab !== 'all' && activeSessionTab !== tabKey) continue;
+
+                for (const kickType of typesToScan) {
+                    const storageFolder = STORAGE_FOLDER_MAP[kickType] || kickType;
+                    if (scannedFolders.has(storageFolder)) continue;
+                    scannedFolders.add(storageFolder);
+                    console.log(`Storage fallback: scanning ${storageFolder}/ for type ${kickType}`);
 
                     try {
-                        const kickTypeRef = storage.ref(`${targetPlayerDocId}/${kickType}`);
+                        const kickTypeRef = storage.ref(`${targetPlayerDocId}/${storageFolder}`);
                         const sessionFolders = await kickTypeRef.listAll();
 
                         for (const sessionPrefix of sessionFolders.prefixes) {
@@ -3948,7 +3979,8 @@
                             } catch (_) {}
 
                             if (!Number.isFinite(metadataNumberReps)) {
-                                if (kickType === 'deadballShot') {
+                                // deadballShot and side_kick both use the same storage structure
+                                if (kickType === 'deadballShot' || kickType === 'side_kick') {
                                     const kickFolders = kickList.prefixes.filter(p => /^(kick|k)[ _-]?\d+/i.test(p.name));
                                     if (kickFolders.length > 0) {
                                         kickCount = kickFolders.length;
@@ -3978,6 +4010,10 @@
                         }
                     }
                 }
+
+                // Update count badge with storage results
+                const sessionCountEl = document.getElementById('sessionCount');
+                if (sessionCountEl) sessionCountEl.textContent = sessions.length;
 
                 if (sessions.length === 0) {
                     sessionsGrid.innerHTML = `
