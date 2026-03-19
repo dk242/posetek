@@ -1748,9 +1748,6 @@ function sizeSaPoseCanvas() {
   let cssW = wrapper.clientWidth;
   let cssH = wrapper.clientHeight;
   if (cssW <= 0 || cssH <= 0) return;
-  const targetAspect = 4 / 3;
-  if ((cssW / cssH) > targetAspect) cssW = cssH * targetAspect;
-  else cssH = cssW / targetAspect;
   const dpr = Math.min(window.devicePixelRatio || 1, 2);
   c.style.width = cssW + "px";
   c.style.height = cssH + "px";
@@ -1774,6 +1771,9 @@ let playing = false;
 let rafId = null;
 let lastTs = 0;
 let accumMs = 0;
+
+const SA_ANALYSIS_FRAME = 22;
+let saAnalysisPauseUsed = false;
 
 let x1n = null, x2n = null, yMid = null, arucoDist = null;
 let groundY = null; // lower ArUco marker y (larger value = lower on screen)
@@ -1822,6 +1822,10 @@ let isPanning = false; // track if we're currently panning
 let followCamActive = false;
 let followCamYMinNorm = null; // global min y across all keypoints (normalized, pre-mapY)
 
+// SA pose plot bounds (independent of main pose canvas)
+let saYMinNorm = null; // min y of face keypoints across all frames
+let saYMaxNorm = null; // max y of foot keypoints across all frames
+
 // Joint angle selection (ported from SideKickView)
 const selectedJoints = new Set();
 const JOINT_PICK_RADIUS = 12;
@@ -1858,13 +1862,21 @@ function getAngleJointDefs(pType) {
 }
 
 function mapSaPosePointToCanvas(nx, ny, W, H) {
-  const fcb = computeFollowCamBounds(curIdx, W, H);
+  const comPt = getComPoint(curIdx);
+  const comX = comPt ? comPt.x : 0;
+  return [saMapX(nx, comX, W, H), saMapY(ny, W, H)];
+}
+
+// Map pose point to canvas for main pose view (poseCanvas) - accounts for zoom/pan
+function mapPosePointToCanvasMain(nx, ny, W, H) {
   const mx = mapX(nx), my = mapY(ny, W, H);
-  if (!fcb) return [mx * W, my * H];
-  const { leftX, rightX, topY, bottomY } = fcb;
+  if (!manualZoomBounds) return [mx * W, my * H];
+  const { leftX, rightX, topY, bottomY } = manualZoomBounds;
   const viewWidthN = Math.max(rightX - leftX, 1e-6);
   const viewHeightN = Math.max(bottomY - topY, 1e-6);
-  return [(mx - leftX) / viewWidthN * W, (my - topY) / viewHeightN * H];
+  const adjLeft = leftX + panOffsetX;
+  const adjTop = topY + panOffsetY;
+  return [(mx - adjLeft) / viewWidthN * W, (my - adjTop) / viewHeightN * H];
 }
 
 // Pose skeleton rendering removed (COM + ArUco viewer only).
@@ -2135,6 +2147,17 @@ function drawComDotAndLine(frameIdx, W, H, ctx) {
   ctx.restore();
 }
 
+function drawSaGroundLine(ctx, W, H) {
+  if (yMid == null || saYMinNorm == null || saYMaxNorm == null) return;
+  ctx.save();
+  ctx.lineWidth = 2;
+  ctx.setLineDash([8,6]);
+  ctx.strokeStyle = "#ffffff";
+  const groundPx = saMapY(yMid, W, H);
+  ctx.beginPath(); ctx.moveTo(0, groundPx); ctx.lineTo(W, groundPx); ctx.stroke();
+  ctx.restore();
+}
+
 function drawPoseFrame(i) {
   const W = poseCanvas.clientWidth, H = poseCanvas.clientHeight;
   drawGrid(poseCtx, W, H);
@@ -2202,14 +2225,21 @@ function drawPoseFrame(i) {
       poseCtx.stroke();
     }
 
-    // joints (with mapX/mapY)
-    poseCtx.fillStyle = "#00ff88";
-    for (const p of frame) {
+    // joints (with mapX/mapY) - highlight selected joints
+    for (let idx = 0; idx < frame.length; idx++) {
+      const p = frame[idx];
       if (!isValidPoint(p)) continue;
       const x = p[0], y = p[1];
+      const isSelected = selectedJoints.has(idx);
+      poseCtx.fillStyle = isSelected ? "#ffcc00" : "#00ff88";
       poseCtx.beginPath();
-      poseCtx.arc(mapX(x) * W, mapY(y, W, H) * H, 3.5 * scale, 0, Math.PI * 2);
+      poseCtx.arc(mapX(x) * W, mapY(y, W, H) * H, isSelected ? 6 : 3.5 * scale, 0, Math.PI * 2);
       poseCtx.fill();
+      if (isSelected) {
+        poseCtx.strokeStyle = "#ffffff";
+        poseCtx.lineWidth = 2;
+        poseCtx.stroke();
+      }
     }
   }
 
@@ -2221,6 +2251,67 @@ function drawPoseFrame(i) {
   if (tx) {
     restoreTransform(poseCtx);
   }
+  drawPoseAngleOverlays(poseCtx, frame, W, H);
+}
+
+function drawPoseAngleOverlays(ctx, frame, W, H) {
+  if (!frame || !selectedJoints.size) return;
+  drawAngleOverlaysCore(ctx, frame, W, H, (nx, ny) => mapPosePointToCanvasMain(nx, ny, W, H));
+}
+
+function drawAngleOverlaysCore(ctx, frame, W, H, mapPt) {
+  if (!frame || !selectedJoints.size) return;
+  const LABEL_OFFSET_PX = 32;
+  const CONNECTOR_GAP_PX = 10;
+  const sel = Array.from(selectedJoints);
+  const drawLabelWithConnector = (anchorX, anchorY, labelText, dirX, dirY) => {
+    const len = Math.hypot(dirX, dirY);
+    if (len < 1e-6) return;
+    const ux = dirX / len, uy = dirY / len;
+    const labelX = anchorX + ux * LABEL_OFFSET_PX;
+    const labelY = anchorY + uy * LABEL_OFFSET_PX;
+    const lineEndX = anchorX + ux * (LABEL_OFFSET_PX - CONNECTOR_GAP_PX);
+    const lineEndY = anchorY + uy * (LABEL_OFFSET_PX - CONNECTOR_GAP_PX);
+    ctx.strokeStyle = "yellow"; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(anchorX, anchorY); ctx.lineTo(lineEndX, lineEndY); ctx.stroke();
+    ctx.font = "14px Inter"; ctx.textBaseline = "middle"; ctx.textAlign = "center"; ctx.fillStyle = "yellow";
+    ctx.fillText(labelText, labelX, labelY);
+  };
+  if (sel.length === 2) {
+    const [iA, iB] = sel;
+    const pA = frame[iA], pB = frame[iB];
+    if (pA && pB) {
+      const mA = mapPt(pA[0], pA[1]);
+      const mB = mapPt(pB[0], pB[1]);
+      const midX = (mA[0] + mB[0]) / 2, midY = (mA[1] + mB[1]) / 2;
+      const dx = mB[0] - mA[0], dy = mB[1] - mA[1];
+      let ang = toDeg(Math.atan2(dx, dy)); ang = Math.abs(ang);
+      ctx.strokeStyle = "yellow"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(mA[0], mA[1]); ctx.lineTo(mB[0], mB[1]); ctx.stroke();
+      let perpX = -dy, perpY = dx;
+      if (Math.hypot(perpX, perpY) < 0.1) { perpX = 1; perpY = 0; }
+      drawLabelWithConnector(midX, midY, ang.toFixed(1) + "°", perpX, perpY);
+    }
+  } else if (sel.length === 3) {
+    const [i1, i2, i3] = sel;
+    const P1 = frame[i1], P2 = frame[i2], P3 = frame[i3];
+    if (P1 && P2 && P3) {
+      const m1 = mapPt(P1[0], P1[1]);
+      const m2 = mapPt(P2[0], P2[1]);
+      const m3 = mapPt(P3[0], P3[1]);
+      const vBA = { x: m1[0] - m2[0], y: m1[1] - m2[1] };
+      const vBC = { x: m3[0] - m2[0], y: m3[1] - m2[1] };
+      const dot = vBA.x * vBC.x + vBA.y * vBC.y;
+      const mag = Math.hypot(vBA.x, vBA.y) * Math.hypot(vBC.x, vBC.y);
+      if (mag > 0) {
+        let ang = toDeg(Math.acos(Math.max(-1, Math.min(1, dot / mag))));
+        ctx.strokeStyle = "yellow"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(m1[0], m1[1]); ctx.lineTo(m2[0], m2[1]); ctx.lineTo(m3[0], m3[1]); ctx.stroke();
+        let bisectX = vBA.x / Math.hypot(vBA.x, vBA.y) + vBC.x / Math.hypot(vBC.x, vBC.y);
+        let bisectY = vBA.y / Math.hypot(vBA.x, vBA.y) + vBC.y / Math.hypot(vBC.x, vBC.y);
+        if (Math.hypot(bisectX, bisectY) < 0.1) { bisectX = 1; bisectY = 0; }
+        drawLabelWithConnector(m2[0], m2[1], ang.toFixed(1) + "°", bisectX, bisectY);
+      }
+    }
+  }
 }
 
 function drawSaPoseFrame(i) {
@@ -2229,19 +2320,15 @@ function drawSaPoseFrame(i) {
   const ctx = c.getContext("2d");
   const W = c.clientWidth, H = c.clientHeight;
   if (!ctx || W <= 0 || H <= 0) return;
+  if (saYMinNorm == null || saYMaxNorm == null) return;
 
   drawGrid(ctx, W, H);
 
-  const fcb = computeFollowCamBounds(i, W, H);
-  let tx = null;
-  if (fcb) {
-    const saved = manualZoomBounds;
-    manualZoomBounds = fcb;
-    tx = applyManualZoomTransform(ctx, W, H);
-    manualZoomBounds = saved;
-  }
+  const comPt = getComPoint(i);
+  const comX = comPt ? comPt.x : 0;
+  const mapPx = (nx, ny) => [saMapX(nx, comX, W, H), saMapY(ny, W, H)];
 
-  drawArucoGuides(ctx, W, H);
+  drawSaGroundLine(ctx, W, H);
 
   const frame = poseSeries?.[i];
   const COCO_EDGES = [[0,1],[0,2],[1,3],[2,4],[5,6],[5,7],[7,9],[6,8],[8,10],[5,11],[6,12],[11,12],[11,13],[13,15],[12,14],[14,16]];
@@ -2258,9 +2345,11 @@ function drawSaPoseFrame(i) {
     for (const [a,b] of edges) {
       const pa = frame[a], pb = frame[b];
       if (!isValidPoint(pa) || !isValidPoint(pb)) continue;
+      const [ax, ay] = mapPx(pa[0], pa[1]);
+      const [bx, by] = mapPx(pb[0], pb[1]);
       ctx.beginPath();
-      ctx.moveTo(mapX(pa[0]) * W, mapY(pa[1], W, H) * H);
-      ctx.lineTo(mapX(pb[0]) * W, mapY(pb[1], W, H) * H);
+      ctx.moveTo(ax, ay);
+      ctx.lineTo(bx, by);
       ctx.stroke();
     }
 
@@ -2268,11 +2357,11 @@ function drawSaPoseFrame(i) {
     for (let idx = 0; idx < frame.length; idx++) {
       const p = frame[idx];
       if (!isValidPoint(p)) continue;
-      const x = p[0], y = p[1];
+      const [px, py] = mapPx(p[0], p[1]);
       const isSelected = selectedJoints.has(idx);
       ctx.fillStyle = isSelected ? "#ffcc00" : "#00ff88";
       ctx.beginPath();
-      ctx.arc(mapX(x) * W, mapY(y, W, H) * H, isSelected ? 6 : 3.5 * scale, 0, Math.PI * 2);
+      ctx.arc(px, py, isSelected ? 6 : 3.5 * scale, 0, Math.PI * 2);
       ctx.fill();
       if (isSelected) {
         ctx.strokeStyle = "#ffffff";
@@ -2282,49 +2371,147 @@ function drawSaPoseFrame(i) {
     }
   }
 
-  drawComShadow(i, W, H, ctx);
-  drawComDotAndLine(i, W, H, ctx);
-  drawComProgress(i, W, H, ctx);
-
-  if (tx) restoreTransform(ctx);
-
   drawSaAngleOverlays(ctx, frame, W, H);
+  drawSaAnalysisOverlays(ctx, frame, i, W, H, comX);
+}
+
+function drawSaAnalysisOverlays(ctx, frame, frameIdx, W, H, comX) {
+  if (frameIdx !== SA_ANALYSIS_FRAME || !frame || !Array.isArray(frame)) return;
+  const n = frame.length;
+  const mapPx = (nx, ny) => [saMapX(nx, comX, W, H), saMapY(ny, W, H)];
+  const isMP = n === 33;
+  const RIGHT_KNEE  = isMP ? 26 : 14;
+  const LEFT_FOOT   = isMP ? 27 : 15;
+  const LEFT_SHOULDER  = isMP ? 11 : 5;
+  const RIGHT_SHOULDER = isMP ? 12 : 6;
+  const isValid = (pt) => pt && pt.length >= 2 && Number.isFinite(pt[0]) && Number.isFinite(pt[1]) && (Math.abs(pt[0]) >= 0.001 || Math.abs(pt[1]) >= 0.001);
+
+  ctx.save();
+
+  // --- "Toe-Off Analysis" tag at top center ---
+  const tagText = "Toe-Off Analysis";
+  const tagFontSize = Math.max(12, Math.round(H * 0.028));
+  ctx.font = `bold ${tagFontSize}px Inter`;
+  const tagPadX = tagFontSize * 0.9;
+  const tagPadY = tagFontSize * 0.45;
+  const tagMetrics = ctx.measureText(tagText);
+  const tagW = tagMetrics.width + tagPadX * 2;
+  const tagH = tagFontSize + tagPadY * 2;
+  const tagX = (W - tagW) / 2;
+  const tagY = H * 0.02;
+  ctx.fillStyle = "rgba(76, 140, 106, 0.92)";
+  ctx.beginPath();
+  ctx.roundRect(tagX, tagY, tagW, tagH, 8);
+  ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.25)";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+  ctx.fillStyle = "#ffffff";
+  ctx.textAlign = "center";
+  ctx.textBaseline = "middle";
+  ctx.fillText(tagText, W / 2, tagY + tagH / 2);
+
+  // --- Red circle highlight on right knee ---
+  const rkPt = frame[RIGHT_KNEE];
+  if (isValid(rkPt)) {
+    const [rkX, rkY] = mapPx(rkPt[0], rkPt[1]);
+    const circR = Math.max(14, Math.round(H * 0.032));
+    ctx.strokeStyle = "rgba(239, 68, 68, 0.35)";
+    ctx.lineWidth = 7;
+    ctx.beginPath(); ctx.arc(rkX, rkY, circR + 5, 0, Math.PI * 2); ctx.stroke();
+    ctx.strokeStyle = "rgba(239, 68, 68, 0.95)";
+    ctx.lineWidth = 3;
+    ctx.beginPath(); ctx.arc(rkX, rkY, circR, 0, Math.PI * 2); ctx.stroke();
+
+    const kneeText = "Pulling your calf closer to your hamstring will allow you to get back to the ground quicker and move faster";
+    drawSaInfoBox(ctx, rkX + circR + 8, rkY, kneeText, "right", W, H);
+  }
+
+  // --- Line from left foot to shoulder center + info box ---
+  const lfPt = frame[LEFT_FOOT];
+  const lsPt = frame[LEFT_SHOULDER];
+  const rsPt = frame[RIGHT_SHOULDER];
+  if (isValid(lfPt) && isValid(lsPt) && isValid(rsPt)) {
+    const scNx = (lsPt[0] + rsPt[0]) / 2;
+    const scNy = (lsPt[1] + rsPt[1]) / 2;
+    const [lfX, lfY] = mapPx(lfPt[0], lfPt[1]);
+    const [scX, scY] = mapPx(scNx, scNy);
+
+    ctx.strokeStyle = "rgba(255, 200, 60, 0.9)";
+    ctx.lineWidth = 2.5;
+    ctx.setLineDash([6, 4]);
+    ctx.beginPath(); ctx.moveTo(lfX, lfY); ctx.lineTo(scX, scY); ctx.stroke();
+    ctx.setLineDash([]);
+
+    ctx.fillStyle = "rgba(255, 200, 60, 0.9)";
+    ctx.beginPath(); ctx.arc(lfX, lfY, 4, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.arc(scX, scY, 4, 0, Math.PI * 2); ctx.fill();
+
+    const midX = (lfX + scX) / 2;
+    const midY = (lfY + scY) / 2;
+    const leanText = "Leaning further forward will allow you to accelerate more quickly. Try to keep your hips straight and at the same time allow your full body to rotate forward when pushing off.";
+    drawSaInfoBox(ctx, midX, midY, leanText, "left", W, H);
+  }
+
+  ctx.restore();
+}
+
+function drawSaInfoBox(ctx, anchorX, anchorY, text, direction, canvasW, canvasH) {
+  ctx.save();
+  const fontSize = Math.max(10, Math.round(canvasH * 0.02));
+  const boxMaxW = Math.min(220, canvasW * 0.26);
+  const pad = Math.round(fontSize * 0.75);
+  const lineH = Math.round(fontSize * 1.35);
+  const connLen = Math.round(canvasW * 0.025);
+  ctx.font = `${fontSize}px Inter`;
+
+  const words = text.split(" ");
+  const lines = [];
+  let cur = words[0];
+  for (let i = 1; i < words.length; i++) {
+    const test = cur + " " + words[i];
+    if (ctx.measureText(test).width > boxMaxW - 2 * pad) { lines.push(cur); cur = words[i]; }
+    else cur = test;
+  }
+  lines.push(cur);
+
+  const textH = lines.length * lineH;
+  const boxW = boxMaxW;
+  const boxH = textH + 2 * pad;
+  let boxX, boxY;
+  if (direction === "right") {
+    boxX = anchorX + connLen;
+    boxY = anchorY - boxH / 2;
+  } else {
+    boxX = anchorX - connLen - boxW;
+    boxY = anchorY - boxH / 2;
+  }
+  if (boxY < 4) boxY = 4;
+  if (boxY + boxH > canvasH - 4) boxY = canvasH - 4 - boxH;
+
+  const connEndX = direction === "right" ? boxX : boxX + boxW;
+  ctx.strokeStyle = "rgba(255,255,255,0.5)";
+  ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.moveTo(anchorX, anchorY); ctx.lineTo(connEndX, anchorY); ctx.stroke();
+
+  ctx.fillStyle = "rgba(0, 0, 0, 0.82)";
+  ctx.beginPath(); ctx.roundRect(boxX, boxY, boxW, boxH, 8); ctx.fill();
+  ctx.strokeStyle = "rgba(255,255,255,0.18)";
+  ctx.lineWidth = 1;
+  ctx.stroke();
+
+  ctx.fillStyle = "rgba(255,255,255,0.92)";
+  ctx.textAlign = "left";
+  ctx.textBaseline = "top";
+  let ty = boxY + pad;
+  for (const line of lines) { ctx.fillText(line, boxX + pad, ty); ty += lineH; }
+
+  ctx.restore();
 }
 
 function drawSaAngleOverlays(ctx, frame, W, H) {
   if (!frame || !selectedJoints.size) return;
-  const sel = Array.from(selectedJoints);
-  if (sel.length === 2) {
-    const [iA, iB] = sel;
-    const pA = frame[iA], pB = frame[iB];
-    if (pA && pB) {
-      const mA = mapSaPosePointToCanvas(pA[0], pA[1], W, H);
-      const mB = mapSaPosePointToCanvas(pB[0], pB[1], W, H);
-      const dx = mB[0] - mA[0], dy = mB[1] - mA[1];
-      let ang = toDeg(Math.atan2(dx, dy)); ang = Math.abs(ang);
-      ctx.strokeStyle = "yellow"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(mA[0], mA[1]); ctx.lineTo(mB[0], mB[1]); ctx.stroke();
-      ctx.font = "14px Inter"; ctx.textBaseline = "middle"; ctx.fillStyle = "yellow";
-      ctx.fillText(ang.toFixed(1) + "°", (mA[0] + mB[0]) / 2 + 5, (mA[1] + mB[1]) / 2 - 5);
-    }
-  } else if (sel.length === 3) {
-    const [i1, i2, i3] = sel;
-    const P1 = frame[i1], P2 = frame[i2], P3 = frame[i3];
-    if (P1 && P2 && P3) {
-      const m1 = mapSaPosePointToCanvas(P1[0], P1[1], W, H);
-      const m2 = mapSaPosePointToCanvas(P2[0], P2[1], W, H);
-      const m3 = mapSaPosePointToCanvas(P3[0], P3[1], W, H);
-      const vBA = { x: m1[0] - m2[0], y: m1[1] - m2[1] };
-      const vBC = { x: m3[0] - m2[0], y: m3[1] - m2[1] };
-      const dot = vBA.x * vBC.x + vBA.y * vBC.y;
-      const mag = Math.hypot(vBA.x, vBA.y) * Math.hypot(vBC.x, vBC.y);
-      if (mag > 0) {
-        let ang = toDeg(Math.acos(Math.max(-1, Math.min(1, dot / mag))));
-        ctx.strokeStyle = "yellow"; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(m1[0], m1[1]); ctx.lineTo(m2[0], m2[1]); ctx.lineTo(m3[0], m3[1]); ctx.stroke();
-        ctx.font = "14px Inter"; ctx.textBaseline = "middle"; ctx.fillStyle = "yellow";
-        ctx.fillText(ang.toFixed(1) + "°", m2[0] + 5, m2[1] - 5);
-      }
-    }
-  }
+  drawAngleOverlaysCore(ctx, frame, W, H, (nx, ny) => mapSaPosePointToCanvas(nx, ny, W, H));
 }
 
 /** =========================
@@ -2631,6 +2818,7 @@ async function loadAllForCurrentRep(){
   console.log("[Data Load] Frame range:", startFrame, "to", endFrame ?? "(end)");
 
   precomputeFollowCamYMin();
+  precomputeSaPoseBounds();
 
   // Refresh stats UI now that velocity/COM/aruco are all available
   // (initial call inside loadRepStats may fire before velocity/COM finish)
@@ -2701,6 +2889,12 @@ function tick(ts){
     const effEnd = getEffectiveEndFrame();
     if (curIdx + 1 <= effEnd) {
       curIdx = curIdx + 1;
+      if (!saAnalysisPauseUsed && curIdx >= SA_ANALYSIS_FRAME) {
+        curIdx = SA_ANALYSIS_FRAME;
+        saAnalysisPauseUsed = true;
+        pause();
+        break;
+      }
     } else {
       curIdx = effEnd;
       pause();
@@ -2733,6 +2927,7 @@ function resetAll(){
   pause();
   curIdx = startFrame;
   fpsTarget = 60;
+  saAnalysisPauseUsed = false;
   resetZoomPan();
   render(performance.now());
 }
@@ -3136,6 +3331,7 @@ function toggleSprintAnalysisLayout() {
     panOffsetX = 0;
     panOffsetY = 0;
     precomputeFollowCamYMin();
+    precomputeSaPoseBounds();
     const saLayout = document.getElementById("sprintAnalysisLayout");
     const origPoseRow = document.querySelector(".pose-stats-row");
     const origBottomRow = document.querySelector(".bottom-row");
@@ -3421,6 +3617,34 @@ poseCanvas.addEventListener("contextmenu", (e) => {
   e.preventDefault(); // Prevent right-click context menu
 });
 
+// Joint selection click (main pose view) - ported from SideKickView
+poseCanvas.addEventListener("click", (e) => {
+  if (followCamActive) return; // Sprint Analysis uses saPoseCanvas
+  const rect = poseCanvas.getBoundingClientRect();
+  const clickX = e.clientX - rect.left;
+  const clickY = e.clientY - rect.top;
+  const W = poseCanvas.clientWidth, H = poseCanvas.clientHeight;
+  const frame = poseSeries?.[curIdx];
+  if (!frame) return;
+  let hitIdx = null;
+  let bestDistSq = JOINT_PICK_RADIUS * JOINT_PICK_RADIUS;
+  frame.forEach((kp, idx) => {
+    if (!kp || kp.length < 2) return;
+    const x = kp[0], y = kp[1];
+    if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+    if (Math.abs(x) < 0.001 && Math.abs(y) < 0.001) return;
+    const mapped = mapPosePointToCanvasMain(x, y, W, H);
+    const d2 = (mapped[0] - clickX) ** 2 + (mapped[1] - clickY) ** 2;
+    if (d2 < bestDistSq) { bestDistSq = d2; hitIdx = idx; }
+  });
+  if (hitIdx !== null) {
+    if (selectedJoints.has(hitIdx)) selectedJoints.delete(hitIdx);
+    else if (selectedJoints.size < 3) selectedJoints.add(hitIdx);
+    initJointAngleChart();
+    render(performance.now());
+  }
+});
+
 // Reset zoom and pan
 function resetZoomPan() {
   manualZoomBounds = null;
@@ -3449,6 +3673,71 @@ function precomputeFollowCamYMin() {
   }
   followCamYMinNorm = Number.isFinite(minY) ? minY : null;
   console.log("[FollowCam] Global Y min (norm):", followCamYMinNorm);
+}
+
+function precomputeSaPoseBounds() {
+  saYMinNorm = null;
+  saYMaxNorm = null;
+  if (!poseSeries.length) return;
+  const FACE_IDX_MP = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10];
+  const FACE_IDX_COCO = [0, 1, 2, 3, 4];
+  let faceYSum = 0, faceYCount = 0;
+  for (const frame of poseSeries) {
+    if (!Array.isArray(frame)) continue;
+    const n = frame.length;
+    const faceIdx = (n === 33) ? FACE_IDX_MP : (n === 17 ? FACE_IDX_COCO : []);
+    for (const idx of faceIdx) {
+      const pt = frame[idx];
+      if (!pt || pt.length < 2) continue;
+      const y = pt[1];
+      if (Number.isFinite(y) && (Math.abs(pt[0]) >= 0.001 || Math.abs(y) >= 0.001)) {
+        faceYSum += y;
+        faceYCount++;
+      }
+    }
+  }
+  const avgFaceY = faceYCount > 0 ? faceYSum / faceYCount : null;
+
+  if (avgFaceY != null && groundY != null) {
+    saYMinNorm = avgFaceY;
+    saYMaxNorm = groundY;
+  } else {
+    let minY = Infinity, maxY = -Infinity;
+    for (const frame of poseSeries) {
+      if (!Array.isArray(frame)) continue;
+      for (const pt of frame) {
+        if (!pt || pt.length < 2) continue;
+        const y = pt[1];
+        if (Number.isFinite(y) && (Math.abs(pt[0]) >= 0.001 || Math.abs(y) >= 0.001)) {
+          if (y < minY) minY = y;
+          if (y > maxY) maxY = y;
+        }
+      }
+    }
+    saYMinNorm = avgFaceY ?? (Number.isFinite(minY) ? minY : null);
+    saYMaxNorm = groundY ?? (Number.isFinite(maxY) ? maxY : null);
+  }
+  console.log("[SA Pose] Y bounds (avg face, groundY):", saYMinNorm, saYMaxNorm);
+}
+
+function getSaYScale(W, H) {
+  if (saYMinNorm == null || saYMaxNorm == null || W <= 0 || H <= 0) return null;
+  const span = Math.max(saYMaxNorm - saYMinNorm, 1e-6);
+  return (0.90 * H) / span;
+}
+
+function saMapY(rawY, W, H) {
+  const scale = getSaYScale(W, H);
+  if (scale == null || !Number.isFinite(rawY)) return rawY;
+  const span = Math.max(saYMaxNorm - saYMinNorm, 1e-6);
+  return 0.05 * H + ((rawY - saYMinNorm) / span) * 0.90 * H;
+}
+
+function saMapX(rawX, comX, W, H) {
+  const yScale = getSaYScale(W, H);
+  if (yScale == null || !Number.isFinite(rawX)) return rawX;
+  const centerX = Number.isFinite(comX) ? comX : 0;
+  return W / 2 + (rawX - centerX) * yScale;
 }
 
 function computeFollowCamBounds(frameIdx, W, H) {
