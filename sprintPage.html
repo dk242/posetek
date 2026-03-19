@@ -221,6 +221,16 @@
     .pro-overlay-popover{position:absolute;bottom:100%;right:0;margin-bottom:4px;padding:0.5rem;background:rgba(15,31,27,0.94);border:1px solid rgba(255,255,255,0.1);border-radius:8px;backdrop-filter:blur(16px);box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:101}
     .pro-overlay-popover .overlay-select{min-width:140px}
 
+    /* Premium lock */
+    .premium-section-locked{position:relative;pointer-events:none;user-select:none}
+    .premium-section-locked > *{visibility:hidden}
+    .premium-section-locked::before{content:'';position:absolute;inset:0;border-radius:12px;background:rgba(0,0,0,0.55);z-index:5}
+    .premium-section-locked .lock-overlay{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:6;pointer-events:none;gap:0.4rem;visibility:visible;padding:1rem;text-align:center}
+    .premium-section-locked .lock-overlay .material-symbols-outlined{font-size:2rem;color:rgba(255,255,255,0.85)}
+    .premium-section-locked .lock-overlay span:last-child{font-size:0.8rem;color:rgba(255,255,255,0.65);font-weight:500}
+    .lock-overlay .unlock-btn{pointer-events:auto;cursor:pointer;margin-top:0.5rem;padding:0.5rem 1.2rem;background:var(--accent, #4c8c6a);color:#fff;border:none;border-radius:8px;font-size:0.85rem;font-weight:600;transition:background 0.2s;text-decoration:none;display:inline-block}
+    .lock-overlay .unlock-btn:hover{background:var(--accent-light, #5ea87e)}
+
     /* Expandable ctrl-panel overlay */
     .ctrl-panel{display:none;flex-direction:column;gap:0.3rem;position:absolute;bottom:46px;right:8px;z-index:100;width:220px;background:rgba(15,31,27,0.94);border:1px solid rgba(255,255,255,0.1);border-radius:10px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:0.5rem;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
     .ctrl-panel.open{display:flex}
@@ -3141,6 +3151,41 @@ function showErr(msg){
   el.textContent = msg;
 }
 
+async function applyPremiumLock(playerDocId, userType) {
+  if (!playerDocId) return;
+  const isCoachUser = userType === "coach";
+  try {
+    const pDoc = await db.collection("players").doc(playerDocId).get();
+    if (!pDoc.exists) return;
+
+    const locked = pDoc.data().premium_content_locked;
+    const shouldLock = isCoachUser ? (locked === true) : (locked !== false);
+    if (!shouldLock) return;
+
+    function addLock(el, label, sentFrom) {
+      if (!el || el.classList.contains("premium-section-locked")) return;
+      el.classList.add("premium-section-locked");
+      const overlay = document.createElement("div");
+      overlay.className = "lock-overlay";
+      overlay.innerHTML = '<span class="material-symbols-outlined">lock</span><span>' + (label || "Premium") + "</span>";
+      if (!isCoachUser) {
+        const btn = document.createElement("a");
+        btn.className = "unlock-btn";
+        btn.textContent = "Unlock Features";
+        btn.href = "premiumInfo.html?player=" + encodeURIComponent(playerDocId) + "&sentFrom=" + encodeURIComponent(sentFrom);
+        overlay.appendChild(btn);
+      }
+      el.appendChild(overlay);
+    }
+
+    addLock(document.getElementById("poseContainer"), "Pose viewer only available for premium members", "sprintPoseViewer");
+    addLock(document.getElementById("sprintAnalysisLayout"), "Sprint analysis only available for premium members", "sprintAnalysis");
+    addLock(document.querySelector(".chart-section"), "Performance analytics only available for premium members", "sprintPerformanceAnalytics");
+  } catch (err) {
+    console.error("[PremiumLock] Error checking premium lock:", err);
+  }
+}
+
 // Some pages/layouts may not include a header logout link.
 const logoutLinkEl = document.getElementById("logoutLink");
 if (logoutLinkEl) {
@@ -3273,6 +3318,8 @@ auth.onAuthStateChanged(async (user)=>{
   try{
     await initRepsBar();
     await loadAllForCurrentRep();
+    const targetPlayerDocId = playerDocId || (!isCoach ? currentUserInfo?.docId : null);
+    await applyPremiumLock(targetPlayerDocId, isCoach ? "coach" : "player");
   }catch(err){
     console.error(err);
     showErr(err?.message || "Failed to load required data.");
