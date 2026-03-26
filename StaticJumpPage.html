@@ -23,22 +23,20 @@
     .nav-links a:hover::after{width:100%}
 
   .container { padding: 2rem; }
-  /* Three-column layout like SideKickView: video | pose | angles */
+  /* Two-column layout: video | pose (angles column hidden, code retained for reuse) */
   .frames-container { display: flex; gap: 1rem; align-items: flex-start; justify-content: space-between; flex-wrap: nowrap; padding: 0 1rem; }
-  .video-container, .pose-container, .angles-column { flex: 1 1 calc((100% - 2rem) / 3); min-width: 280px; }
-  .video-container { max-width: 40%; }
-  .pose-container { max-width: 40%; }
-  .angles-column { max-width: 40%; }
+  .video-container, .pose-container { flex: 1 1 calc((100% - 1rem) / 2); min-width: 280px; }
+  .angles-column { display: none !important; /* Hidden but code retained for reuse */ }
 
-    .video-container{background:linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25));border:1px solid var(--card-border);border-radius:12px;padding:1rem;position:relative;width:100%;max-width:40%;backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28)}
+    .video-container{background:linear-gradient(135deg, rgba(0,0,0,0.35), rgba(0,0,0,0.25));border:1px solid var(--card-border);border-radius:12px;padding:1rem;position:relative;width:100%;backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28)}
     .video-container video,#rawFrameCanvas{width:100%;max-width:100%;height:auto;aspect-ratio:16/9;border-radius:8px}
-    .pose-container{background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));border:1px solid var(--card-border);border-radius:12px;position:relative;overflow:hidden;width:480px;z-index:5;backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28);max-width:40%}
+    .pose-container{background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));border:1px solid var(--card-border);border-radius:12px;position:relative;overflow:hidden;width:100%;z-index:5;backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28);flex:1;min-height:0}
     .pose-container canvas{display:block;width:100%;max-width:100%;height:auto;aspect-ratio:4/3;background-color:#1a3a2e}
+  .pose-canvas-wrapper { position: relative; min-height: 0; }
 
-    .nav-buttons{display:flex;flex-direction:column;gap:0.6rem;padding:0.6rem;background:linear-gradient(135deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));border:1px solid var(--card-border);border-radius:12px;backdrop-filter:blur(10px);box-shadow:0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.05)}
-    .btn-row{display:flex;gap:0.5rem;justify-content:center}
-    .icon-btn{width:44px;height:44px;border:1px solid var(--card-border);border-radius:12px;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);color:#fff;font-size:1.1rem;cursor:pointer;transition:transform 200ms ease, box-shadow 200ms ease, background 200ms ease, opacity 200ms ease;display:flex;align-items:center;justify-content:center;box-shadow:0 4px 12px rgba(76,140,106,0.3), inset 0 1px 0 rgba(255,255,255,0.2);touch-action:manipulation;-webkit-user-select:none;user-select:none}
-    .icon-btn:hover{transform:translateY(-2px);box-shadow:0 6px 16px rgba(76,140,106,0.4), 0 4px 12px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.2);background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%)}
+    .btn-row{display:flex;gap:0.25rem;justify-content:center;align-items:center}
+    .icon-btn{width:30px;height:30px;border:none;border-radius:8px;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);color:#fff;font-size:0.85rem;cursor:pointer;transition:transform 150ms ease, box-shadow 150ms ease, background 150ms ease;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 6px rgba(76,140,106,0.2);touch-action:manipulation;-webkit-user-select:none;user-select:none}
+    .icon-btn:hover{transform:translateY(-1px);box-shadow:0 3px 10px rgba(76,140,106,0.3);background:linear-gradient(135deg, #56a07a 0%, var(--accent) 100%)}
     .icon-btn:active{transform:translateY(0) scale(0.95)}
     .icon-btn.active{background:linear-gradient(135deg, var(--secondary), #2b5a47);box-shadow:0 2px 8px rgba(0,0,0,0.3), inset 0 1px 0 rgba(255,255,255,0.15)}
     .btn{display:inline-flex;align-items:center;justify-content:center;padding:.55rem 1rem;border:1px solid var(--card-border);border-radius:10px;background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);color:#fff;font-weight:600;cursor:pointer;transition:transform 200ms ease, box-shadow 200ms ease, background 200ms ease;text-decoration:none;box-shadow:0 4px 12px rgba(76,140,106,0.3), inset 0 1px 0 rgba(255,255,255,0.2)}
@@ -98,11 +96,10 @@
     .video-container:fullscreen,.pose-container:fullscreen{width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;border-radius:0!important;margin:0!important;padding:0!important;box-shadow:none!important;border:none!important}
     .video-container:fullscreen{display:flex;align-items:center;justify-content:center;background:#000}
     .video-container:fullscreen video{max-width:100vw!important;max-height:100vh!important}
-    .pose-container:fullscreen #poseCanvas{width:100%!important;height:auto!important;max-width:100%!important}
+    .pose-container:fullscreen #poseCanvas{width:100%!important;height:100%!important;max-width:100%!important}
     .pose-container:fullscreen #pose3DCanvas{width:100%!important;height:100%!important;max-width:100%!important}
-    .video-container:fullscreen .nav-buttons{position:absolute;left:12px;right:12px;bottom:12px;z-index:1000;margin:0;padding:0.6rem;background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.45));border:1px solid var(--card-border);border-radius:12px;backdrop-filter:blur(8px)}
-    .pose-container:fullscreen .nav-buttons{position:absolute;right:16px;bottom:16px;z-index:1000;width:auto;max-width:48vw;margin:0;padding:0.6rem;background:linear-gradient(180deg, rgba(0,0,0,0.55), rgba(0,0,0,0.45));border:1px solid var(--card-border);border-radius:12px;backdrop-filter:blur(8px)}
-    .video-container:fullscreen .fullscreen-btn,.pose-container:fullscreen .fullscreen-btn,.pose-container:fullscreen .frame-number{top:16px;right:16px;left:16px;z-index:1000}
+    .video-container:fullscreen .fullscreen-btn,.pose-container:fullscreen .fullscreen-btn{top:16px;right:16px;z-index:1000}
+    .pose-container:fullscreen .frame-number{top:16px;left:16px;z-index:1000}
     .pose-container:fullscreen ~ #anglesColumn{display:none!important}
 
     /* Responsive: stack on small widths */
@@ -221,6 +218,222 @@
   .view-toggle-btn{flex:1;padding:0.5rem 1rem;border:1px solid var(--card-border);border-radius:8px;background:rgba(255,255,255,0.05);color:var(--text-light);font-weight:600;cursor:pointer;transition:var(--transition);text-align:center;}
   .view-toggle-btn:hover{background:rgba(255,255,255,0.08);}
   .view-toggle-btn.active{background:linear-gradient(135deg, var(--accent), #56a07a);border-color:var(--accent);box-shadow:0 4px 12px rgba(76,140,106,0.3);}
+
+  /* --- YouTube-style bottom bars and expandable control panels --- */
+  .yt-bar {
+    display: flex;
+    flex-direction: column;
+    background: linear-gradient(135deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+    border-top: 1px solid var(--card-border);
+    position: relative;
+  }
+  .video-container .yt-bar { margin-top: 0.35rem; }
+  .yt-progress-wrapper {
+    padding: 0 10px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+  }
+  .yt-bar-controls {
+    display: flex;
+    align-items: center;
+    padding: 1px 6px 4px;
+    gap: 2px;
+  }
+  .yt-bar-btn {
+    width: 28px;
+    height: 28px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: rgba(255,255,255,0.85);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background 0.15s ease;
+    padding: 0;
+    touch-action: manipulation;
+    font-size: 1rem;
+  }
+  .yt-bar-btn .material-symbols-outlined { font-size: 1.15rem; }
+  .yt-bar-btn:hover { background: rgba(255,255,255,0.1); }
+  .yt-bar-btn:active { transform: scale(0.9); }
+  .yt-bar-frame {
+    color: rgba(255,255,255,0.6);
+    font-size: 0.65rem;
+    font-weight: 600;
+    font-variant-numeric: tabular-nums;
+    margin-left: 2px;
+  }
+  .ctrl-panel {
+    display: none;
+    flex-direction: column;
+    gap: 0.3rem;
+    position: absolute;
+    bottom: 46px;
+    right: 8px;
+    z-index: 100;
+    width: 240px;
+    background: rgba(15,31,27,0.94);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 10px;
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    padding: 0.5rem;
+    box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+  }
+  .ctrl-panel.open { display: flex; }
+  .ctrl-panel-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding-bottom: 0.2rem;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+    margin-bottom: 0.1rem;
+  }
+  .ctrl-panel-title {
+    font-size: 0.65rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    opacity: 0.5;
+  }
+  .ctrl-panel-close {
+    width: 22px;
+    height: 22px;
+    border: none;
+    border-radius: 50%;
+    background: transparent;
+    color: rgba(255,255,255,0.6);
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    transition: background 0.15s ease;
+  }
+  .ctrl-panel-close:hover { background: rgba(255,255,255,0.1); }
+  .ctrl-panel-close .material-symbols-outlined { font-size: 0.95rem; }
+  .slider-group { margin-top: 0.25rem; }
+  .slider-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.2rem;
+  }
+  .slider-label { font-size: 0.75rem; opacity: 0.7; }
+  .slider-value { font-size: 0.75rem; font-weight: 600; }
+  .ctrl-extras { display: flex; flex-direction: column; gap: 0.45rem; margin-top: 0.35rem; }
+  .ctrl-checkbox { display: flex; align-items: center; gap: 0.45rem; font-size: 0.75rem; opacity: 0.9; }
+  .ctrl-checkbox input[type="checkbox"] { cursor: pointer; }
+  .ctrl-hint { margin-top: 0.35rem; text-align: center; font-size: 0.7rem; opacity: 0.65; }
+  .yt-bar-overlay-btn {
+    border: 1px solid var(--card-border);
+    border-radius: 999px;
+    background: rgba(255,255,255,0.08);
+    color: var(--text-light);
+    font-size: 0.68rem;
+    font-weight: 600;
+    padding: 0.2rem 0.55rem;
+    cursor: pointer;
+  }
+  .yt-bar-overlay-btn:hover { background: rgba(255,255,255,0.14); }
+  .yt-bar-overlay-btn.active {
+    background: linear-gradient(135deg, var(--accent), #56a07a);
+    border-color: var(--accent);
+  }
+
+  /* Custom range slider — themed track/thumb (no default blue), embedded look */
+  input[type="range"] {
+    -webkit-appearance: none;
+    appearance: none;
+    width: 100%;
+    height: 16px;
+    background: transparent;
+    outline: none;
+    cursor: pointer;
+  }
+  input[type="range"]::-webkit-slider-runnable-track {
+    height: 3px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 2px;
+  }
+  input[type="range"]::-webkit-slider-thumb {
+    -webkit-appearance: none;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+    transition: transform 0.12s ease;
+    margin-top: -3.5px;
+  }
+  input[type="range"]::-webkit-slider-thumb:hover {
+    transform: scale(1.3);
+  }
+  input[type="range"]::-moz-range-thumb {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: var(--accent-light);
+    cursor: pointer;
+    border: none;
+  }
+  input[type="range"]::-moz-range-track {
+    height: 3px;
+    background: rgba(255,255,255,0.12);
+    border-radius: 2px;
+  }
+
+  :fullscreen .yt-bar {
+    position: absolute;
+    left: 0; right: 0; bottom: 0;
+    z-index: 1001;
+    background: linear-gradient(0deg, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.4) 70%, transparent 100%);
+    border: none;
+    padding-top: 40px;
+  }
+  :fullscreen .yt-progress-wrapper {
+    padding: 0 16px;
+    height: 22px;
+    align-items: center;
+  }
+  :fullscreen .yt-progress-wrapper input[type="range"] {
+    height: 18px;
+    background: transparent;
+    transition: height 0.15s ease;
+  }
+  :fullscreen .yt-progress-wrapper input[type="range"]::-webkit-slider-runnable-track {
+    height: 3px;
+    background: rgba(255,255,255,0.25);
+    transition: height 0.15s ease;
+  }
+  :fullscreen .yt-progress-wrapper:hover input[type="range"]::-webkit-slider-runnable-track {
+    height: 5px;
+  }
+  :fullscreen .yt-progress-wrapper input[type="range"]::-webkit-slider-thumb {
+    width: 13px;
+    height: 13px;
+    margin-top: -5px;
+    background: #fff;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+  }
+  :fullscreen .yt-progress-wrapper:hover input[type="range"]::-webkit-slider-thumb {
+    margin-top: -4px;
+  }
+  :fullscreen .yt-bar-controls { padding: 2px 12px 10px; gap: 6px; }
+  :fullscreen .yt-bar-btn { width: 34px; height: 34px; }
+  :fullscreen .yt-bar-frame { font-size: 0.75rem; color: rgba(255,255,255,0.8); }
+  :fullscreen .ctrl-panel {
+    bottom: 72px;
+    right: 16px;
+    z-index: 1002;
+    width: 280px;
+    background: rgba(0,0,0,0.82);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
   
   /* Key Frame Tabs in Chart */
   .keyframes-tabs{display:flex;gap:0.25rem;padding:0.5rem 0.75rem 0 0.75rem;border-bottom:1px solid rgba(255,255,255,0.1);}
@@ -259,6 +472,457 @@
   .premium-section-locked .lock-overlay span:last-child { font-size: 0.8rem; color: rgba(255,255,255,0.6); font-weight: 500; }
   .lock-overlay .unlock-btn { pointer-events: auto; cursor: pointer; margin-top: 0.5rem; padding: 0.5rem 1.2rem; background: var(--accent, #4c8c6a); color: #fff; border: none; border-radius: 8px; font-size: 0.85rem; font-weight: 600; transition: background 0.2s; text-decoration: none; display: inline-block; }
   .lock-overlay .unlock-btn:hover { background: var(--accent-light, #5ea87e); }
+
+  /* --- Jump Analysis Mode --- */
+  .analyze-kick-btn {
+    display: block;
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
+    color: #1a1a1a;
+    background: linear-gradient(135deg, #f5c842 0%, #e6a817 100%);
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    box-shadow: 0 4px 16px rgba(230,168,23,0.35), inset 0 1px 0 rgba(255,255,255,0.35);
+    transition: transform 180ms ease, box-shadow 180ms ease, filter 180ms ease;
+    touch-action: manipulation;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+  .analyze-kick-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 22px rgba(230,168,23,0.5), inset 0 1px 0 rgba(255,255,255,0.35);
+    filter: brightness(1.05);
+  }
+  .analyze-kick-btn:active {
+    transform: translateY(0) scale(0.98);
+    box-shadow: 0 2px 8px rgba(230,168,23,0.3);
+  }
+  #analyzeJumpBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+    box-shadow: none;
+    transform: none;
+  }
+  #analyzeJumpBtn:disabled:hover {
+    transform: none;
+    filter: grayscale(0.4);
+    box-shadow: none;
+  }
+
+  .analysis-header {
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 1010;
+    text-align: center;
+    padding: 1rem 1.5rem;
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 1.2px;
+    text-transform: uppercase;
+    color: #fff;
+    background: linear-gradient(180deg, rgba(0,0,0,0.75) 0%, rgba(0,0,0,0.3) 80%, transparent 100%);
+    pointer-events: none;
+  }
+  .pose-container:fullscreen .analysis-header {
+    font-size: 1.4rem;
+    padding: 1.4rem 2rem;
+  }
+
+  .analysis-start-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1005;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.45);
+  }
+  .analysis-start-btn {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #fff;
+    transition: transform 200ms ease;
+  }
+  .analysis-start-btn:hover { transform: scale(1.08); }
+  .analysis-start-btn:active { transform: scale(0.97); }
+  .analysis-start-icon {
+    width: 80px;
+    height: 80px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 40% 38%, rgba(245,200,66,0.9), rgba(230,168,23,0.95));
+    box-shadow: 0 4px 30px rgba(230,168,23,0.5), 0 0 60px rgba(230,168,23,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: #1a1a1a;
+  }
+  .analysis-start-icon .material-symbols-outlined { font-size: 2.4rem; }
+  .analysis-start-label {
+    font-size: 1.05rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.6);
+  }
+  .pose-container:fullscreen .analysis-start-icon {
+    width: 110px;
+    height: 110px;
+  }
+  .pose-container:fullscreen .analysis-start-icon .material-symbols-outlined { font-size: 3.2rem; }
+  .pose-container:fullscreen .analysis-start-label { font-size: 1.3rem; }
+
+  .analysis-feedback-panel {
+    position: absolute;
+    top: 0;
+    right: 0;
+    width: 25%;
+    min-width: 220px;
+    height: 100%;
+    z-index: 1008;
+    background: linear-gradient(180deg, rgba(10,25,20,0.92) 0%, rgba(8,20,16,0.95) 100%);
+    border-left: 1px solid rgba(255,255,255,0.08);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+  }
+  .analysis-feedback-inner {
+    padding: 4.5rem 1.2rem 1.2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  .pose-container:fullscreen .analysis-feedback-inner {
+    padding: 5rem 1.5rem 1.5rem;
+    gap: 1rem;
+  }
+  .analysis-feedback-title {
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: #f5c842;
+    margin: 0;
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+  .pose-container:fullscreen .analysis-feedback-title { font-size: 1.15rem; }
+
+  .analysis-feedback-angles {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .analysis-angle-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0.4rem 0.6rem;
+    background: rgba(255,255,255,0.04);
+    border-radius: 6px;
+    border-left: 3px solid var(--angle-color, #4c8c6a);
+  }
+  .analysis-angle-row.analysis-angle-close { border-left-color: #4caf50; }
+  .analysis-angle-row.analysis-angle-moderate { border-left-color: #ffc107; }
+  .analysis-angle-row.analysis-angle-large { border-left-color: #f44336; }
+  .analysis-angle-name {
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.75);
+  }
+  .analysis-angle-value {
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #fff;
+    font-variant-numeric: tabular-nums;
+  }
+  .pose-container:fullscreen .analysis-angle-name { font-size: 0.85rem; }
+  .pose-container:fullscreen .analysis-angle-value { font-size: 0.95rem; }
+
+  .analysis-angle-spacer { height: 0.6rem; }
+
+  .analysis-feedback-divider {
+    height: 1px;
+    background: rgba(255,255,255,0.08);
+    margin: 0.25rem 0;
+  }
+
+  .analysis-feedback-text {
+    font-size: 0.78rem;
+    line-height: 1.55;
+    color: rgba(255,255,255,0.82);
+  }
+  .analysis-feedback-text p {
+    margin: 0 0 0.5rem;
+  }
+  .analysis-feedback-text strong {
+    color: #fff;
+    font-weight: 700;
+  }
+  .pose-container:fullscreen .analysis-feedback-text { font-size: 0.88rem; line-height: 1.6; }
+
+  .analysis-continue-btn {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.7rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    background: linear-gradient(135deg, #f5c842 0%, #e6a817 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(230,168,23,0.35);
+    transition: transform 150ms ease, box-shadow 150ms ease, filter 150ms ease;
+    touch-action: manipulation;
+  }
+  .analysis-continue-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(230,168,23,0.5);
+    filter: brightness(1.05);
+  }
+  .analysis-continue-btn:active {
+    transform: translateY(0) scale(0.98);
+  }
+  .pose-container:fullscreen .analysis-continue-btn {
+    padding: 0.85rem 1.2rem;
+    font-size: 0.95rem;
+  }
+
+  .pose-container.analysis-active #poseFullscreenBtn,
+  .pose-container.analysis-active #frameNumberDisplay,
+  .pose-container.analysis-active .view-toggle,
+  .pose-container.analysis-active #miniPoseSelector,
+  .pose-container.analysis-active #poseExpandBtn {
+    display: none !important;
+  }
+
+  .pose-container.analysis-active #poseYtBar {
+    pointer-events: none;
+    opacity: 0.6;
+  }
+
+  .pose-container:fullscreen.analysis-feedback-visible {
+    display: flex !important;
+    flex-direction: row;
+    align-items: stretch;
+  }
+  .pose-container:fullscreen.analysis-feedback-visible .pose-canvas-wrapper {
+    flex: 1 1 75%;
+    min-width: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .pose-container:fullscreen.analysis-feedback-visible #poseCanvas {
+    width: 100% !important;
+    height: auto !important;
+    max-height: 100vh;
+  }
+  .pose-container:fullscreen.analysis-feedback-visible .analysis-feedback-panel {
+    position: relative;
+    flex: 0 0 25%;
+    height: 100vh;
+  }
+  .pose-container:fullscreen.analysis-feedback-visible .yt-bar {
+    position: absolute;
+    left: 0;
+    right: 25%;
+    bottom: 0;
+  }
+  .pose-container:fullscreen.analysis-feedback-visible .ctrl-panel {
+    display: none !important;
+  }
+  .pose-container:fullscreen.analysis-feedback-visible .analysis-header {
+    right: 25%;
+  }
+
+  .annotation-toolbar {
+    position: absolute;
+    left: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 1005;
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+  }
+  .annotation-tool-btn {
+    padding: 0.5rem 0.75rem;
+    font-size: 0.75rem;
+    font-weight: 600;
+    color: rgba(255,255,255,0.9);
+    background: rgba(20,40,35,0.9);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 8px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: background 0.2s, border-color 0.2s;
+  }
+  .annotation-tool-btn:hover {
+    background: rgba(30,55,48,0.95);
+    border-color: rgba(255,255,255,0.25);
+  }
+  .annotation-tool-btn.active {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+    border-color: rgba(255,255,255,0.3);
+    color: #1a1a1a;
+  }
+
+  .annotation-textarea {
+    width: 100%;
+    min-height: 120px;
+    padding: 0.6rem 0.8rem;
+    font-size: 0.8rem;
+    line-height: 1.5;
+    color: #fff;
+    background: rgba(255,255,255,0.06);
+    border: 1px solid rgba(255,255,255,0.12);
+    border-radius: 8px;
+    resize: vertical;
+    font-family: inherit;
+  }
+  .annotation-textarea::placeholder {
+    color: rgba(255,255,255,0.4);
+  }
+
+  .annotation-save-btn {
+    display: block;
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.6rem 1rem;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    background: linear-gradient(135deg, #4caf50 0%, #388e3c 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    box-shadow: 0 3px 12px rgba(76,175,80,0.35);
+    transition: transform 150ms ease, box-shadow 150ms ease;
+  }
+  .annotation-save-btn:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 5px 18px rgba(76,175,80,0.5);
+  }
+  .annotation-save-btn.disabled,
+  .annotation-save-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    transform: none;
+    box-shadow: none;
+  }
+
+  .key-takeaways-overlay {
+    position: absolute;
+    inset: 0;
+    z-index: 1010;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(0,0,0,0.7);
+    backdrop-filter: blur(8px);
+  }
+  .key-takeaways-inner {
+    max-width: 90%;
+    width: 480px;
+    padding: 2rem;
+    background: linear-gradient(180deg, rgba(15,35,28,0.98) 0%, rgba(10,25,20,0.98) 100%);
+    border: 1px solid rgba(255,255,255,0.1);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.5);
+  }
+  .key-takeaways-title {
+    font-size: 1.1rem;
+    font-weight: 700;
+    color: #f5c842;
+    margin: 0 0 1rem;
+    text-transform: uppercase;
+  }
+  .key-takeaways-text {
+    font-size: 0.9rem;
+    line-height: 1.6;
+    color: rgba(255,255,255,0.9);
+    margin-bottom: 1.5rem;
+    white-space: pre-wrap;
+  }
+  .key-takeaways-close-btn {
+    display: block;
+    width: 100%;
+    padding: 0.7rem 1rem;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: #1a1a1a;
+    background: linear-gradient(135deg, #f5c842 0%, #e6a817 100%);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: transform 150ms ease;
+  }
+  .key-takeaways-close-btn:hover {
+    transform: translateY(-1px);
+  }
+
+  .bs-draggable-popup {
+    position: absolute;
+    z-index: 2001;
+    width: 260px;
+    user-select: none;
+    -webkit-user-select: none;
+    filter: drop-shadow(0 6px 20px rgba(0,0,0,0.5));
+  }
+  .bs-draggable-popup.dragging { cursor: grabbing; }
+  .bs-draggable-popup-drag-handle {
+    height: 24px;
+    cursor: grab;
+    background: rgba(255,255,255,0.06);
+    border-radius: 12px 12px 0 0;
+  }
+  .bs-draggable-popup-drag-handle::after {
+    content: '';
+    display: block;
+    width: 24px;
+    height: 4px;
+    margin: 10px auto 0;
+    background: rgba(255,255,255,0.3);
+    border-radius: 2px;
+  }
+  .bs-draggable-popup-inner {
+    cursor: default;
+    user-select: text;
+    background: rgba(30, 30, 40, 0.95);
+    border: 1px solid rgba(239, 68, 68, 0.5);
+    border-radius: 12px;
+    padding: 0.9rem 1rem;
+  }
+  .bs-draggable-popup-title { margin: 0 0 0.4rem 0; font-size: 0.85rem; font-weight: 700; color: #f87171; }
+  .bs-draggable-popup-text { margin: 0; font-size: 0.78rem; line-height: 1.5; color: rgba(255,255,255,0.88); }
+  .bs-popup-edit-wrap { margin-top: 0.4rem; }
+  .bs-draggable-popup-edit {
+    width: 100%;
+    min-height: 60px;
+    padding: 0.5rem 0.6rem;
+    font-size: 0.78rem;
+    line-height: 1.5;
+    color: rgba(255,255,255,0.9);
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.2);
+    border-radius: 6px;
+    font-family: inherit;
+    resize: vertical;
+  }
+  .bs-popup-save-btn { margin-top: 0.5rem; padding: 0.35rem 0.8rem; font-size: 0.8rem; font-weight: 600; background: rgba(245, 200, 66, 0.9); color: #1a1a1a; border: none; border-radius: 6px; cursor: pointer; }
   </style>
 </head>
 <body>
@@ -309,32 +973,19 @@
   <canvas id="rawFrameCanvas" width="480" height="270" style="width:100%;height:auto;border-radius:8px;background:#000"></canvas>
         <div id="videoLoadingIndicator" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-weight:600;display:none;z-index:5;background:rgba(0,0,0,0.8);padding:1rem 1.5rem;border-radius:8px;border:1px solid rgba(255,255,255,0.2);">Loading video...</div>
         <button id="videoFullscreenBtn" class="fullscreen-btn" title="Fullscreen Video">⛶</button>
-  <div class="nav-buttons" style="margin-top:.5rem;margin-left:8px;">
-          <div class="btn-row">
-            <button id="rawPrevBtn"      class="icon-btn" title="Previous frame">←</button>
-            <button id="rawPlayPauseBtn" class="icon-btn" title="Play/Pause">▶</button>
-            <button id="rawNextBtn"      class="icon-btn" title="Next frame">→</button>
-            <button id="rawShowPoseBtn"  class="icon-btn" title="Show Pose">🦵</button>
+        <div class="ctrl-panel" id="rawCtrlPanel">
+          <div class="ctrl-panel-header">
+            <span class="ctrl-panel-title">Settings</span>
+            <button class="ctrl-panel-close" id="rawCollapseBtn" title="Close settings">
+              <span class="material-symbols-outlined">close</span>
+            </button>
           </div>
-          <div class="btn-row">
-            <button id="rawRestartBtn" class="icon-btn" title="Restart">⟲</button>
-            <button id="rawZoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
-            <button id="rawZoomInBtn" class="icon-btn" title="Zoom In">+</button>
-            <span id="rawFrameLabel" style="align-self:center;font-weight:600;opacity:.85">Frame: 0</span>
-          </div>
-          <div style="margin-top:0.5rem;padding:0 0.5rem;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
-              <span style="font-size:0.75rem;opacity:0.7;">Frame</span>
-              <span id="rawFrameSliderValue" style="font-size:0.75rem;font-weight:600;">0</span>
+          <div class="slider-group">
+            <div class="slider-row">
+              <span class="slider-label">Speed</span>
+              <span id="rawSpeedValue" class="slider-value">0.25x</span>
             </div>
-            <input id="rawFrameSlider" type="range" min="0" max="0" step="1" value="0" style="width:100%;cursor:pointer;"/>
-          </div>
-          <div style="margin-top:0.5rem;padding:0 0.5rem;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
-              <span style="font-size:0.75rem;opacity:0.7;">Speed</span>
-              <span id="rawSpeedValue" style="font-size:0.75rem;font-weight:600;">1.0x</span>
-            </div>
-            <input id="rawSpeedSlider" type="range" min="0" max="8" step="1" value="5" list="rawSpeedMarkers" style="width:100%;cursor:pointer;"/>
+            <input id="rawSpeedSlider" type="range" min="0" max="8" step="1" value="2" list="rawSpeedMarkers"/>
             <datalist id="rawSpeedMarkers">
               <option value="0" label="0.05x"></option>
               <option value="1" label="0.1x"></option>
@@ -347,11 +998,39 @@
               <option value="8" label="2x"></option>
             </datalist>
           </div>
+          <div class="btn-row" style="justify-content:flex-start;gap:0.3rem;margin-top:0.2rem;">
+            <button id="rawRestartBtn" class="icon-btn" title="Restart">⟲</button>
+            <button id="rawZoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
+            <button id="rawZoomInBtn" class="icon-btn" title="Zoom In">+</button>
+          </div>
+        </div>
+        <div class="yt-bar" id="rawYtBar">
+          <div class="yt-progress-wrapper">
+            <input id="rawFrameSlider" type="range" min="0" max="0" step="1" value="0"/>
+          </div>
+          <div class="yt-bar-controls">
+            <button class="yt-bar-btn" id="rawPlayPauseBtn" title="Play/Pause">▶</button>
+            <button class="yt-bar-btn" id="rawPrevBtn" title="Previous frame">
+              <span class="material-symbols-outlined">skip_previous</span>
+            </button>
+            <button class="yt-bar-btn" id="rawNextBtn" title="Next frame">
+              <span class="material-symbols-outlined">skip_next</span>
+            </button>
+            <span class="yt-bar-frame" id="rawFrameLabel">Frame: 0</span>
+            <span id="rawFrameSliderValue" style="display:none">0</span>
+            <div style="flex:1"></div>
+            <button id="rawShowPoseBtn" class="yt-bar-overlay-btn active" title="Toggle pose overlay">Display overlay</button>
+            <button class="yt-bar-btn" id="rawExpandBtn" title="Settings">
+              <span class="material-symbols-outlined">tune</span>
+            </button>
+          </div>
         </div>
       </div>
 
       <!-- Pose container in middle (sibling of video and angles) -->
+      <div style="display:flex;flex-direction:column;gap:0.5rem;flex:1 1 calc((100% - 1rem) / 2);min-width:280px;">
         <div class="pose-container">
+        <div class="pose-canvas-wrapper">
         <div id="frameNumberDisplay" class="frame-number">Frame: 0</div>
         <button id="poseFullscreenBtn" class="fullscreen-btn" title="Fullscreen Pose">⛶</button>
         <div id="jumpHeightOverlay" class="jump-height-overlay" aria-label="Jump height">
@@ -371,32 +1050,70 @@
         <canvas id="pose3DCanvas" style="display:none; width:100%; height:100%;"></canvas>
         <div id="angleHudDom" class="angle-hud" style="display:none">0.0°</div>
         <div id="alignPrompt" class="align-prompt">Select the joint to overlay from</div>
-        <div class="nav-buttons">
-          <div class="btn-row">
-            <button id="prevBtn"      class="icon-btn" title="Previous">←</button>
-            <button id="playPauseBtn" class="icon-btn" title="Play/Pause">▶</button>
-            <button id="nextBtn"      class="icon-btn" title="Next">→</button>
-            <button id="resetViewBtn" class="icon-btn" title="Reset View">⟲</button>
-            <button id="toggleMiniPoseBtn" class="icon-btn" title="Show Joint Selector">◉</button>
-            <button id="toggle3DFixedBtn" class="icon-btn" title="Toggle Fixed/Unfixed 3D Pose" style="display:none;">📍</button>
-          </div>
-          <div class="btn-row">
-            <button id="zoomOutBtn"   class="icon-btn" title="Zoom Out">–</button>
-            <button id="zoomInBtn"    class="icon-btn" title="Zoom In">+</button>
-          </div>
-          <div style="margin-top:0.5rem;padding:0 0.5rem;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
-              <span style="font-size:0.75rem;opacity:0.7;">Frame</span>
-              <span id="poseFrameSliderValue" style="font-size:0.75rem;font-weight:600;">0</span>
+        <div id="annotationToolbar" class="annotation-toolbar" style="display:none;">
+          <button id="annotationToolPositionDiff" class="annotation-tool-btn active" title="Position Difference Displays - click limbs to show user vs filtered overlay shading">Position Difference Displays</button>
+          <button id="annotationToolRedLimbs" class="annotation-tool-btn" title="Red Limbs - click limbs to highlight">Red Limbs</button>
+          <button id="annotationToolInfoCircles" class="annotation-tool-btn" title="Info Circles - click to add comment">Info Circles</button>
+        </div>
+        </div>
+        <div id="analysisHeader" class="analysis-header" style="display:none;">
+          Analyzing Jumping Technique
+        </div>
+        <div id="analysisStartOverlay" class="analysis-start-overlay" style="display:none;">
+          <button id="analysisStartBtn" class="analysis-start-btn">
+            <span class="analysis-start-icon">
+              <span class="material-symbols-outlined">play_arrow</span>
+            </span>
+            <span class="analysis-start-label">Start Analysis</span>
+          </button>
+        </div>
+        <div id="analysisFeedbackPanel" class="analysis-feedback-panel" style="display:none;">
+          <div class="analysis-feedback-inner">
+            <h3 id="analysisFeedbackTitle" class="analysis-feedback-title">Full Depth Analysis</h3>
+            <div id="analysisFeedbackAngles" class="analysis-feedback-angles"></div>
+            <div class="analysis-feedback-divider"></div>
+            <div id="analysisFeedbackText" class="analysis-feedback-text"></div>
+            <textarea id="annotationAnalysisTextarea" class="annotation-textarea" style="display:none;" placeholder="Write your analysis here..."></textarea>
+            <div id="annotationKeyTakeawaysSection" style="display:none;">
+              <textarea id="annotationKeyTakeawaysTextarea" class="annotation-textarea" placeholder="Key takeaways for the player..."></textarea>
             </div>
-            <input id="poseFrameSlider" type="range" min="0" max="0" step="1" value="0" style="width:100%;cursor:pointer;"/>
+            <button id="annotationSaveBtn" class="annotation-save-btn" style="display:none;">Save</button>
+            <button id="annotationSaveExitBtn" class="annotation-save-btn" style="display:none;">Save & Exit</button>
+            <button id="analysisContinueBtn" class="analysis-continue-btn">Continue Analysis</button>
           </div>
-          <div style="margin-top:0.5rem;padding:0 0.5rem;">
-            <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:0.25rem;">
-              <span style="font-size:0.75rem;opacity:0.7;">Speed</span>
-              <span id="poseSpeedValue" style="font-size:0.75rem;font-weight:600;">1.0x</span>
+        </div>
+        <div id="keyTakeawaysOverlay" class="key-takeaways-overlay" style="display:none;">
+          <div class="key-takeaways-inner">
+            <h3 class="key-takeaways-title">Key Takeaways</h3>
+            <div id="keyTakeawaysText" class="key-takeaways-text"></div>
+            <button id="keyTakeawaysCloseBtn" class="key-takeaways-close-btn">Done</button>
+          </div>
+        </div>
+        <div id="bsDraggablePopup" class="bs-draggable-popup" style="display:none;">
+          <div id="bsPopupDragHandle" class="bs-draggable-popup-drag-handle" title="Drag to move"></div>
+          <div class="bs-draggable-popup-inner">
+            <button id="bsPopupClose" class="bs-draggable-popup-close">&times;</button>
+            <h4 id="bsPopupTitle" class="bs-draggable-popup-title"></h4>
+            <p id="bsPopupText" class="bs-draggable-popup-text"></p>
+            <div id="bsPopupEditWrap" class="bs-popup-edit-wrap" style="display:none;">
+              <textarea id="bsPopupEdit" class="bs-draggable-popup-edit" placeholder="Enter comment..."></textarea>
+              <button id="bsPopupSave" class="bs-popup-save-btn">Save</button>
             </div>
-            <input id="poseSpeedSlider" type="range" min="0" max="8" step="1" value="5" list="poseSpeedMarkers" style="width:100%;cursor:pointer;"/>
+          </div>
+        </div>
+        <div class="ctrl-panel" id="poseCtrlPanel">
+          <div class="ctrl-panel-header">
+            <span class="ctrl-panel-title">Controls</span>
+            <button class="ctrl-panel-close" id="poseCollapseBtn" title="Close controls">
+              <span class="material-symbols-outlined">close</span>
+            </button>
+          </div>
+          <div class="slider-group">
+            <div class="slider-row">
+              <span class="slider-label">Speed</span>
+              <span id="poseSpeedValue" class="slider-value">1.0x</span>
+            </div>
+            <input id="poseSpeedSlider" type="range" min="0" max="8" step="1" value="5" list="poseSpeedMarkers"/>
             <datalist id="poseSpeedMarkers">
               <option value="0" label="0.05x"></option>
               <option value="1" label="0.1x"></option>
@@ -409,36 +1126,63 @@
               <option value="8" label="2x"></option>
             </datalist>
           </div>
-          <div style="margin-top: 0.5rem; font-size: 0.75rem; color: rgba(255,255,255,0.7); text-align: center;">
-            <div>Zoom: Click and drag to select area</div>
-            <div>Pan: Right-click and drag to move view</div>
+          <div class="btn-row" style="gap:0.3rem;">
+            <button id="resetViewBtn" class="icon-btn" title="Reset View">⟲</button>
+            <button id="zoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
+            <button id="zoomInBtn" class="icon-btn" title="Zoom In">+</button>
+            <button id="toggleMiniPoseBtn" class="icon-btn" title="Show Joint Selector">◉</button>
+            <button id="toggle3DFixedBtn" class="icon-btn" title="Toggle Fixed/Unfixed 3D Pose" style="display:none;">📍</button>
           </div>
-          <div style="margin-top: 0.5rem;">
-            <select id="overlayRepSelect" class="btn full-width" style="background:var(--card-bg);border:1px solid var(--card-border);color:#fff">
+          <div class="ctrl-extras">
+            <select id="overlayRepSelect" style="width:100%;border-radius:8px;background:var(--card-bg);border:1px solid var(--card-border);padding:.35rem 0.6rem;color:#fff;font-size:0.75rem;">
               <option value="none">No Overlay</option>
             </select>
-          </div>
-          <div class="btn-row" style="margin-top:.5rem;">
-            <button id="alignOverlayBtn" class="btn">Align Overlay</button>
-          </div>
-          <div style="margin-top:.5rem;display:flex;gap:.5rem;align-items:center;justify-content:center;">
-            <label for="overlayShiftSlider" style="opacity:.85;">Frame shift:</label>
-            <input id="overlayShiftSlider" type="range" min="0" max="0" step="1" value="0" style="width:60%"/>
-            <span id="overlayShiftValue" style="min-width:48px;text-align:right;opacity:.85;">0</span>
-          </div>
-          <div style="margin-top:.5rem;display:flex;gap:.75rem;flex-direction:column;font-size:0.85rem;">
-            <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
-              <input type="checkbox" id="autoAlignToggle" checked style="cursor:pointer;"/>
+            <button id="alignOverlayBtn" class="btn" style="width:100%;">Align Overlay</button>
+            <div style="display:flex;gap:.5rem;align-items:center;justify-content:space-between;">
+              <label for="overlayShiftSlider" style="opacity:.85;font-size:0.75rem;">Frame shift</label>
+              <span id="overlayShiftValue" style="min-width:48px;text-align:right;opacity:.85;font-size:0.75rem;">0</span>
+            </div>
+            <input id="overlayShiftSlider" type="range" min="0" max="0" step="1" value="0"/>
+            <label class="ctrl-checkbox">
+              <input type="checkbox" id="autoAlignToggle" checked />
               <span>Auto-align (torso)</span>
             </label>
-            <label style="display:flex;align-items:center;gap:.5rem;cursor:pointer;">
-              <input type="checkbox" id="normalizeScaleToggle" checked style="cursor:pointer;"/>
+            <label class="ctrl-checkbox">
+              <input type="checkbox" id="normalizeScaleToggle" checked />
               <span>Normalize scale</span>
             </label>
           </div>
-          <!-- Ground/COM overlays are always displayed (no toggles) -->
+          <div class="ctrl-hint">Zoom: drag-select area · Pan: right-drag view</div>
+        </div>
+        <div class="yt-bar" id="poseYtBar">
+          <div class="yt-progress-wrapper">
+            <input id="poseFrameSlider" type="range" min="0" max="0" step="1" value="0"/>
+          </div>
+          <div class="yt-bar-controls">
+            <button class="yt-bar-btn" id="playPauseBtn" title="Play/Pause">▶</button>
+            <button class="yt-bar-btn" id="prevBtn" title="Previous">
+              <span class="material-symbols-outlined">skip_previous</span>
+            </button>
+            <button class="yt-bar-btn" id="nextBtn" title="Next">
+              <span class="material-symbols-outlined">skip_next</span>
+            </button>
+            <span class="yt-bar-frame" id="poseYtFrameLabel">Frame: 0</span>
+            <span id="poseFrameSliderValue" style="display:none">0</span>
+            <div style="flex:1"></div>
+            <button class="yt-bar-btn" id="poseExpandBtn" title="Settings">
+              <span class="material-symbols-outlined">tune</span>
+            </button>
+          </div>
         </div>
         </div>
+
+      <div id="analyzeJumpBtnWrapper" style="position:relative;">
+        <button type="button" id="analyzeJumpBtn" class="analyze-kick-btn" disabled aria-disabled="true">&#x26A1; Analyze Jump</button>
+      </div>
+      <div id="annotateJumpBtnWrapper" style="position:relative; display:none;">
+        <button id="annotateJumpBtn" class="analyze-kick-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);">&#x270F; Annotate Jumping Analysis</button>
+      </div>
+      </div>
 
       <!-- Right column: Angles chart (top) and Height/Chest chart (bottom) -->
       <div class="angles-column" id="anglesColumn">
@@ -613,28 +1357,41 @@
     let currentFrame = 0;
     let isPlaying = false;
     let animationInterval = null;
+    let playerHeightMeters = null;
     
     // New: 3D and key frame state
     let currentView = '2D'; // '2D' or '3D'
     let keyFramesData = null; // Array of 4 frame indices
-    let filteredAveragePositions = null; // (time_step, keypoint_type, coordinate)
+    let filteredAveragePositions = null; // per-frame chain of [x,y] or legacy [[name,[x,y]],...]
     let jointAnglesKeyFrames = null; // Joint angles at key frames
     let showFilteredOverlay = false;
     let currentKeyFrame = null; // null or 0-3
     let baseFrameDelay = 100;
+    let analysisMode = false;
+    let analysisPhase = 'idle'; // 'idle'|'playing-to-full-depth'|'full_depth'|'playing-to-takeoff'|'takeoff'|'done'|'playing-to-end'
+    let analysisInterval = null;
+    let annotationMode = false;
+    let annotationPhase = 'idle'; // 'idle'|'full_depth'|'takeoff'|'key_takeaways'
+    let annotationTool = 'position_diff_limbs';
+    let annotationData = {
+      full_depth: { position_diff_limbs: [], red_limbs: [], info_circles: [], analysis_text: '' },
+      takeoff: { position_diff_limbs: [], red_limbs: [], info_circles: [], analysis_text: '' },
+      key_takeaways: ''
+    };
+    let jumpAnalysisData = null;
+    let annotationDirty = false;
     let poseSpeedIdx = 5;
     const SPEED_OPTIONS = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
 
-    let manualZoomBounds = null;
     let isZoomSelecting = false;
     let zoomStartX = 0, zoomStartY = 0;
     let zoomCurrentX = 0, zoomCurrentY = 0;
-    let panOffsetX = 0, panOffsetY = 0;
     let panStartX = 0, panStartY = 0;
     let isPanning = false;
     let isSelectingZoomCenter = false;
-    let zoomCenterX = 0.5;
-    let zoomCenterY = 0.5;
+    let poseManualZoomBounds = null;
+    let posePanOffsetX = 0, posePanOffsetY = 0;
+    let poseZoomCenterX = 0.5, poseZoomCenterY = 0.5;
 
     // Three.js 3D viewer state
     let threeScene = null;
@@ -731,11 +1488,11 @@
   let rawTimeHandler = null;        // stored 'timeupdate' handler so we can remove it
   let rawPlayFallbackInterval = null; // interval fallback when no rVFC/timeupdate
     let rawIsPlaying = false;
-    let rawSpeedIdx = 5; // Default to 1x speed (index 5 in SPEED_OPTIONS)
+    let rawSpeedIdx = 2; // Default to 0.25x (index 2 in SPEED_OPTIONS)
     let baseIntervalMs = 1000/30;
     let rawMaxFrame = 0;
 
-    // Raw video zoom/pan state (separate from pose canvas)
+    // Raw video zoom/pan state (shared with 2D pose viewer mapping)
     let rawManualZoomBounds = null;
     let rawIsZoomSelecting = false;
     let rawZoomStartX = 0, rawZoomStartY = 0;
@@ -748,7 +1505,7 @@
 
     // Pose overlay
     let poseLoaded = false;
-    let isPoseVisible = false;
+    let isPoseVisible = true;
     let overlayPoseData = null;
     let overlayFrameShift = 0;
     let overlayAlignMode = false;
@@ -974,7 +1731,7 @@
           return;
         }
         // In fullscreen, place just above controls, dynamically based on controls height
-        const controls=poseContainerEl.querySelector('.nav-buttons');
+        const controls=poseContainerEl.querySelector('#poseYtBar, .yt-bar, .nav-buttons');
         if(!controls){
           hudDom.style.top='';
           hudDom.style.transform='';
@@ -1154,6 +1911,106 @@
       overlayAlignmentLocked = false;
     }
 
+    // Trim: max normalized y based on ground line + 0.05 (crops bottom of real video)
+    function getVideoTrimMaxY() {
+      if (sessionMetadata && Number.isFinite(sessionMetadata.ground_loc_y)) {
+        return Math.min(1, Math.max(0.05, sessionMetadata.ground_loc_y + 0.05));
+      }
+      return 1;
+    }
+
+    /** Same trim + zoom/pan math as drawRawFrameToCanvas / drawPoseOverlay (normalized → display pixels). */
+    function getRawVideoPoseDisplayMapping() {
+      const trimMaxY = getVideoTrimMaxY();
+      let zoomOffsetX = 0, zoomOffsetY = 0, zoomScaleX = 1, zoomScaleY = 1;
+      if (rawManualZoomBounds) {
+        const viewWidthN = rawManualZoomBounds.rightX - rawManualZoomBounds.leftX;
+        let viewTopY = Math.max(0, rawManualZoomBounds.topY);
+        let viewBottomY = Math.min(trimMaxY, rawManualZoomBounds.bottomY);
+        viewTopY = Math.min(viewTopY, viewBottomY - 0.01);
+        const viewHeightN = viewBottomY - viewTopY;
+        const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, rawManualZoomBounds.leftX + rawPanOffsetX));
+        const adjustedTopY = Math.max(0, Math.min(trimMaxY - viewHeightN, viewTopY + rawPanOffsetY));
+        zoomOffsetX = adjustedLeftX;
+        zoomOffsetY = adjustedTopY;
+        zoomScaleX = 1 / viewWidthN;
+        zoomScaleY = 1 / viewHeightN;
+      } else {
+        zoomScaleY = 1 / trimMaxY;
+      }
+      return { zoomOffsetX, zoomOffsetY, zoomScaleX, zoomScaleY };
+    }
+
+    function getPoseViewerDisplayMapping() {
+      const trimMaxY = getVideoTrimMaxY();
+      let zoomOffsetX = 0, zoomOffsetY = 0, zoomScaleX = 1, zoomScaleY = 1;
+      if (poseManualZoomBounds) {
+        const viewWidthN = poseManualZoomBounds.rightX - poseManualZoomBounds.leftX;
+        const viewHeightN = poseManualZoomBounds.bottomY - poseManualZoomBounds.topY;
+        const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, poseManualZoomBounds.leftX + posePanOffsetX));
+        const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, poseManualZoomBounds.topY + posePanOffsetY));
+        zoomOffsetX = adjustedLeftX;
+        zoomOffsetY = adjustedTopY;
+        const s = 1 / Math.max(viewWidthN, viewHeightN, 1e-6);
+        zoomScaleX = s;
+        zoomScaleY = s;
+      } else {
+        zoomScaleY = 1 / trimMaxY;
+      }
+      return { zoomOffsetX, zoomOffsetY, zoomScaleX, zoomScaleY };
+    }
+
+    function mapRawNormalizedPoseToDisplayPixels(nx, ny, W, H) {
+      const { zoomOffsetX, zoomOffsetY, zoomScaleX, zoomScaleY } = getRawVideoPoseDisplayMapping();
+      const adjX = (nx - zoomOffsetX) * zoomScaleX;
+      const adjY = (ny - zoomOffsetY) * zoomScaleY;
+      return [adjX * W, adjY * H];
+    }
+
+    function mapNormalizedPoseToDisplayPixels(nx, ny, W, H) {
+      if (_poseCanvasTransformActive) {
+        return [nx * W, ny * H];
+      }
+      const { zoomOffsetX, zoomOffsetY, zoomScaleX, zoomScaleY } = getPoseViewerDisplayMapping();
+      const adjX = (nx - zoomOffsetX) * zoomScaleX;
+      const adjY = (ny - zoomOffsetY) * zoomScaleY;
+      return [adjX * W, adjY * H];
+    }
+
+    function mapPosePointToCanvas(nx, ny, W, H) {
+      return mapNormalizedPoseToDisplayPixels(nx, ny, W, H);
+    }
+
+    let _poseCanvasTransformActive = false;
+
+    function applyPoseZoomTransform(ctx, W, H) {
+      if (!poseManualZoomBounds) return null;
+      const { leftX, rightX, topY, bottomY } = poseManualZoomBounds;
+      const viewWidthN = rightX - leftX;
+      const viewHeightN = bottomY - topY;
+      const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, leftX + posePanOffsetX));
+      const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, topY + posePanOffsetY));
+      const s = 1 / Math.max(viewWidthN, viewHeightN, 1e-6);
+      const leftPx = adjustedLeftX * W;
+      const topPx = adjustedTopY * H;
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      ctx.save();
+      ctx.setTransform(dpr * s, 0, 0, dpr * s, dpr * (-s * leftPx), dpr * (-s * topPx));
+      return { leftX: adjustedLeftX, rightX: adjustedLeftX + viewWidthN, topY: adjustedTopY, bottomY: adjustedTopY + viewHeightN, s };
+    }
+
+    function restorePoseTransform(ctx) {
+      ctx.restore();
+      const dpr = Math.min(window.devicePixelRatio || 1, 2);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
+
+    /** Keep visual line/joint thickness constant: when zoomed via canvas transform, scale down to counteract magnification. */
+    function getRawVideoPoseDisplayScalePx() {
+      if (!poseManualZoomBounds) return 1;
+      return poseManualZoomBounds.rightX - poseManualZoomBounds.leftX;
+    }
+
     // Cache canvas sizing to avoid excessive recalculations
     let cachedCanvasSize = { width: 0, height: 0, dpr: 1 };
     function sizeRawCanvas(force = false) {
@@ -1168,30 +2025,28 @@
       
       let cssW, cssH;
       
+      const trimMaxY = getVideoTrimMaxY();
+      const vw = (rawVideoEl && rawVideoEl.videoWidth) ? rawVideoEl.videoWidth : 480;
+      const vh = (rawVideoEl && rawVideoEl.videoHeight) ? rawVideoEl.videoHeight : 270;
+      const effectiveVh = vh * trimMaxY;
+      const videoAspect = vw / effectiveVh;
+
       if (isFullscreen) {
-        // In fullscreen, use the actual screen dimensions and maintain video aspect ratio
-        const vw = (rawVideoEl && rawVideoEl.videoWidth) ? rawVideoEl.videoWidth : 1920;
-        const vh = (rawVideoEl && rawVideoEl.videoHeight) ? rawVideoEl.videoHeight : 1080;
-        const videoAspect = vw / vh;
+        // In fullscreen, use the actual screen dimensions and maintain trimmed video aspect ratio
         const screenAspect = window.innerWidth / window.innerHeight;
-        
         if (screenAspect > videoAspect) {
-          // Screen is wider than video - fit to height
           cssH = window.innerHeight;
           cssW = Math.round(cssH * videoAspect);
         } else {
-          // Screen is taller than video - fit to width
           cssW = window.innerWidth;
           cssH = Math.round(cssW / videoAspect);
         }
         rawCanvas.style.width = cssW + 'px';
         rawCanvas.style.height = cssH + 'px';
       } else {
-        // Normal mode - use clientWidth and maintain aspect ratio
+        // Normal mode - use clientWidth and maintain trimmed aspect ratio (less tall)
         cssW = rawCanvas.clientWidth || 480;
-        const vw = (rawVideoEl && rawVideoEl.videoWidth) ? rawVideoEl.videoWidth : 480;
-        const vh = (rawVideoEl && rawVideoEl.videoHeight) ? rawVideoEl.videoHeight : 270;
-        cssH = Math.round(cssW * (vh / vw));
+        cssH = Math.round(cssW / videoAspect);
         rawCanvas.style.height = cssH + 'px';
       }
       
@@ -1223,6 +2078,22 @@
 
     function rawZoomIn() {
       if (!rawManualZoomBounds) {
+        // Match pose viewer behavior: auto-zoom from current pose frame before prompting click center.
+        try {
+          let auto = null;
+          const frameIdx = Math.max(0, Math.min(rawCurrentFrame, (poseData2D?.length || 1) - 1));
+          const frame = poseData2D?.[frameIdx] || [];
+          if (Array.isArray(frame) && frame.some(p => p)) {
+            auto = computeAutoZoomFromFrame(frame, { margin: 0.22, minWidth: 0.14, minHeight: 0.14 });
+          }
+          if (auto) {
+            rawManualZoomBounds = auto;
+            rawPanOffsetX = 0;
+            rawPanOffsetY = 0;
+            drawRawFrameToCanvas();
+            return;
+          }
+        } catch (_e) {}
         rawIsSelectingZoomCenter = true;
         rawCanvas.style.cursor = 'crosshair';
         return;
@@ -1294,16 +2165,20 @@
       // Clear canvas first
       rawCtx.clearRect(0, 0, cssW, cssH);
 
-      // Calculate source rectangle from video based on zoom bounds
+      // Calculate source rectangle from video based on zoom bounds and trim
       const vw = rawVideoEl.videoWidth || cssW;
       const vh = rawVideoEl.videoHeight || cssH;
-      let sx = 0, sy = 0, sw = vw, sh = vh;
+      const trimMaxY = getVideoTrimMaxY();
+      let sx = 0, sy = 0, sw = vw, sh = vh * trimMaxY;
 
       if (rawManualZoomBounds) {
         const viewWidthN = rawManualZoomBounds.rightX - rawManualZoomBounds.leftX;
-        const viewHeightN = rawManualZoomBounds.bottomY - rawManualZoomBounds.topY;
+        let viewTopY = Math.max(0, rawManualZoomBounds.topY);
+        let viewBottomY = Math.min(trimMaxY, rawManualZoomBounds.bottomY);
+        viewTopY = Math.min(viewTopY, viewBottomY - 0.01);
+        const viewHeightN = viewBottomY - viewTopY;
         const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, rawManualZoomBounds.leftX + rawPanOffsetX));
-        const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, rawManualZoomBounds.topY + rawPanOffsetY));
+        const adjustedTopY = Math.max(0, Math.min(trimMaxY - viewHeightN, viewTopY + rawPanOffsetY));
 
         sx = adjustedLeftX * vw;
         sy = adjustedTopY * vh;
@@ -1311,7 +2186,7 @@
         sh = viewHeightN * vh;
       }
 
-      // Draw the zoomed portion of video to fill canvas (no stretching)
+      // Draw the zoomed/trimmed portion of video to fill canvas
       rawCtx.drawImage(rawVideoEl, sx, sy, sw, sh, 0, 0, cssW, cssH);
 
       if (isPoseVisible) {
@@ -1336,23 +2211,6 @@
       const pts = frame; if (!Array.isArray(pts) || !pts.some(Boolean)) return;
 
       const W = rawCanvas.clientWidth, H = rawCanvas.clientHeight;
-      let normalized = true;
-      for (let k = 0; k < Math.min(10, pts.length); k++) {
-        const pr = pts[k]; if (!pr) continue; const sx = Array.isArray(pr) ? pr[0] : pr.x; const sy = Array.isArray(pr) ? pr[1] : pr.y; if (sx > 1.5 || sy > 1.5) { normalized = false; break; }
-      }
-
-      // Calculate zoom offset for coordinate mapping
-      let zoomOffsetX = 0, zoomOffsetY = 0, zoomScaleX = 1, zoomScaleY = 1;
-      if (rawManualZoomBounds) {
-        const viewWidthN = rawManualZoomBounds.rightX - rawManualZoomBounds.leftX;
-        const viewHeightN = rawManualZoomBounds.bottomY - rawManualZoomBounds.topY;
-        const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, rawManualZoomBounds.leftX + rawPanOffsetX));
-        const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, rawManualZoomBounds.topY + rawPanOffsetY));
-        zoomOffsetX = adjustedLeftX;
-        zoomOffsetY = adjustedTopY;
-        zoomScaleX = 1 / viewWidthN;
-        zoomScaleY = 1 / viewHeightN;
-      }
 
       const getXY = (i) => {
         const p = pts[i];
@@ -1360,9 +2218,7 @@
         const px = Array.isArray(p) ? p[0] : p.x;
         const py = Array.isArray(p) ? p[1] : p.y;
         if (!Number.isFinite(px) || !Number.isFinite(py)) return null;
-        const adjX = (px - zoomOffsetX) * zoomScaleX;
-        const adjY = (py - zoomOffsetY) * zoomScaleY;
-        return [adjX * W, adjY * H];
+        return mapRawNormalizedPoseToDisplayPixels(px, py, W, H);
       };
 
       rawCtx.save();
@@ -1457,10 +2313,12 @@
         rawCtx.restore();
       }
 
+      const normYToScreen = (ny) => Math.max(0, Math.min(H, (ny / trimMaxY) * H));
+
       // Torso midpoint red dot (if present for this frame)
       const tm = torsoMidpointData?.[idx];
       if (Array.isArray(tm) && Number.isFinite(tm[0]) && Number.isFinite(tm[1])) {
-        const x = tm[0] * W, y = tm[1] * H;
+        const x = tm[0] * W, y = normYToScreen(tm[1]);
         rawCtx.save(); rawCtx.fillStyle = '#ff3b30';
         rawCtx.beginPath(); rawCtx.arc(x, y, Math.max(3, Math.round(W/400)), 0, Math.PI*2); rawCtx.fill(); rawCtx.restore();
       }
@@ -1468,7 +2326,7 @@
       // Initial COM line (blue/cyan dashed horizontal at chest_starting_loc)
       if (showCOMLine && sessionMetadata && Number.isFinite(sessionMetadata.chest_starting_loc)) {
         const chestY = sessionMetadata.chest_starting_loc;
-        const yScreen = Math.max(0, Math.min(1, chestY)) * H;
+        const yScreen = normYToScreen(Math.max(0, Math.min(1, chestY)));
         rawCtx.save();
         rawCtx.strokeStyle = 'rgba(0,200,255,0.85)'; // cyan like pose graph
         rawCtx.lineWidth = 2;
@@ -1483,7 +2341,7 @@
       // Ground line (yellow dashed)
       if (showGroundLine && sessionMetadata && Number.isFinite(sessionMetadata.ground_loc_y)) {
         const groundY = sessionMetadata.ground_loc_y;
-        const yScreen = Math.max(0, Math.min(1, groundY)) * H;
+        const yScreen = normYToScreen(Math.max(0, Math.min(1, groundY)));
         rawCtx.save();
         rawCtx.strokeStyle = 'yellow';
         rawCtx.lineWidth = 2;
@@ -1497,7 +2355,7 @@
 
       // COM marker (cyan dot with white stroke)
       if (showCOMLine && Array.isArray(tm) && Number.isFinite(tm[0]) && Number.isFinite(tm[1])) {
-        const x = tm[0] * W, y = tm[1] * H;
+        const x = tm[0] * W, y = normYToScreen(tm[1]);
         const radius = Math.max(4, Math.round(W/300));
         rawCtx.save();
         rawCtx.fillStyle = 'cyan';
@@ -1523,8 +2381,8 @@
         if (heightDiff > 0.001) { // Small threshold to avoid showing at initial position
           // Draw vertical line from chest starting position to current torso position
           const x = tm[0] * W;
-          const y1 = chestY * H;
-          const y2 = torsoY * H;
+          const y1 = normYToScreen(chestY);
+          const y2 = normYToScreen(torsoY);
           
           rawCtx.save();
           rawCtx.strokeStyle = 'magenta';
@@ -1547,7 +2405,7 @@
           let yPos = H - 42; // Default position
           
           if (isFullscreen) {
-            const controls = videoContainer.querySelector('.nav-buttons');
+            const controls = videoContainer.querySelector('#rawYtBar, .yt-bar, .nav-buttons');
             if (controls) {
               const contRect = rawCanvas.getBoundingClientRect();
               const ctrRect = controls.getBoundingClientRect();
@@ -1640,9 +2498,711 @@
       throw new Error(`None of the JSON candidates were found. Tried: ${paths.join(', ')}`);
     }
 
+    async function loadJumpAnalysis() {
+      const { player, session } = getUrlBits();
+      if (!player || !session) { jumpAnalysisData = null; return; }
+      try {
+        const candidates = currentKickId
+          ? [`${player}/jump/${session}/${currentKickId}/jump_analysis.json`]
+          : [`${player}/jump/${session}/jump_analysis.json`];
+        jumpAnalysisData = await fetchJSONFromCandidates(candidates);
+      } catch (e) {
+        jumpAnalysisData = null;
+      }
+    }
+
+    async function saveJumpAnalysis() {
+      const { player, session } = getUrlBits();
+      if (!player || !session) throw new Error('Missing player or session');
+      const path = currentKickId
+        ? `${player}/jump/${session}/${currentKickId}/jump_analysis.json`
+        : `${player}/jump/${session}/jump_analysis.json`;
+      const blob = new Blob([JSON.stringify(annotationData, null, 2)], { type: 'application/json' });
+      await storage.ref(path).put(blob);
+      jumpAnalysisData = JSON.parse(JSON.stringify(annotationData));
+    }
+
+    const ANGLE_LABELS = ['Shank → Ground', 'Thigh → Shank', 'Torso → Thigh', 'Upper Arm → Torso', 'Lower Arm → Upper Arm'];
+    const FULL_DEPTH_OPTIMAL_RANGES = {
+      ankle: { min: 78, max: 84, label: 'Ankle', unit: '°' },
+      knee: { min: 72, max: 85, label: 'Knee', unit: '°' },
+      hip: { min: 75, max: 80, label: 'Hip', unit: '°' },
+      shoulder: { min: 50, max: 90, label: 'Shoulder', unit: '°' }
+    };
+    const FULL_DEPTH_CLOSE_BUFFER_DEG = 10;
+    const METERS_TO_INCHES = 39.3701;
+    const FULL_DEPTH_FEEDBACK = `<p><strong>Squat Depth:</strong> At full depth (coil), aim for 90-110° of knee flexion. A deeper countermovement stores more elastic energy for explosive takeoff.</p><p><strong>Torso Angle:</strong> Lean forward slightly (10-15°) to maintain balance while loading the legs. Avoid excessive forward lean which can reduce jump height.</p><p><strong>Arm Position:</strong> Swing arms back during the descent to prepare for upward drive. Hands should be behind the hips at full depth.</p>`;
+    /** Assumed capture rate for jump analysis timing (frames → seconds). */
+    const ANALYSIS_CAPTURE_FPS = 120;
+    /** Elite ranges (seconds); yellow zone extends ±TIME_METRIC_BUFFER_S outside elite via getRangeStatus. */
+    const TAKEOFF_ELITE_PROPULSIVE_S = { min: 0.20, max: 0.28 };
+    const TAKEOFF_ELITE_TTO_S = { min: 0.60, max: 0.75 };
+    const TIME_METRIC_BUFFER_S = 0.15;
+
+    function roundToTenth(value) {
+      return Number.isFinite(value) ? Number(value).toFixed(1) : '—';
+    }
+
+    function getRangeStatus(value, min, max, closeBuffer) {
+      if (!Number.isFinite(value) || !Number.isFinite(min) || !Number.isFinite(max)) return 'neutral';
+      if (value >= min && value <= max) return 'close';
+      if (value >= (min - closeBuffer) && value <= (max + closeBuffer)) return 'moderate';
+      return 'large';
+    }
+
+    function rangeToDisplay(min, max, unit) {
+      if (!Number.isFinite(min) || !Number.isFinite(max)) return '';
+      return `${min.toFixed(1)}-${max.toFixed(1)}${unit}`;
+    }
+
+    /**
+     * First frame where torso midpoint reaches 5% of the way from chest_start line toward ground line (unweighting onset heuristic).
+     */
+    function findUnweightingStartFrameHeuristic(toeOffKf) {
+      if (!sessionMetadata || !Number.isFinite(sessionMetadata.chest_starting_loc) || !Number.isFinite(sessionMetadata.ground_loc_y)) return null;
+      if (!Array.isArray(torsoMidpointData) || !torsoMidpointData.length) return null;
+      const c0 = sessionMetadata.chest_starting_loc;
+      const g = sessionMetadata.ground_loc_y;
+      if (Math.abs(g - c0) < 1e-9) return 0;
+      const t0 = c0 + 0.05 * (g - c0);
+      const maxF = Number.isFinite(toeOffKf)
+        ? Math.min(torsoMidpointData.length - 1, Math.max(0, Math.round(toeOffKf)))
+        : torsoMidpointData.length - 1;
+      for (let f = 0; f <= maxF; f++) {
+        const tm = torsoMidpointData[f];
+        if (!Array.isArray(tm) || !Number.isFinite(tm[1])) continue;
+        const y = tm[1];
+        if (g >= c0) {
+          if (y >= t0) return f;
+        } else if (y <= t0) {
+          return f;
+        }
+      }
+      return null;
+    }
+
+    function computeTakeoffTimingMetrics() {
+      const fps = ANALYSIS_CAPTURE_FPS;
+      const coil = Array.isArray(keyFramesData) && keyFramesData[0] != null ? Math.round(Number(keyFramesData[0])) : null;
+      const toeOff = Array.isArray(keyFramesData) && keyFramesData[2] != null ? Math.round(Number(keyFramesData[2])) : null;
+      let propulsiveFrames = null;
+      let propulsiveSeconds = null;
+      if (coil !== null && toeOff !== null && toeOff >= coil) {
+        propulsiveFrames = toeOff - coil;
+        propulsiveSeconds = propulsiveFrames / fps;
+      }
+      const UNWEIGHTING_START_FRAME_OFFSET = 7;
+      const ttoStartHeuristic = findUnweightingStartFrameHeuristic(toeOff);
+      const ttoStart = ttoStartHeuristic !== null ? Math.max(0, ttoStartHeuristic - UNWEIGHTING_START_FRAME_OFFSET) : null;
+      console.log('[Takeoff timing] Unweighting phase start frame (5% chest→ground heuristic):', ttoStartHeuristic, 'adjusted (-' + UNWEIGHTING_START_FRAME_OFFSET + '):', ttoStart);
+      let ttoFrames = null;
+      let ttoSeconds = null;
+      if (ttoStart !== null && toeOff !== null && toeOff >= ttoStart) {
+        ttoFrames = toeOff - ttoStart;
+        ttoSeconds = ttoFrames / fps;
+      }
+      return {
+        propulsiveSeconds,
+        ttoSeconds,
+        propulsiveFrames,
+        ttoFrames,
+        ttoStartFrame: ttoStart,
+        coilFrame: coil,
+        toeOffFrame: toeOff
+      };
+    }
+
+    function buildTakeoffTimingRowsHTML(metrics) {
+      const m = metrics || {};
+      const { propulsiveSeconds, ttoSeconds } = m;
+      const buf = TIME_METRIC_BUFFER_S;
+      const ep = TAKEOFF_ELITE_PROPULSIVE_S;
+      const et = TAKEOFF_ELITE_TTO_S;
+      let html = '<div class="analysis-angle-spacer"></div>';
+      html += '<div style="font-size:0.68rem;font-weight:600;color:rgba(255,255,255,0.45);text-transform:uppercase;letter-spacing:0.5px;margin-bottom:0.2rem;">Timing (' + ANALYSIS_CAPTURE_FPS + ' fps)</div>';
+
+      const propStatus = getRangeStatus(propulsiveSeconds, ep.min, ep.max, buf);
+      const propClass = getStatusClass(propStatus);
+      const propVal = Number.isFinite(propulsiveSeconds) ? `${propulsiveSeconds.toFixed(3)} s` : '—';
+      html += `<div class="analysis-angle-row ${propClass}" style="--angle-color: #4c8c6a"><span class="analysis-angle-name">Propulsive Phase Time <span style="opacity:0.75;font-weight:500">(Elite ${ep.min.toFixed(2)}–${ep.max.toFixed(2)} s; ±${buf.toFixed(2)} s)</span></span><span class="analysis-angle-value">${propVal}</span></div>`;
+      html += '<div style="font-size:0.65rem;color:rgba(255,255,255,0.45);text-align:left;margin:-0.15rem 0 0.35rem 0.55rem;line-height:1.35;">Bottom of countermovement → toe-off</div>';
+
+      const ttoStatus = getRangeStatus(ttoSeconds, et.min, et.max, buf);
+      const ttoClass = getStatusClass(ttoStatus);
+      const ttoVal = Number.isFinite(ttoSeconds) ? `${ttoSeconds.toFixed(3)} s` : '—';
+      html += `<div class="analysis-angle-row ${ttoClass}" style="--angle-color: #4c8c6a"><span class="analysis-angle-name">Time to Take-Off (TTO) <span style="opacity:0.75;font-weight:500">(Elite ${et.min.toFixed(2)}–${et.max.toFixed(2)} s; ±${buf.toFixed(2)} s)</span></span><span class="analysis-angle-value">${ttoVal}</span></div>`;
+  
+      return html;
+    }
+
+    function getCountermovementDepthMeters() {
+      if (!Array.isArray(chestOffsetData) || !Array.isArray(keyFramesData)) return null;
+      const fullDepthFrame = Number(keyFramesData[0]);
+      if (!Number.isFinite(fullDepthFrame)) return null;
+      const idx = Math.max(0, Math.min(chestOffsetData.length - 1, Math.round(fullDepthFrame)));
+      const value = chestOffsetData?.[idx]?.[1];
+      return Number.isFinite(value) ? Math.abs(Number(value)) : null;
+    }
+
+    function buildFullDepthMetrics(anglesArr) {
+      const metrics = [];
+      const ankleVal = Number.isFinite(anglesArr?.[0]) ? Number(anglesArr[0]) : null;
+      const kneeVal = Number.isFinite(anglesArr?.[1]) ? Number(anglesArr[1]) : null;
+      const hipVal = Number.isFinite(anglesArr?.[2]) ? Number(anglesArr[2]) : null;
+      const shoulderVal = Number.isFinite(anglesArr?.[3]) ? Number(anglesArr[3]) : null;
+      const depthMeters = getCountermovementDepthMeters();
+      const depthInches = Number.isFinite(depthMeters) ? depthMeters * METERS_TO_INCHES : null;
+      const depthMinInches = Number.isFinite(playerHeightMeters) ? (playerHeightMeters * 0.15 * METERS_TO_INCHES) : null;
+      const depthMaxInches = Number.isFinite(playerHeightMeters) ? (playerHeightMeters * 0.22 * METERS_TO_INCHES) : null;
+      const depthCloseBufferInches = Number.isFinite(playerHeightMeters)
+        ? (playerHeightMeters * (0.03 * (10 / 7)) * METERS_TO_INCHES)
+        : (2 * (10 / 7));
+
+      [
+        { id: 'ankle', value: ankleVal },
+        { id: 'knee', value: kneeVal },
+        { id: 'hip', value: hipVal },
+        { id: 'shoulder', value: shoulderVal }
+      ].forEach((item) => {
+        const spec = FULL_DEPTH_OPTIMAL_RANGES[item.id];
+        const status = getRangeStatus(item.value, spec.min, spec.max, FULL_DEPTH_CLOSE_BUFFER_DEG);
+        metrics.push({
+          id: item.id,
+          name: spec.label,
+          value: item.value,
+          optimalMin: spec.min,
+          optimalMax: spec.max,
+          unit: spec.unit,
+          status
+        });
+      });
+
+      metrics.push({
+        id: 'depth',
+        name: 'Countermovement Depth',
+        value: depthInches,
+        optimalMin: depthMinInches,
+        optimalMax: depthMaxInches,
+        unit: ' in',
+        status: getRangeStatus(depthInches, depthMinInches, depthMaxInches, depthCloseBufferInches)
+      });
+
+      return metrics;
+    }
+
+    function getStatusClass(status) {
+      if (status === 'close') return 'analysis-angle-close';
+      if (status === 'moderate') return 'analysis-angle-moderate';
+      if (status === 'large') return 'analysis-angle-large';
+      return '';
+    }
+
+    function buildFullDepthFeedbackFromMetrics(metrics) {
+      const notes = [];
+      const metricList = Array.isArray(metrics) ? metrics : [];
+      const evaluableCount = metricList.filter(m =>
+        Number.isFinite(m?.value) && Number.isFinite(m?.optimalMin) && Number.isFinite(m?.optimalMax)
+      ).length;
+      if (evaluableCount === 0) {
+        return FULL_DEPTH_FEEDBACK;
+      }
+
+      const badMetrics = metricList.filter(m => m.status === 'moderate' || m.status === 'large');
+
+      badMetrics.forEach((metric) => {
+        if (!Number.isFinite(metric.value) || !Number.isFinite(metric.optimalMin) || !Number.isFinite(metric.optimalMax)) return;
+
+        if (metric.id === 'shoulder') {
+          if (metric.value < metric.optimalMin) {
+            notes.push('<p><strong>Arm Load:</strong> Get your arms further behind your body before you explode up. This will help you generate more power.</p>');
+          } else {
+            notes.push('<p><strong>Arm Control:</strong> Your shoulders are over-extended at coil. Keep the arms loaded back, but controlled, so the swing stays efficient into takeoff.</p>');
+          }
+          return;
+        }
+
+        if (metric.id === 'ankle') {
+          if (metric.value < metric.optimalMin) {
+            notes.push('<p><strong>Ankle Position:</strong> You are too dorsiflexed at the bottom. Sit into the coil with a slightly more open ankle to stay balanced and ready to drive upward.</p>');
+          } else {
+            notes.push('<p><strong>Ankle Position:</strong> You are too plantarflexed at the bottom. Keep the heel connection stronger so you can transfer force cleanly through takeoff.</p>');
+          }
+          return;
+        }
+
+        if (metric.id === 'knee') {
+          if (metric.value < metric.optimalMin) {
+            notes.push('<p><strong>Knee Flexion:</strong> You are too deep in the knee at coil. Use a controlled dip so you can reverse direction faster and avoid losing stiffness.</p>');
+          } else {
+            notes.push('<p><strong>Knee Flexion:</strong> You need more knee bend at coil. Add a deeper countermovement to store more elastic energy before takeoff.</p>');
+          }
+          return;
+        }
+
+        if (metric.id === 'hip') {
+          if (metric.value < metric.optimalMin) {
+            notes.push('<p><strong>Hip Position:</strong> Your hips are too closed at full depth. Keep your torso and hips stacked so you can drive vertically instead of leaking force forward.</p>');
+          } else {
+            notes.push('<p><strong>Hip Position:</strong> You are not loading enough at the hips. Sit slightly more into the hips during the dip to improve your upward impulse.</p>');
+          }
+          return;
+        }
+
+        if (metric.id === 'depth') {
+          if (metric.value < metric.optimalMin) {
+            notes.push('<p><strong>Countermovement Depth:</strong> Your dip is too shallow. Load deeper before takeoff to build more force through the stretch-shortening cycle.</p>');
+          } else {
+            notes.push('<p><strong>Countermovement Depth:</strong> Your dip is too deep. Keep the countermovement tighter to reduce time loss and improve reactivity.</p>');
+          }
+        }
+      });
+
+      if (!notes.length) {
+        return '<p><strong>Full-Depth Position:</strong> Your ankle, knee, hip, shoulder, and dip depth are all in an efficient loading window. Keep this same coil timing into takeoff.</p>';
+      }
+      return notes.join('');
+    }
+
+    async function loadPlayerHeightMeters() {
+      const { player } = getUrlBits();
+      if (!player) {
+        playerHeightMeters = null;
+        return;
+      }
+      try {
+        const playerSnap = await db.collection('players').doc(player).get();
+        // Firestore `players.height` is stored in centimeters
+        const rawHeight = playerSnap.exists ? playerSnap.data()?.height : null;
+        const heightCm = Number(rawHeight);
+        playerHeightMeters = Number.isFinite(heightCm) && heightCm > 0 ? heightCm / 100 : null;
+      } catch (err) {
+        console.warn('[jump] Failed to load player height:', err?.message || err);
+        playerHeightMeters = null;
+      }
+    }
+
+    function markAnnotationDirty() { annotationDirty = true; }
+    function updateAnnotationSaveBtnState() {
+      const saveBtn = document.getElementById('annotationSaveBtn');
+      if (saveBtn) saveBtn.disabled = !annotationDirty;
+      const saveExitBtn = document.getElementById('annotationSaveExitBtn');
+      if (saveExitBtn) saveExitBtn.disabled = !annotationDirty;
+    }
+
+    function enterAnalysisMode() {
+      analysisMode = true;
+      analysisPhase = 'idle';
+      if (isPlaying) togglePlayPause();
+      // Reset pose-viewer zoom state when analysis starts.
+      poseManualZoomBounds = null;
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
+      poseZoomCenterX = 0.5;
+      poseZoomCenterY = 0.5;
+      const poseContainer = document.querySelector('.pose-container');
+      if (poseContainer) poseContainer.classList.add('analysis-active');
+      currentFrame = 0;
+      drawPose(currentFrame);
+      updateFrameNumberDisplay();
+      const pfs = document.getElementById('poseFrameSlider');
+      if (pfs) pfs.value = '0';
+      const analysisHeaderEl = document.getElementById('analysisHeader');
+      const analysisStartOverlay = document.getElementById('analysisStartOverlay');
+      const analysisFeedbackPanel = document.getElementById('analysisFeedbackPanel');
+      if (analysisHeaderEl) analysisHeaderEl.style.display = '';
+      if (analysisHeaderEl) analysisHeaderEl.textContent = 'Analyzing Jumping Technique';
+      if (analysisStartOverlay) analysisStartOverlay.style.display = '';
+      if (analysisFeedbackPanel) analysisFeedbackPanel.style.display = 'none';
+      if (poseContainer) poseContainer.classList.remove('analysis-feedback-visible');
+      function rf(el){ if (!el) return; if (el.requestFullscreen) el.requestFullscreen(); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); else if (el.msRequestFullscreen) el.msRequestFullscreen(); }
+      rf(poseContainer);
+      requestAnimationFrame(() => {
+        try { drawPose(currentFrame); drawRawFrameToCanvas(); } catch (_) {}
+      });
+    }
+
+    function exitAnalysisMode() {
+      analysisMode = false;
+      analysisPhase = 'idle';
+      if (analysisInterval) { clearInterval(analysisInterval); analysisInterval = null; }
+      const poseContainer = document.querySelector('.pose-container');
+      if (poseContainer) {
+        poseContainer.classList.remove('analysis-active');
+        poseContainer.classList.remove('analysis-feedback-visible');
+      }
+      const analysisHeaderEl = document.getElementById('analysisHeader');
+      const analysisStartOverlay = document.getElementById('analysisStartOverlay');
+      const analysisFeedbackPanel = document.getElementById('analysisFeedbackPanel');
+      const ktOverlay = document.getElementById('keyTakeawaysOverlay');
+      if (analysisHeaderEl) analysisHeaderEl.style.display = 'none';
+      if (analysisStartOverlay) analysisStartOverlay.style.display = 'none';
+      if (analysisFeedbackPanel) analysisFeedbackPanel.style.display = 'none';
+      if (ktOverlay) ktOverlay.style.display = 'none';
+      if (analysisHeaderEl) analysisHeaderEl.textContent = 'Analyzing Jumping Technique';
+      poseManualZoomBounds = null;
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
+      drawPose(currentFrame);
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+      if (poseContainer && fsEl === poseContainer) {
+        if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); else if (document.msExitFullscreen) document.msExitFullscreen();
+      }
+    }
+
+    function analysisStepFrame() {
+      const dataLen = currentView === '3D' ? (poseData ? poseData.length : 0) : (poseData2D ? poseData2D.length : 0);
+      if (!dataLen) return;
+      currentFrame = Math.min(currentFrame + 1, dataLen - 1);
+      drawPose(currentFrame);
+      updateFrameNumberDisplay();
+      const pfs = document.getElementById('poseFrameSlider');
+      const pfv = document.getElementById('poseFrameSliderValue');
+      if (pfs) pfs.value = currentFrame.toString();
+      if (pfv) pfv.textContent = currentFrame.toString();
+    }
+
+    function showFeedbackPanel(phase) {
+      const isFullDepth = phase === 'full_depth';
+      const analysisFeedbackTitle = document.getElementById('analysisFeedbackTitle');
+      const analysisFeedbackAngles = document.getElementById('analysisFeedbackAngles');
+      const analysisFeedbackText = document.getElementById('analysisFeedbackText');
+      const analysisFeedbackPanel = document.getElementById('analysisFeedbackPanel');
+      const analysisContinueBtn = document.getElementById('analysisContinueBtn');
+      if (analysisFeedbackTitle) analysisFeedbackTitle.textContent = isFullDepth ? 'Full Depth Analysis' : 'Takeoff Analysis';
+      const textarea = document.getElementById('annotationAnalysisTextarea');
+      const keyTakeawaysSection = document.getElementById('annotationKeyTakeawaysSection');
+      const saveBtn = document.getElementById('annotationSaveBtn');
+      const saveExitBtn = document.getElementById('annotationSaveExitBtn');
+      if (textarea) textarea.style.display = 'none';
+      if (keyTakeawaysSection) keyTakeawaysSection.style.display = 'none';
+      if (saveBtn) saveBtn.style.display = 'none';
+      if (saveExitBtn) saveExitBtn.style.display = 'none';
+      document.getElementById('annotationToolbar').style.display = 'none';
+      const phaseIndex = isFullDepth ? 0 : 2;
+      let anglesHTML = '';
+      let fullDepthMetrics = [];
+      const phaseAngles = getJointAnglesForPhaseIndex(phaseIndex);
+      if (isFullDepth && phaseAngles && phaseAngles.length >= 5) {
+        const arr = phaseAngles;
+        fullDepthMetrics = buildFullDepthMetrics(arr);
+        fullDepthMetrics.forEach((metric) => {
+          const rowClass = getStatusClass(metric.status);
+          const optimalText = (Number.isFinite(metric.optimalMin) && Number.isFinite(metric.optimalMax))
+            ? `Optimal: ${rangeToDisplay(metric.optimalMin, metric.optimalMax, metric.unit)}`
+            : 'Optimal: unavailable';
+          const valueText = Number.isFinite(metric.value) ? `${roundToTenth(metric.value)}${metric.unit}` : '—';
+          anglesHTML += `<div class="analysis-angle-row ${rowClass}" style="--angle-color: #4c8c6a"><span class="analysis-angle-name">${metric.name} <span style="opacity:0.75;font-weight:500">(${optimalText})</span></span><span class="analysis-angle-value">${valueText}</span></div>`;
+        });
+      }
+      if (!isFullDepth) {
+        anglesHTML += buildTakeoffTimingRowsHTML(computeTakeoffTimingMetrics());
+      }
+      if (analysisFeedbackAngles) analysisFeedbackAngles.innerHTML = anglesHTML;
+      const phaseKey = isFullDepth ? 'full_depth' : 'takeoff';
+      const annData = annotationMode ? annotationData : jumpAnalysisData;
+      const customText = annData?.[phaseKey]?.analysis_text;
+      const feedbackDivider = document.querySelector('#analysisFeedbackPanel .analysis-feedback-divider');
+      if (analysisFeedbackText) {
+        if (isFullDepth) {
+          analysisFeedbackText.style.display = '';
+          analysisFeedbackText.innerHTML = buildFullDepthFeedbackFromMetrics(fullDepthMetrics);
+          if (feedbackDivider) feedbackDivider.style.display = '';
+        } else if (customText && customText.trim()) {
+          analysisFeedbackText.style.display = '';
+          analysisFeedbackText.innerHTML = '<p>' + customText.replace(/\n/g, '</p><p>') + '</p>';
+          if (feedbackDivider) feedbackDivider.style.display = '';
+        } else {
+          analysisFeedbackText.innerHTML = '';
+          analysisFeedbackText.style.display = 'none';
+          if (feedbackDivider) feedbackDivider.style.display = 'none';
+        }
+      }
+      if (analysisContinueBtn) analysisContinueBtn.textContent = isFullDepth ? 'Continue Analysis' : 'Finish Analysis';
+      if (analysisFeedbackPanel) analysisFeedbackPanel.style.display = '';
+      const poseContainer = document.querySelector('.pose-container');
+      if (poseContainer) poseContainer.classList.add('analysis-feedback-visible');
+      poseManualZoomBounds = null;
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
+      poseZoomIn();
+      drawPose(currentFrame);
+    }
+
+    function startAnalysisPlayback() {
+      const analysisStartOverlay = document.getElementById('analysisStartOverlay');
+      if (analysisStartOverlay) analysisStartOverlay.style.display = 'none';
+      poseManualZoomBounds = null;
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
+      poseZoomCenterX = 0.5;
+      poseZoomCenterY = 0.5;
+      analysisPhase = 'playing-to-full-depth';
+      try { drawPose(currentFrame); drawRawFrameToCanvas(); } catch (_) {}
+      const dataLen = poseData2D ? poseData2D.length : 0;
+      const fullDepthFrame = keyFramesData && keyFramesData[0] != null ? Math.round(Number(keyFramesData[0])) : null;
+      const baseTakeoff = keyFramesData && keyFramesData[2] != null ? Math.round(Number(keyFramesData[2])) : null;
+      const takeoffFrame = baseTakeoff != null ? Math.min(dataLen - 1, Math.max(0, baseTakeoff + 5)) : null;
+      const frameDelay = Math.max(20, Math.round(baseFrameDelay / (SPEED_OPTIONS[poseSpeedIdx] || 1)));
+      analysisInterval = setInterval(() => {
+        if (analysisPhase === 'playing-to-full-depth') {
+          analysisStepFrame();
+          if (Number.isFinite(fullDepthFrame) && currentFrame >= fullDepthFrame) {
+            clearInterval(analysisInterval);
+            analysisInterval = null;
+            analysisPhase = 'full_depth';
+            currentFrame = Math.min(fullDepthFrame, Math.max(0, dataLen - 1));
+            drawPose(currentFrame);
+            showFeedbackPanel('full_depth');
+          } else if (currentFrame >= dataLen - 1) {
+            clearInterval(analysisInterval);
+            analysisInterval = null;
+            analysisPhase = 'done';
+          }
+        } else if (analysisPhase === 'playing-to-takeoff') {
+          analysisStepFrame();
+          if (Number.isFinite(takeoffFrame) && currentFrame >= takeoffFrame) {
+            clearInterval(analysisInterval);
+            analysisInterval = null;
+            analysisPhase = 'takeoff';
+            currentFrame = Math.min(takeoffFrame, Math.max(0, dataLen - 1));
+            drawPose(currentFrame);
+            showFeedbackPanel('takeoff');
+          } else if (currentFrame >= dataLen - 1) {
+            clearInterval(analysisInterval);
+            analysisInterval = null;
+            analysisPhase = 'done';
+          }
+        }
+      }, frameDelay);
+    }
+
+    async function enterAnnotationMode() {
+      await loadJumpAnalysis();
+      if (jumpAnalysisData) {
+        ['full_depth', 'takeoff'].forEach(phase => {
+          const src = jumpAnalysisData[phase];
+          if (src) {
+            annotationData[phase].position_diff_limbs = Array.isArray(src.position_diff_limbs) ? JSON.parse(JSON.stringify(src.position_diff_limbs)) : [];
+            annotationData[phase].red_limbs = Array.isArray(src.red_limbs) ? JSON.parse(JSON.stringify(src.red_limbs)) : [];
+            annotationData[phase].info_circles = Array.isArray(src.info_circles) ? JSON.parse(JSON.stringify(src.info_circles)) : [];
+            annotationData[phase].analysis_text = typeof src.analysis_text === 'string' ? src.analysis_text : '';
+          }
+        });
+        annotationData.key_takeaways = typeof jumpAnalysisData.key_takeaways === 'string' ? jumpAnalysisData.key_takeaways : '';
+      }
+      annotationDirty = false;
+      annotationMode = true;
+      annotationPhase = 'idle';
+      analysisMode = true;
+      analysisPhase = 'idle';
+      if (isPlaying) togglePlayPause();
+      poseManualZoomBounds = null;
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
+      poseZoomCenterX = 0.5;
+      poseZoomCenterY = 0.5;
+      const poseContainer = document.querySelector('.pose-container');
+      if (poseContainer) poseContainer.classList.add('analysis-active');
+      currentFrame = 0;
+      drawPose(currentFrame);
+      updateFrameNumberDisplay();
+      const pfs = document.getElementById('poseFrameSlider');
+      if (pfs) pfs.value = '0';
+      const analysisHeaderEl = document.getElementById('analysisHeader');
+      const analysisStartOverlay = document.getElementById('analysisStartOverlay');
+      const analysisFeedbackPanel = document.getElementById('analysisFeedbackPanel');
+      if (analysisHeaderEl) { analysisHeaderEl.style.display = ''; analysisHeaderEl.textContent = 'Annotate Jumping Analysis'; }
+      if (analysisStartOverlay) analysisStartOverlay.style.display = '';
+      if (analysisFeedbackPanel) analysisFeedbackPanel.style.display = 'none';
+      if (poseContainer) poseContainer.classList.remove('analysis-feedback-visible');
+      document.getElementById('annotationToolbar').style.display = 'none';
+      document.getElementById('keyTakeawaysOverlay').style.display = 'none';
+      function rf(el){ if (!el) return; if (el.requestFullscreen) el.requestFullscreen(); else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen(); else if (el.msRequestFullscreen) el.msRequestFullscreen(); }
+      rf(poseContainer);
+      requestAnimationFrame(() => {
+        try { drawPose(currentFrame); drawRawFrameToCanvas(); } catch (_) {}
+      });
+    }
+
+    function exitAnnotationMode() {
+      annotationMode = false;
+      annotationPhase = 'idle';
+      analysisMode = false;
+      analysisPhase = 'idle';
+      if (analysisInterval) { clearInterval(analysisInterval); analysisInterval = null; }
+      const poseContainer = document.querySelector('.pose-container');
+      if (poseContainer) {
+        poseContainer.classList.remove('analysis-active');
+        poseContainer.classList.remove('analysis-feedback-visible');
+      }
+      const analysisHeaderEl = document.getElementById('analysisHeader');
+      const analysisStartOverlay = document.getElementById('analysisStartOverlay');
+      const analysisFeedbackPanel = document.getElementById('analysisFeedbackPanel');
+      if (analysisHeaderEl) analysisHeaderEl.style.display = 'none';
+      if (analysisStartOverlay) analysisStartOverlay.style.display = 'none';
+      if (analysisFeedbackPanel) analysisFeedbackPanel.style.display = 'none';
+      document.getElementById('annotationToolbar').style.display = 'none';
+      document.getElementById('keyTakeawaysOverlay').style.display = 'none';
+      if (analysisHeaderEl) analysisHeaderEl.textContent = 'Analyzing Jumping Technique';
+      poseManualZoomBounds = null;
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
+      drawPose(currentFrame);
+      const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+      if (poseContainer && fsEl === poseContainer) {
+        if (document.exitFullscreen) document.exitFullscreen(); else if (document.webkitExitFullscreen) document.webkitExitFullscreen(); else if (document.msExitFullscreen) document.msExitFullscreen();
+      }
+    }
+
+    function showAnnotationPanel(phase) {
+      const isFullDepth = phase === 'full_depth';
+      const analysisFeedbackTitle = document.getElementById('analysisFeedbackTitle');
+      const analysisFeedbackAngles = document.getElementById('analysisFeedbackAngles');
+      const analysisFeedbackText = document.getElementById('analysisFeedbackText');
+      const analysisFeedbackPanel = document.getElementById('analysisFeedbackPanel');
+      const analysisContinueBtn = document.getElementById('analysisContinueBtn');
+      const textarea = document.getElementById('annotationAnalysisTextarea');
+      const keyTakeawaysSection = document.getElementById('annotationKeyTakeawaysSection');
+      const saveBtn = document.getElementById('annotationSaveBtn');
+      const saveExitBtn = document.getElementById('annotationSaveExitBtn');
+      if (analysisFeedbackTitle) analysisFeedbackTitle.textContent = isFullDepth ? 'Full Depth Annotation' : 'Takeoff Annotation';
+      const phaseIndex = isFullDepth ? 0 : 2;
+      let anglesHTML = '';
+      const phaseAnglesAnn = getJointAnglesForPhaseIndex(phaseIndex);
+      if (isFullDepth && phaseAnglesAnn && phaseAnglesAnn.length >= 5) {
+        const arr = phaseAnglesAnn;
+        const fullDepthMetrics = buildFullDepthMetrics(arr);
+        fullDepthMetrics.forEach((metric) => {
+          const rowClass = getStatusClass(metric.status);
+          const optimalText = (Number.isFinite(metric.optimalMin) && Number.isFinite(metric.optimalMax))
+            ? `Optimal: ${rangeToDisplay(metric.optimalMin, metric.optimalMax, metric.unit)}`
+            : 'Optimal: unavailable';
+          const valueText = Number.isFinite(metric.value) ? `${roundToTenth(metric.value)}${metric.unit}` : '—';
+          anglesHTML += `<div class="analysis-angle-row ${rowClass}" style="--angle-color: #4c8c6a"><span class="analysis-angle-name">${metric.name} <span style="opacity:0.75;font-weight:500">(${optimalText})</span></span><span class="analysis-angle-value">${valueText}</span></div>`;
+        });
+      }
+      if (!isFullDepth) {
+        anglesHTML += buildTakeoffTimingRowsHTML(computeTakeoffTimingMetrics());
+      }
+      if (analysisFeedbackAngles) analysisFeedbackAngles.innerHTML = anglesHTML;
+      if (analysisFeedbackText) analysisFeedbackText.style.display = 'none';
+      if (analysisContinueBtn) analysisContinueBtn.style.display = '';
+      annotationDirty = false;
+      if (textarea) {
+        textarea.style.display = 'block';
+        textarea.value = annotationData[phase].analysis_text || '';
+        textarea.oninput = markAnnotationDirty;
+      }
+      if (keyTakeawaysSection) keyTakeawaysSection.style.display = 'none';
+      if (saveBtn) {
+        saveBtn.style.display = 'block';
+        saveBtn.onclick = async () => {
+          annotationData[phase].analysis_text = textarea?.value || '';
+          await saveJumpAnalysis();
+          annotationDirty = false;
+          updateAnnotationSaveBtnState();
+        };
+      }
+      if (saveExitBtn) saveExitBtn.style.display = 'none';
+      if (analysisContinueBtn) analysisContinueBtn.textContent = isFullDepth ? 'Continue Analysis' : 'Finish Analysis';
+      updateAnnotationSaveBtnState();
+      if (analysisFeedbackPanel) analysisFeedbackPanel.style.display = '';
+      const poseContainer = document.querySelector('.pose-container');
+      if (poseContainer) poseContainer.classList.add('analysis-feedback-visible');
+      document.getElementById('annotationToolbar').style.display = '';
+      poseManualZoomBounds = null;
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
+      poseZoomIn();
+      drawPose(currentFrame);
+    }
+
+    function showKeyTakeawaysAnnotationPanel() {
+      const analysisFeedbackTitle = document.getElementById('analysisFeedbackTitle');
+      const analysisFeedbackAngles = document.getElementById('analysisFeedbackAngles');
+      const analysisFeedbackText = document.getElementById('analysisFeedbackText');
+      const textarea = document.getElementById('annotationAnalysisTextarea');
+      const keyTakeawaysSection = document.getElementById('annotationKeyTakeawaysSection');
+      const keyTakeawaysTextarea = document.getElementById('annotationKeyTakeawaysTextarea');
+      const saveBtn = document.getElementById('annotationSaveBtn');
+      const saveExitBtn = document.getElementById('annotationSaveExitBtn');
+      const analysisFeedbackPanel = document.getElementById('analysisFeedbackPanel');
+      const analysisContinueBtn = document.getElementById('analysisContinueBtn');
+      if (analysisFeedbackTitle) analysisFeedbackTitle.textContent = 'Key Takeaways';
+      if (analysisFeedbackAngles) analysisFeedbackAngles.innerHTML = '';
+      if (analysisFeedbackText) analysisFeedbackText.style.display = 'none';
+      if (textarea) textarea.style.display = 'none';
+      if (keyTakeawaysSection) { keyTakeawaysSection.style.display = 'block'; if (keyTakeawaysTextarea) keyTakeawaysTextarea.value = annotationData.key_takeaways || ''; }
+      if (saveBtn) saveBtn.style.display = 'none';
+      if (saveExitBtn) {
+        saveExitBtn.style.display = 'block';
+        saveExitBtn.onclick = async () => {
+          annotationData.key_takeaways = keyTakeawaysTextarea?.value || '';
+          await saveJumpAnalysis();
+          exitAnnotationMode();
+        };
+      }
+      if (analysisContinueBtn) analysisContinueBtn.style.display = 'none';
+      if (analysisFeedbackPanel) analysisFeedbackPanel.style.display = '';
+      const poseContainer = document.querySelector('.pose-container');
+      if (poseContainer) poseContainer.classList.add('analysis-feedback-visible');
+      document.getElementById('annotationToolbar').style.display = 'none';
+    }
+
+    function startAnnotationPlayback() {
+      const analysisStartOverlay = document.getElementById('analysisStartOverlay');
+      if (analysisStartOverlay) analysisStartOverlay.style.display = 'none';
+      poseManualZoomBounds = null;
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
+      poseZoomCenterX = 0.5;
+      poseZoomCenterY = 0.5;
+      analysisPhase = 'playing-to-full-depth';
+      try { drawPose(currentFrame); drawRawFrameToCanvas(); } catch (_) {}
+      const dataLen = poseData2D ? poseData2D.length : 0;
+      const fullDepthFrame = keyFramesData && keyFramesData[0] != null ? Math.round(Number(keyFramesData[0])) : null;
+      const baseTakeoff = keyFramesData && keyFramesData[2] != null ? Math.round(Number(keyFramesData[2])) : null;
+      const takeoffFrame = baseTakeoff != null ? Math.min(dataLen - 1, Math.max(0, baseTakeoff + 5)) : null;
+      const frameDelay = Math.max(20, Math.round(baseFrameDelay / (SPEED_OPTIONS[poseSpeedIdx] || 1)));
+      analysisInterval = setInterval(() => {
+        if (analysisPhase === 'playing-to-full-depth') {
+          analysisStepFrame();
+          if (Number.isFinite(fullDepthFrame) && currentFrame >= fullDepthFrame) {
+            clearInterval(analysisInterval);
+            analysisInterval = null;
+            analysisPhase = 'full_depth';
+            annotationPhase = 'full_depth';
+            currentFrame = Math.min(fullDepthFrame, Math.max(0, dataLen - 1));
+            drawPose(currentFrame);
+            showAnnotationPanel('full_depth');
+          } else if (currentFrame >= dataLen - 1) {
+            clearInterval(analysisInterval);
+            analysisInterval = null;
+            analysisPhase = 'done';
+          }
+        } else if (analysisPhase === 'playing-to-takeoff') {
+          analysisStepFrame();
+          if (Number.isFinite(takeoffFrame) && currentFrame >= takeoffFrame) {
+            clearInterval(analysisInterval);
+            analysisInterval = null;
+            analysisPhase = 'takeoff';
+            annotationPhase = 'takeoff';
+            currentFrame = Math.min(takeoffFrame, Math.max(0, dataLen - 1));
+            drawPose(currentFrame);
+            showAnnotationPanel('takeoff');
+          } else if (currentFrame >= dataLen - 1) {
+            clearInterval(analysisInterval);
+            analysisInterval = null;
+            analysisPhase = 'done';
+          }
+        }
+      }, frameDelay);
+    }
+
     auth.onAuthStateChanged(async user => {
       if (!user) { window.location.href = 'kickai.html'; return; }
       await initRepsBar();
+      await loadPlayerHeightMeters();
       await loadAllForCurrentRep();
       updateFrameNumberDisplay();
       await applyPremiumLock();
@@ -1657,10 +3217,12 @@
       try {
         const pDoc = await db.collection('players').doc(playerDocId).get();
         if (!pDoc.exists) return;
-        const locked = pDoc.data().premium_content_locked;
-        const shouldLock = isCoach ? (locked === true) : (locked !== false);
-        if (!shouldLock) return;
-        function addLock(el, label, sentFrom) {
+        const d = pDoc.data();
+        const locked = d.premium_content_locked;
+        const feedbackNeeded = d.feedback_form_needed === true;
+        const shouldPremiumLock = isCoach ? (locked === true) : (locked !== false);
+        const shouldFeedbackLock = !isCoach && feedbackNeeded === true;
+        function addPremiumLock(el, label, sentFrom) {
           if (!el || el.classList.contains('premium-section-locked')) return;
           el.classList.add('premium-section-locked');
           const ov = document.createElement('div');
@@ -1675,8 +3237,28 @@
           }
           el.appendChild(ov);
         }
-        addLock(document.querySelector('.pose-container'), 'Pose viewer only available for premium members', 'jumpPoseViewer');
-        addLock(document.getElementById('anglesColumn'), 'Keypoints viewer only available for premium members', 'jumpKeypointsViewer');
+        function addFeedbackLock(el, label) {
+          if (!el || el.classList.contains('premium-section-locked')) return;
+          el.classList.add('premium-section-locked');
+          const ov = document.createElement('div');
+          ov.className = 'lock-overlay';
+          ov.innerHTML = '<span class="material-symbols-outlined">lock</span><span>' + (label || 'Complete feedback form') + '</span>';
+          if (userType === 'player') {
+            const btn = document.createElement('a');
+            btn.className = 'unlock-btn';
+            btn.textContent = 'Complete feedback form';
+            btn.href = 'feedbackForm.html?player=' + encodeURIComponent(playerDocId) + '&userType=player&previousPage=' + encodeURIComponent((window.location.pathname.split('/').pop() || '') + (window.location.search || ''));
+            ov.appendChild(btn);
+          }
+          el.appendChild(ov);
+        }
+        if (shouldPremiumLock) {
+          addPremiumLock(document.querySelector('.pose-container'), 'Pose viewer only available for premium members', 'jumpPoseViewer');
+          addPremiumLock(document.getElementById('anglesColumn'), 'Keypoints viewer only available for premium members', 'jumpKeypointsViewer');
+        } else if (shouldFeedbackLock) {
+          addFeedbackLock(document.querySelector('.pose-container'), 'Complete feedback form');
+          addFeedbackLock(document.getElementById('anglesColumn'), 'Complete feedback form');
+        }
       } catch (e) { console.error('[PremiumLock] Error:', e); }
     }
 
@@ -1746,7 +3328,32 @@
       } 
     }
 
+    /** True when key_frames.json is loaded and has the four keyframe indices analysis needs. */
+    function keyFramesReadyForAnalysis() {
+      if (!Array.isArray(keyFramesData) || keyFramesData.length < 4) return false;
+      return keyFramesData.slice(0, 4).every((k) => k != null && Number.isFinite(Number(k)));
+    }
+
+    /** Enable Analyze Jump only when pose, raw video, and key_frames.json are all ready. */
+    function updateAnalyzeJumpButtonState() {
+      const btn = document.getElementById('analyzeJumpBtn');
+      if (!btn) return;
+      const videoEl = document.getElementById('rawVideo');
+      const poseReady = Array.isArray(poseData) && poseData.length > 0;
+      const videoReady = !!(videoEl && videoEl.src && !videoEl.error && videoEl.readyState >= 2);
+      const keyFramesReady = keyFramesReadyForAnalysis();
+      const ready = poseReady && videoReady && keyFramesReady;
+      btn.disabled = !ready;
+      btn.setAttribute('aria-disabled', ready ? 'false' : 'true');
+    }
+
     async function loadAllForCurrentRep() {
+      const analyzeJumpBtnPre = document.getElementById('analyzeJumpBtn');
+      if (analyzeJumpBtnPre) {
+        analyzeJumpBtnPre.disabled = true;
+        analyzeJumpBtnPre.setAttribute('aria-disabled', 'true');
+      }
+      keyFramesData = null;
       clearAllCanvases();
       // Reset frame to 0 when switching reps
       currentFrame = 0;
@@ -1775,15 +3382,16 @@
       await loadKeyFrames();
       await loadFilteredAveragePositions();
       await loadJointAnglesKeyFrames();
+      await loadJumpAnalysis();
       try { drawMiniPoseKeypointsPreview(); } catch {}
       await populateOverlayRepSelect();
+      try { sizeRawCanvas(); } catch {}
       drawPose(currentFrame);
       drawRawFrameToCanvas();
       updateFrameNumberDisplay();
-      // Initialize angle display with first key frame
-      if (jointAnglesKeyFrames && jointAnglesKeyFrames.length > 0) {
-        updateAngleInfoPanel();
-      }
+      // Angles from filtered positions × video size (or JSON fallback)
+      updateAngleInfoPanel();
+      updateAnalyzeJumpButtonState();
     }
 
     async function populateOverlayRepSelect() {
@@ -1938,18 +3546,19 @@
             .map(v => Math.round(Number(v)))
             .map(v => (Number.isFinite(v) ? v : null));
         }
-        console.log('[KeyFrames] Loaded (rounded):', keyFramesData);
+        console.log('[StaticJump] key_frames.json loaded:', keyFramesData);
         // Show key frames bar if data exists
         const keyframesBar = document.getElementById('keyframesBar');
         if (keyframesBar && Array.isArray(keyFramesData) && keyFramesData.length >= 4) {
           keyframesBar.style.display = 'flex';
         }
       } catch (err) { 
-        console.warn('No key_frames.json found'); 
+        console.warn('[StaticJump] key_frames.json failed to load:', err);
         keyFramesData = null;
         const keyframesBar = document.getElementById('keyframesBar');
         if (keyframesBar) keyframesBar.style.display = 'none';
       }
+      updateAnalyzeJumpButtonState();
     }
 
     async function loadFilteredAveragePositions() {
@@ -1974,40 +3583,7 @@
       } catch (err) { console.warn('No joint_angles_key_frames.json found'); jointAnglesKeyFrames = null; }
     }
 
-    function applyManualZoomTransform(ctx, W, H) {
-      if (!manualZoomBounds) return null;
-      const { leftX, rightX, topY, bottomY } = manualZoomBounds;
-      const viewWidthN = rightX - leftX; const viewHeightN = bottomY - topY;
-      const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, leftX + panOffsetX));
-      const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, topY + panOffsetY));
-      const sx = 1 / viewWidthN; const sy = 1 / viewHeightN; const leftPx = adjustedLeftX * W; const topPx = adjustedTopY * H;
-      const dpr = Math.min(window.devicePixelRatio || 1, 2);
-      ctx.save(); ctx.setTransform(dpr * sx, 0, 0, dpr * sy, dpr * (-sx * leftPx), dpr * (-sy * topPx));
-      return { leftX: adjustedLeftX, rightX: adjustedLeftX + viewWidthN, topY: adjustedTopY, bottomY: adjustedTopY + viewHeightN, sx, sy };
-    }
-    function restoreTransform(ctx){ const dpr = Math.min(window.devicePixelRatio || 1, 2); ctx.restore(); ctx.setTransform(dpr, 0, 0, dpr, 0, 0); }
-
-    // Map a normalized point (0..1) to canvas pixels under current pose zoom/pan
-    function mapPosePointToCanvas(nx, ny, W, H) {
-      if (!manualZoomBounds) {
-        return [nx * W, ny * H];
-      }
-      const leftX = manualZoomBounds.leftX;
-      const rightX = manualZoomBounds.rightX;
-      const topY = manualZoomBounds.topY;
-      const bottomY = manualZoomBounds.bottomY;
-      const viewWidthN = rightX - leftX;
-      const viewHeightN = bottomY - topY;
-      const adjustedLeftX = Math.max(0, Math.min(1 - viewWidthN, leftX + panOffsetX));
-      const adjustedTopY = Math.max(0, Math.min(1 - viewHeightN, topY + panOffsetY));
-      const sx = 1 / Math.max(viewWidthN, 1e-6);
-      const sy = 1 / Math.max(viewHeightN, 1e-6);
-      const x = (nx - adjustedLeftX) * (W * sx);
-      const y = (ny - adjustedTopY) * (H * sy);
-      return [x, y];
-    }
-
-    // Draw selection marquee for zoom region in screen-space (before applying transform)
+    // Draw selection marquee for zoom region in screen-space
     function drawZoomSelection(W, H) {
       if (!isZoomSelecting) return;
       const leftX = Math.min(zoomStartX, zoomCurrentX);
@@ -2070,6 +3646,7 @@
 
     function updateFrameNumberDisplay() {
       const frameDisplay = document.getElementById('frameNumberDisplay'); if (frameDisplay) frameDisplay.textContent = `Frame: ${currentFrame}`;
+      const poseBarLabel = document.getElementById('poseYtFrameLabel'); if (poseBarLabel) poseBarLabel.textContent = `Frame: ${currentFrame}`;
       updateVerticalHeightDisplay();
       updateKeyFrameHighlight();
       updateAngleInfoPanel();
@@ -2134,20 +3711,19 @@
         }
       }
       
-      if (displayKeyFrame !== null && jointAnglesKeyFrames) {
-        const angles = jointAnglesKeyFrames[displayKeyFrame];
-        if (angles && (Array.isArray(angles) || typeof angles === 'object')) {
-          // Update angle values (5 angles expected)
+      if (displayKeyFrame !== null) {
+        const angles = getJointAnglesArrayForKeyFrameSlot(displayKeyFrame);
+        if (angles && angles.length >= 5) {
           for (let i = 0; i < 5; i++) {
             const elem = document.getElementById(`angle${i}`);
-            const angleValue = Array.isArray(angles) ? angles[i] : angles[i];
+            const angleValue = angles[i];
             if (elem && angleValue !== undefined && Number.isFinite(angleValue)) {
               elem.textContent = `${angleValue.toFixed(1)}°`;
             } else if (elem) {
               elem.textContent = '--°';
             }
           }
-          return; // Successfully updated
+          return;
         }
       }
       
@@ -2681,6 +4257,7 @@
     }
 
     function drawPose(frameIdx) {
+      _poseCanvasTransformActive = false;
       // Switch between 2D and 3D rendering
       const canvas2D = document.getElementById('poseCanvas');
       const canvas3D = document.getElementById('pose3DCanvas');
@@ -2732,72 +4309,172 @@
   // Show zoom selection rectangle in screen space
   drawZoomSelection(W, H);
 
-  let tx = null; if (manualZoomBounds) { tx = applyManualZoomTransform(ctx, W, H); }
+      // Apply uniform zoom via canvas transform (matching SideKickView approach)
+      let tx = null;
+      if (poseManualZoomBounds) {
+        tx = applyPoseZoomTransform(ctx, W, H);
+        _poseCanvasTransformActive = true;
+      }
 
       if (hasPose) {
-        const baseStroke = 5.5; let scalePx = 1; if (manualZoomBounds) { const { leftX, rightX, topY, bottomY } = manualZoomBounds; const viewWidthN = rightX - leftX; const viewHeightN = bottomY - topY; const sx = 1 / Math.max(viewWidthN, 1e-6); const sy = 1 / Math.max(viewHeightN, 1e-6); scalePx = 1 / Math.max(sx, sy); }
+        const baseStroke = 5.5;
+        const scalePx = getRawVideoPoseDisplayScalePx();
+        const isKeyframeFrame = isFrameIndexAnyKeyframe(idx);
+        const coilKf = Array.isArray(keyFramesData) && keyFramesData[0] != null && Number.isFinite(Number(keyFramesData[0]))
+          ? Math.round(Number(keyFramesData[0])) : null;
+        const takeoffDisplayKf = getTakeoffAnalysisDisplayFrameIdx();
+        /** Hide MediaPipe limbs + joints on full-depth (coil) or takeoff analysis frame (playback uses takeoff key + 5). */
+        const skipNormalPoseInAnalysisKeyframe = (analysisMode || annotationMode) &&
+          filteredAveragePositions &&
+          idx >= 0 && idx < filteredAveragePositions.length &&
+          ((analysisPhase === 'full_depth' && coilKf !== null && idx === coilKf) ||
+           (analysisPhase === 'takeoff' && takeoffDisplayKf !== null && idx === takeoffDisplayKf));
+        const analysisPhaseKeyframeThick = (analysisPhase === 'full_depth' && coilKf !== null && idx === coilKf) ||
+          (analysisPhase === 'takeoff' && takeoffDisplayKf !== null && idx === takeoffDisplayKf);
         
         // Get highlighted joints/bones if angle is selected
         const highlightInfo = highlightedAngle ? getAngleJoints(highlightedAngle, frame.length) : {joints: [], bones: []};
         console.log('drawPose: highlightedAngle=', highlightedAngle, 'highlightInfo=', highlightInfo, 'frameLength=', frame.length);
         
         // Draw bones
-        ctx.strokeStyle = '#ffffff'; ctx.lineWidth = baseStroke * scalePx;
-        const edges = (poseType == 17) ? COCO17_EDGES : POSE_CONNECTIONS;
-        edges.forEach(([s,e])=>{ 
-          const p1=frame[s], p2=frame[e]; 
-          if (!p1||!p2) return; 
-          const x1=p1[0]*W, y1=p1[1]*H; 
-          const x2=p2[0]*W, y2=p2[1]*H; 
-          
-          // Check if this bone should be highlighted
-          const isHighlighted = highlightInfo.bones.some(([bs, be]) => (bs === s && be === e) || (bs === e && be === s));
-          if (isHighlighted) {
-            ctx.strokeStyle = '#ffaa00';
-            ctx.lineWidth = (baseStroke + 3) * scalePx;
-          } else {
-            ctx.strokeStyle = '#ffffff';
-            ctx.lineWidth = baseStroke * scalePx;
-          }
-          
-          ctx.beginPath(); 
-          ctx.moveTo(x1,y1); 
-          ctx.lineTo(x2,y2); 
-          ctx.stroke(); 
-        });
-        
-        // Draw joints
-        const baseRadius = 4; 
-        frame.forEach((p, idx)=>{ 
-          if (!p) return; 
-          const x=p[0]*W, y=p[1]*H; 
-          const r = baseRadius * (manualZoomBounds ? scalePx : 1); 
-          const isHighlighted = highlightInfo.joints.includes(idx);
-          
-          ctx.beginPath(); 
-          ctx.arc(x,y, isHighlighted ? r * 1.5 : r, 0, 2*Math.PI); 
-          
-          if (selectedJoints.has(idx)) { 
-            ctx.fillStyle='yellow'; 
-            ctx.strokeStyle='orange'; 
-            ctx.lineWidth=2 * (manualZoomBounds ? scalePx : 1); 
-            ctx.fill(); 
+        if (!skipNormalPoseInAnalysisKeyframe) {
+          ctx.strokeStyle = '#ffffff'; ctx.lineWidth = baseStroke * scalePx;
+          const edges = (poseType == 17) ? COCO17_EDGES : POSE_CONNECTIONS;
+          edges.forEach(([s,e])=>{ 
+            const p1=frame[s], p2=frame[e]; 
+            if (!p1||!p2) return; 
+            const [x1,y1] = mapNormalizedPoseToDisplayPixels(p1[0], p1[1], W, H);
+            const [x2,y2] = mapNormalizedPoseToDisplayPixels(p2[0], p2[1], W, H);
+            
+            // Check if this bone should be highlighted
+            const isHighlighted = highlightInfo.bones.some(([bs, be]) => (bs === s && be === e) || (bs === e && be === s));
+            if (isHighlighted) {
+              ctx.strokeStyle = '#ffaa00';
+              ctx.lineWidth = (baseStroke + 3) * scalePx;
+            } else {
+              ctx.strokeStyle = '#ffffff';
+              ctx.lineWidth = baseStroke * scalePx;
+            }
+            
+            ctx.beginPath(); 
+            ctx.moveTo(x1,y1); 
+            ctx.lineTo(x2,y2); 
             ctx.stroke(); 
-          } else if (isHighlighted) {
-            ctx.fillStyle='#ffaa00';
-            ctx.strokeStyle='#ff8800';
-            ctx.lineWidth=3 * (manualZoomBounds ? scalePx : 1);
-            ctx.fill();
-            ctx.stroke();
-          } else { 
-            ctx.fillStyle='#00ff66'; 
-            ctx.fill(); 
-          } 
-        });
+          });
+        }
+        
+        // Draw joints (hidden with limbs on full-depth / takeoff analysis keyframes)
+        if (!skipNormalPoseInAnalysisKeyframe) {
+          const baseRadius = 4; 
+          frame.forEach((p, jIdx)=>{ 
+            if (!p) return; 
+            const [x,y] = mapNormalizedPoseToDisplayPixels(p[0], p[1], W, H);
+            const r = baseRadius * scalePx; 
+            const isHighlighted = highlightInfo.joints.includes(jIdx);
+            
+            ctx.beginPath(); 
+            ctx.arc(x,y, isHighlighted ? r * 1.5 : r, 0, 2*Math.PI); 
+            
+            if (selectedJoints.has(jIdx)) { 
+              ctx.fillStyle='yellow'; 
+              ctx.strokeStyle='orange'; 
+              ctx.lineWidth=2 * scalePx; 
+              ctx.fill(); 
+              ctx.stroke(); 
+            } else if (isHighlighted) {
+              ctx.fillStyle='#ffaa00';
+              ctx.strokeStyle='#ff8800';
+              ctx.lineWidth=3 * scalePx;
+              ctx.fill();
+              ctx.stroke();
+            } else { 
+              ctx.fillStyle='#00ff66'; 
+              ctx.fill(); 
+            } 
+          });
+        }
 
         // Draw filtered average positions overlay if enabled and at key frame
         if (showFilteredOverlay && currentKeyFrame !== null && filteredAveragePositions) {
-          drawFilteredPositionsOverlay(ctx, W, H, idx, scalePx);
+          drawFilteredPositionsOverlay(ctx, W, H, idx, scalePx, isKeyframeFrame ? 1.55 : 1);
+        }
+
+        // At analysis keyframes: full depth = quality-colored limbs; takeoff = amber
+        const isAnalysisKeyframe = (analysisMode || annotationMode) && (analysisPhase === 'full_depth' || analysisPhase === 'takeoff');
+        if (isAnalysisKeyframe && filteredAveragePositions && idx >= 0 && idx < filteredAveragePositions.length) {
+          drawFilteredPositionsOverlayAnalysis(ctx, W, H, idx, scalePx, {
+            useFullDepthQuality: analysisPhase === 'full_depth',
+            keyframeThick: analysisPhaseKeyframeThick
+          });
+        }
+
+        // Red limbs (annotation)
+        const annPhase = (analysisPhase === 'full_depth' || analysisPhase === 'takeoff') ? analysisPhase : null;
+        const annData = annotationMode ? annotationData : jumpAnalysisData;
+        if ((analysisMode || annotationMode) && hasPose && frame && annPhase && annData?.[annPhase]?.red_limbs?.length) {
+          ctx.save();
+          annData[annPhase].red_limbs.forEach(limb => {
+            const [i1, i2] = limb.joints;
+            const p1 = frame[i1], p2 = frame[i2];
+            if (!p1 || !p2) return;
+            const [x1,y1] = mapNormalizedPoseToDisplayPixels(p1[0], p1[1], W, H);
+            const [x2,y2] = mapNormalizedPoseToDisplayPixels(p2[0], p2[1], W, H);
+            ctx.strokeStyle = 'rgba(239, 68, 68, 0.95)';
+            ctx.lineWidth = (baseStroke + 4) * scalePx;
+            ctx.beginPath();
+            ctx.moveTo(x1, y1);
+            ctx.lineTo(x2, y2);
+            ctx.stroke();
+          });
+          ctx.restore();
+        }
+
+        // Position diff limbs (yellow shading)
+        if ((analysisMode || annotationMode) && hasPose && frame && annPhase && annData?.[annPhase]?.position_diff_limbs?.length) {
+          ctx.save();
+          annData[annPhase].position_diff_limbs.forEach(limb => {
+            const [i1, i2] = limb.joints;
+            const p1 = frame[i1], p2 = frame[i2];
+            if (!p1 || !p2) return;
+            const [x1,y1] = mapNormalizedPoseToDisplayPixels(p1[0], p1[1], W, H);
+            const [x2,y2] = mapNormalizedPoseToDisplayPixels(p2[0], p2[1], W, H);
+            ctx.fillStyle = 'rgba(255, 255, 0, 0.2)';
+            ctx.beginPath();
+            const dx = x2 - x1, dy = y2 - y1;
+            const perp = 8 * scalePx;
+            const nx = -dy / (Math.hypot(dx, dy) + 1e-9);
+            const ny = dx / (Math.hypot(dx, dy) + 1e-9);
+            ctx.moveTo(x1 + nx * perp, y1 + ny * perp);
+            ctx.lineTo(x2 + nx * perp, y2 + ny * perp);
+            ctx.lineTo(x2 - nx * perp, y2 - ny * perp);
+            ctx.lineTo(x1 - nx * perp, y1 - ny * perp);
+            ctx.closePath();
+            ctx.fill();
+          });
+          ctx.restore();
+        }
+
+        // Info circles (annotation)
+        if ((analysisMode || annotationMode) && hasPose && annPhase && annData?.[annPhase]?.info_circles?.length) {
+          ctx.save();
+          annData[annPhase].info_circles.forEach(ic => {
+            let cx, cy;
+            if (Array.isArray(ic.position) && ic.position.length >= 2) {
+              [cx, cy] = mapNormalizedPoseToDisplayPixels(ic.position[0], ic.position[1], W, H);
+            } else if (ic.type === 'joint' && ic.joint_index != null && frame[ic.joint_index]) {
+              const p = frame[ic.joint_index];
+              [cx, cy] = mapNormalizedPoseToDisplayPixels(p[0], p[1], W, H);
+            } else if (ic.type === 'limb' && ic.joints && frame[ic.joints[0]] && frame[ic.joints[1]]) {
+              const p1 = frame[ic.joints[0]], p2 = frame[ic.joints[1]];
+              [cx, cy] = mapNormalizedPoseToDisplayPixels((p1[0] + p2[0]) / 2, (p1[1] + p2[1]) / 2, W, H);
+            } else return;
+            ctx.strokeStyle = 'rgba(245, 200, 66, 0.9)';
+            ctx.lineWidth = 2 * scalePx;
+            ctx.beginPath();
+            ctx.arc(cx, cy, 14 * scalePx, 0, Math.PI * 2);
+            ctx.stroke();
+          });
+          ctx.restore();
         }
 
         // Draw overlay pose (semi-transparent, with alignment transforms)
@@ -2818,14 +4495,15 @@
             ctx.save();
             ctx.globalAlpha = 0.6;
             ctx.strokeStyle = 'rgba(200,200,200,0.9)';
-            ctx.lineWidth = (baseStroke * 0.65) * (manualZoomBounds ? scalePx : 1);
+            ctx.lineWidth = (baseStroke * 0.65) * scalePx;
             const edges2 = (fr2.length === 17) ? COCO17_EDGES : POSE_CONNECTIONS;
             edges2.forEach(([s,e])=>{
               const p1=fr2[s], p2=fr2[e];
               if (!p1||!p2) return;
               const t1 = transformOverlayPointN(p1[0], p1[1]);
               const t2 = transformOverlayPointN(p2[0], p2[1]);
-              const x1=t1[0]*W, y1=t1[1]*H; const x2=t2[0]*W, y2=t2[1]*H;
+              const [x1,y1] = mapNormalizedPoseToDisplayPixels(t1[0], t1[1], W, H);
+              const [x2,y2] = mapNormalizedPoseToDisplayPixels(t2[0], t2[1], W, H);
               ctx.beginPath();
               ctx.moveTo(x1,y1);
               ctx.lineTo(x2,y2);
@@ -2833,12 +4511,13 @@
             });
             // draw overlay joints (darker green)
             ctx.fillStyle = 'rgba(12,150,70,0.85)';
-            const rOv = baseRadius * 0.9 * (manualZoomBounds ? scalePx : 1);
+            const rOv = baseRadius * 0.9 * scalePx;
             fr2.forEach(p=>{
               if (!p) return;
               const tp = transformOverlayPointN(p[0], p[1]);
+              const [ox, oy] = mapNormalizedPoseToDisplayPixels(tp[0], tp[1], W, H);
               ctx.beginPath();
-              ctx.arc(tp[0]*W, tp[1]*H, rOv, 0, Math.PI*2);
+              ctx.arc(ox, oy, rOv, 0, Math.PI*2);
               ctx.fill();
             });
             ctx.restore();
@@ -2848,10 +4527,11 @@
 
       // Draw chest_starting_loc (horizontal guideline) and ground_loc_y (solid black line)
       if (sessionMetadata) {
+        const lineScale = getRawVideoPoseDisplayScalePx();
         const chestY = sessionMetadata.chest_starting_loc;
         if (showCOMLine && Number.isFinite(chestY)) {
-          const y = Math.max(0, Math.min(1, chestY)) * H;
-          const lineW = 2 * (manualZoomBounds ? (1 / Math.max(1 / Math.max((manualZoomBounds.rightX - manualZoomBounds.leftX), 1e-6), 1 / Math.max((manualZoomBounds.bottomY - manualZoomBounds.topY), 1e-6))) : 1);
+          const y = mapNormalizedPoseToDisplayPixels(0.5, Math.max(0, Math.min(1, chestY)), W, H)[1];
+          const lineW = 2 * lineScale;
           ctx.save();
           ctx.strokeStyle = 'rgba(0,200,255,0.85)'; // cyan like backKickView
           ctx.lineWidth = lineW;
@@ -2861,8 +4541,8 @@
         }
         const groundY = sessionMetadata.ground_loc_y;
         if (showGroundLine && Number.isFinite(groundY)) {
-          const y = Math.max(0, Math.min(1, groundY)) * H;
-          const lineW = 2 * (manualZoomBounds ? (1 / Math.max(1 / Math.max((manualZoomBounds.rightX - manualZoomBounds.leftX), 1e-6), 1 / Math.max((manualZoomBounds.bottomY - manualZoomBounds.topY), 1e-6))) : 1);
+          const y = mapNormalizedPoseToDisplayPixels(0.5, Math.max(0, Math.min(1, groundY)), W, H)[1];
+          const lineW = 2 * lineScale;
           ctx.save();
           ctx.setLineDash([10, 5]); // dashed
           ctx.strokeStyle = 'rgba(255,200,0,0.85)'; // yellow/gold like backKickView
@@ -2873,7 +4553,15 @@
       }
 
       // Ball overlay if present
-      const bbox = ballData?.[idx]; if (bbox) { const [x1,y1,x2,y2] = bbox; const cx = ((x1+x2)/2)*W; const cy = ((y1+y2)/2)*H; const r  = ((x2-x1)*W)/2; ctx.strokeStyle='red'; ctx.lineWidth=2; ctx.beginPath(); ctx.arc(cx,cy,r,0,2*Math.PI); ctx.stroke(); }
+      const bbox = ballData?.[idx];
+      if (bbox) {
+        const [x1, y1, x2, y2] = bbox;
+        const [px1, py1] = mapNormalizedPoseToDisplayPixels(x1, y1, W, H);
+        const [px2, py2] = mapNormalizedPoseToDisplayPixels(x2, y2, W, H);
+        const cx = (px1 + px2) / 2, cy = (py1 + py2) / 2;
+        const r = Math.max(Math.abs(px2 - px1), Math.abs(py2 - py1)) / 2;
+        ctx.strokeStyle = 'red'; ctx.lineWidth = 2; ctx.beginPath(); ctx.arc(cx, cy, r, 0, 2 * Math.PI); ctx.stroke();
+      }
 
       // Draw mini pose selector
       drawMiniPoseSelector();
@@ -2881,13 +4569,8 @@
       // Torso midpoint (COM marker)
       const tm = torsoMidpointData?.[idx];
       if (showCOMLine && Array.isArray(tm) && Number.isFinite(tm[0]) && Number.isFinite(tm[1])) {
-        const x = tm[0] * W, y = tm[1] * H;
-        let scalePx = 1;
-        if (manualZoomBounds) {
-          const vw = manualZoomBounds.rightX - manualZoomBounds.leftX;
-          const vh = manualZoomBounds.bottomY - manualZoomBounds.topY;
-          scalePx = 1 / Math.max(1 / Math.max(vw, 1e-6), 1 / Math.max(vh, 1e-6));
-        }
+        const [x, y] = mapNormalizedPoseToDisplayPixels(tm[0], tm[1], W, H);
+        const scalePx = getRawVideoPoseDisplayScalePx();
         ctx.save();
         ctx.fillStyle = 'rgba(0,200,255,0.9)'; // cyan fill
         ctx.strokeStyle = 'rgba(255,255,255,0.9)'; // white stroke
@@ -2903,17 +4586,10 @@
       if (showCOMToGroundDistance && sessionMetadata && Array.isArray(tm) && Number.isFinite(tm[0]) && Number.isFinite(tm[1])) {
         const chestY = sessionMetadata.chest_starting_loc;
         if (Number.isFinite(chestY)) {
-          const xBar = tm[0] * W;
-          const yChest = Math.max(0, Math.min(1, chestY)) * H;
-          const yTorso = tm[1] * H;
-          const top = Math.min(yChest, yTorso);
-          const height = Math.abs(yTorso - yChest);
-          let scalePx = 1;
-          if (manualZoomBounds) {
-            const vw = manualZoomBounds.rightX - manualZoomBounds.leftX;
-            const vh = manualZoomBounds.bottomY - manualZoomBounds.topY;
-            scalePx = 1 / Math.max(1 / Math.max(vw, 1e-6), 1 / Math.max(vh, 1e-6));
-          }
+          const [xBar] = mapNormalizedPoseToDisplayPixels(tm[0], tm[1], W, H);
+          const yChest = mapNormalizedPoseToDisplayPixels(0, Math.max(0, Math.min(1, chestY)), W, H)[1];
+          const yTorso = mapNormalizedPoseToDisplayPixels(0, tm[1], W, H)[1];
+          const scalePx = getRawVideoPoseDisplayScalePx();
           ctx.save();
           ctx.strokeStyle = 'rgba(255,100,255,0.85)'; // magenta like backKickView
           ctx.lineWidth = 3 * scalePx;
@@ -2951,9 +4627,7 @@
         }
       }
 
-      if (manualZoomBounds) { restoreTransform(ctx); }
-
-      // Draw angle overlay in screen-space (after restoring transform)
+      // Draw angle overlay lines (world space, inside zoom transform)
       let angleHUDText = null;
       if (angleOverlay) {
         if (angleOverlay.type === 'line') {
@@ -2965,19 +4639,26 @@
           ctx.strokeStyle='yellow'; ctx.lineWidth=2; ctx.beginPath(); ctx.moveTo(x1,y1); ctx.lineTo(x2,y2); ctx.lineTo(x3,y3); ctx.stroke();
           angleHUDText = `${angleOverlay.ang.toFixed(1)}°`;
         }
-        if (angleHUDText) {
-          const poseContainerEl = document.querySelector('.pose-container');
-          const hudDom = document.getElementById('angleHudDom');
-          const isFs = document.fullscreenElement && poseContainerEl && (document.fullscreenElement === poseContainerEl || poseContainerEl.contains(document.fullscreenElement));
-          if (isFs && hudDom) {
-            hudDom.textContent = angleHUDText;
-            hudDom.style.display = 'block';
-            updateAngleHudPosition();
-          } else {
-            if (hudDom) hudDom.style.display = 'none';
-            // Draw in box at bottom-right when not in fullscreen
-            drawAngleHUD(ctx, W, H, angleHUDText, 'bottom-right');
-          }
+      }
+
+      // Restore zoom transform before drawing screen-space HUD elements
+      if (tx) {
+        restorePoseTransform(ctx);
+        _poseCanvasTransformActive = false;
+      }
+
+      // Draw angle HUD in screen space
+      if (angleHUDText) {
+        const poseContainerEl = document.querySelector('.pose-container');
+        const hudDom = document.getElementById('angleHudDom');
+        const isFs = document.fullscreenElement && poseContainerEl && (document.fullscreenElement === poseContainerEl || poseContainerEl.contains(document.fullscreenElement));
+        if (isFs && hudDom) {
+          hudDom.textContent = angleHUDText;
+          hudDom.style.display = 'block';
+          updateAngleHudPosition();
+        } else {
+          if (hudDom) hudDom.style.display = 'none';
+          drawAngleHUD(ctx, W, H, angleHUDText, 'bottom-right');
         }
       } else {
         const hudDom = document.getElementById('angleHudDom'); if (hudDom) hudDom.style.display = 'none';
@@ -2990,32 +4671,293 @@
       updateVerticalHeightDisplay();
     }
     
+    /** Chain order for indexed `filtered_average_2d_positions` frames (each entry is [x,y] normalized). */
+    const FILTERED_AVG_CHAIN_KEYS = ['ankle', 'knee', 'hip', 'shoulder', 'elbow', 'wrist'];
+
+    /**
+     * Normalize one frame from filtered_average_2d_positions.json to { ankle:[x,y], ... }.
+     * Supports: (1) indexed [[x,y],...] along FILTERED_AVG_CHAIN_KEYS, (2) legacy [["ankle",[x,y]],...].
+     */
+    function filteredAverageFrameToPositions(frameData) {
+      if (!frameData || !Array.isArray(frameData)) return null;
+      const positions = {};
+      const first = frameData[0];
+      if (frameData.length && Array.isArray(first) && typeof first[0] === 'string') {
+        frameData.forEach((pair) => {
+          if (!Array.isArray(pair) || pair.length < 2) return;
+          const [type, coords] = pair;
+          if (typeof type === 'string' && Array.isArray(coords) && coords.length >= 2 &&
+              Number.isFinite(coords[0]) && Number.isFinite(coords[1])) {
+            positions[type] = coords;
+          }
+        });
+        return Object.keys(positions).length ? positions : null;
+      }
+      for (let i = 0; i < frameData.length && i < FILTERED_AVG_CHAIN_KEYS.length; i++) {
+        const pt = frameData[i];
+        if (Array.isArray(pt) && pt.length >= 2 && Number.isFinite(pt[0]) && Number.isFinite(pt[1])) {
+          positions[FILTERED_AVG_CHAIN_KEYS[i]] = pt;
+        }
+      }
+      return Object.keys(positions).length ? positions : null;
+    }
+
+    /**
+     * Raw video pixel size for geometry (angles independent of pose canvas zoom).
+     */
+    function getAnalysisVideoPixelSize() {
+      const vw = (rawVideoEl && rawVideoEl.videoWidth) ? rawVideoEl.videoWidth : 1920;
+      const vh = (rawVideoEl && rawVideoEl.videoHeight) ? rawVideoEl.videoHeight : 1080;
+      return { vw: Math.max(1, vw), vh: Math.max(1, vh) };
+    }
+
+    function normFilteredToVideoPixels(pt, vw, vh) {
+      if (!pt || !Number.isFinite(pt[0]) || !Number.isFinite(pt[1])) return null;
+      return { x: pt[0] * vw, y: pt[1] * vh };
+    }
+
+    function angleAtVertexDegPx(p1, vertex, p2) {
+      if (!p1 || !vertex || !p2) return NaN;
+      const ax = p1.x - vertex.x, ay = p1.y - vertex.y;
+      const bx = p2.x - vertex.x, by = p2.y - vertex.y;
+      const mag = Math.hypot(ax, ay) * Math.hypot(bx, by);
+      if (mag < 1e-9) return NaN;
+      const dot = ax * bx + ay * by;
+      return toDeg(Math.acos(Math.max(-1, Math.min(1, dot / mag))));
+    }
+
+    /**
+     * Angle between shank (ankle→knee) and horizontal ground (same definition in video pixel space).
+     */
+    function angleShankToGroundDegPx(ankle, knee) {
+      if (!ankle || !knee) return NaN;
+      const vx = knee.x - ankle.x, vy = knee.y - ankle.y;
+      const mag = Math.hypot(vx, vy);
+      if (mag < 1e-9) return NaN;
+      return toDeg(Math.acos(Math.max(-1, Math.min(1, vx / mag))));
+    }
+
+    function distanceToClosedRangeDeg(v, minR, maxR) {
+      if (!Number.isFinite(v) || !Number.isFinite(minR) || !Number.isFinite(maxR)) return Infinity;
+      if (v < minR) return minR - v;
+      if (v > maxR) return v - maxR;
+      return 0;
+    }
+
+    /** Prefer θ or 180°−θ by whichever is nearer FULL_DEPTH_OPTIMAL_RANGES.ankle. */
+    function pickAnkleShankAngleNearerOptimal(rawDeg) {
+      if (!Number.isFinite(rawDeg)) return NaN;
+      const { min, max } = FULL_DEPTH_OPTIMAL_RANGES.ankle;
+      const complement = 180 - rawDeg;
+      const dRaw = distanceToClosedRangeDeg(rawDeg, min, max);
+      const dComp = distanceToClosedRangeDeg(complement, min, max);
+      return dComp < dRaw ? complement : rawDeg;
+    }
+
+    /**
+     * Five jump angles from one filtered_average frame using normalized coords × video W/H only.
+     * Order matches ANGLE_LABELS / joint_angles_key_frames.json.
+     */
+    function computeJumpAnglesFromFilteredFrameData(frameData) {
+      const positions = filteredAverageFrameToPositions(frameData);
+      if (!positions) return null;
+      const { ankle, knee, hip, shoulder, elbow, wrist } = positions;
+      if (![ankle, knee, hip, shoulder, elbow, wrist].every(p => p && Number.isFinite(p[0]) && Number.isFinite(p[1]))) return null;
+      const { vw, vh } = getAnalysisVideoPixelSize();
+      const A = normFilteredToVideoPixels(ankle, vw, vh);
+      const K = normFilteredToVideoPixels(knee, vw, vh);
+      const H = normFilteredToVideoPixels(hip, vw, vh);
+      const S = normFilteredToVideoPixels(shoulder, vw, vh);
+      const E = normFilteredToVideoPixels(elbow, vw, vh);
+      const Wrist = normFilteredToVideoPixels(wrist, vw, vh);
+      if (!A || !K || !H || !S || !E || !Wrist) return null;
+      const a0 = pickAnkleShankAngleNearerOptimal(angleShankToGroundDegPx(A, K));
+      const a1 = angleAtVertexDegPx(H, K, A);
+      const a2 = angleAtVertexDegPx(S, H, K);
+      const a3 = angleAtVertexDegPx(E, S, H);
+      const a4 = angleAtVertexDegPx(S, E, Wrist);
+      if (![a0, a1, a2, a3, a4].every(Number.isFinite)) return null;
+      return [a0, a1, a2, a3, a4];
+    }
+
+    /**
+     * @param {number} kfSlot - keyframe tab index 0..3 (Coil, Mid, Takeoff, Highest)
+     */
+    function getJointAnglesArrayForKeyFrameSlot(kfSlot) {
+      if (!Array.isArray(keyFramesData) || kfSlot < 0 || kfSlot >= keyFramesData.length) return null;
+      const frameIdx = Math.round(Number(keyFramesData[kfSlot]));
+      if (Number.isFinite(frameIdx) && Array.isArray(filteredAveragePositions) &&
+          frameIdx >= 0 && frameIdx < filteredAveragePositions.length) {
+        const computed = computeJumpAnglesFromFilteredFrameData(filteredAveragePositions[frameIdx]);
+        if (computed && computed.length === 5 && computed.every(Number.isFinite)) return computed;
+      }
+      if (jointAnglesKeyFrames && jointAnglesKeyFrames[kfSlot] != null) {
+        const angles = jointAnglesKeyFrames[kfSlot];
+        const arr = Array.isArray(angles) ? angles : [angles[0], angles[1], angles[2], angles[3], angles[4]];
+        if (arr.length >= 5 && arr.slice(0, 5).every(v => v != null && Number.isFinite(Number(v)))) {
+          const out = arr.slice(0, 5).map(Number);
+          if (Number.isFinite(out[0])) out[0] = pickAnkleShankAngleNearerOptimal(out[0]);
+          return out;
+        }
+      }
+      return null;
+    }
+
+    /** Analysis phases use jointAnglesKeyFrames indices 0 (coil) and 2 (takeoff). */
+    function getJointAnglesForPhaseIndex(phaseIndex) {
+      const kfSlot = phaseIndex === 0 ? 0 : phaseIndex === 2 ? 2 : null;
+      if (kfSlot === null) return null;
+      return getJointAnglesArrayForKeyFrameSlot(kfSlot);
+    }
+
+    /** Canvas stroke colors aligned with .analysis-angle-close / moderate / large */
+    const STATUS_QUALITY_COLORS = {
+      close: 'rgba(76, 175, 80, 0.95)',
+      moderate: 'rgba(255, 193, 7, 0.95)',
+      large: 'rgba(244, 67, 54, 0.95)',
+      neutral: 'rgba(180, 180, 180, 0.9)'
+    };
+
+    function qualityColorForStatus(status) {
+      if (status === 'close') return STATUS_QUALITY_COLORS.close;
+      if (status === 'moderate') return STATUS_QUALITY_COLORS.moderate;
+      if (status === 'large') return STATUS_QUALITY_COLORS.large;
+      return STATUS_QUALITY_COLORS.neutral;
+    }
+
+    /** Map filtered chain key name → FULL_DEPTH_OPTIMAL_RANGES id (or null if no range / N/A). */
+    const FILTERED_KEYPOINT_METRIC_ID = {
+      ankle: 'ankle',
+      knee: 'knee',
+      hip: 'hip',
+      shoulder: 'shoulder',
+      elbow: null,
+      wrist: null
+    };
+
+    function getFullDepthQualityStatusForMetric(metricId, angleDeg) {
+      if (!metricId) return 'neutral';
+      const spec = FULL_DEPTH_OPTIMAL_RANGES[metricId];
+      if (!spec) return 'neutral';
+      if (!Number.isFinite(angleDeg)) return 'neutral';
+      return getRangeStatus(angleDeg, spec.min, spec.max, FULL_DEPTH_CLOSE_BUFFER_DEG);
+    }
+
+    function isFrameIndexAnyKeyframe(frameIdx) {
+      if (!Array.isArray(keyFramesData)) return false;
+      return keyFramesData.some((kf) => Number.isFinite(Number(kf)) && Math.round(Number(kf)) === frameIdx);
+    }
+
+    /**
+     * Frame index when takeoff analysis pauses (same as startAnalysisPlayback / takeoffFrame(): keyFramesData[2] + 5, clamped).
+     */
+    function getTakeoffAnalysisDisplayFrameIdx() {
+      const dataLen = Array.isArray(poseData2D) ? poseData2D.length : 0;
+      if (dataLen < 1) return null;
+      const base = Array.isArray(keyFramesData) && keyFramesData[2] != null && Number.isFinite(Number(keyFramesData[2]))
+        ? Math.round(Number(keyFramesData[2])) : null;
+      if (base === null) return null;
+      return Math.min(dataLen - 1, Math.max(0, base + 5));
+    }
+
+    /**
+     * Analysis overlay: full-depth uses per-limb green/yellow/red from joint-angle zones; takeoff stays amber.
+     * @param {object} [opts]
+     * @param {boolean} [opts.useFullDepthQuality]
+     * @param {boolean} [opts.keyframeThick] — thicker lines at keyframe indices
+     */
+    function drawFilteredPositionsOverlayAnalysis(ctx, W, H, frameIdx, scalePx = 1, opts) {
+      const useFullDepthQuality = opts && opts.useFullDepthQuality;
+      const keyframeThick = opts && opts.keyframeThick;
+      if (!filteredAveragePositions || !Array.isArray(filteredAveragePositions)) return;
+      if (frameIdx < 0 || frameIdx >= filteredAveragePositions.length) return;
+      const frameData = filteredAveragePositions[frameIdx];
+      const positions = filteredAverageFrameToPositions(frameData);
+      if (!positions) return;
+
+      const angles = computeJumpAnglesFromFilteredFrameData(frameData);
+      const thickMul = keyframeThick ? 1.65 : 1;
+      const baseW = (4 * scalePx * thickMul);
+
+      const connections = [
+        { start: 'ankle', end: 'knee', metricId: 'ankle' },
+        { start: 'knee', end: 'hip', metricId: 'knee' },
+        { start: 'hip', end: 'shoulder', metricId: 'hip' },
+        { start: 'shoulder', end: 'elbow', metricId: 'shoulder' },
+        { start: 'elbow', end: 'wrist', metricId: null }
+      ];
+
+      ctx.save();
+      ctx.globalAlpha = useFullDepthQuality ? 0.92 : 0.85;
+      ctx.setLineDash([]);
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+
+      connections.forEach(({ start, end, metricId }) => {
+        const p1 = positions[start], p2 = positions[end];
+        if (!p1 || !p2) return;
+        let strokeStyle = 'rgba(230, 168, 23, 0.9)';
+        if (useFullDepthQuality) {
+          if (angles && metricId) {
+            const idxMap = { ankle: 0, knee: 1, hip: 2, shoulder: 3 };
+            const ai = idxMap[metricId];
+            const st = getFullDepthQualityStatusForMetric(metricId, angles[ai]);
+            strokeStyle = qualityColorForStatus(st);
+          } else {
+            strokeStyle = angles ? STATUS_QUALITY_COLORS.neutral : 'rgba(230, 168, 23, 0.9)';
+          }
+        }
+        ctx.strokeStyle = strokeStyle;
+        ctx.lineWidth = baseW;
+        const [x1, y1] = mapNormalizedPoseToDisplayPixels(p1[0], p1[1], W, H);
+        const [x2, y2] = mapNormalizedPoseToDisplayPixels(p2[0], p2[1], W, H);
+        ctx.beginPath();
+        ctx.moveTo(x1, y1);
+        ctx.lineTo(x2, y2);
+        ctx.stroke();
+      });
+
+      const jointR = (6 * scalePx * (keyframeThick ? 1.2 : 1));
+      FILTERED_AVG_CHAIN_KEYS.forEach((key) => {
+        const pos = positions[key];
+        if (!pos) return;
+        let fillStyle = 'rgba(245, 200, 66, 0.9)';
+        if (useFullDepthQuality && angles) {
+          const mid = FILTERED_KEYPOINT_METRIC_ID[key];
+          if (mid) {
+            const idxMap = { ankle: 0, knee: 1, hip: 2, shoulder: 3 };
+            const st = getFullDepthQualityStatusForMetric(mid, angles[idxMap[mid]]);
+            fillStyle = qualityColorForStatus(st);
+          } else {
+            fillStyle = STATUS_QUALITY_COLORS.neutral;
+          }
+        }
+        ctx.fillStyle = fillStyle;
+        const [x, y] = mapNormalizedPoseToDisplayPixels(pos[0], pos[1], W, H);
+        ctx.beginPath();
+        ctx.arc(x, y, jointR, 0, Math.PI * 2);
+        ctx.fill();
+      });
+
+      ctx.restore();
+    }
+
     /**
      * Draw filtered average 2D positions as overlay (simplified skeleton)
-     * Format: (time_step, keypoint_type, coordinate)
-     * Keypoint types: ankle, knee, hip, shoulder, elbow, wrist (5 types, 2 sides = 10 points)
+     * @param {number} [lineWidthMul] — multiply base width (e.g. thicker at keyframes)
      */
-    function drawFilteredPositionsOverlay(ctx, W, H, frameIdx, scalePx = 1) {
+    function drawFilteredPositionsOverlay(ctx, W, H, frameIdx, scalePx = 1, lineWidthMul = 1) {
       if (!filteredAveragePositions || !Array.isArray(filteredAveragePositions)) return;
       if (frameIdx < 0 || frameIdx >= filteredAveragePositions.length) return;
       
       const frameData = filteredAveragePositions[frameIdx];
-      if (!frameData || !Array.isArray(frameData)) return;
-      
-      // frameData format: [[keypoint_type, [x, y]], ...]
-      // Expected keypoint types: ankle, knee, hip, shoulder, elbow, wrist
-      // Map to positions
-      const positions = {};
-      frameData.forEach(([type, coords]) => {
-        if (Array.isArray(coords) && coords.length >= 2) {
-          positions[type] = coords;
-        }
-      });
+      const positions = filteredAverageFrameToPositions(frameData);
+      if (!positions) return;
       
       ctx.save();
       ctx.globalAlpha = 0.7;
       ctx.strokeStyle = 'rgba(255, 100, 255, 0.9)'; // Magenta for filtered
-      ctx.lineWidth = (3.5 * scalePx);
+      ctx.lineWidth = (3.5 * scalePx * lineWidthMul);
       ctx.setLineDash([5, 3]);
       
       // Draw connections between filtered points
@@ -3031,9 +4973,11 @@
         const p1 = positions[start];
         const p2 = positions[end];
         if (p1 && p2) {
+          const [x1, y1] = mapNormalizedPoseToDisplayPixels(p1[0], p1[1], W, H);
+          const [x2, y2] = mapNormalizedPoseToDisplayPixels(p2[0], p2[1], W, H);
           ctx.beginPath();
-          ctx.moveTo(p1[0] * W, p1[1] * H);
-          ctx.lineTo(p2[0] * W, p2[1] * H);
+          ctx.moveTo(x1, y1);
+          ctx.lineTo(x2, y2);
           ctx.stroke();
         }
       });
@@ -3043,8 +4987,9 @@
       ctx.setLineDash([]);
       Object.values(positions).forEach(pos => {
         if (pos) {
+          const [x, y] = mapNormalizedPoseToDisplayPixels(pos[0], pos[1], W, H);
           ctx.beginPath();
-          ctx.arc(pos[0] * W, pos[1] * H, 5 * scalePx, 0, Math.PI * 2);
+          ctx.arc(x, y, 5 * scalePx, 0, Math.PI * 2);
           ctx.fill();
         }
       });
@@ -3053,6 +4998,7 @@
     }
 
     function stepFrame(dir) {
+      if (analysisMode || annotationMode) return;
       const dataLength = currentView === '3D' ? (poseData ? poseData.length : 0) : (poseData2D ? poseData2D.length : 0);
       currentFrame = Math.min(Math.max(0, currentFrame + dir), Math.max(0, dataLength - 1));
       const poseFrameSlider = document.getElementById('poseFrameSlider');
@@ -3062,6 +5008,7 @@
       drawPose(currentFrame);
     }
     function togglePlayPause() { 
+      if (analysisMode || annotationMode) return;
       const btn = document.getElementById('playPauseBtn'); 
       isPlaying = !isPlaying; 
       if (isPlaying) { 
@@ -3074,13 +5021,13 @@
       } 
     }
     function resetZoomPan() {
-      manualZoomBounds = null;
-      panOffsetX = 0;
-      panOffsetY = 0;
+      poseManualZoomBounds = null;
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
+      poseZoomCenterX = 0.5;
+      poseZoomCenterY = 0.5;
       isZoomSelecting = false;
       isPanning = false;
-      zoomCenterX = 0.5;
-      zoomCenterY = 0.5;
     }
     function resetView() {
       resetZoomPan();
@@ -3091,6 +5038,7 @@
         currentFrame = 0;
       }
       drawPose(currentFrame);
+      try { drawRawFrameToCanvas(); } catch (_) {}
       updateFrameNumberDisplay();
     }
 
@@ -3112,7 +5060,7 @@
           return;
         }
         // In fullscreen, place just above controls, dynamically based on controls height
-        const controls=poseContainerEl.querySelector('.nav-buttons');
+        const controls=poseContainerEl.querySelector('#poseYtBar, .yt-bar, .nav-buttons');
         if(!controls){
           hudDom.style.top='';
           hudDom.style.transform='';
@@ -3144,10 +5092,61 @@
     poseCanvas.addEventListener('click', e => {
       const rect = poseCanvas.getBoundingClientRect(); const clickX = e.clientX - rect.left; const clickY = e.clientY - rect.top; const W = poseCanvas.clientWidth; const H = poseCanvas.clientHeight;
 
+      if (annotationMode && (annotationPhase === 'full_depth' || annotationPhase === 'takeoff') && poseData2D && poseData2D.length) {
+        const phase = annotationPhase;
+        const frame = normalizePoseFrame(poseData2D[currentFrame]) || [];
+        if (frame.length) {
+          const edges = (poseType == 17) ? COCO17_EDGES : POSE_CONNECTIONS;
+          if (annotationTool === 'position_diff_limbs' || annotationTool === 'red_limbs') {
+            let bestLimb = null, bestDistSq = 400;
+            edges.forEach(([a, b]) => {
+              const p1 = frame[a], p2 = frame[b];
+              if (!p1 || !p2) return;
+              const m1 = mapPosePointToCanvas(p1[0], p1[1], W, H);
+              const m2 = mapPosePointToCanvas(p2[0], p2[1], W, H);
+              const ax = m1[0], ay = m1[1], bx = m2[0], by = m2[1];
+              const abx = bx - ax, aby = by - ay;
+              const apx = clickX - ax, apy = clickY - ay;
+              const t = Math.max(0, Math.min(1, (apx * abx + apy * aby) / (abx * abx + aby * aby + 1e-9)));
+              const cx = ax + t * abx, cy = ay + t * aby;
+              const dx = clickX - cx, dy = clickY - cy;
+              const d2 = dx * dx + dy * dy;
+              if (d2 < bestDistSq) { bestDistSq = d2; bestLimb = { joints: [a, b] }; }
+            });
+            if (bestLimb) {
+              const arr = annotationTool === 'position_diff_limbs' ? annotationData[phase].position_diff_limbs : annotationData[phase].red_limbs;
+              const idx = arr.findIndex(l => (l.joints[0] === bestLimb.joints[0] && l.joints[1] === bestLimb.joints[1]));
+              if (idx >= 0) arr.splice(idx, 1);
+              else arr.push(bestLimb);
+              markAnnotationDirty();
+              drawPose(currentFrame);
+              updateAnnotationSaveBtnState();
+            }
+            return;
+          }
+          if (annotationTool === 'info_circles') {
+            let hitJoint = null, bestDistSq = 225;
+            frame.forEach((p, idx) => {
+              if (!p) return;
+              const m = mapPosePointToCanvas(p[0], p[1], W, H);
+              const dx = clickX - m[0], dy = clickY - m[1];
+              if (dx * dx + dy * dy < bestDistSq) { bestDistSq = dx * dx + dy * dy; hitJoint = idx; }
+            });
+            if (hitJoint != null) {
+              annotationData[phase].info_circles.push({ type: 'joint', joint_index: hitJoint, position: null, text: '' });
+              markAnnotationDirty();
+              drawPose(currentFrame);
+              updateAnnotationSaveBtnState();
+            }
+            return;
+          }
+        }
+      }
+
       // Handle zoom center selection
       if (isSelectingZoomCenter) {
-        zoomCenterX = clickX / W;
-        zoomCenterY = clickY / H;
+        poseZoomCenterX = clickX / W;
+        poseZoomCenterY = clickY / H;
         isSelectingZoomCenter = false;
         poseCanvas.style.cursor = '';
         const prompt = document.getElementById('alignPrompt');
@@ -3159,20 +5158,27 @@
         // Now perform initial zoom centered on selected point
         const f = 0.8;
         const halfW = 0.1 * f, halfH = 0.1 * f;
-        manualZoomBounds = {
-          leftX: Math.max(0, zoomCenterX - halfW),
-          rightX: Math.min(1, zoomCenterX + halfW),
-          topY: Math.max(0, zoomCenterY - halfH),
-          bottomY: Math.min(1, zoomCenterY + halfH)
+        poseManualZoomBounds = {
+          leftX: Math.max(0, poseZoomCenterX - halfW),
+          rightX: Math.min(1, poseZoomCenterX + halfW),
+          topY: Math.max(0, poseZoomCenterY - halfH),
+          bottomY: Math.min(1, poseZoomCenterY + halfH)
         };
-        panOffsetX = 0; panOffsetY = 0;
+        posePanOffsetX = 0;
+        posePanOffsetY = 0;
         drawPose(currentFrame);
         return;
       }
 
       if (overlayAlignMode && Array.isArray(poseData2D) && poseData2D.length) {
         const frame = poseData2D[currentFrame] || []; let bestIdx = null; let bestDistSq = Infinity;
-        frame.forEach((kp, idx) => { if (!kp) return; const cx = kp[0]*W, cy = kp[1]*H; const dx = cx - clickX, dy = cy - clickY; const d2 = dx*dx + dy*dy; if (d2 < bestDistSq) { bestDistSq = d2; bestIdx = idx; } });
+        frame.forEach((kp, idx) => {
+          if (!kp) return;
+          const m = mapPosePointToCanvas(kp[0], kp[1], W, H);
+          const dx = m[0] - clickX, dy = m[1] - clickY;
+          const d2 = dx * dx + dy * dy;
+          if (d2 < bestDistSq) { bestDistSq = d2; bestIdx = idx; }
+        });
         if (bestIdx != null) {
           overlayAlignJointIndex = bestIdx; if (overlayPoseData && overlayPoseData.length) {
             const i2 = Math.max(0, Math.min(currentFrame + overlayFrameShift, overlayPoseData.length - 1));
@@ -3227,32 +5233,59 @@
       });
     }
 
-    // Zoom/Pan mouse events
+    // Zoom/Pan mouse events (same normalized bounds + pan as raw video canvas)
     poseCanvas.addEventListener("mousedown", (e) => {
-      if (isSelectingZoomCenter) return; // Don't start selection during zoom center mode
+      if (isSelectingZoomCenter) return;
       const rect = poseCanvas.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-      if (e.button === 0) { isZoomSelecting = true; zoomStartX = x; zoomStartY = y; zoomCurrentX = x; zoomCurrentY = y; }
-      else if (e.button === 2) { e.preventDefault(); isZoomSelecting = false; isPanning = true; panStartX = x; panStartY = y; }
+      if (e.button === 0 && !poseManualZoomBounds) {
+        isZoomSelecting = true; zoomStartX = x; zoomStartY = y; zoomCurrentX = x; zoomCurrentY = y;
+      } else if (e.button === 2) {
+        e.preventDefault();
+        if (!poseManualZoomBounds) return;
+        isZoomSelecting = false;
+        isPanning = true;
+        panStartX = e.clientX;
+        panStartY = e.clientY;
+        poseCanvas.style.cursor = 'grabbing';
+      }
     });
     poseCanvas.addEventListener("mousemove", (e) => {
       const rect = poseCanvas.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top;
-      if (isZoomSelecting) { zoomCurrentX = x; zoomCurrentY = y; try { drawPose(currentFrame); } catch (e) {} }
-      else if (e.buttons === 2 && isPanning) { e.preventDefault(); const deltaX = (x - panStartX) / poseCanvas.clientWidth; const deltaY = (y - panStartY) / poseCanvas.clientHeight; panOffsetX -= deltaX; panOffsetY -= deltaY; panStartX = x; panStartY = y; try { drawPose(currentFrame); } catch (e) {} }
+      if (isZoomSelecting) { zoomCurrentX = x; zoomCurrentY = y; try { drawPose(currentFrame); } catch (err) {} }
+      else if (e.buttons === 2 && isPanning && poseManualZoomBounds) {
+        e.preventDefault();
+        const dx = e.clientX - panStartX;
+        const dy = e.clientY - panStartY;
+        panStartX = e.clientX;
+        panStartY = e.clientY;
+        const Wc = poseCanvas.clientWidth, Hc = poseCanvas.clientHeight;
+        const viewWidthN = poseManualZoomBounds.rightX - poseManualZoomBounds.leftX;
+        const viewHeightN = poseManualZoomBounds.bottomY - poseManualZoomBounds.topY;
+        posePanOffsetX -= (dx / Wc) * viewWidthN;
+        posePanOffsetY -= (dy / Hc) * viewHeightN;
+        try { drawPose(currentFrame); } catch (err) {}
+      }
     });
     poseCanvas.addEventListener("mouseup", (e) => {
       const rect = poseCanvas.getBoundingClientRect(); const x = e.clientX - rect.left; const y = e.clientY - rect.top;
       if (e.button === 0 && isZoomSelecting) {
-        isZoomSelecting = false; const leftX = Math.min(zoomStartX, x) / poseCanvas.clientWidth; const rightX = Math.max(zoomStartX, x) / poseCanvas.clientWidth; const topY = Math.min(zoomStartY, y) / poseCanvas.clientHeight; const bottomY = Math.max(zoomStartY, y) / poseCanvas.clientHeight;
-        const widthPx = Math.abs(x - zoomStartX); const heightPx = Math.abs(y - zoomStartY); const minSize = 20;
-        if (widthPx >= minSize && heightPx >= minSize) {
-          const canvasAspect = poseCanvas.clientWidth / poseCanvas.clientHeight; const selectionAspect = widthPx / heightPx;
-          let finalLeftX = leftX, finalRightX = rightX, finalTopY = topY, finalBottomY = bottomY;
-          if (selectionAspect > canvasAspect) { const centerX = (leftX + rightX) / 2; const targetWidth = (bottomY - topY) * canvasAspect; finalLeftX = centerX - targetWidth / 2; finalRightX = centerX + targetWidth / 2; }
-          else { const centerY = (topY + bottomY) / 2; const targetHeight = (rightX - leftX) / canvasAspect; finalTopY = centerY - targetHeight / 2; finalBottomY = centerY + targetHeight / 2; }
-          manualZoomBounds = { leftX: finalLeftX, rightX: finalRightX, topY: finalTopY, bottomY: finalBottomY }; panOffsetX = 0; panOffsetY = 0; try { drawPose(currentFrame); } catch (e) {}
-        } else { try { drawPose(currentFrame); } catch (e) {} }
+        isZoomSelecting = false;
+        const W = poseCanvas.clientWidth, H = poseCanvas.clientHeight;
+        const leftX = Math.min(zoomStartX, x) / W;
+        const rightX = Math.max(zoomStartX, x) / W;
+        const topY = Math.min(zoomStartY, y) / H;
+        const bottomY = Math.max(zoomStartY, y) / H;
+        const minSize = 0.05;
+        if ((rightX - leftX) > minSize && (bottomY - topY) > minSize) {
+          poseManualZoomBounds = enforceSquareBounds({ leftX, rightX, topY, bottomY });
+          posePanOffsetX = 0;
+          posePanOffsetY = 0;
+          poseZoomCenterX = (leftX + rightX) / 2;
+          poseZoomCenterY = (topY + bottomY) / 2;
+          try { drawPose(currentFrame); } catch (err) {}
+        } else { try { drawPose(currentFrame); } catch (err) {} }
       }
-      if (e.button === 2 && isPanning) { isPanning = false; }
+      if (e.button === 2 && isPanning) { isPanning = false; poseCanvas.style.cursor = ''; }
     });
     poseCanvas.addEventListener("contextmenu", (e) => { e.preventDefault(); });
 
@@ -3264,6 +5297,10 @@
       if (perfDashLink && playerParam) {
         perfDashLink.href = `kickingview.html?player=${encodeURIComponent(playerParam)}`;
       }
+      if (urlParams.get('userType') === 'coach') {
+        const w = document.getElementById('annotateJumpBtnWrapper');
+        if (w) w.style.display = '';
+      }
       
       // Hide mini pose selector by default
       const miniPoseSelector=document.getElementById('miniPoseSelector');
@@ -3273,9 +5310,189 @@
       document.getElementById('prevBtn').onclick      = () => { stepFrame(-1); updateFrameNumberDisplay(); };
       document.getElementById('nextBtn').onclick      = () => { stepFrame(1); updateFrameNumberDisplay(); };
       document.getElementById('playPauseBtn').onclick = () => { togglePlayPause(); };
-      document.getElementById('zoomInBtn').onclick    = () => { zoomIn(); };
-      document.getElementById('zoomOutBtn').onclick   = () => { zoomOut(); };
+      document.getElementById('zoomInBtn').onclick    = () => { poseZoomIn(); };
+      document.getElementById('zoomOutBtn').onclick   = () => { poseZoomOut(); };
       document.getElementById('resetViewBtn').onclick = () => { resetView(); };
+
+      const analyzeJumpBtn = document.getElementById('analyzeJumpBtn');
+      if (analyzeJumpBtn) analyzeJumpBtn.onclick = enterAnalysisMode;
+      const annotateJumpBtn = document.getElementById('annotateJumpBtn');
+      if (annotateJumpBtn) annotateJumpBtn.onclick = enterAnnotationMode;
+
+      const analysisStartBtn = document.getElementById('analysisStartBtn');
+      if (analysisStartBtn) {
+        analysisStartBtn.onclick = (e) => {
+          e.stopPropagation();
+          if (annotationMode) startAnnotationPlayback();
+          else startAnalysisPlayback();
+        };
+      }
+
+      const analysisContinueBtn = document.getElementById('analysisContinueBtn');
+      const dataLen = () => (poseData2D ? poseData2D.length : 0);
+      const fullDepthFrame = () => keyFramesData && keyFramesData[0] != null ? Math.round(Number(keyFramesData[0])) : null;
+      const takeoffFrame = () => {
+        const base = keyFramesData && keyFramesData[2] != null ? Math.round(Number(keyFramesData[2])) : null;
+        return base != null ? Math.min(dataLen() - 1, Math.max(0, base + 5)) : null;
+      };
+      const frameDelay = () => Math.max(20, Math.round(baseFrameDelay / (SPEED_OPTIONS[poseSpeedIdx] || 1)));
+
+      if (analysisContinueBtn) {
+        analysisContinueBtn.onclick = () => {
+          if (annotationMode) {
+            const textarea = document.getElementById('annotationAnalysisTextarea');
+            if (annotationPhase === 'full_depth') {
+              annotationData.full_depth.analysis_text = textarea?.value || '';
+              document.getElementById('analysisFeedbackPanel').style.display = 'none';
+              document.querySelector('.pose-container')?.classList.remove('analysis-feedback-visible');
+              document.getElementById('annotationToolbar').style.display = 'none';
+              poseManualZoomBounds = null; posePanOffsetX = 0; posePanOffsetY = 0;
+              drawPose(currentFrame);
+              annotationPhase = 'playing-to-takeoff';
+              analysisPhase = 'playing-to-takeoff';
+              const tf = takeoffFrame();
+              analysisInterval = setInterval(() => {
+                analysisStepFrame();
+                if (Number.isFinite(tf) && currentFrame >= tf) {
+                  clearInterval(analysisInterval); analysisInterval = null;
+                  analysisPhase = 'takeoff'; annotationPhase = 'takeoff';
+                  currentFrame = Math.min(tf, Math.max(0, dataLen() - 1));
+                  drawPose(currentFrame);
+                  showAnnotationPanel('takeoff');
+                } else if (currentFrame >= dataLen() - 1) {
+                  clearInterval(analysisInterval); analysisInterval = null; analysisPhase = 'done';
+                }
+              }, 100);
+            } else if (annotationPhase === 'takeoff') {
+              annotationData.takeoff.analysis_text = textarea?.value || '';
+              showKeyTakeawaysAnnotationPanel();
+            }
+            return;
+          }
+          if (analysisPhase === 'full_depth') {
+            document.getElementById('analysisFeedbackPanel').style.display = 'none';
+            document.querySelector('.pose-container')?.classList.remove('analysis-feedback-visible');
+            poseManualZoomBounds = null; posePanOffsetX = 0; posePanOffsetY = 0;
+            drawPose(currentFrame);
+            analysisPhase = 'playing-to-takeoff';
+            const tf = takeoffFrame();
+            analysisInterval = setInterval(() => {
+              analysisStepFrame();
+              if (Number.isFinite(tf) && currentFrame >= tf) {
+                clearInterval(analysisInterval); analysisInterval = null;
+                analysisPhase = 'takeoff';
+                currentFrame = Math.min(tf, Math.max(0, dataLen() - 1));
+                drawPose(currentFrame);
+                showFeedbackPanel('takeoff');
+              } else if (currentFrame >= dataLen() - 1) {
+                clearInterval(analysisInterval); analysisInterval = null; analysisPhase = 'done';
+              }
+            }, 100);
+          } else if (analysisPhase === 'takeoff' || analysisPhase === 'done') {
+            const tf = takeoffFrame();
+            const endFrame = Math.min(dataLen() - 1, Math.round(tf || 0) + 100);
+            if (currentFrame >= endFrame) {
+              if (jumpAnalysisData?.key_takeaways && jumpAnalysisData.key_takeaways.trim()) {
+                document.getElementById('keyTakeawaysText').textContent = jumpAnalysisData.key_takeaways;
+                document.getElementById('keyTakeawaysOverlay').style.display = 'flex';
+              } else {
+                exitAnalysisMode();
+              }
+              return;
+            }
+            document.getElementById('analysisFeedbackPanel').style.display = 'none';
+            document.querySelector('.pose-container')?.classList.remove('analysis-feedback-visible');
+            analysisPhase = 'playing-to-end';
+            analysisInterval = setInterval(() => {
+              analysisStepFrame();
+              if (currentFrame >= endFrame) {
+                clearInterval(analysisInterval); analysisInterval = null;
+                if (jumpAnalysisData?.key_takeaways && jumpAnalysisData.key_takeaways.trim()) {
+                  document.getElementById('keyTakeawaysText').textContent = jumpAnalysisData.key_takeaways;
+                  document.getElementById('keyTakeawaysOverlay').style.display = 'flex';
+                } else {
+                  exitAnalysisMode();
+                }
+              }
+            }, frameDelay());
+          }
+        };
+      }
+
+      document.getElementById('keyTakeawaysCloseBtn')?.addEventListener('click', () => {
+        document.getElementById('keyTakeawaysOverlay').style.display = 'none';
+        exitAnalysisMode();
+      });
+
+      document.getElementById('annotationToolPositionDiff')?.addEventListener('click', () => {
+        annotationTool = 'position_diff_limbs';
+        document.querySelectorAll('.annotation-tool-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('annotationToolPositionDiff')?.classList.add('active');
+      });
+      document.getElementById('annotationToolRedLimbs')?.addEventListener('click', () => {
+        annotationTool = 'red_limbs';
+        document.querySelectorAll('.annotation-tool-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('annotationToolRedLimbs')?.classList.add('active');
+      });
+      document.getElementById('annotationToolInfoCircles')?.addEventListener('click', () => {
+        annotationTool = 'info_circles';
+        document.querySelectorAll('.annotation-tool-btn').forEach(b => b.classList.remove('active'));
+        document.getElementById('annotationToolInfoCircles')?.classList.add('active');
+      });
+
+      ['fullscreenchange','webkitfullscreenchange','msfullscreenchange'].forEach(evt => {
+        document.addEventListener(evt, () => {
+          if (analysisMode || annotationMode) {
+            const fsEl = document.fullscreenElement || document.webkitFullscreenElement || document.msFullscreenElement;
+            if (!fsEl) {
+              if (analysisInterval) { clearInterval(analysisInterval); analysisInterval = null; }
+              analysisMode = false; analysisPhase = 'idle';
+              annotationMode = false; annotationPhase = 'idle';
+              document.querySelector('.pose-container')?.classList.remove('analysis-active');
+              document.querySelector('.pose-container')?.classList.remove('analysis-feedback-visible');
+              document.getElementById('analysisHeader').style.display = 'none';
+              document.getElementById('analysisStartOverlay').style.display = 'none';
+              document.getElementById('analysisFeedbackPanel').style.display = 'none';
+              document.getElementById('annotationToolbar').style.display = 'none';
+              document.getElementById('keyTakeawaysOverlay').style.display = 'none';
+              const h = document.getElementById('analysisHeader');
+              if (h) h.textContent = 'Analyzing Jumping Technique';
+              drawPose(currentFrame);
+            }
+          }
+        });
+      });
+
+      // Expand/collapse settings panels (SideKickView-style)
+      const rawCtrlPanel = document.getElementById('rawCtrlPanel');
+      const poseCtrlPanel = document.getElementById('poseCtrlPanel');
+      const rawExpandBtn = document.getElementById('rawExpandBtn');
+      const poseExpandBtn = document.getElementById('poseExpandBtn');
+      const rawCollapseBtn = document.getElementById('rawCollapseBtn');
+      const poseCollapseBtn = document.getElementById('poseCollapseBtn');
+
+      if (rawExpandBtn && rawCtrlPanel) {
+        rawExpandBtn.addEventListener('click', () => rawCtrlPanel.classList.toggle('open'));
+      }
+      if (poseExpandBtn && poseCtrlPanel) {
+        poseExpandBtn.addEventListener('click', () => poseCtrlPanel.classList.toggle('open'));
+      }
+      if (rawCollapseBtn && rawCtrlPanel) {
+        rawCollapseBtn.addEventListener('click', () => rawCtrlPanel.classList.remove('open'));
+      }
+      if (poseCollapseBtn && poseCtrlPanel) {
+        poseCollapseBtn.addEventListener('click', () => poseCtrlPanel.classList.remove('open'));
+      }
+      document.addEventListener('click', (evt) => {
+        const target = evt.target;
+        if (!(target instanceof Element)) return;
+        if (rawCtrlPanel && rawCtrlPanel.classList.contains('open') && !rawCtrlPanel.contains(target) && (!rawExpandBtn || !rawExpandBtn.contains(target))) {
+          rawCtrlPanel.classList.remove('open');
+        }
+        if (poseCtrlPanel && poseCtrlPanel.classList.contains('open') && !poseCtrlPanel.contains(target) && (!poseExpandBtn || !poseExpandBtn.contains(target))) {
+          poseCtrlPanel.classList.remove('open');
+        }
+      });
       
       // Toggle mini pose selector
       document.getElementById('toggleMiniPoseBtn').onclick=()=>{
@@ -3524,6 +5741,7 @@
       const poseFrameSliderValue = document.getElementById('poseFrameSliderValue');
       if (poseFrameSlider) {
         poseFrameSlider.addEventListener('input', () => {
+          if (analysisMode || annotationMode) return;
           const newFrame = parseInt(poseFrameSlider.value, 10);
           if (newFrame !== currentFrame) {
             currentFrame = newFrame;
@@ -3537,7 +5755,8 @@
       const rawSpeedSlider = document.getElementById('rawSpeedSlider');
       const rawSpeedValue = document.getElementById('rawSpeedValue');
       if (rawSpeedSlider) {
-        // Initialize display
+        // Initialize display and sync slider with rawSpeedIdx
+        rawSpeedSlider.value = String(rawSpeedIdx);
         if (rawSpeedValue) rawSpeedValue.textContent = SPEED_OPTIONS[rawSpeedIdx] + 'x';
         
         rawSpeedSlider.addEventListener('input', () => {
@@ -3656,7 +5875,7 @@
     rawPrevBtn.onclick = () => { rawCurrentFrame = Math.max(0, rawCurrentFrame - 1); seekAndDraw(frameIdxToTime(rawCurrentFrame)); rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`; const rawFrameSlider = document.getElementById('rawFrameSlider'); const rawFrameSliderValue = document.getElementById('rawFrameSliderValue'); if (rawFrameSlider) rawFrameSlider.value = rawCurrentFrame.toString(); if (rawFrameSliderValue) rawFrameSliderValue.textContent = rawCurrentFrame.toString(); };
     rawNextBtn.onclick = () => { rawCurrentFrame = Math.min(rawMaxFrame, rawCurrentFrame + 1); seekAndDraw(frameIdxToTime(rawCurrentFrame)); rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`; const rawFrameSlider = document.getElementById('rawFrameSlider'); const rawFrameSliderValue = document.getElementById('rawFrameSliderValue'); if (rawFrameSlider) rawFrameSlider.value = rawCurrentFrame.toString(); if (rawFrameSliderValue) rawFrameSliderValue.textContent = rawCurrentFrame.toString(); };
 
-  document.getElementById('rawRestartBtn').onclick = () => { if (rawIsPlaying) { stopRawPlaybackCleanup(); rawIsPlaying = false; document.getElementById('rawPlayPauseBtn').textContent = '▶'; } rawCurrentFrame = 0; rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`; seekAndDraw(0); rawResetZoomPan(); drawRawFrameToCanvas(); const rawFrameSlider = document.getElementById('rawFrameSlider'); const rawFrameSliderValue = document.getElementById('rawFrameSliderValue'); if (rawFrameSlider) rawFrameSlider.value = '0'; if (rawFrameSliderValue) rawFrameSliderValue.textContent = '0'; };
+  document.getElementById('rawRestartBtn').onclick = () => { if (rawIsPlaying) { stopRawPlaybackCleanup(); rawIsPlaying = false; document.getElementById('rawPlayPauseBtn').textContent = '▶'; } rawCurrentFrame = 0; rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`; seekAndDraw(0); rawResetZoomPan(); drawRawFrameToCanvas(); try { drawPose(currentFrame); } catch (_) {} const rawFrameSlider = document.getElementById('rawFrameSlider'); const rawFrameSliderValue = document.getElementById('rawFrameSliderValue'); if (rawFrameSlider) rawFrameSlider.value = '0'; if (rawFrameSliderValue) rawFrameSliderValue.textContent = '0'; };
   const playBtn = document.getElementById('rawPlayPauseBtn');
   const showPoseBtn  = document.getElementById('rawShowPoseBtn');
   playBtn.onclick = () => { rawIsPlaying = !rawIsPlaying; if (rawIsPlaying) { playBtn.textContent = '⏸'; restartPlayTimer(); } else { playBtn.textContent = '▶'; stopRawPlaybackCleanup(); } };
@@ -3672,6 +5891,7 @@
     rawVideoEl.addEventListener('loadeddata', () => {
       const loadingIndicator = document.getElementById('videoLoadingIndicator');
       if (loadingIndicator) loadingIndicator.style.display = 'none';
+      updateAnalyzeJumpButtonState();
     });
     
     rawVideoEl.addEventListener('waiting', () => {
@@ -3685,10 +5905,16 @@
     rawVideoEl.addEventListener('canplay', () => {
       const loadingIndicator = document.getElementById('videoLoadingIndicator');
       if (loadingIndicator) loadingIndicator.style.display = 'none';
+      updateAnalyzeJumpButtonState();
+    });
+
+    rawVideoEl.addEventListener('error', () => {
+      updateAnalyzeJumpButtonState();
     });
     
     rawVideoEl.addEventListener('loadedmetadata', () => {
       rawDuration = rawVideoEl.duration || 0; rawCurrentFrame = 0;
+      try { rawVideoEl.playbackRate = SPEED_OPTIONS[rawSpeedIdx] || 1; } catch {}
       try { const src = rawVideoEl.currentSrc || ''; const m = src.match(/_(\d{2})\.mov/i); if (m) frameStepSec = 1 / parseInt(m[1], 10); } catch {}
       recalcTiming(); sizeRawCanvas(); seekAndDraw(0); rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
       const rawFrameSlider = document.getElementById('rawFrameSlider');
@@ -3725,6 +5951,7 @@
         rawPanOffsetX = 0;
         rawPanOffsetY = 0;
         drawRawFrameToCanvas();
+        try { drawPose(currentFrame); } catch (_) {}
         return;
       }
 
@@ -3809,11 +6036,13 @@
         rawPanOffsetX -= (dx / W) * viewWidthN;
         rawPanOffsetY -= (dy / H) * viewHeightN;
         drawRawFrameToCanvas();
+        try { drawPose(currentFrame); } catch (_) {}
       } else if (rawIsZoomSelecting) {
         const rect = rawCanvas.getBoundingClientRect();
         rawZoomCurrentX = e.clientX - rect.left;
         rawZoomCurrentY = e.clientY - rect.top;
         drawRawFrameToCanvas();
+        try { drawPose(currentFrame); } catch (_) {}
       }
     });
 
@@ -3836,6 +6065,7 @@
           rawZoomCenterX = (leftX + rightX) / 2;
           rawZoomCenterY = (topY + bottomY) / 2;
           drawRawFrameToCanvas();
+          try { drawPose(currentFrame); } catch (_) {}
         }
       }
     });
@@ -3868,11 +6098,69 @@
           poseData2D = poseData.map(frame => normalizePoseFrame(frame, true));
         }
       } catch (e) { console.error('Failed to load pose.json:', e); }
+      updateAnalyzeJumpButtonState();
     }
 
-    function zoomIn() {
-      if (!manualZoomBounds) {
-        // First zoom: prompt user to select center
+    function enforceSquareBounds(bounds) {
+      if (!bounds) return bounds;
+      const w = bounds.rightX - bounds.leftX;
+      const h = bounds.bottomY - bounds.topY;
+      const size = Math.max(w, h);
+      const clampedSize = Math.min(size, 1);
+      const cx = (bounds.leftX + bounds.rightX) / 2;
+      const cy = (bounds.topY + bounds.bottomY) / 2;
+      const safeCx = Math.max(clampedSize / 2, Math.min(1 - clampedSize / 2, cx));
+      const safeCy = Math.max(clampedSize / 2, Math.min(1 - clampedSize / 2, cy));
+      return {
+        leftX: safeCx - clampedSize / 2,
+        rightX: safeCx + clampedSize / 2,
+        topY: safeCy - clampedSize / 2,
+        bottomY: safeCy + clampedSize / 2
+      };
+    }
+
+    function computeAutoZoomFromFrame(frame, opts) {
+      const { margin = 0.15, minWidth = 0.15, minHeight = 0.15 } = (opts || {});
+      if (!Array.isArray(frame) || frame.length === 0) return null;
+      let minX = Infinity, minY = Infinity, maxX = -Infinity, maxY = -Infinity, found = false;
+      frame.forEach(p => {
+        if (!p) return;
+        const x = p[0], y = p[1];
+        if (!Number.isFinite(x) || !Number.isFinite(y)) return;
+        found = true;
+        if (x < minX) minX = x;
+        if (y < minY) minY = y;
+        if (x > maxX) maxX = x;
+        if (y > maxY) maxY = y;
+      });
+      if (!found) return null;
+      const w = Math.max(minWidth, (maxX - minX) * (1 + margin));
+      const h = Math.max(minHeight, (maxY - minY) * (1 + margin));
+      const cx = (minX + maxX) / 2;
+      const cy = (minY + maxY) / 2;
+      const leftX = Math.max(0, Math.min(1 - w, cx - w / 2));
+      const topY = Math.max(0, Math.min(1 - h, cy - h / 2));
+      return enforceSquareBounds({ leftX, rightX: leftX + w, topY, bottomY: topY + h });
+    }
+
+    function poseZoomIn() {
+      if (!poseManualZoomBounds) {
+        // Auto-zoom to the pose figure at the current frame when possible
+        try {
+          let auto = null;
+          const frame = poseData2D?.[currentFrame] || [];
+          if (Array.isArray(frame) && frame.some(p => p)) {
+            auto = computeAutoZoomFromFrame(frame, { margin: 0.22, minWidth: 0.14, minHeight: 0.14 });
+          }
+          if (auto) {
+            poseManualZoomBounds = auto;
+            posePanOffsetX = 0;
+            posePanOffsetY = 0;
+            drawPose(currentFrame);
+            return;
+          }
+        } catch (e) {}
+        // Fallback: prompt user to select center if no pose data available
         isSelectingZoomCenter = true;
         const prompt = document.getElementById('alignPrompt');
         if (prompt) {
@@ -3883,35 +6171,52 @@
         poseCanvas.style.cursor = 'crosshair';
         return;
       }
-      // Subsequent zooms: use stored center
-      const cx = zoomCenterX;
-      const cy = zoomCenterY;
-      const w = manualZoomBounds.rightX - manualZoomBounds.leftX;
-      const h = manualZoomBounds.bottomY - manualZoomBounds.topY;
-      const f = 0.8;
-      manualZoomBounds = { leftX: cx - (w * f) / 2, rightX: cx + (w * f) / 2, topY: cy - (h * f) / 2, bottomY: cy + (h * f) / 2 };
-      panOffsetX = 0; panOffsetY = 0;
+      // Subsequent zooms: incorporate pan offset into center, then shrink bounds
+      const currentCenterX = (poseManualZoomBounds.leftX + poseManualZoomBounds.rightX) / 2 + posePanOffsetX;
+      const currentCenterY = (poseManualZoomBounds.topY + poseManualZoomBounds.bottomY) / 2 + posePanOffsetY;
+      const currentWidth = poseManualZoomBounds.rightX - poseManualZoomBounds.leftX;
+      const currentHeight = poseManualZoomBounds.bottomY - poseManualZoomBounds.topY;
+      const zoomFactor = 0.8;
+      const newWidth = currentWidth * zoomFactor;
+      const newHeight = currentHeight * zoomFactor;
+      poseManualZoomBounds = {
+        leftX: currentCenterX - newWidth / 2,
+        rightX: currentCenterX + newWidth / 2,
+        topY: currentCenterY - newHeight / 2,
+        bottomY: currentCenterY + newHeight / 2
+      };
+      posePanOffsetX = 0;
+      posePanOffsetY = 0;
       drawPose(currentFrame);
     }
-    function zoomOut() {
-      if (!manualZoomBounds) { return; }
-      const cx = zoomCenterX; const cy = zoomCenterY;
-      const w = manualZoomBounds.rightX - manualZoomBounds.leftX;
-      const h = manualZoomBounds.bottomY - manualZoomBounds.topY;
-      const f = 1.25;
-      const newW = Math.min(1, w * f);
-      const newH = Math.min(1, h * f);
-      if (newW >= 0.95 || newH >= 0.95) {
-        manualZoomBounds = null; panOffsetX = 0; panOffsetY = 0; zoomCenterX = 0.5; zoomCenterY = 0.5;
+    function poseZoomOut() {
+      if (!poseManualZoomBounds) { return; }
+      const currentCenterX = (poseManualZoomBounds.leftX + poseManualZoomBounds.rightX) / 2 + posePanOffsetX;
+      const currentCenterY = (poseManualZoomBounds.topY + poseManualZoomBounds.bottomY) / 2 + posePanOffsetY;
+      const currentSize = poseManualZoomBounds.rightX - poseManualZoomBounds.leftX;
+      const zoomFactor = 1.25;
+      const newSize = Math.min(1, currentSize * zoomFactor);
+      if (newSize >= 0.95) {
+        poseManualZoomBounds = null;
+        posePanOffsetX = 0;
+        posePanOffsetY = 0;
+        poseZoomCenterX = 0.5;
+        poseZoomCenterY = 0.5;
       } else {
-        manualZoomBounds = { leftX: Math.max(0, cx - newW / 2), rightX: Math.min(1, cx + newW / 2), topY: Math.max(0, cy - newH / 2), bottomY: Math.min(1, cy + newH / 2) };
-        panOffsetX = 0; panOffsetY = 0;
+        poseManualZoomBounds = enforceSquareBounds({
+          leftX: currentCenterX - newSize / 2,
+          rightX: currentCenterX + newSize / 2,
+          topY: currentCenterY - newSize / 2,
+          bottomY: currentCenterY + newSize / 2
+        });
+        posePanOffsetX = 0;
+        posePanOffsetY = 0;
       }
       drawPose(currentFrame);
     }
 
   // ===== Mini Pose Keypoints Preview =====
-  // Tracks which keypoint is currently highlighted (0-4, or null)
+  // Tracks which keypoint is currently highlighted (0-5 chain index, or null)
   let highlightedKeypointIdx = null;
   // Store drawn keypoint positions for click detection
   let drawnKeypointPositions = [];
@@ -3919,8 +6224,8 @@
   /**
    * Draw filtered_average_2d_positions for the currently selected keyframe.
    * - Only draws if a keyframe is selected (currentKeyFrame !== null)
-   * - Draws 5 keypoints connected 0->1, 1->2, etc.
-   * - Clicking a keypoint highlights it and the corresponding angle row
+   * - Draws up to 6 chain keypoints (ankle→wrist) connected in order
+   * - Clicking a keypoint highlights it and the corresponding angle row (first five map to angles)
    */
   function drawMiniPoseKeypointsPreview() {
     const c = document.getElementById('miniPoseKeypointsCanvas');
@@ -3980,7 +6285,7 @@
     }
 
     const frameData = filteredAveragePositions[frameIdx];
-    if (!frameData || !Array.isArray(frameData) || frameData.length < 5) {
+    if (!frameData || !Array.isArray(frameData) || frameData.length < 2) {
       ctx.save();
       ctx.fillStyle = 'rgba(255,255,255,0.5)';
       ctx.font = '13px sans-serif';
@@ -3991,19 +6296,26 @@
       return;
     }
 
-    // Extract keypoint positions (expecting 5 keypoints)
-    // Format: array of [x, y] pairs (normalized 0-1)
+    const posMap = filteredAverageFrameToPositions(frameData);
+    if (!posMap) {
+      ctx.save();
+      ctx.fillStyle = 'rgba(255,255,255,0.5)';
+      ctx.font = '13px sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText('Unrecognized filtered-average format', W / 2, H / 2);
+      ctx.restore();
+      return;
+    }
     const keypoints = [];
-    for (let i = 0; i < Math.min(5, frameData.length); i++) {
-      const pt = frameData[i];
-      if (Array.isArray(pt) && pt.length >= 2 && Number.isFinite(pt[0]) && Number.isFinite(pt[1])) {
-        keypoints.push({ x: pt[0], y: pt[1] });
-      } else {
-        keypoints.push(null);
-      }
+    for (let i = 0; i < FILTERED_AVG_CHAIN_KEYS.length; i++) {
+      const k = FILTERED_AVG_CHAIN_KEYS[i];
+      const pt = posMap[k];
+      if (pt && pt.length >= 2) keypoints.push({ x: pt[0], y: pt[1] });
+      else keypoints.push(null);
     }
 
-    // Draw connecting lines (0->1, 1->2, 2->3, 3->4)
+    // Draw connecting lines along chain
     ctx.save();
     ctx.strokeStyle = 'rgba(255,255,255,0.7)';
     ctx.lineWidth = 3;
@@ -4021,8 +6333,8 @@
     ctx.restore();
 
     // Draw keypoints
-    const keypointColors = ['#ff6b6b', '#fbbf24', '#34d399', '#7dd3fc', '#a78bfa']; // ankle, knee, hip, shoulder, elbow
-    const keypointLabels = ['Ankle', 'Knee', 'Hip', 'Shoulder', 'Elbow'];
+    const keypointColors = ['#ff6b6b', '#fbbf24', '#34d399', '#7dd3fc', '#a78bfa', '#f472b6'];
+    const keypointLabels = ['Ankle', 'Knee', 'Hip', 'Shoulder', 'Elbow', 'Wrist'];
     const radius = 12;
     const highlightRadius = 16;
 

@@ -2025,6 +2025,7 @@
         // Premium content lock: grays out specific sections and shows a lock icon
         // Players default to locked (must explicitly have premium_content_locked=false to unlock).
         // Coaches default to unlocked (must explicitly have premium_content_locked=true to lock).
+        // When premium does not apply, feedback_form_needed can lock the same sections (players only).
         async function applyPremiumLock(playerDocId) {
             if (!playerDocId) return;
             try {
@@ -2032,17 +2033,22 @@
                 if (!playerDoc.exists) return;
                 const data = playerDoc.data();
                 const locked = data.premium_content_locked;
+                const feedbackNeeded = data.feedback_form_needed === true;
+                let shouldPremiumLock;
                 if (isCoach) {
-                    if (locked !== true) return;
+                    shouldPremiumLock = locked === true;
                 } else {
-                    if (locked === false) return;
+                    shouldPremiumLock = locked !== false;
                 }
+                const shouldFeedbackLock = !isCoach && feedbackNeeded === true;
+                if (!shouldPremiumLock && !shouldFeedbackLock) return;
 
                 const urlParamsForLock = new URLSearchParams(window.location.search);
                 const urlUserTypeForLock = urlParamsForLock.get('userType');
+                const lockMode = shouldPremiumLock ? 'premium' : 'feedback';
 
                 function addSectionLock(el, label, sentFrom) {
-                    if (!el) return;
+                    if (!el || el.classList.contains('premium-section-locked')) return;
                     el.classList.add('premium-section-locked');
                     const overlay = document.createElement('div');
                     overlay.className = 'lock-overlay';
@@ -2050,24 +2056,33 @@
                     if (urlUserTypeForLock === 'player') {
                         const btn = document.createElement('a');
                         btn.className = 'unlock-btn';
-                        btn.textContent = 'Unlock Features';
-                        btn.href = 'premiumInfo.html?player=' + encodeURIComponent(playerDocId) + '&sentFrom=' + encodeURIComponent(sentFrom);
+                        if (lockMode === 'premium') {
+                            btn.textContent = 'Unlock Features';
+                            btn.href = 'premiumInfo.html?player=' + encodeURIComponent(playerDocId) + '&sentFrom=' + encodeURIComponent(sentFrom);
+                        } else {
+                            btn.textContent = 'Complete feedback form';
+                            btn.href = 'feedbackForm.html?player=' + encodeURIComponent(playerDocId) + '&userType=player&previousPage=' + encodeURIComponent((window.location.pathname.split('/').pop() || '') + (window.location.search || ''));
+                        }
                         overlay.appendChild(btn);
                     }
                     el.appendChild(overlay);
                 }
 
+                const premiumLabel = 'Premium Content';
+                const feedbackLabel = 'Complete feedback form';
+                const label = lockMode === 'premium' ? premiumLabel : feedbackLabel;
+
                 // Physical Profile — lock only the pose canvas area
-                addSectionLock(document.querySelector('#physicalProfileCard .pose-visual'), 'Premium Content', 'profilePoseViewer');
+                addSectionLock(document.querySelector('#physicalProfileCard .pose-visual'), label, 'profilePoseViewer');
 
                 // 3. Player Snapshot — lock only the info-grid
-                addSectionLock(document.getElementById('snapshotInfoGrid'), 'Premium Content', 'profileSnapshot');
+                addSectionLock(document.getElementById('snapshotInfoGrid'), label, 'profileSnapshot');
 
                 // 4. Assigned Drills — lock only the tasks container
-                addSectionLock(document.getElementById('tasksContainer'), 'Premium Content', 'profileDrills');
+                addSectionLock(document.getElementById('tasksContainer'), label, 'profileDrills');
 
                 // 5. IDP — lock only the idp content area
-                addSectionLock(document.getElementById('idpContent'), 'Premium Content', 'profileIDP');
+                addSectionLock(document.getElementById('idpContent'), label, 'profileIDP');
 
             } catch (err) {
                 console.error('[PremiumLock] Error checking premium lock:', err);

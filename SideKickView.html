@@ -595,6 +595,18 @@
     transform: translateY(0) scale(0.98);
     box-shadow: 0 2px 8px rgba(230,168,23,0.3);
   }
+  #analyzeKickBtn:disabled {
+    opacity: 0.45;
+    cursor: not-allowed;
+    filter: grayscale(0.4);
+    box-shadow: none;
+    transform: none;
+  }
+  #analyzeKickBtn:disabled:hover {
+    transform: none;
+    filter: grayscale(0.4);
+    box-shadow: none;
+  }
 
   /* Repetition pills */
   .reps-bar { gap: .5rem; }
@@ -782,13 +794,11 @@
   }
   :fullscreen .yt-progress-wrapper:hover input[type="range"] { height: 5px; }
   :fullscreen .yt-progress-wrapper input[type="range"]::-webkit-slider-thumb {
-    width: 0; height: 0;
-    transition: width 0.15s ease, height 0.15s ease;
-  }
-  :fullscreen .yt-progress-wrapper:hover input[type="range"]::-webkit-slider-thumb {
     width: 13px; height: 13px;
     background: #fff;
     box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+    border-radius: 50%;
+    cursor: pointer;
   }
   :fullscreen .yt-bar-controls { padding: 2px 12px 10px; gap: 6px; }
   :fullscreen .yt-bar-btn { width: 34px; height: 34px; }
@@ -1769,7 +1779,7 @@
       </div>
 
       <div id="analyzeKickBtnWrapper" style="position:relative;">
-        <button id="analyzeKickBtn" class="analyze-kick-btn">⚡ Analyze Kick</button>
+        <button type="button" id="analyzeKickBtn" class="analyze-kick-btn" disabled aria-disabled="true">⚡ Analyze Kick</button>
       </div>
       <div id="annotateKickBtnWrapper" style="position:relative; display:none;">
         <button id="annotateKickBtn" class="analyze-kick-btn" style="background:linear-gradient(135deg,#f59e0b,#d97706);">&#x270F; Annotate Kicking Analysis</button>
@@ -2230,6 +2240,7 @@
           const t = rawVideoEl.currentTime || 0;
           rawCurrentFrame = timeToFrameIdx(t);
           rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+          syncRawSlider();
           drawRawFrameToCanvas();
           // Stop at end
           const duration = rawDuration || rawVideoEl.duration || 0;
@@ -2252,6 +2263,7 @@
           const t = rawVideoEl.currentTime || 0;
           rawCurrentFrame = timeToFrameIdx(t);
           rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+          syncRawSlider();
           drawRawFrameToCanvas();
         };
         rawVideoEl.addEventListener('timeupdate', rawTimeHandler);
@@ -2264,6 +2276,7 @@
         const t = rawVideoEl.currentTime || 0;
         rawCurrentFrame = timeToFrameIdx(t);
         rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+        syncRawSlider();
         drawRawFrameToCanvas();
       }, Math.max(20, Math.round(baseIntervalMs / (SPEED_OPTIONS[rawSpeedIdx]||1))));
     }
@@ -2955,10 +2968,12 @@
       try {
         const pDoc = await db.collection('players').doc(playerDocId).get();
         if (!pDoc.exists) return;
-        const locked = pDoc.data().premium_content_locked;
-        const shouldLock = isCoach ? (locked === true) : (locked !== false);
-        if (!shouldLock) return;
-        function addLock(el, label, sentFrom) {
+        const d = pDoc.data();
+        const locked = d.premium_content_locked;
+        const feedbackNeeded = d.feedback_form_needed === true;
+        const shouldPremiumLock = isCoach ? (locked === true) : (locked !== false);
+        const shouldFeedbackLock = !isCoach && feedbackNeeded === true;
+        function addPremiumLock(el, label, sentFrom) {
           if (!el || el.classList.contains('premium-section-locked')) return;
           el.classList.add('premium-section-locked');
           const ov = document.createElement('div');
@@ -2973,8 +2988,28 @@
           }
           el.appendChild(ov);
         }
-        addLock(document.querySelector('.pose-container'), 'Pose viewer only available for premium members', 'sideKickPoseViewer');
-        addLock(document.getElementById('analyzeKickBtnWrapper'), 'Analysis only available for premium members', 'sideKickAnalysis');
+        function addFeedbackLock(el, label) {
+          if (!el || el.classList.contains('premium-section-locked')) return;
+          el.classList.add('premium-section-locked');
+          const ov = document.createElement('div');
+          ov.className = 'lock-overlay';
+          ov.innerHTML = '<span class="material-symbols-outlined">lock</span><span>' + (label || 'Complete feedback form') + '</span>';
+          if (userType === 'player') {
+            const btn = document.createElement('a');
+            btn.className = 'unlock-btn';
+            btn.textContent = 'Complete feedback form';
+            btn.href = 'feedbackForm.html?player=' + encodeURIComponent(playerDocId) + '&userType=player&previousPage=' + encodeURIComponent((window.location.pathname.split('/').pop() || '') + (window.location.search || ''));
+            ov.appendChild(btn);
+          }
+          el.appendChild(ov);
+        }
+        if (shouldPremiumLock) {
+          addPremiumLock(document.querySelector('.pose-container'), 'Pose viewer only available for premium members', 'sideKickPoseViewer');
+          addPremiumLock(document.getElementById('analyzeKickBtnWrapper'), 'Analysis only available for premium members', 'sideKickAnalysis');
+        } else if (shouldFeedbackLock) {
+          addFeedbackLock(document.querySelector('.pose-container'), 'Complete feedback form');
+          addFeedbackLock(document.getElementById('analyzeKickBtnWrapper'), 'Complete feedback form');
+        }
       } catch (e) { /* console.error('[PremiumLock] Error:', e); */ }
     }
 
@@ -3105,7 +3140,37 @@
 
     function clearAllCanvases(){ const poseCanvas=document.getElementById('poseCanvas'); const rawVideoEl=document.getElementById('rawVideo'); const rawCanvas=document.getElementById('rawFrameCanvas'); if(poseCanvas){ const ctx=poseCanvas.getContext('2d'); const W=poseCanvas.width, H=poseCanvas.height; ctx.clearRect(0,0,W,H); ctx.fillStyle='#1a3a2e'; ctx.fillRect(0,0,W,H); } if(rawVideoEl){ rawVideoEl.pause(); rawVideoEl.src=''; rawVideoEl.load(); } if(rawCanvas){ const ctx=rawCanvas.getContext('2d'); ctx.clearRect(0,0,rawCanvas.width,rawCanvas.height); ctx.fillStyle='#1a3a2e'; ctx.fillRect(0,0,rawCanvas.width,rawCanvas.height); } }
 
+    /**
+     * Kicking analysis needs ball_trajectory.json timing (backswing = transition_frame, contact).
+     * Contact may also come from ball_information.json — same as startAnalysisPlayback.
+     */
+    function ballTrajectoryReadyForKickingAnalysis() {
+      if (!ballTrajectory || typeof ballTrajectory !== 'object') return false;
+      const trans = ballTrajectory.transition_frame;
+      if (!Number.isFinite(Number(trans))) return false;
+      const cf = Number(ballTrajectory?.contact_frame ?? ballInfo?.contact_frame);
+      return Number.isFinite(cf);
+    }
+
+    function updateAnalyzeKickButtonState() {
+      const btn = document.getElementById('analyzeKickBtn');
+      if (!btn) return;
+      const videoEl = document.getElementById('rawVideo');
+      const poseReady = Array.isArray(poseData) && poseData.length > 0;
+      const videoReady = !!(videoEl && videoEl.src && !videoEl.error && videoEl.readyState >= 2);
+      const trajectoryReady = ballTrajectoryReadyForKickingAnalysis();
+      const ready = poseReady && videoReady && trajectoryReady;
+      btn.disabled = !ready;
+      btn.setAttribute('aria-disabled', ready ? 'false' : 'true');
+    }
+
     async function loadAllForCurrentRep() {
+      const analyzeKickBtnPre = document.getElementById('analyzeKickBtn');
+      if (analyzeKickBtnPre) {
+        analyzeKickBtnPre.disabled = true;
+        analyzeKickBtnPre.setAttribute('aria-disabled', 'true');
+      }
+      ballTrajectory = null;
       clearAllCanvases();
       playerFootPathPts = null;
       await loadDeadballShotVideo(); // will use rep path if present, otherwise fallback
@@ -3124,6 +3189,7 @@
       // redraw current pose frame with whatever just loaded
       /* console.log('[LoadAll] Complete. origBall:', origBall, 'ballTrajectory:', ballTrajectory); */
       drawPose(currentFrame);
+      updateAnalyzeKickButtonState();
     }
 
     async function loadKickAnalysis() {
@@ -3209,16 +3275,12 @@
           ? [`${player}/deadballShot/${session}/${currentKickId}/ball_trajectory.json`]
           : [`${player}/deadballShot/${session}/ball_trajectory.json`];
         ballTrajectory = await fetchJSONFromCandidates(candidates);
-        console.log('[BallTrajectory] Loaded:', ballTrajectory);
-        console.log('[BallTrajectory] contact_frame:', ballTrajectory?.contact_frame);
-        console.log('[BallTrajectory] transition_frame:', ballTrajectory?.transition_frame);
-        console.log('[BallTrajectory] t_values length:', ballTrajectory?.t_values?.length);
-        console.log('[BallTrajectory] x_values length:', ballTrajectory?.x_values?.length);
-        console.log('[BallTrajectory] y_values length:', ballTrajectory?.y_values?.length);
+        console.log('[SideKick] ball_trajectory.json loaded:', ballTrajectory);
       } catch (err) {
-        console.warn('No ball_trajectory.json found:', err);
+        console.warn('[SideKick] ball_trajectory.json failed to load:', err);
         ballTrajectory = null;
       }
+      updateAnalyzeKickButtonState();
     }
 
     async function populateOverlayRepSelect() {
@@ -3525,10 +3587,62 @@
       return out;
     }
 
+    function getBallCenterNormalized(origBallBox) {
+      if (!origBallBox || origBallBox.length < 4) return null;
+      const [x1, y1, x2, y2] = origBallBox;
+      if (!Number.isFinite(x1) || !Number.isFinite(y1) || !Number.isFinite(x2) || !Number.isFinite(y2)) return null;
+      return [(x1 + x2) / 2, (y1 + y2) / 2];
+    }
+
+    /** Mean ankle/foot position in normalized space for one side (same indices as foot path). */
+    function footCentroidForSide(fr, pType, footSide) {
+      if (!fr) return null;
+      const foot = String(footSide).toLowerCase();
+      const footIndices = pType === 17 ? (foot === 'left' ? [15] : [16]) : (foot === 'left' ? [27, 29, 31] : [28, 30, 32]);
+      const validPts = footIndices.map(ki => fr[ki]).filter(p => p && Number.isFinite(p[0]) && Number.isFinite(p[1]));
+      if (validPts.length === 0) return null;
+      const mx = validPts.reduce((s, p) => s + p[0], 0) / validPts.length;
+      const my = validPts.reduce((s, p) => s + p[1], 0) / validPts.length;
+      return [mx, my];
+    }
+
+    /**
+     * At backswing, pick left vs right by whichever foot centroid is farther from orig_ball center.
+     * Returns 'left' | 'right' | null (null if tie or missing data).
+     */
+    function getFootPathStrikeSideFromBallDistance(pType, backswingFrame, origBallBox, poseArr) {
+      const bc = getBallCenterNormalized(origBallBox);
+      if (!bc || !poseArr?.length || !Number.isFinite(backswingFrame)) return null;
+      const idx = Math.min(Math.max(0, Math.round(backswingFrame)), poseArr.length - 1);
+      const fr = normalizePoseFrame(poseArr[idx]);
+      if (!fr || !fr.some(p => p)) return null;
+      const leftC = footCentroidForSide(fr, pType, 'left');
+      const rightC = footCentroidForSide(fr, pType, 'right');
+      if (!leftC || !rightC) return null;
+      const dl = Math.hypot(leftC[0] - bc[0], leftC[1] - bc[1]);
+      const dr = Math.hypot(rightC[0] - bc[0], rightC[1] - bc[1]);
+      if (Math.abs(dl - dr) < 1e-6) return null;
+      return dl > dr ? 'left' : 'right';
+    }
+
+    /**
+     * Foot path uses strike-foot side: smart pick (farther from ball at backswing + orig_ball) when available,
+     * else Firestore strike_foot.
+     */
+    function resolveFootPathStrikeSide() {
+      const transFrame = ballTrajectory?.transition_frame != null ? Math.round(Number(ballTrajectory.transition_frame)) : null;
+      if (Number.isFinite(transFrame) && origBall && poseData?.length) {
+        const smart = getFootPathStrikeSideFromBallDistance(poseType, transFrame, origBall, poseData);
+        if (smart) return smart;
+      }
+      return firestoreRepData?.strikeFoot ? String(firestoreRepData.strikeFoot).toLowerCase() : null;
+    }
+
     function computePlayerFootPath() {
       playerFootPathPts = null;
-      if (!poseData?.length || !firestoreRepData?.strikeFoot) {
-        console.log('[FootPath] Player: skipped (poseData=', !!poseData?.length, 'strikeFoot=', firestoreRepData?.strikeFoot, ')');
+      const foot = resolveFootPathStrikeSide();
+      if (!poseData?.length || !foot) {
+        console.log('[FootPath] Player: skipped (poseData=', !!poseData?.length, 'resolvedFoot=', foot, ')');
         return;
       }
       const transFrame = ballTrajectory?.transition_frame != null ? Math.round(Number(ballTrajectory.transition_frame)) : null;
@@ -3542,7 +3656,6 @@
         console.log('[FootPath] Player: skipped (transFrame=', transFrame, '> endFrame=', endFrame, ')');
         return;
       }
-      const foot = firestoreRepData.strikeFoot.toLowerCase();
       const footIndices = poseType === 17 ? (foot === 'left' ? [15] : [16]) : (foot === 'left' ? [27, 29, 31] : [28, 30, 32]);
       const footPts = [];
       for (let fi = transFrame; fi <= endFrame; fi++) {
@@ -3566,8 +3679,9 @@
 
     function computeProFootPath() {
       proFootPathPts = null;
-      if (!proPoseData?.length || !proBallTrajectory || !firestoreRepData?.strikeFoot) {
-        console.log('[FootPath] Pro: skipped (proPoseData=', !!proPoseData?.length, 'proBallTrajectory=', !!proBallTrajectory, 'strikeFoot=', firestoreRepData?.strikeFoot, ')');
+      const footSide = resolveFootPathStrikeSide();
+      if (!proPoseData?.length || !proBallTrajectory || !footSide) {
+        console.log('[FootPath] Pro: skipped (proPoseData=', !!proPoseData?.length, 'proBallTrajectory=', !!proBallTrajectory, 'resolvedFoot=', footSide, ')');
         return;
       }
       let proTransFrame = proBallTrajectory.transition_frame != null ? Math.round(Number(proBallTrajectory.transition_frame)) : null;
@@ -3589,7 +3703,7 @@
         console.log('[FootPath] Pro: skipped (proTransFrame=', proTransFrame, '> proEndFrame=', proEndFrame, ')');
         return;
       }
-      const foot = firestoreRepData.strikeFoot.toLowerCase();
+      const foot = footSide;
       const proFootIndices = poseType === 17 ? (foot === 'left' ? [15] : [16]) : (foot === 'left' ? [27, 29, 31] : [28, 30, 32]);
       const proFootPts = [];
       for (let pfi = proTransFrame; pfi <= proEndFrame; pfi++) {
@@ -3708,6 +3822,99 @@
       const dir = computeLocalDirection(smooth, 5);
       if (!dir) return null;
       return -Math.atan2(dir.dy, dir.dx) * 180 / Math.PI;
+    }
+
+    /** Mirror pose about vertical center (normalized x → 1 − x) for pro overlay when player faces the opposite way. */
+    function mirrorPoseFrameX(fr) {
+      if (!fr || !Array.isArray(fr)) return fr;
+      return fr.map(p => (p && Number.isFinite(p[0]) && Number.isFinite(p[1])) ? [1 - p[0], p[1]] : (p || null));
+    }
+
+    function mirrorFootPathPtsX(pts) {
+      if (!pts || !pts.length) return pts;
+      return pts.map(p => (p && Number.isFinite(p.x)) ? { ...p, x: 1 - p.x } : p);
+    }
+
+    /** Spatial align offset was computed in unmirrored pro space; adjust when mirroring pro about x. */
+    function adjustProAlignOffsetForMirror(alignOff, proPlantOriginal) {
+      if (!alignOff || !proPlantOriginal || !Number.isFinite(proPlantOriginal[0])) return alignOff;
+      return { dx: alignOff.dx + 2 * proPlantOriginal[0] - 1, dy: alignOff.dy };
+    }
+
+    /**
+     * True if the player moves right → left in frame (decreasing normalized x along approach).
+     * Uses ballTrajectory.direction if set, else strike-foot path, else ball trajectory x vs frame.
+     */
+    function isPlayerMovingRightToLeft() {
+      try {
+        const bt = ballTrajectory;
+        if (!bt) return false;
+        const d = bt.direction;
+        if (d != null && d !== '') {
+          const s = String(d).toLowerCase().replace(/[_\s-]/g, '');
+          if (s === 'rtl' || s === 'righttoleft' || s === 'negx' || d === -1) return true;
+          if (s === 'ltr' || s === 'lefttoright' || d === 1) return false;
+        }
+        if (playerFootPathPts && playerFootPathPts.length >= 2) {
+          const cf = Number(bt?.contact_frame ?? ballInfo?.contact_frame ?? 0);
+          const approach = playerFootPathPts.filter(p => p.i <= cf);
+          if (approach.length >= 2) {
+            const x0 = approach[0].x, x1 = approach[approach.length - 1].x;
+            if (Math.abs(x1 - x0) > 1e-4) return x1 < x0;
+          }
+        }
+        if (bt.t_values && bt.x_values && bt.t_values.length === bt.x_values.length) {
+          const transF = bt.transition_frame != null ? Math.round(Number(bt.transition_frame)) : null;
+          const cf = Number(bt?.contact_frame ?? ballInfo?.contact_frame ?? 0);
+          if (Number.isFinite(transF) && Number.isFinite(cf)) {
+            function xNearFrame(f) {
+              let best = null, bestD = Infinity;
+              for (let i = 0; i < bt.t_values.length; i++) {
+                const df = Math.abs(Number(bt.t_values[i]) - f);
+                if (df < bestD) { bestD = df; best = bt.x_values[i]; }
+              }
+              return best;
+            }
+            const xa = xNearFrame(transF), xb = xNearFrame(cf);
+            if (xa != null && xb != null && Number.isFinite(xa) && Number.isFinite(xb) && Math.abs(xb - xa) > 1e-6) {
+              return xb < xa;
+            }
+          }
+        }
+      } catch (e) { /* ignore */ }
+      return false;
+    }
+
+    /** Pro foot-path / shaded region: same scale+translate as mirrored pro skeleton (contact anchor). */
+    function getProPathToScreenPx(proCf, W, H, flipProX) {
+      const sf = proScaleFactor;
+      const alignOff = proAlignOffsetN || { dx: 0, dy: 0 };
+      const plantIdx = getPlantFootIndex(poseType, firestoreRepData?.strikeFoot);
+      const rib = Math.round(Number(proCf));
+      const pIdx = Number.isFinite(rib) && proPoseData?.length ? Math.min(Math.max(0, rib), proPoseData.length - 1) : 0;
+      const pfrContact = proPoseData && proPoseData.length ? normalizePoseFrame(proPoseData[pIdx]) : null;
+      let ao = alignOff;
+      if (flipProX && plantIdx != null && pfrContact?.[plantIdx]) {
+        ao = adjustProAlignOffsetForMirror(alignOff, pfrContact[plantIdx]);
+      }
+      const dxPx = ao.dx * W, dyPx = ao.dy * H;
+      let proAnchorPx = 0, proAnchorPy = 0;
+      if (plantIdx != null && pfrContact && pfrContact[plantIdx]) {
+        const px = flipProX ? 1 - pfrContact[plantIdx][0] : pfrContact[plantIdx][0];
+        proAnchorPx = px * W;
+        proAnchorPy = pfrContact[plantIdx][1] * H;
+      }
+      const sxBase = dxPx + proAnchorPx * (1 - sf);
+      const syBase = dyPx + proAnchorPy * (1 - sf);
+      return {
+        sxBase,
+        syBase,
+        sf,
+        toPxPro: (p) => ({
+          x: (flipProX ? (1 - p.x) : p.x) * W * sf + sxBase,
+          y: p.y * H * sf + syBase
+        })
+      };
     }
 
     // Transform functions (ported from sprintworkpage)
@@ -4039,6 +4246,7 @@
       const ctx = canvas.getContext('2d');
       // Use CSS pixel size for consistent input mapping and drawing
       const W = canvas.clientWidth, H = canvas.clientHeight;
+      const flipProX = isPlayerMovingRightToLeft();
       // Ensure DPR-aware baseline transform is applied when not zoomed
       (function ensureBaseTransform(){
         const dpr = Math.min(window.devicePixelRatio || 1, 2);
@@ -4224,7 +4432,19 @@
             const atBackswing = Number.isFinite(backswingFrame) && idx === backswingFrame;
             const atContact = Number.isFinite(contactFrameNum) && idx === Math.round(contactFrameNum);
             // At backswing keyframe: align by plant foot at backswing; at contact or elsewhere: align by plant foot at contact
-            const alignOffset = (atBackswing && proAlignOffsetN_backswing) ? proAlignOffsetN_backswing : proAlignOffsetN;
+            const proCfIdx = proBallTrajectory?.contact_frame != null ? Math.round(Number(proBallTrajectory.contact_frame)) : null;
+            const proBsIdx = proBallTrajectory?.transition_frame != null ? Math.round(Number(proBallTrajectory.transition_frame)) : null;
+            let alignOffset = (atBackswing && proAlignOffsetN_backswing) ? proAlignOffsetN_backswing : proAlignOffsetN;
+            const alignSourceIsBackswing = !!(atBackswing && proAlignOffsetN_backswing);
+            if (flipProX && alignOffset) {
+              const proFrameForAlign = alignSourceIsBackswing && Number.isFinite(proBsIdx) ? proBsIdx : proCfIdx;
+              const plantIdxAlign = getPlantFootIndex(poseType, firestoreRepData?.strikeFoot);
+              if (plantIdxAlign != null && Number.isFinite(proFrameForAlign)) {
+                const rawPAlign = normalizePoseFrame(proPoseData[Math.min(proFrameForAlign, proPoseData.length - 1)]);
+                const pp = rawPAlign && rawPAlign[plantIdxAlign] ? rawPAlign[plantIdxAlign] : null;
+                if (pp) alignOffset = adjustProAlignOffsetForMirror(alignOffset, pp);
+              }
+            }
             let dxPx = 0, dyPx = 0;
             if (alignOffset) {
               dxPx = alignOffset.dx * W;
@@ -4233,10 +4453,12 @@
             const sf = proScaleFactor;
             let proAnchorPx = 0, proAnchorPy = 0;
             const plantIdx = getPlantFootIndex(poseType, firestoreRepData?.strikeFoot);
-            const proCfIdx = proBallTrajectory?.contact_frame != null ? Math.round(Number(proBallTrajectory.contact_frame)) : null;
-            const proBsIdx = proBallTrajectory?.transition_frame != null ? Math.round(Number(proBallTrajectory.transition_frame)) : null;
             const anchorFrameIdx = atBackswing && Number.isFinite(proBsIdx) ? proBsIdx : proCfIdx;
-            const frProAnchor = anchorFrameIdx != null ? normalizePoseFrame(proPoseData[Math.min(anchorFrameIdx, proPoseData.length - 1)]) : null;
+            let frProAnchor = anchorFrameIdx != null ? normalizePoseFrame(proPoseData[Math.min(anchorFrameIdx, proPoseData.length - 1)]) : null;
+            if (flipProX) {
+              frPro = mirrorPoseFrameX(frPro);
+              if (frProAnchor) frProAnchor = mirrorPoseFrameX(frProAnchor);
+            }
             if (plantIdx != null && frProAnchor && frProAnchor[plantIdx]) {
               proAnchorPx = frProAnchor[plantIdx][0] * W;
               proAnchorPy = frProAnchor[plantIdx][1] * H;
@@ -4627,24 +4849,11 @@
         const cf = Number(ballTrajectory?.contact_frame ?? ballInfo?.contact_frame ?? 0);
         const proTransFrame = proBallTrajectory.transition_frame != null ? Math.round(Number(proBallTrajectory.transition_frame)) : transFrame;
         const proCf = proBallTrajectory.contact_frame != null ? Math.round(Number(proBallTrajectory.contact_frame)) : Math.round(cf);
-        const sf = proScaleFactor;
-        const alignOff = proAlignOffsetN || { dx: 0, dy: 0 };
-        const dxPx = alignOff.dx * W;
-        const dyPx = alignOff.dy * H;
-        const pfrContact = proPoseData && proCf < proPoseData.length ? normalizePoseFrame(proPoseData[Math.min(proCf, proPoseData.length - 1)]) : null;
-        const plantIdx = getPlantFootIndex(poseType, firestoreRepData?.strikeFoot);
-        let proAnchorPx = 0, proAnchorPy = 0;
-        if (plantIdx != null && pfrContact && pfrContact[plantIdx]) {
-          proAnchorPx = pfrContact[plantIdx][0] * W;
-          proAnchorPy = pfrContact[plantIdx][1] * H;
-        }
-        const sxBase = dxPx + proAnchorPx * (1 - sf);
-        const syBase = dyPx + proAnchorPy * (1 - sf);
+        const { toPxPro } = getProPathToScreenPx(proCf, W, H, flipProX);
         const playerApproach = playerFootPathPts.filter(p => p.i >= transFrame && p.i <= cf);
         const proApproach = proFootPathPts.filter(p => p.i >= proTransFrame && p.i <= proCf);
         if (playerApproach.length >= 2 && proApproach.length >= 2) {
           const toPxPlayer = (p) => ({ x: p.x * W, y: p.y * H });
-          const toPxPro = (p) => ({ x: p.x * W * sf + sxBase, y: p.y * H * sf + syBase });
           const playerPts = playerApproach.map(toPxPlayer);
           const proPts = proApproach.map(toPxPro);
           const smoothPlayer = catmullRomSpline(playerPts.map(p => ({ x: p.x, y: p.y })), 4);
@@ -4774,22 +4983,11 @@
       // --- Pro overlay foot path (uses precomputed proFootPathPts) ---
       if (showFootPath && proFootPathPts && proFootPathPts.length >= 2 && proOverlayActive && proPoseData && proBallTrajectory && !hideFootPathAtKeyframe && showFootPathInSegment) {
         const proCf = proBallTrajectory.contact_frame != null ? Math.round(Number(proBallTrajectory.contact_frame)) : null;
-        const sf = proScaleFactor;
-        const alignOff = proAlignOffsetN || { dx: 0, dy: 0 };
-        const dxPx = alignOff.dx * W;
-        const dyPx = alignOff.dy * H;
-        const pfrContact = normalizePoseFrame(proPoseData[Math.min(proCf, proPoseData.length - 1)]);
-        const plantIdx = getPlantFootIndex(poseType, firestoreRepData?.strikeFoot);
-        let proAnchorPx = 0, proAnchorPy = 0;
-        if (plantIdx != null && pfrContact && pfrContact[plantIdx]) {
-          proAnchorPx = pfrContact[plantIdx][0] * W;
-          proAnchorPy = pfrContact[plantIdx][1] * H;
-        }
-        const sxBase = dxPx + proAnchorPx * (1 - sf);
-        const syBase = dyPx + proAnchorPy * (1 - sf);
+        const proCfAligned = (proCf != null && Number.isFinite(proCf)) ? proCf : Number(ballTrajectory?.contact_frame ?? ballInfo?.contact_frame ?? 0);
+        const { toPxPro } = getProPathToScreenPx(proCfAligned, W, H, flipProX);
         const proCurrentIdx = Math.max(0, Math.min(idx + proFrameShift, proPoseData.length - 1));
         const proDrawEnd = (analysisMode && (analysisPhase === 'backswing' || analysisPhase === 'contact')) ? proCf : proCurrentIdx;
-        const toPx = (p) => ({ ...p, x: p.x * W * sf + sxBase, y: p.y * H * sf + syBase });
+        const toPx = (p) => ({ ...p, ...toPxPro(p) });
         const ptsPx = proFootPathPts.map(toPx);
         const elapsed = ptsPx.filter(p => p.i <= proDrawEnd);
         const future = ptsPx.filter(p => p.i > proDrawEnd);
@@ -6214,20 +6412,6 @@
       const analysisFeedbackText = document.getElementById('analysisFeedbackText');
       const analysisContinueBtn = document.getElementById('analysisContinueBtn');
 
-      const BACKSWING_FEEDBACK = `
-        <p><strong>Hip Rotation:</strong> Focus on opening the hips more during the backswing phase. A wider hip angle generates more rotational power through the kinetic chain, allowing for greater ball velocity at contact.</p>
-        <p><strong>Plant Foot Positioning:</strong> Your plant foot should be placed 15-20cm beside the ball, pointing toward your target. Currently, the plant foot is slightly too far back, which limits your follow-through range.</p>
-        <p><strong>Knee Flexion:</strong> Increase the degree of knee bend in your kicking leg during the backswing. A deeper backswing with 90-110° of knee flexion stores more elastic energy in the quadriceps for a more powerful snap at contact.</p>
-        <p><strong>Upper Body Lean:</strong> Maintain a slight backward lean (10-15°) with your torso to counterbalance the leg swing. This helps keep your center of gravity stable and improves accuracy.</p>
-      `;
-
-      const CONTACT_FEEDBACK = `
-        <p><strong>Ankle Lock:</strong> The ankle of the kicking foot should be firmly locked and plantarflexed at contact. A loose ankle dissipates energy and reduces ball speed. Focus on pointing the toe down and keeping the foot rigid.</p>
-        <p><strong>Knee Extension:</strong> At the moment of contact, the knee should be rapidly extending. The current knee angle suggests slightly early contact — aim to strike the ball when the shin is at maximum angular velocity.</p>
-        <p><strong>Hip Drive:</strong> Continue driving the hip forward through the ball after contact. The hip angle at contact indicates the leg swing could benefit from more follow-through, which adds both power and accuracy.</p>
-        <p><strong>Contact Point:</strong> Strike the ball with the instep (laces area) for power shots. Ensure the contact is slightly below the ball's center to achieve the optimal launch angle for distance kicks.</p>
-      `;
-
       function enterAnalysisMode() {
         analysisMode = true;
         analysisPhase = 'idle';
@@ -6412,10 +6596,12 @@
         const isBackswing = phase === 'backswing';
         analysisFeedbackTitle.textContent = isBackswing ? 'Backswing Annotation' : 'Contact Annotation';
         const angles = computeAnalysisAngles();
+        const rtlPlayer = isPlayerMovingRightToLeft();
         let proAngles = [];
         if (proOverlayActive && proPoseData && Array.isArray(proPoseData)) {
           const iPro = Math.max(0, Math.min(currentFrame + proFrameShift, proPoseData.length - 1));
-          const frPro = normalizePoseFrame(proPoseData[iPro]);
+          let frPro = normalizePoseFrame(proPoseData[iPro]);
+          if (rtlPlayer) frPro = mirrorPoseFrameX(frPro);
           if (Array.isArray(frPro) && frPro.some(p=>p)) {
             const defs = getAngleJointDefs(poseType);
             proAngles = defs.map(def => {
@@ -6438,7 +6624,8 @@
           const cf = Number(ballTrajectory?.contact_frame ?? ballInfo?.contact_frame ?? 0);
           const proCf = proBallTrajectory.contact_frame != null ? Number(proBallTrajectory.contact_frame) : null;
           const playerAngle = computeFootPathAngleAtContact(playerFootPathPts, cf);
-          const proAngle = computeFootPathAngleAtContact(proFootPathPts, proCf);
+          const proPtsForAngle = rtlPlayer ? mirrorFootPathPtsX(proFootPathPts) : proFootPathPts;
+          const proAngle = computeFootPathAngleAtContact(proPtsForAngle, proCf);
           if (playerAngle != null && proAngle != null && Number.isFinite(proCf)) {
             let diff = playerAngle - proAngle;
             while (diff > 180) diff -= 360;
@@ -6594,10 +6781,12 @@
 
         // Populate angle readouts (with pro comparison when pro overlay is active)
         const angles = computeAnalysisAngles();
+        const rtlPlayer = isPlayerMovingRightToLeft();
         let proAngles = [];
         if (proOverlayActive && proPoseData && Array.isArray(proPoseData)) {
           const iPro = Math.max(0, Math.min(currentFrame + proFrameShift, proPoseData.length - 1));
-          const frPro = normalizePoseFrame(proPoseData[iPro]);
+          let frPro = normalizePoseFrame(proPoseData[iPro]);
+          if (rtlPlayer) frPro = mirrorPoseFrameX(frPro);
           if (Array.isArray(frPro) && frPro.some(p=>p)) {
             const defs = getAngleJointDefs(poseType);
             proAngles = defs.map(def => {
@@ -6630,7 +6819,8 @@
           const cf = Number(ballTrajectory?.contact_frame ?? ballInfo?.contact_frame ?? 0);
           const proCf = proBallTrajectory.contact_frame != null ? Number(proBallTrajectory.contact_frame) : null;
           const playerAngle = computeFootPathAngleAtContact(playerFootPathPts, cf);
-          const proAngle = computeFootPathAngleAtContact(proFootPathPts, proCf);
+          const proPtsForAngle = rtlPlayer ? mirrorFootPathPtsX(proFootPathPts) : proFootPathPts;
+          const proAngle = computeFootPathAngleAtContact(proPtsForAngle, proCf);
           if (playerAngle != null && proAngle != null && Number.isFinite(proCf)) {
             let diff = playerAngle - proAngle;
             while (diff > 180) diff -= 360;
@@ -6646,13 +6836,13 @@
         }
         analysisFeedbackAngles.innerHTML = anglesHTML;
 
-        // Set feedback text (use kickAnalysisData if available, else hardcoded)
+        // Written analysis from coach only (no placeholder when empty)
         const phaseKey = isBackswing ? 'backswing' : 'contact';
         const customText = kickAnalysisData?.[phaseKey]?.analysis_text;
         if (customText && customText.trim()) {
           analysisFeedbackText.innerHTML = '<p>' + customText.replace(/\n/g, '</p><p>') + '</p>';
         } else {
-          analysisFeedbackText.innerHTML = isBackswing ? BACKSWING_FEEDBACK : CONTACT_FEEDBACK;
+          analysisFeedbackText.innerHTML = '';
         }
 
         // Set button text
@@ -7012,6 +7202,16 @@
       rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
     });
 
+    rawVideoEl.addEventListener('loadeddata', () => {
+      updateAnalyzeKickButtonState();
+    });
+    rawVideoEl.addEventListener('canplay', () => {
+      updateAnalyzeKickButtonState();
+    });
+    rawVideoEl.addEventListener('error', () => {
+      updateAnalyzeKickButtonState();
+    });
+
     document.addEventListener('keydown', (e) => {
       if (e.key === 'ArrowLeft')  { startFast(-1); }
       if (e.key === 'ArrowRight') { startFast(1); }
@@ -7033,6 +7233,7 @@
       } catch (e) {
         /* console.error('Failed to load pose.json:', e); */
       }
+      updateAnalyzeKickButtonState();
     }
 
   </script>

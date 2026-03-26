@@ -813,6 +813,11 @@
             font-weight: 500;
         }
 
+        .session-card-locked .lock-overlay .unlock-btn {
+            pointer-events: auto;
+            cursor: pointer;
+        }
+
         .session-card-locked:hover {
             transform: none;
             box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1), inset 0 1px 0 rgba(255, 255, 255, 0.1);
@@ -882,6 +887,24 @@
         }
         .lock-overlay .unlock-btn:hover {
             background: var(--accent-light, #5ea87e);
+        }
+
+        .header-nav-btn.leaderboard-feedback-locked {
+            position: relative;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.15rem;
+            padding: 0.35rem 0.65rem;
+            line-height: 1.15;
+            white-space: normal;
+            max-width: 9rem;
+            text-align: center;
+        }
+        .header-nav-btn.leaderboard-feedback-locked .lb-lock-line {
+            display: block;
+            font-size: 0.65rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.75);
         }
     </style>
 </head>
@@ -1133,47 +1156,6 @@
                     </div>
                 </div>
 
-                <!-- Sprint Technique Breakdown -->
-                <div id="sprintTechniqueSection" style="border-top: 1px solid var(--card-border); padding-top: 1rem; margin-top: 0.5rem;">
-                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Sprint Technique Breakdown</h3>
-                    
-                    <div class="best-jump-grid">
-                        <div>
-                            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Pose at Key Frames</h4>
-                            <div class="tab-container keyframe-container">
-                                <button class="sprint-keyframe-btn active" data-keyframe="propulsion" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1)); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 700; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); transition: var(--transition);">Propulsion</button>
-                                <button class="sprint-keyframe-btn" data-keyframe="midflight" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Mid-Flight</button>
-                                <button class="sprint-keyframe-btn" data-keyframe="braking" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Braking</button>
-                            </div>
-                            <div style="text-align: center; margin-bottom: 0.5rem;">
-                                <span id="sprintPoseViewIndicator" style="font-size: 0.8rem; color: #4c8c6a; font-weight: 600; padding: 0.25rem 0.75rem; background: rgba(76, 140, 106, 0.15); border-radius: 12px; display: inline-block;">Viewing: Best Sprint</span>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600;">Movement Trajectory</div>
-                                <div class="pose-container" style="height: 350px; display: flex; justify-content: center; align-items: center; background: #1a3a2e; border-radius: 8px; position: relative;">
-                                    <div id="sprintTrajectoryLoader" class="loader" style="position: absolute; display: none;">
-                                        <div class="loader-body"></div>
-                                        <div class="loader-arm-left"></div>
-                                        <div class="loader-arm-right"></div>
-                                        <div class="loader-leg-left"></div>
-                                        <div class="loader-leg-right"></div>
-                                    </div>
-                                    <canvas id="sprintTrajectoryCanvas" width="500" height="350" style="max-width: 100%;"></canvas>
-                                    <div style="position: absolute; color: var(--text-muted); font-size: 0.9rem;">Data coming soon</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Joint Angles: Best vs Average</h4>
-                            <div class="chart-container" style="height: 300px; position: relative;">
-                                <canvas id="sprintAngleComparisonChart"></canvas>
-                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-muted); font-size: 0.9rem;">Data coming soon</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
                 <div id="noSprintData" style="display: none; text-align: center; padding: 2rem; color: var(--text-muted);">
                     <h3>No sprint data available</h3>
                     <p>Complete sprint sessions to see your performance metrics here</p>
@@ -1182,14 +1164,6 @@
 
             <!-- KICK CONTENT SECTION -->
             <div id="kickContent" style="display: none;">
-                <!-- Foot filter selector for kick -->
-                <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1rem; flex-wrap: wrap;">
-                    <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; margin-right: 0.25rem;">Foot:</span>
-                    <button class="time-filter kick-foot-filter active" data-foot="all">All</button>
-                    <button class="time-filter kick-foot-filter" data-foot="left">Left</button>
-                    <button class="time-filter kick-foot-filter" data-foot="right">Right</button>
-                </div>
-
                 <!-- Time period selector for kick -->
                 <div style="display: flex; align-items: center; gap: 0.5rem; margin-bottom: 1.5rem; flex-wrap: wrap;">
                     <span style="font-size: 0.85rem; color: var(--text-muted); font-weight: 500; margin-right: 0.25rem;">Period:</span>
@@ -1231,47 +1205,6 @@
                             <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
                                 <div class="stat-value" id="kickTrend">--</div>
                                 <div class="stat-label">Trend</div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Kick Technique Breakdown -->
-                <div id="kickTechniqueSection" style="border-top: 1px solid var(--card-border); padding-top: 1rem; margin-top: 0.5rem;">
-                    <h3 style="font-size: 1rem; margin-bottom: 0.75rem;">Kick Technique Breakdown</h3>
-                    
-                    <div class="best-jump-grid">
-                        <div>
-                            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Pose at Key Frames</h4>
-                            <div class="tab-container keyframe-container">
-                                <button class="kick-keyframe-btn active" data-keyframe="approach" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1)); border: 1px solid rgba(255, 255, 255, 0.2); color: var(--text-light); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 700; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2); transition: var(--transition);">Approach</button>
-                                <button class="kick-keyframe-btn" data-keyframe="backswing" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Backswing</button>
-                                <button class="kick-keyframe-btn" data-keyframe="impact" style="background: rgba(255, 255, 255, 0.05); border: 1px solid var(--card-border); color: var(--text-muted); font-family: 'Poppins', 'Inter', sans-serif; font-weight: 600; padding: 0.5rem 1rem; cursor: pointer; font-size: 0.85rem; border-radius: 10px; box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05); transition: var(--transition);">Impact</button>
-                            </div>
-                            <div style="text-align: center; margin-bottom: 0.5rem;">
-                                <span id="kickPoseViewIndicator" style="font-size: 0.8rem; color: #4c8c6a; font-weight: 600; padding: 0.25rem 0.75rem; background: rgba(76, 140, 106, 0.15); border-radius: 12px; display: inline-block;">Viewing: Best Kick</span>
-                            </div>
-                            <div style="text-align: center;">
-                                <div style="font-size: 0.75rem; color: var(--text-muted); margin-bottom: 0.25rem; font-weight: 600;">Movement Trajectory</div>
-                                <div class="pose-container" style="height: 350px; display: flex; justify-content: center; align-items: center; background: #1a3a2e; border-radius: 8px; position: relative;">
-                                    <div id="kickTrajectoryLoader" class="loader" style="position: absolute; display: none;">
-                                        <div class="loader-body"></div>
-                                        <div class="loader-arm-left"></div>
-                                        <div class="loader-arm-right"></div>
-                                        <div class="loader-leg-left"></div>
-                                        <div class="loader-leg-right"></div>
-                                    </div>
-                                    <canvas id="kickTrajectoryCanvas" width="500" height="350" style="max-width: 100%;"></canvas>
-                                    <div style="position: absolute; color: var(--text-muted); font-size: 0.9rem;">Data coming soon</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            <h4 style="font-size: 0.9rem; margin-bottom: 0.5rem;">Joint Angles: Best vs Average</h4>
-                            <div class="chart-container" style="height: 300px; position: relative;">
-                                <canvas id="kickAngleComparisonChart"></canvas>
-                                <div style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: var(--text-muted); font-size: 0.9rem;">Data coming soon</div>
                             </div>
                         </div>
                     </div>
@@ -1375,6 +1308,23 @@
                 return;
             }
 
+            isPremiumLocked = false;
+            isFeedbackFormLocked = false;
+            if (currentPlayerInfo && currentPlayerInfo.docId) {
+                try {
+                    const pDoc = await db.collection('players').doc(currentPlayerInfo.docId).get();
+                    if (pDoc.exists) {
+                        const d = pDoc.data();
+                        const locked = d.premium_content_locked;
+                        const feedbackNeeded = d.feedback_form_needed === true;
+                        isPremiumLocked = isCoach ? (locked === true) : (locked !== false);
+                        isFeedbackFormLocked = !isCoach && feedbackNeeded === true;
+                    }
+                } catch (e) {
+                    console.error('[ContentLock] Error loading player doc for locks:', e);
+                }
+            }
+
             populateSideLinks();
 
             // Load all reps (jump, sprint, kick) in a single query
@@ -1394,25 +1344,10 @@
             // Update session count from cache
             updateSessionCountFromCache();
 
-            // Check premium content lock
-            if (currentPlayerInfo) {
-                const pDocId = currentPlayerInfo.docId;
-                if (pDocId) {
-                    try {
-                        const pDoc = await db.collection('players').doc(pDocId).get();
-                        if (pDoc.exists) {
-                            const locked = pDoc.data().premium_content_locked;
-                            // Players default to locked; coaches default to unlocked
-                            const shouldLock = isCoach ? (locked === true) : (locked !== false);
-                            if (shouldLock) {
-                                isPremiumLocked = true;
-                                applyTechniqueSectionLocks();
-                            }
-                        }
-                    } catch (e) {
-                        console.error('[PremiumLock] Error checking premium lock:', e);
-                    }
-                }
+            if (isPremiumLocked) {
+                applyTechniqueSectionLocks();
+            } else if (isFeedbackFormLocked) {
+                applyTechniqueSectionFeedbackLocks();
             }
 
             // Auto-expand sessions if fewer than 4 for current tab
@@ -1508,14 +1443,12 @@
         let allJumpReps = [];
         let bestJumpRep = null;
         let allSprintReps = [];
-        let bestSprintRep = null;
         let allKickReps = [];
-        let bestKickRep = null;
         let currentKickTimePeriod = 'week';
-        let currentFootFilter = 'all'; // 'all', 'left', or 'right'
         let kickSpeedChart = null;
         let cachedAllSessions = null; // Fetched once at init, reused for count + cards
         let isPremiumLocked = false;
+        let isFeedbackFormLocked = false;
         let isSessionsExpanded = false;
 
         // Collapsible sessions toggle
@@ -1642,6 +1575,7 @@
             }
 
             if (isPremiumLocked) applyTechniqueSectionLocks();
+            else if (isFeedbackFormLocked) applyTechniqueSectionFeedbackLocks();
         }
         
         // Placeholder display for rep types not yet implemented (kept for compatibility)
@@ -1726,7 +1660,6 @@
                     document.getElementById('noSprintData').style.display = 'none';
                 } else {
                     document.getElementById('noSprintData').style.display = 'block';
-                    document.getElementById('sprintTechniqueSection').style.display = 'none';
                 }
 
                 // Kick empty-state
@@ -1734,7 +1667,6 @@
                     document.getElementById('noKickData').style.display = 'none';
                 } else {
                     document.getElementById('noKickData').style.display = 'block';
-                    document.getElementById('kickTechniqueSection').style.display = 'none';
                 }
             } catch (error) {
                 console.error('Error loading reps data:', error);
@@ -1905,7 +1837,6 @@
                 document.getElementById('maxSprintSpeed').textContent = '--';
                 document.getElementById('totalSprints').textContent = '0';
                 document.getElementById('sprintTrend').textContent = '--';
-                document.getElementById('sprintTechniqueSection').style.display = 'none';
                 return;
             }
 
@@ -1915,11 +1846,6 @@
             const speeds = filteredReps.map(r => (r.maxVelocity || 0) * MS_TO_MPH);
             const avgSpeed = (speeds.reduce((a, b) => a + b, 0) / speeds.length).toFixed(1);
             const maxSpeed = Math.max(...speeds).toFixed(1);
-
-            // Find best sprint overall (not just in period)
-            bestSprintRep = allSprintReps.reduce((best, current) => {
-                return (current.maxVelocity > (best.maxVelocity || 0)) ? current : best;
-            }, allSprintReps[0]);
 
             // Calculate trend (compare first half vs second half)
             const midPoint = Math.floor(filteredReps.length / 2);
@@ -1938,9 +1864,6 @@
 
             // Update chart
             updateSprintSpeedChart(filteredReps);
-
-            // Show technique section (even if data coming soon)
-            document.getElementById('sprintTechniqueSection').style.display = 'block';
         }
 
         // Update sprint speed chart
@@ -2006,17 +1929,9 @@
 
         // ============ KICK DATA FUNCTIONS ============
         
-        // Filter kick reps by foot selection
-        function filterKickRepsByFoot(reps, footFilter) {
-            if (footFilter === 'all') return reps;
-            return reps.filter(rep => rep.strikeFoot === footFilter);
-        }
-
         // Update kick dashboard with filtered data
         function updateKickDashboard() {
-            // First filter by time period, then by foot
             let filteredReps = filterRepsByPeriod(allKickReps, currentKickTimePeriod);
-            const footFilteredReps = filterKickRepsByFoot(filteredReps, currentFootFilter);
 
             // Update chart title
             const chartTitle = document.getElementById('kickChartTitle');
@@ -2024,27 +1939,27 @@
                 chartTitle.textContent = 'Ball Speed Over Time';
             }
 
-            if (footFilteredReps.length === 0) {
+            if (filteredReps.length === 0) {
                 document.getElementById('avgKickSpeed').textContent = '--';
                 document.getElementById('maxKickSpeed').textContent = '--';
                 document.getElementById('avgLaunchAngle').textContent = '--';
                 document.getElementById('totalKicks').textContent = '0';
                 document.getElementById('kickTrend').textContent = '--';
-                document.getElementById('kickTechniqueSection').style.display = 'none';
-                // Still draw chart with all data if foot filter gives no results
-                if (filteredReps.length > 0) {
-                    updateKickSpeedChart(filteredReps);
-                }
                 return;
             }
 
             // Calculate statistics
-            const speeds = footFilteredReps.map(r => r.velocity || 0);
+            const speeds = filteredReps.map(r => r.velocity || 0);
             const nonZeroSpeeds = speeds.filter(s => s > 0);
-            // Exclude reps with launch angle 180 ± 1 when computing avg launch angle
-            const angles = footFilteredReps
-                .map(r => r.launchAngle ?? 0)
-                .filter(a => Math.abs(a - 180) > 1);
+            // Exclude reps with launch angle 180 ± 1 when computing avg launch angle.
+            // Per rep, use the smaller of angle vs (180 - angle) so the average reflects
+            // the acute side of the launch (same complement as mirroring about 90°).
+            const angles = filteredReps
+                .filter(r => Math.abs((r.launchAngle ?? 0) - 180) > 1)
+                .map(r => {
+                    const a = r.launchAngle ?? 0;
+                    return Math.min(a, 180 - a);
+                });
             const avgSpeed = nonZeroSpeeds.length > 0
                 ? (nonZeroSpeeds.reduce((a, b) => a + b, 0) / nonZeroSpeeds.length).toFixed(1)
                 : '--';
@@ -2053,15 +1968,10 @@
                 ? (angles.reduce((a, b) => a + b, 0) / angles.length).toFixed(1)
                 : '--';
 
-            // Find best kick overall (not just in period)
-            bestKickRep = allKickReps.reduce((best, current) => {
-                return (current.velocity > (best.velocity || 0)) ? current : best;
-            }, allKickReps[0]);
-
             // Calculate trend (compare first half vs second half)
-            const midPoint = Math.floor(footFilteredReps.length / 2);
-            const firstHalf = footFilteredReps.slice(midPoint);
-            const secondHalf = footFilteredReps.slice(0, midPoint);
+            const midPoint = Math.floor(filteredReps.length / 2);
+            const firstHalf = filteredReps.slice(midPoint);
+            const secondHalf = filteredReps.slice(0, midPoint);
             const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((sum, r) => sum + (r.velocity || 0), 0) / firstHalf.length : 0;
             const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((sum, r) => sum + (r.velocity || 0), 0) / secondHalf.length : 0;
             const trendPercent = firstAvg > 0 ? ((secondAvg - firstAvg) / firstAvg * 100).toFixed(1) : 0;
@@ -2071,14 +1981,11 @@
             document.getElementById('avgKickSpeed').textContent = avgSpeed === '--' ? '--' : avgSpeed;
             document.getElementById('maxKickSpeed').textContent = maxSpeed;
             document.getElementById('avgLaunchAngle').textContent = avgAngle === '--' ? '--' : avgAngle + '°';
-            document.getElementById('totalKicks').textContent = footFilteredReps.length;
+            document.getElementById('totalKicks').textContent = filteredReps.length;
             document.getElementById('kickTrend').textContent = trendText;
 
             // Update chart with time-filtered data (shows both feet)
             updateKickSpeedChart(filteredReps);
-
-            // Show technique section
-            document.getElementById('kickTechniqueSection').style.display = 'block';
         }
 
         // Update kick speed chart with dual lines for left/right foot
@@ -3380,52 +3287,6 @@
             });
         });
 
-        // Event listeners for kick foot filter
-        document.querySelectorAll('.kick-foot-filter').forEach(btn => {
-            btn.addEventListener('click', () => {
-                // Remove active state from all kick foot filter buttons
-                document.querySelectorAll('.kick-foot-filter').forEach(b => {
-                    b.classList.remove('active');
-                    b.style.background = 'rgba(255, 255, 255, 0.05)';
-                    b.style.border = '1px solid var(--card-border)';
-                    b.style.color = 'var(--text-muted)';
-                    b.style.fontWeight = '600';
-                    b.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
-                });
-                // Add active state to clicked button
-                btn.classList.add('active');
-                btn.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1))';
-                btn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-                btn.style.color = 'var(--text-light)';
-                btn.style.fontWeight = '700';
-                btn.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
-                
-                currentFootFilter = btn.dataset.foot;
-                
-                // Update kick dashboard
-                if (currentRepType === 'kick') {
-                    updateKickDashboard();
-                }
-            });
-            
-            // Add hover effects
-            btn.addEventListener('mouseenter', () => {
-                if (!btn.classList.contains('active')) {
-                    btn.style.background = 'rgba(255, 255, 255, 0.08)';
-                    btn.style.transform = 'translateY(-2px)';
-                    btn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
-                }
-            });
-            
-            btn.addEventListener('mouseleave', () => {
-                if (!btn.classList.contains('active')) {
-                    btn.style.background = 'rgba(255, 255, 255, 0.05)';
-                    btn.style.transform = 'translateY(0)';
-                    btn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
-                }
-            });
-        });
-
         // Event listeners for keyframe toggle
         document.querySelectorAll('.keyframe-btn').forEach(btn => {
             btn.addEventListener('click', () => {
@@ -3479,53 +3340,6 @@
                 drawBestJumpPose();
             });
         }
-
-        // Generic keyframe button handler factory
-        function setupKeyframeButtons(selector) {
-            document.querySelectorAll(selector).forEach(btn => {
-                btn.addEventListener('click', () => {
-                    // Remove active state from all buttons of this type
-                    document.querySelectorAll(selector).forEach(b => {
-                        b.classList.remove('active');
-                        b.style.background = 'rgba(255, 255, 255, 0.05)';
-                        b.style.border = '1px solid var(--card-border)';
-                        b.style.color = 'var(--text-muted)';
-                        b.style.fontWeight = '600';
-                        b.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
-                    });
-                    // Add active state to clicked button
-                    btn.classList.add('active');
-                    btn.style.background = 'linear-gradient(135deg, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0.1))';
-                    btn.style.border = '1px solid rgba(255, 255, 255, 0.2)';
-                    btn.style.color = 'var(--text-light)';
-                    btn.style.fontWeight = '700';
-                    btn.style.boxShadow = '0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2)';
-                    
-                    console.log('Selected keyframe:', btn.dataset.keyframe);
-                });
-                
-                // Add hover effects
-                btn.addEventListener('mouseenter', () => {
-                    if (!btn.classList.contains('active')) {
-                        btn.style.background = 'rgba(255, 255, 255, 0.08)';
-                        btn.style.transform = 'translateY(-2px)';
-                        btn.style.boxShadow = '0 4px 8px rgba(0, 0, 0, 0.15)';
-                    }
-                });
-                
-                btn.addEventListener('mouseleave', () => {
-                    if (!btn.classList.contains('active')) {
-                        btn.style.background = 'rgba(255, 255, 255, 0.05)';
-                        btn.style.transform = 'translateY(0)';
-                        btn.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.05)';
-                    }
-                });
-            });
-        }
-        
-        // Setup sprint and kick keyframe buttons
-        setupKeyframeButtons('.sprint-keyframe-btn');
-        setupKeyframeButtons('.kick-keyframe-btn');
 
         // Add hover effects to View Full Analysis button
         const viewFullAnalysisBtn = document.getElementById('viewBestJumpLink');
@@ -3598,8 +3412,25 @@
             lbParams.set('userType', userTypeParam);
             leaderboardHref += '?' + lbParams.toString();
 
+            const encodedPrevPage = encodeURIComponent((window.location.pathname.split('/').pop() || '') + (window.location.search || ''));
+            const feedbackFormHref = playerDocId
+                ? 'feedbackForm.html?player=' + encodeURIComponent(playerDocId) + '&userType=player&previousPage=' + encodedPrevPage
+                : 'feedbackForm.html?previousPage=' + encodedPrevPage;
+
             const lbBtn = document.getElementById('leaderboardBtn');
-            if (lbBtn) lbBtn.href = leaderboardHref;
+            if (lbBtn) {
+                if (isFeedbackFormLocked && playerDocId) {
+                    lbBtn.href = feedbackFormHref;
+                    lbBtn.classList.add('leaderboard-feedback-locked');
+                    lbBtn.title = 'Complete feedback form to unlock leaderboards';
+                    lbBtn.innerHTML = '<span class="material-symbols-outlined">lock</span><span class="lb-lock-line"><span>Complete feedback form</span></span>';
+                } else {
+                    lbBtn.href = leaderboardHref;
+                    lbBtn.classList.remove('leaderboard-feedback-locked');
+                    lbBtn.title = 'Leaderboards';
+                    lbBtn.innerHTML = '<span class="material-symbols-outlined">leaderboard</span><span>Leaderboard</span>';
+                }
+            }
 
             const links = [
                 { href: `profile.html?userType=${userTypeParam}`, text: 'Profile', icon: 'person' }
@@ -3607,12 +3438,15 @@
             if (isCoach) {
                 links.push({ href: `coachesview.html?userType=coach`, text: 'Player Roster', icon: 'people' });
             }
-            links.push({ href: leaderboardHref, text: 'Leaderboards', icon: 'leaderboard' });
+            const leaderboardsMenuHref = (isFeedbackFormLocked && playerDocId) ? feedbackFormHref : leaderboardHref;
+            const leaderboardsMenuText = (isFeedbackFormLocked && playerDocId) ? 'Complete feedback form' : 'Leaderboards';
+            const leaderboardsMenuIcon = (isFeedbackFormLocked && playerDocId) ? 'lock' : 'leaderboard';
+            links.push({ href: leaderboardsMenuHref, text: leaderboardsMenuText, icon: leaderboardsMenuIcon });
 
             links.forEach((a, idx) => {
                 const link = document.createElement('a');
                 let finalHref = a.href || '#';
-                if (playerDocId && !finalHref.includes('leaderboard') && !finalHref.includes('coachesview')) {
+                if (playerDocId && !finalHref.includes('leaderboard') && !finalHref.includes('coachesview') && !finalHref.includes('feedbackForm.html')) {
                     const separator = finalHref.includes('?') ? '&' : '?';
                     finalHref += separator + 'player=' + encodeURIComponent(playerDocId);
                 }
@@ -3667,9 +3501,7 @@
             const playerDocId = urlParams.get('player') || currentPlayerInfo?.docId;
 
             const sections = [
-                { id: 'bestJumpSection', text: 'Vertical jump analysis only available for premium members', sentFrom: 'kickingJumpAnalysis' },
-                { id: 'sprintTechniqueSection', text: 'Sprint technique analysis only available for premium members', sentFrom: 'kickingSprintTechnique' },
-                { id: 'kickTechniqueSection', text: 'Kick technique analysis only available for premium members', sentFrom: 'kickingKickTechnique' }
+                { id: 'bestJumpSection', text: 'Vertical jump analysis only available for premium members', sentFrom: 'kickingJumpAnalysis' }
             ];
             sections.forEach(({ id, text, sentFrom }) => {
                 const el = document.getElementById(id);
@@ -3684,6 +3516,33 @@
                     btn.className = 'unlock-btn';
                     btn.textContent = 'Unlock Features';
                     btn.href = 'premiumInfo.html?player=' + encodeURIComponent(playerDocId) + '&sentFrom=' + encodeURIComponent(sentFrom);
+                    overlay.appendChild(btn);
+                }
+                el.appendChild(overlay);
+            });
+        }
+
+        function applyTechniqueSectionFeedbackLocks() {
+            const urlParams = new URLSearchParams(window.location.search);
+            const urlUserType = urlParams.get('userType');
+            const playerDocId = urlParams.get('player') || currentPlayerInfo?.docId;
+            const fbPrev = encodeURIComponent((window.location.pathname.split('/').pop() || '') + (window.location.search || ''));
+            const sections = [
+                { id: 'bestJumpSection', text: 'Complete feedback form' }
+            ];
+            sections.forEach(({ id, text }) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                if (el.classList.contains('technique-section-locked')) return;
+                el.classList.add('technique-section-locked');
+                const overlay = document.createElement('div');
+                overlay.className = 'lock-overlay';
+                overlay.innerHTML = `<span class="material-symbols-outlined">lock</span><span class="lock-label">${text}</span>`;
+                if (urlUserType === 'player' && playerDocId) {
+                    const btn = document.createElement('a');
+                    btn.className = 'unlock-btn';
+                    btn.textContent = 'Complete feedback form';
+                    btn.href = 'feedbackForm.html?player=' + encodeURIComponent(playerDocId) + '&userType=player&previousPage=' + fbPrev;
                     overlay.appendChild(btn);
                 }
                 el.appendChild(overlay);
@@ -4086,9 +3945,24 @@
                     ${sessionTypeBadge}
                 `;
 
-                // Session cards remain clickable for all users — premium lock is enforced on destination pages
+                if (isFeedbackFormLocked && !isCoach) {
+                    sessionCard.classList.add('session-card-locked');
+                    const overlay = document.createElement('div');
+                    overlay.className = 'lock-overlay';
+                    overlay.innerHTML = '<span class="material-symbols-outlined">lock</span><span>Complete feedback form</span>';
+                    const lockPlayerId = new URLSearchParams(window.location.search).get('player') || currentPlayerInfo?.docId;
+                    if (lockPlayerId) {
+                        const btn = document.createElement('a');
+                        btn.className = 'unlock-btn';
+                        btn.textContent = 'Complete feedback form';
+                        btn.href = 'feedbackForm.html?player=' + encodeURIComponent(lockPlayerId) + '&userType=player&previousPage=' + encodeURIComponent((window.location.pathname.split('/').pop() || '') + (window.location.search || ''));
+                        overlay.appendChild(btn);
+                    }
+                    sessionCard.appendChild(overlay);
+                }
 
                 sessionCard.addEventListener('click', async () => {
+                    if (isFeedbackFormLocked && !isCoach) return;
                     let destinationPage = 'sessionsexpanded.html';
                     if (session.type === 'freeRecord') {
                         destinationPage = 'freeRecordPage.html';

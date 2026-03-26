@@ -1,0 +1,1391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <title>PoseTek — Session Feedback</title>
+    <link href="https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@300;400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --accent-light: #5ea87e;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --text-dark: #1a1a1a;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --sheet-bg: linear-gradient(145deg, rgba(26, 58, 46, 0.96), rgba(45, 94, 74, 0.9));
+            --sheet-border: rgba(76, 140, 106, 0.35);
+            --sheet-header-bg: linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.08));
+            --sheet-muted: rgba(255, 255, 255, 0.58);
+            --sheet-text: rgba(255, 255, 255, 0.94);
+            --sheet-input-bg: rgba(0, 0, 0, 0.22);
+            --sheet-input-border: rgba(255, 255, 255, 0.14);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(76, 140, 106, 0.3);
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary);
+            color: var(--text-light);
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+            -webkit-overflow-scrolling: touch;
+            min-height: 100vh;
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(76, 140, 106, 0.08), transparent), radial-gradient(ellipse 60% 50% at 80% 80%, rgba(76, 140, 106, 0.05), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 2rem;
+            background: rgba(15, 31, 27, 0.85);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo {
+            font-family: 'Poppins', 'SF Pro Display', sans-serif;
+            font-size: 1.6rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .nav-links a {
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 0.95rem;
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .nav-links a:hover {
+            color: var(--accent);
+        }
+
+        .nav-links a::after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 0;
+            height: 2px;
+            background-color: var(--accent);
+            transition: var(--transition);
+        }
+
+        .nav-links a:hover::after {
+            width: 100%;
+        }
+
+        header .nav-links {
+            display: none !important;
+        }
+
+        .nav-toggle {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: var(--transition);
+            color: var(--text-light);
+            font-size: 1.1rem;
+        }
+
+        .nav-toggle:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .home-btn-style {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 40px;
+            height: 40px;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .home-btn-style:hover {
+            background: rgba(255, 255, 255, 0.12);
+            transform: translateY(-1px);
+        }
+
+        .header-nav-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.4rem;
+            padding: 0.45rem 0.85rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            text-decoration: none;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            transition: var(--transition);
+            white-space: nowrap;
+            letter-spacing: 0.2px;
+        }
+
+        .header-nav-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-light);
+            transform: translateY(-1px);
+        }
+
+        .header-nav-btn .material-symbols-outlined {
+            font-size: 1.05rem;
+        }
+
+        .side-nav {
+            position: fixed;
+            top: 0;
+            left: -320px;
+            width: 320px;
+            height: 100%;
+            background: linear-gradient(180deg, rgba(15, 38, 33, 0.98), rgba(12, 34, 30, 0.98));
+            box-shadow: 6px 0 30px rgba(0, 0, 0, 0.45);
+            z-index: 1200;
+            padding: 2rem 1.25rem;
+            transition: left 0.32s cubic-bezier(0.2, 0.9, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .side-nav.open {
+            left: 0;
+        }
+
+        .side-nav .close-side {
+            margin-left: auto;
+            background: none;
+            border: none;
+            color: var(--text-light);
+            font-size: 1.25rem;
+            cursor: pointer;
+            opacity: 0.85;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            min-width: 44px;
+            min-height: 44px;
+        }
+
+        .side-nav .close-side:active {
+            transform: scale(0.9);
+        }
+
+        .side-nav .side-link {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 0.65rem 0.85rem;
+            border-radius: 10px;
+            color: var(--text-light);
+            text-decoration: none;
+            font-weight: 600;
+            transition: var(--transition);
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+        }
+
+        .side-nav .side-link:hover {
+            background: rgba(255, 255, 255, 0.03);
+            transform: translateX(4px);
+        }
+
+        .side-nav .side-link:active {
+            background: rgba(255, 255, 255, 0.06);
+            transform: translateX(2px) scale(0.98);
+        }
+
+        .side-divider {
+            height: 1px;
+            background: var(--card-border);
+            margin: 0.75rem 0;
+        }
+
+        .side-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.35);
+            z-index: 1100;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 200ms ease;
+        }
+
+        .side-backdrop.open {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .side-link .material-symbols-outlined {
+            font-variation-settings: 'wght' 400;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 24px;
+            height: 24px;
+            line-height: 24px;
+            vertical-align: middle;
+            color: var(--text-light);
+        }
+
+        .side-link span:first-of-type {
+            margin-right: 6px;
+        }
+
+        .action-btn {
+            padding: 0.6rem 1.2rem;
+            background: linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);
+            border: none;
+            border-radius: 50px;
+            color: var(--text-light);
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+            min-height: 44px;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            box-shadow: 0 4px 12px rgba(76, 140, 106, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .action-btn:hover {
+            background: linear-gradient(135deg, #56a07a 0%, var(--accent) 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(76, 140, 106, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+        }
+
+        .action-btn:active {
+            transform: translateY(0) scale(0.98);
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 1;
+            max-width: 640px;
+            margin: 0 auto;
+            padding: 2rem 1.25rem 4rem;
+        }
+
+        .form-hero {
+            text-align: center;
+            margin-bottom: 1.75rem;
+        }
+
+        .form-hero .eyebrow {
+            font-size: 0.75rem;
+            font-weight: 700;
+            letter-spacing: 0.12em;
+            text-transform: uppercase;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+
+        .form-hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            line-height: 1.25;
+        }
+
+        .form-hero p {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+            max-width: 36rem;
+            margin: 0 auto;
+        }
+
+        .sheet-card {
+            background: var(--sheet-bg);
+            border-radius: 14px;
+            box-shadow:
+                0 18px 48px rgba(0, 0, 0, 0.28),
+                0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+            border: 1px solid var(--sheet-border);
+            overflow: hidden;
+            margin-bottom: 1rem;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .sheet-card-header {
+            padding: 1.35rem 1.5rem 1rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--sheet-header-bg);
+        }
+
+        .sheet-card-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--sheet-text);
+            display: flex;
+            align-items: flex-start;
+            gap: 0.65rem;
+            line-height: 1.35;
+        }
+
+        .q-num {
+            flex-shrink: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 1.5rem;
+            height: 1.5rem;
+            background: rgba(76, 140, 106, 0.45);
+            color: #d4f0e0;
+            border: 1px solid rgba(94, 168, 126, 0.45);
+            border-radius: 6px;
+            font-size: 0.8rem;
+            font-weight: 700;
+            font-family: 'Inter', sans-serif;
+        }
+
+        .required-mark {
+            color: #ff8a9a;
+            margin-left: 0.15rem;
+        }
+
+        .sheet-card-body {
+            padding: 1.25rem 1.5rem 1.5rem;
+        }
+
+        .hint {
+            font-size: 0.8rem;
+            color: var(--sheet-muted);
+            margin-top: 0.5rem;
+        }
+
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.65rem;
+        }
+
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 0.65rem;
+            cursor: pointer;
+            font-size: 0.95rem;
+            color: rgba(255, 255, 255, 0.9);
+            padding: 0.45rem 0;
+        }
+
+        .radio-option input {
+            width: 1.1rem;
+            height: 1.1rem;
+            accent-color: var(--accent);
+            flex-shrink: 0;
+        }
+
+        .ranking-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.88rem;
+        }
+
+        .ranking-table th,
+        .ranking-table td {
+            padding: 0.65rem 0.5rem;
+            text-align: left;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            vertical-align: middle;
+            color: rgba(255, 255, 255, 0.88);
+        }
+
+        .ranking-table th:last-child,
+        .ranking-table td:last-child {
+            width: 5.5rem;
+            text-align: right;
+        }
+
+        .ranking-table th {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.04em;
+        }
+
+        .ranking-table tr:last-child td {
+            border-bottom: none;
+        }
+
+        .ranking-table select {
+            padding: 0.45rem 0.6rem;
+            border-radius: 8px;
+            border: 1px solid var(--sheet-input-border);
+            background: var(--sheet-input-bg);
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 0.9rem;
+            min-width: 4.5rem;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12) inset;
+        }
+
+        .ranking-table select option {
+            background-color: var(--primary);
+            color: var(--text-light);
+        }
+
+        .ranking-table select:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.2), 0 4px 12px rgba(0, 0, 0, 0.15) inset;
+        }
+
+        .textarea-field {
+            width: 100%;
+            min-height: 120px;
+            padding: 0.85rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--sheet-input-border);
+            background: var(--sheet-input-bg);
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            resize: vertical;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.15) inset;
+        }
+
+        .textarea-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.18), 0 4px 14px rgba(0, 0, 0, 0.12) inset;
+        }
+
+        .textarea-field::placeholder {
+            color: rgba(255, 255, 255, 0.42);
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 10px;
+            border: 1px solid var(--sheet-input-border);
+            background: var(--sheet-input-bg);
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 0.95rem;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) inset;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.18), 0 4px 14px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.42);
+        }
+
+        .sheet-form-label {
+            display: block;
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.88);
+            margin-bottom: 0.45rem;
+        }
+
+        .submit-wrap {
+            padding: 0.5rem 0 0;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.75rem;
+            border-radius: 12px;
+            background: linear-gradient(135deg, #ffffff, #e8f5e9);
+            color: var(--primary);
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+            touch-action: manipulation;
+        }
+
+        .submit-btn:hover {
+            filter: brightness(1.03);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+        }
+
+        .submit-btn:active {
+            transform: translateY(0);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(26, 58, 46, 0.25);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 0.85rem 1rem;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            display: none;
+        }
+
+        .message.error {
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(255, 138, 154, 0.35);
+            color: #ffc9c9;
+        }
+
+        .message.success {
+            background: rgba(76, 140, 106, 0.2);
+            border: 1px solid rgba(140, 222, 170, 0.35);
+            color: #b8f0d0;
+        }
+
+        .success-panel {
+            display: none;
+            background: var(--sheet-bg);
+            border-radius: 14px;
+            padding: 2.5rem 1.5rem;
+            text-align: center;
+            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.28), 0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+            border: 1px solid var(--sheet-border);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .success-panel .icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1.25rem;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #4c8c6a, #2d5e4a);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .success-panel .icon svg {
+            width: 32px;
+            height: 32px;
+            stroke: #fff;
+            stroke-width: 2.5;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .success-panel h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.35rem;
+            color: var(--sheet-text);
+            margin-bottom: 0.5rem;
+        }
+
+        .success-panel p {
+            color: var(--sheet-muted);
+            font-size: 0.95rem;
+            max-width: 28rem;
+            margin: 0 auto;
+        }
+
+        .success-panel .home-link {
+            display: inline-block;
+            margin-top: 1.5rem;
+            color: var(--accent-light);
+            font-weight: 600;
+            text-decoration: none;
+        }
+
+        .success-panel .home-link:hover {
+            text-decoration: underline;
+            color: #c8f5d8;
+        }
+
+        .visually-hidden {
+            position: absolute;
+            width: 1px;
+            height: 1px;
+            padding: 0;
+            margin: -1px;
+            overflow: hidden;
+            clip: rect(0, 0, 0, 0);
+            white-space: nowrap;
+            border: 0;
+        }
+
+        .conditional-q-block {
+            display: none;
+            margin-top: 1.25rem;
+            padding-top: 1.25rem;
+            border-top: 1px solid var(--sheet-input-border);
+        }
+
+        .conditional-q-block.is-visible {
+            display: block;
+        }
+
+        .conditional-q-block .nested-followup {
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.06);
+        }
+
+        .subq-label {
+            font-weight: 600;
+            font-size: 0.95rem;
+            color: var(--sheet-text);
+            margin-bottom: 0.75rem;
+            display: block;
+        }
+
+        @media (max-width: 980px) {
+            header {
+                padding: 1.25rem 1.5rem;
+            }
+
+            .logo {
+                font-size: 1.6rem;
+            }
+        }
+
+        @media (max-width: 600px) {
+            .form-hero h1 {
+                font-size: 1.35rem;
+            }
+
+            .sheet-card-header,
+            .sheet-card-body {
+                padding-left: 1.1rem;
+                padding-right: 1.1rem;
+            }
+
+            .ranking-table {
+                font-size: 0.82rem;
+            }
+
+            .ranking-table td:first-child {
+                padding-right: 0.35rem;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 1rem 1.25rem;
+            }
+
+            .logo {
+                font-size: 1.4rem;
+            }
+        }
+
+        @media (max-width: 375px) {
+            .logo {
+                font-size: 1.3rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div style="display:flex;align-items:center;gap:0.75rem;">
+            <button id="navToggle" class="nav-toggle" aria-label="Open navigation">&#9776;</button>
+            <div class="logo">PoseTek</div>
+        </div>
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <a id="leaderboardBtn" href="leaderboard.html" class="header-nav-btn" title="Leaderboards">
+                <span class="material-symbols-outlined">leaderboard</span>
+                <span>Leaderboard</span>
+            </a>
+            <a href="coachesview.html" class="home-btn home-btn-style" title="Home">
+                <span class="material-symbols-outlined" style="color:var(--text-light);font-size:1.3rem;">home</span>
+            </a>
+        </div>
+    </header>
+
+    <!-- Side navigation panel (matches StaticJumpPage.html) -->
+    <aside id="sideNav" class="side-nav" aria-hidden="true">
+        <div style="display:flex;align-items:center;gap:0.5rem;">
+            <div style="font-weight:700;font-size:1.25rem;">Menu</div>
+            <button class="close-side" id="closeSide">✕</button>
+        </div>
+        <div class="side-divider"></div>
+        <div id="sideProfile" style="display:flex;align-items:center;gap:0.75rem;padding:0.5rem 0;">
+            <div id="profileAvatar" style="width:44px;height:44px;border-radius:10px;background:var(--accent);display:flex;align-items:center;justify-content:center;font-weight:700;color:#fff;font-size:1rem">C</div>
+            <div style="display:flex;flex-direction:column;">
+                <div id="profileName" style="font-weight:700">Coach</div>
+                <div id="profileEmail" style="font-size:0.85rem;opacity:0.85">email@example.com</div>
+            </div>
+        </div>
+        <div class="side-divider"></div>
+        <div id="sideLinks" style="display:flex;flex-direction:column;gap:0.5rem;margin-top:0.5rem"></div>
+        <div class="side-divider"></div>
+        <div style="margin-top:auto">
+            <button class="action-btn" id="sideLogout">Logout</button>
+        </div>
+    </aside>
+    <div id="sideBackdrop" class="side-backdrop" tabindex="-1"></div>
+
+    <main class="page-shell">
+        <div class="form-hero" id="formHero">
+            <p class="eyebrow">Quick feedback</p>
+            <h1>IDP session feedback</h1>
+            <p>Your answers help us improve PoseTek and plan what to build next. When completed you will automatically have access to all of the data in the player dashboard/leaderboard.</p>
+        </div>
+
+        <div id="errorMessage" class="message error" role="alert"></div>
+
+        <form id="feedbackForm">
+            <!-- Q1 -->
+            <section class="sheet-card">
+                <div class="sheet-card-header">
+                    <h2><span class="q-num">1</span> Would you like us to come back to do this again next week?<span class="required-mark">*</span></h2>
+                </div>
+                <div class="sheet-card-body">
+                    <div class="radio-group" role="radiogroup" aria-label="Return next week">
+                        <label class="radio-option">
+                            <input type="radio" name="comeBackNextWeek" value="Yes" required>
+                            Yes
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="comeBackNextWeek" value="No">
+                            No
+                        </label>
+                    </div>
+
+                    <div id="q1YesBranch" class="conditional-q-block" aria-live="polite">
+                        <span class="subq-label">Would you like us to…<span class="required-mark">*</span></span>
+                        <div class="radio-group" role="radiogroup" aria-label="How next week should work">
+                            <label class="radio-option">
+                                <input type="radio" name="nextWeekApproach" value="same_as_last_week">
+                                Do the same thing as last week
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="nextWeekApproach" value="different_data">
+                                Collect different data / test different things
+                            </label>
+                        </div>
+                        <div id="q1DifferentDataBlock" class="conditional-q-block nested-followup">
+                            <label for="differentDataDetails" class="sheet-form-label">What data do you want (dribbling, passing, shooting acc, etc.)?<span class="required-mark">*</span></label>
+                            <textarea id="differentDataDetails" name="differentDataDetails" class="textarea-field" placeholder="e.g. dribbling, passing, shooting accuracy…" rows="3"></textarea>
+                        </div>
+                    </div>
+
+                    <div id="q1NoBranch" class="conditional-q-block" aria-live="polite">
+                        <span class="subq-label">How come?<span class="required-mark">*</span></span>
+                        <div class="radio-group" role="radiogroup" aria-label="Why not come back">
+                            <label class="radio-option">
+                                <input type="radio" name="notReturningReason" value="Takes too long">
+                                Takes too long
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="notReturningReason" value="Would rather use the time to train">
+                                Would rather use the time to train
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="notReturningReason" value="Not interested in the results">
+                                Not interested in the results
+                            </label>
+                            <label class="radio-option">
+                                <input type="radio" name="notReturningReason" value="Other">
+                                Other
+                            </label>
+                        </div>
+                        <div id="notReturningOtherWrap" class="conditional-q-block nested-followup">
+                            <label for="notReturningOther" class="sheet-form-label">Other — tell us more<span class="required-mark">*</span></label>
+                            <textarea id="notReturningOther" name="notReturningOther" class="textarea-field" placeholder="Your thoughts…" rows="3"></textarea>
+                        </div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Q2 -->
+            <section class="sheet-card">
+                <div class="sheet-card-header">
+                    <h2><span class="q-num">2</span> Rank what excites you most about this technology (1 = most excited, 5 = least)<span class="required-mark">*</span></h2>
+                </div>
+                <div class="sheet-card-body">
+                    <p class="hint" style="margin-top:0;margin-bottom:0.75rem;">Assign each rank 1–5 exactly once.</p>
+                    <div style="overflow-x:auto;">
+                        <table class="ranking-table" aria-label="Feature ranking">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Feature</th>
+                                    <th scope="col">Rank</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td>Competition between teammates</td>
+                                    <td>
+                                        <select name="rank_teammates" id="rank_teammates" required aria-label="Rank for competition between teammates">
+                                            <option value="" disabled selected>—</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Quantifying progress over time</td>
+                                    <td>
+                                        <select name="rank_progress" id="rank_progress" required aria-label="Rank for quantifying progress">
+                                            <option value="" disabled selected>—</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>AI-based biomechanics analysis to improve technique / form</td>
+                                    <td>
+                                        <select name="rank_biomech" id="rank_biomech" required aria-label="Rank for AI biomechanics">
+                                            <option value="" disabled selected>—</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Seeing how you compare against pros (quantification)</td>
+                                    <td>
+                                        <select name="rank_pro_quant" id="rank_pro_quant" required aria-label="Rank for compare to pros quantification">
+                                            <option value="" disabled selected>—</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>Seeing how your technique differs from the pros</td>
+                                    <td>
+                                        <select name="rank_pro_tech" id="rank_pro_tech" required aria-label="Rank for technique vs pros">
+                                            <option value="" disabled selected>—</option>
+                                            <option value="1">1</option>
+                                            <option value="2">2</option>
+                                            <option value="3">3</option>
+                                            <option value="4">4</option>
+                                            <option value="5">5</option>
+                                        </select>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Q3 -->
+            <section class="sheet-card">
+                <div class="sheet-card-header">
+                    <h2><span class="q-num">3</span> If this app could do anything, what would you want it to be able to do?<span class="required-mark">*</span></h2>
+                </div>
+                <div class="sheet-card-body">
+                    <label for="dreamFeatures" class="visually-hidden">Your ideas</label>
+                    <textarea id="dreamFeatures" name="dreamFeatures" class="textarea-field" required placeholder="The more detail, the better — drills, reports, social features, anything." minlength="10"></textarea>
+                </div>
+            </section>
+
+            <!-- Q4 -->
+            <section class="sheet-card">
+                <div class="sheet-card-header">
+                    <h2><span class="q-num">4</span> Would you like to see this app integrated with your team on a more regular basis?<span class="required-mark">*</span></h2>
+                </div>
+                <div class="sheet-card-body">
+                    <div class="radio-group" role="radiogroup" aria-label="BUSC integration">
+                        <label class="radio-option">
+                            <input type="radio" name="buscIntegration" value="Yes" required>
+                            Yes
+                        </label>
+                        <label class="radio-option">
+                            <input type="radio" name="buscIntegration" value="No">
+                            No
+                        </label>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Q5 -->
+            <section class="sheet-card">
+                <div class="sheet-card-header">
+                    <h2><span class="q-num">5</span> Would you like to be added to the app waitlist? We will be opening up the app to beta consumers soon!</h2>
+                </div>
+                <div class="sheet-card-body">
+                    <label for="waitlistEmail" class="sheet-form-label">Email (optional)</label>
+                    <input type="email" class="input-field" id="waitlistEmail" name="waitlistEmail" placeholder="you@example.com" autocomplete="email">
+                    <p class="hint">If you enter an email, we&apos;ll add you to the waitlist. Skip if you prefer not to.</p>
+                </div>
+            </section>
+
+            <!-- Q6 -->
+            <section class="sheet-card">
+                <div class="sheet-card-header">
+                    <h2><span class="q-num">6</span> Any other thoughts about this product? (optional)</h2>
+                </div>
+                <div class="sheet-card-body">
+                    <textarea id="otherThoughts" name="otherThoughts" class="textarea-field" placeholder="Development ideas, how training could be more fun, or anything else on your mind…" style="min-height:100px;"></textarea>
+                </div>
+            </section>
+
+            <div class="submit-wrap">
+                <button type="submit" class="submit-btn" id="submitBtn">
+                    <span class="spinner" aria-hidden="true"></span>
+                    Submit feedback
+                </button>
+            </div>
+        </form>
+
+        <div class="success-panel" id="successPanel" role="status">
+            <div class="icon">
+                <svg viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            </div>
+            <h2>Thank you</h2>
+            <p>Your feedback was submitted successfully. We read every response.</p>
+            <a href="kickai.html" class="home-link" id="successBackLink">Back to home</a>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        window.auth = auth;
+        window.db = db;
+
+        // --- Side nav wiring (same as StaticJumpPage.html) ---
+        (function sideNavSetup() {
+            const waitForAuth = () => new Promise((resolve) => {
+                if (window.firebase && window.firebase.auth) return resolve();
+                const t = setInterval(() => {
+                    if (window.firebase && window.firebase.auth) {
+                        clearInterval(t);
+                        resolve();
+                    }
+                }, 50);
+            });
+
+            waitForAuth().then(async () => {
+                const navToggle = document.getElementById('navToggle');
+                const sideNav = document.getElementById('sideNav');
+                const closeSide = document.getElementById('closeSide');
+                const sideLinks = document.getElementById('sideLinks');
+                const sideBackdrop = document.getElementById('sideBackdrop');
+
+                function openSide() {
+                    sideNav.classList.add('open');
+                    sideNav.setAttribute('aria-hidden', 'false');
+                    if (sideBackdrop) sideBackdrop.classList.add('open');
+                }
+
+                function closeSideNav() {
+                    sideNav.classList.remove('open');
+                    sideNav.setAttribute('aria-hidden', 'true');
+                    if (sideBackdrop) sideBackdrop.classList.remove('open');
+                }
+
+                if (navToggle) navToggle.addEventListener('click', (e) => { e.preventDefault(); openSide(); });
+                if (closeSide) closeSide.addEventListener('click', (e) => { e.preventDefault(); closeSideNav(); });
+                if (sideBackdrop) sideBackdrop.addEventListener('click', (e) => { e.preventDefault(); closeSideNav(); });
+                document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeSideNav(); });
+
+                const urlParams = new URLSearchParams(window.location.search || '');
+                const playerParam = urlParams.get('player');
+                const userType = urlParams.get('userType');
+                const isPlayer = userType === 'player';
+
+                let coachUID = null;
+                if (isPlayer && playerParam) {
+                    try {
+                        const pDoc = await db.collection('players').doc(playerParam).get();
+                        if (pDoc.exists) coachUID = pDoc.data().coachUID || null;
+                    } catch (e) { /* ignore */ }
+                }
+
+                const profileHref = isPlayer && playerParam
+                    ? `profile.html?player=${encodeURIComponent(playerParam)}&userType=player`
+                    : (playerParam ? `profile.html?player=${encodeURIComponent(playerParam)}` : 'profile.html');
+
+                let leaderboardHref = 'leaderboard.html';
+                if (isPlayer) {
+                    const lbParams = new URLSearchParams();
+                    if (coachUID) lbParams.set('coach', coachUID);
+                    if (playerParam) lbParams.set('player', playerParam);
+                    lbParams.set('userType', 'player');
+                    leaderboardHref += '?' + lbParams.toString();
+                }
+
+                const navigationLinks = [
+                    { href: profileHref, text: 'Player Profile', icon: 'person' },
+                    ...(isPlayer ? [] : [{ href: 'coachesview.html', text: 'Player Roster', icon: 'people' }]),
+                    { href: leaderboardHref, text: 'Leaderboards', icon: 'leaderboard' }
+                ];
+
+                const lbBtn = document.getElementById('leaderboardBtn');
+                if (lbBtn) lbBtn.href = leaderboardHref;
+
+                const homeBtn = document.querySelector('.home-btn');
+                if (homeBtn && isPlayer) {
+                    homeBtn.href = playerParam ? `profile.html?player=${encodeURIComponent(playerParam)}&userType=player` : 'profile.html?userType=player';
+                }
+
+                navigationLinks.forEach((a, idx) => {
+                    const link = document.createElement('a'); link.href = a.href || '#'; link.className = 'side-link';
+                    const icon = document.createElement('span'); icon.className = 'material-symbols-outlined'; icon.style.fontSize = '20px';
+                    icon.textContent = a.icon;
+                    const spanText = document.createElement('span'); spanText.textContent = a.text;
+                    link.appendChild(icon); link.appendChild(spanText);
+                    link.style.transitionDelay = (idx * 40) + 'ms';
+                    link.addEventListener('click', () => closeSideNav());
+                    sideLinks.appendChild(link);
+                });
+
+                const sideLogoutBtn = document.getElementById('sideLogout');
+                if (sideLogoutBtn) sideLogoutBtn.addEventListener('click', (e) => { e.preventDefault(); firebase.auth().signOut().then(() => window.location.href = 'kickai.html'); });
+            });
+        })();
+
+        const form = document.getElementById('feedbackForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const errorMessage = document.getElementById('errorMessage');
+        const successPanel = document.getElementById('successPanel');
+        const formHero = document.getElementById('formHero');
+
+        function wireConditionalQ1() {
+            const comeBackRadios = document.querySelectorAll('input[name="comeBackNextWeek"]');
+            const q1Yes = document.getElementById('q1YesBranch');
+            const q1No = document.getElementById('q1NoBranch');
+            const approachRadios = document.querySelectorAll('input[name="nextWeekApproach"]');
+            const q1Diff = document.getElementById('q1DifferentDataBlock');
+            const reasonRadios = document.querySelectorAll('input[name="notReturningReason"]');
+            const otherWrap = document.getElementById('notReturningOtherWrap');
+            const differentTa = document.getElementById('differentDataDetails');
+            const otherTa = document.getElementById('notReturningOther');
+            if (!q1Yes || !q1No || !q1Diff || !otherWrap) return;
+
+            function clearBranchYes() {
+                approachRadios.forEach((r) => { r.checked = false; });
+                if (differentTa) differentTa.value = '';
+                q1Diff.classList.remove('is-visible');
+            }
+            function clearBranchNo() {
+                reasonRadios.forEach((r) => { r.checked = false; });
+                if (otherTa) otherTa.value = '';
+                otherWrap.classList.remove('is-visible');
+            }
+
+            comeBackRadios.forEach((r) => r.addEventListener('change', () => {
+                if (r.value === 'Yes') {
+                    q1Yes.classList.add('is-visible');
+                    q1No.classList.remove('is-visible');
+                    clearBranchNo();
+                } else {
+                    q1No.classList.add('is-visible');
+                    q1Yes.classList.remove('is-visible');
+                    clearBranchYes();
+                }
+            }));
+
+            approachRadios.forEach((r) => r.addEventListener('change', () => {
+                if (r.value === 'different_data') {
+                    q1Diff.classList.add('is-visible');
+                } else {
+                    q1Diff.classList.remove('is-visible');
+                    if (differentTa) differentTa.value = '';
+                }
+            }));
+
+            reasonRadios.forEach((r) => r.addEventListener('change', () => {
+                if (r.value === 'Other') {
+                    otherWrap.classList.add('is-visible');
+                } else {
+                    otherWrap.classList.remove('is-visible');
+                    if (otherTa) otherTa.value = '';
+                }
+            }));
+        }
+
+        function validateQ1() {
+            const comeBack = document.querySelector('input[name="comeBackNextWeek"]:checked');
+            if (!comeBack) {
+                return 'Please answer question 1.';
+            }
+            if (comeBack.value === 'Yes') {
+                const approach = document.querySelector('input[name="nextWeekApproach"]:checked');
+                if (!approach) {
+                    return 'Please choose how you would like next week to go.';
+                }
+                if (approach.value === 'different_data') {
+                    const t = document.getElementById('differentDataDetails').value.trim();
+                    if (!t) {
+                        return 'Please describe what data you want us to collect.';
+                    }
+                }
+            } else {
+                const reason = document.querySelector('input[name="notReturningReason"]:checked');
+                if (!reason) {
+                    return 'Please tell us why you would prefer we not come back.';
+                }
+                if (reason.value === 'Other') {
+                    const t = document.getElementById('notReturningOther').value.trim();
+                    if (!t) {
+                        return 'Please enter your thoughts for Other.';
+                    }
+                }
+            }
+            return null;
+        }
+
+        wireConditionalQ1();
+
+        function showError(msg) {
+            errorMessage.textContent = msg;
+            errorMessage.style.display = 'block';
+            errorMessage.classList.remove('success');
+            errorMessage.classList.add('error');
+        }
+
+        function hideError() {
+            errorMessage.style.display = 'none';
+        }
+
+        function setLoading(loading) {
+            submitBtn.disabled = loading;
+            const spin = submitBtn.querySelector('.spinner');
+            if (spin) spin.style.display = loading ? 'inline-block' : 'none';
+        }
+
+        function validateRanking() {
+            const ids = ['rank_teammates', 'rank_progress', 'rank_biomech', 'rank_pro_quant', 'rank_pro_tech'];
+            const values = ids.map((id) => document.getElementById(id).value);
+            if (values.some((v) => !v)) {
+                return 'Please assign a rank to every feature.';
+            }
+            const nums = values.map(Number);
+            const set = new Set(nums);
+            if (set.size !== 5) {
+                return 'Each rank from 1 to 5 must be used exactly once. Adjust your selections so there are no duplicates.';
+            }
+            return null;
+        }
+
+        /** Same-origin relative return path only (open-redirect safe). */
+        function sanitizePreviousPageReturn(raw) {
+            if (!raw) return null;
+            let s;
+            try {
+                s = decodeURIComponent(raw);
+            } catch (err) {
+                return null;
+            }
+            s = s.trim();
+            if (!s) return null;
+            if (s.includes('..') || /javascript:/i.test(s) || /^https?:\/\//i.test(s) || s.startsWith('//')) {
+                return null;
+            }
+            return s;
+        }
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            hideError();
+
+            const q1Err = validateQ1();
+            if (q1Err) {
+                showError(q1Err);
+                return;
+            }
+
+            const rankErr = validateRanking();
+            if (rankErr) {
+                showError(rankErr);
+                return;
+            }
+
+            const waitlistEmail = document.getElementById('waitlistEmail').value.trim();
+            const urlParams = new URLSearchParams(window.location.search || '');
+            const playerId = urlParams.get('player') || null;
+            const returnTo = sanitizePreviousPageReturn(urlParams.get('previousPage'));
+
+            const comeBackVal = document.querySelector('input[name="comeBackNextWeek"]:checked')?.value;
+            const approachLabels = {
+                same_as_last_week: 'Do the same thing as last week',
+                different_data: 'Collect different data / test different things'
+            };
+            let nextWeekApproach = null;
+            let differentDataDetails = null;
+            let notReturningReason = null;
+            let notReturningReasonOther = null;
+
+            if (comeBackVal === 'Yes') {
+                const appr = document.querySelector('input[name="nextWeekApproach"]:checked')?.value;
+                nextWeekApproach = appr ? (approachLabels[appr] || appr) : null;
+                if (appr === 'different_data') {
+                    differentDataDetails = document.getElementById('differentDataDetails').value.trim();
+                }
+            } else if (comeBackVal === 'No') {
+                notReturningReason = document.querySelector('input[name="notReturningReason"]:checked')?.value || null;
+                if (notReturningReason === 'Other') {
+                    notReturningReasonOther = document.getElementById('notReturningOther').value.trim();
+                }
+            }
+
+            const payload = {
+                playerId,
+                comeBackNextWeek: comeBackVal,
+                nextWeekApproach,
+                differentDataDetails,
+                notReturningReason,
+                notReturningReasonOther,
+                ranking: {
+                    competitionBetweenTeammates: Number(document.getElementById('rank_teammates').value),
+                    quantifyingProgressOverTime: Number(document.getElementById('rank_progress').value),
+                    aiBiomechanicsTechnique: Number(document.getElementById('rank_biomech').value),
+                    compareToProsQuantification: Number(document.getElementById('rank_pro_quant').value),
+                    techniqueDiffersFromPros: Number(document.getElementById('rank_pro_tech').value)
+                },
+                dreamAppCapabilities: document.getElementById('dreamFeatures').value.trim(),
+                buscRegularIntegration: document.querySelector('input[name="buscIntegration"]:checked')?.value,
+                waitlistInterested: Boolean(waitlistEmail),
+                waitlistEmail: waitlistEmail || null,
+                otherThoughts: document.getElementById('otherThoughts').value.trim() || null,
+                submittedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+
+            setLoading(true);
+
+            try {
+                const feedbackRef = db.collection('userFeedback').doc();
+                const batch = db.batch();
+                batch.set(feedbackRef, payload);
+                if (playerId) {
+                    batch.update(db.collection('players').doc(playerId), { feedback_form_needed: false });
+                }
+                await batch.commit();
+
+                const successBackLink = document.getElementById('successBackLink');
+                if (successBackLink) {
+                    if (returnTo) {
+                        successBackLink.href = returnTo;
+                        successBackLink.textContent = 'Back to previous page';
+                    } else {
+                        successBackLink.href = 'kickai.html';
+                        successBackLink.textContent = 'Back to home';
+                    }
+                }
+
+                form.style.display = 'none';
+                formHero.style.display = 'none';
+                hideError();
+                successPanel.style.display = 'block';
+            } catch (err) {
+                console.error('Firestore write error:', err);
+                showError('Something went wrong. Please try again in a moment.');
+            } finally {
+                setLoading(false);
+            }
+        });
+    </script>
+    <script src="user-badge.js"></script>
+</body>
+</html>

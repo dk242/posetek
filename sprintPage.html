@@ -10,7 +10,7 @@
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
   <style>
-    :root { --primary:#1a3a2e; --secondary:#2d5e4a; --accent:#4c8c6a; --accent-light:#5ea87e; --text-light:#ffffff; --text-muted:rgba(255,255,255,0.7); --text-dark:#121212; --card-bg:rgba(255,255,255,0.08); --card-border:rgba(255,255,255,0.1); --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); --sa-fullscreen-pad:clamp(10px, 1.2vw, 18px); --sa-stage-ratio:1.82; --sa-pose-aspect:1.3333333333; }
+    :root { --primary:#1a3a2e; --secondary:#2d5e4a; --accent:#4c8c6a; --accent-light:#5ea87e; --text-light:#ffffff; --text-muted:rgba(255,255,255,0.7); --text-dark:#121212; --card-bg:rgba(255,255,255,0.08); --card-border:rgba(255,255,255,0.1); --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1); --sa-fullscreen-pad:clamp(10px, 1.2vw, 18px); --sa-stage-ratio:1.95; --sa-pose-aspect:1.3333333333; }
     *{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color: rgba(76, 140, 106, 0.3);} 
     body{font-family:'Inter',sans-serif;background-color:var(--primary);color:var(--text-light);-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale;-webkit-overflow-scrolling:touch}
     body::before{content:'';position:fixed;inset:0;background:radial-gradient(ellipse 80% 60% at 20% 10%,rgba(76,140,106,0.08),transparent),radial-gradient(ellipse 60% 50% at 80% 80%,rgba(76,140,106,0.05),transparent);pointer-events:none;z-index:0}
@@ -184,7 +184,7 @@
     /* ── Sprint Analysis Layout ─────────────── */
     .sprint-analysis-layout{width:100%}
     .sa-stage{display:flex;gap:1rem;height:70vh;min-height:500px;width:100%;align-items:stretch}
-    .sa-left-panel{flex:0 0 40%;display:flex;flex-direction:column;position:relative;overflow:hidden;background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));border:1px solid var(--card-border);backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28);border-radius:8px}
+    .sa-left-panel{flex:0 0 60%;display:flex;flex-direction:column;position:relative;overflow:hidden;background:linear-gradient(135deg, rgba(255,255,255,0.1), rgba(255,255,255,0.05));border:1px solid var(--card-border);backdrop-filter:blur(10px);box-shadow:0 14px 40px rgba(0,0,0,0.28);border-radius:8px}
     .sa-pose-canvas-wrapper{flex:1;position:relative;min-height:0;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#07110d}
     .sa-pose-canvas-wrapper canvas{max-width:100%;max-height:100%;display:block;background:#1a3a2e}
     .sa-right-panel{flex:1;display:flex;flex-direction:column;gap:1rem;min-width:0}
@@ -193,6 +193,7 @@
     .sa-chart-top .chartWrap{flex:1;min-height:180px}
     .sa-chart-bottom{flex:1;min-height:0;display:flex;flex-direction:column;padding:1rem}
     .sa-joint-chart-wrap{flex:1;min-height:180px}
+    .sa-accel-chart-wrap{flex:1;min-height:180px}
     .sa-ctrl-panel{display:none;flex-direction:column;gap:0.3rem;position:absolute;bottom:46px;right:8px;z-index:100;width:200px;background:rgba(15,31,27,0.94);border:1px solid rgba(255,255,255,0.1);border-radius:10px;backdrop-filter:blur(16px);-webkit-backdrop-filter:blur(16px);padding:0.5rem;box-shadow:0 8px 24px rgba(0,0,0,0.4)}
     .sa-ctrl-panel.open{display:flex}
     .ctrl-panel-header{display:flex;align-items:center;justify-content:space-between;padding-bottom:0.2rem;border-bottom:1px solid rgba(255,255,255,0.08);margin-bottom:0.1rem}
@@ -257,7 +258,7 @@
     .sprint-analysis-layout:fullscreen{width:100vw!important;height:100vh!important;max-width:none!important;max-height:none!important;margin:0!important;padding:var(--sa-fullscreen-pad)!important;box-sizing:border-box;display:flex;align-items:center;justify-content:center;background:#020603;overflow:hidden}
     .sprint-analysis-layout:fullscreen .sa-stage{width:min(calc(100vw - (var(--sa-fullscreen-pad) * 2)), calc((100vh - (var(--sa-fullscreen-pad) * 2)) * var(--sa-stage-ratio)));height:min(calc((100vw - (var(--sa-fullscreen-pad) * 2)) / var(--sa-stage-ratio)), calc(100vh - (var(--sa-fullscreen-pad) * 2)));min-height:0;max-width:100%;max-height:100%;gap:clamp(0.75rem, 1.2vw, 1.15rem)}
     .sprint-analysis-layout:fullscreen .sa-left-panel,.sprint-analysis-layout:fullscreen .sa-right-panel,.sprint-analysis-layout:fullscreen .sa-chart-bottom{min-height:0}
-    .sprint-analysis-layout:fullscreen .sa-chart-top .chartWrap,.sprint-analysis-layout:fullscreen .sa-joint-chart-wrap{min-height:0}
+    .sprint-analysis-layout:fullscreen .sa-chart-top .chartWrap,.sprint-analysis-layout:fullscreen .sa-joint-chart-wrap,.sprint-analysis-layout:fullscreen .sa-accel-chart-wrap{min-height:0}
     .canvas-overlay-btn{position:absolute;bottom:10px;height:auto;border:none;border-radius:8px;background:linear-gradient(135deg, rgba(0,0,0,0.8), rgba(0,0,0,0.7));color:white;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;padding:5px 9px;transition:var(--transition);z-index:10;backdrop-filter:blur(10px);box-shadow:0 2px 8px rgba(0,0,0,0.3)}
     .canvas-overlay-btn:hover{background:linear-gradient(135deg, rgba(0,0,0,0.95), rgba(0,0,0,0.85));transform:scale(1.05)}
     @media (max-width:900px){.sa-stage{flex-direction:column;height:auto;min-height:400px}.sa-left-panel{flex:0 0 auto;min-height:350px}.sa-right-panel{flex:1}}
@@ -409,7 +410,6 @@
           <div class="sa-pose-canvas-wrapper" id="saPoseCanvasWrapper">
             <div id="saFrameNumberDisplay" class="frame-number">Frame: 0</div>
             <button id="saFullscreenBtn" class="fullscreen-btn" title="Fullscreen Sprint Analysis">⛶</button>
-            <button id="saAnglesHintBtn" class="canvas-overlay-btn" title="Click joints on canvas to select angles (up to 3)" style="right:10px;bottom:10px;">📐 Angles</button>
             <canvas id="saPoseCanvas" width="480" height="360"></canvas>
           </div>
           <div class="sa-ctrl-panel" id="saCtrlPanel">
@@ -429,7 +429,7 @@
               <button id="saZoomOutBtn" class="icon-btn" title="Zoom Out">–</button>
               <button id="saZoomInBtn" class="icon-btn" title="Zoom In">+</button>
             </div>
-            <div class="ctrl-hint">Click joints to select angles · Right-drag to pan</div>
+            <div class="ctrl-hint">Right-drag to pan</div>
           </div>
           <div class="sa-yt-bar" id="saYtBar">
             <div class="yt-progress-wrapper">
@@ -450,11 +450,10 @@
           <div class="sa-chart-top" id="saChartTop"></div>
           <div class="sa-chart-bottom card">
             <div class="chart-header">
-              <span class="chart-title">Joint Angles</span>
-              <span id="saJointAngleHint" class="chart-overlay-badge" style="opacity:0.8;">Click joints on pose to add</span>
+              <span class="chart-title">Acceleration</span>
             </div>
-            <div class="chartWrap sa-joint-chart-wrap">
-              <canvas id="jointAngleChart"></canvas>
+            <div class="chartWrap sa-accel-chart-wrap">
+              <canvas id="saAccelChart"></canvas>
             </div>
           </div>
         </div>
@@ -1247,7 +1246,7 @@ function initRawVideoPlayerControls() {
       try { drawRawFrameToCanvas(); } catch(_) {}
       try { sizeSaPoseCanvas(); } catch(_) {}
       try { sizeVelChart(); } catch(_) {}
-      try { if (jointAngleChartInstance) jointAngleChartInstance.resize(); } catch(_) {}
+      try { if (saAccelChartInstance) saAccelChartInstance.resize(); } catch(_) {}
       try { updateSprintAnalysisFullscreenUi(); } catch(_) {}
       try {
         const saLayout = document.getElementById("sprintAnalysisLayout");
@@ -1729,6 +1728,120 @@ function drawJointAngleChart(currentFrame) {
   }
   if (!jointAngleChartInstance) initJointAngleChart();
   else updateJointAngleChartAnnotation(currentFrame);
+}
+
+/** =========================
+ *  Sprint Analysis – Acceleration Chart (bottom-right panel)
+ *  ========================= */
+const saAccelChartCanvas = document.getElementById("saAccelChart");
+let saAccelChartInstance = null;
+
+function initSaAccelChart() {
+  destroySaAccelChart();
+  if (!saAccelChartCanvas || !velocitySeries?.length) return;
+
+  const accelRaw = computeAccelerationSeries();
+  const effStart = startFrame;
+  const effEnd = endFrame != null ? Math.min(endFrame, velocitySeries.length - 1) : velocitySeries.length - 1;
+  const timePoints = [];
+  const accPts = [];
+  for (let i = effStart; i <= effEnd; i++) {
+    const t = (i - effStart) / CHART_VIDEO_FPS;
+    timePoints.push(t);
+    const a = accelRaw[i];
+    accPts.push({ x: t, y: Number.isFinite(a) ? +(a).toFixed(3) : null });
+  }
+
+  const curTimeSec = Math.max(0, (curIdx - effStart) / CHART_VIDEO_FPS);
+
+  saAccelChartInstance = new Chart(saAccelChartCanvas, {
+    type: "line",
+    data: {
+      datasets: [{
+        label: METRIC_PALETTE.acceleration.label,
+        data: accPts,
+        borderColor: METRIC_PALETTE.acceleration.border,
+        backgroundColor: METRIC_PALETTE.acceleration.bg,
+        fill: true, tension: 0.35,
+        pointRadius: 0, pointHoverRadius: 5,
+        borderWidth: 2,
+      }],
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      animation: { duration: 250, easing: "easeOutQuart" },
+      interaction: { mode: "index", intersect: false },
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: "rgba(8,22,17,0.95)",
+          borderColor: "rgba(255,255,255,0.12)",
+          borderWidth: 1,
+          titleColor: "rgba(255,255,255,0.9)",
+          bodyColor: "rgba(255,255,255,0.72)",
+          padding: 10,
+          cornerRadius: 8,
+          callbacks: {
+            title: (items) => `t = ${(+items[0].label).toFixed(2)}s`,
+            label: (ctx) => {
+              const v = ctx.parsed.y;
+              if (v == null || !Number.isFinite(v)) return null;
+              return ` ${ctx.dataset.label}: ${v.toFixed(2)} m/s²`;
+            },
+          },
+        },
+        annotation: {
+          annotations: {
+            frameLine: {
+              type: "line",
+              xMin: curTimeSec, xMax: curTimeSec,
+              borderColor: "rgba(255,75,75,0.8)",
+              borderWidth: 2,
+              borderDash: [5, 3],
+              label: { display: false },
+            },
+          },
+        },
+      },
+      scales: {
+        x: {
+          type: "linear",
+          title: { display: true, text: "Time (s)", color: "rgba(255,255,255,0.55)", font: { size: 10, family: "'Inter',sans-serif" } },
+          ticks: { color: "rgba(255,255,255,0.5)", maxTicksLimit: 9, font: { size: 10 } },
+          grid: { color: "rgba(255,255,255,0.05)" },
+        },
+        y: {
+          type: "linear",
+          title: { display: true, text: "Acceleration (m/s²)", color: "rgba(255,255,255,0.55)", font: { size: 10, family: "'Inter',sans-serif" } },
+          ticks: { color: "rgba(255,255,255,0.5)", font: { size: 10 } },
+          grid: { color: "rgba(255,255,255,0.05)" },
+        },
+      },
+    },
+  });
+}
+
+function destroySaAccelChart() {
+  if (saAccelChartInstance) {
+    saAccelChartInstance.destroy();
+    saAccelChartInstance = null;
+  }
+}
+
+function updateSaAccelChartAnnotation(currentFrame) {
+  if (!saAccelChartInstance?.options?.plugins?.annotation?.annotations?.frameLine) return;
+  const t = Math.max(0, (currentFrame - startFrame) / CHART_VIDEO_FPS);
+  saAccelChartInstance.options.plugins.annotation.annotations.frameLine.xMin = t;
+  saAccelChartInstance.options.plugins.annotation.annotations.frameLine.xMax = t;
+  saAccelChartInstance.update("none");
+}
+
+function drawSaAccelChart(currentFrame) {
+  if (!saAccelChartCanvas) return;
+  if (!velocitySeries?.length) { if (saAccelChartInstance) destroySaAccelChart(); return; }
+  if (!saAccelChartInstance) initSaAccelChart();
+  else updateSaAccelChartAnnotation(currentFrame);
 }
 
 /** =========================
@@ -2952,7 +3065,7 @@ function currentAbsoluteFrame(){
 function render(nowMs){
   if (followCamActive) {
     drawSaPoseFrame(curIdx);
-    drawJointAngleChart(curIdx);
+    drawSaAccelChart(curIdx);
     const saFrameEl = document.getElementById("saFrameNumberDisplay");
     if (saFrameEl) saFrameEl.textContent = "Frame: " + currentAbsoluteFrame();
     const saSlider = document.getElementById("saFrameSlider");
@@ -3158,11 +3271,13 @@ async function applyPremiumLock(playerDocId, userType) {
     const pDoc = await db.collection("players").doc(playerDocId).get();
     if (!pDoc.exists) return;
 
-    const locked = pDoc.data().premium_content_locked;
-    const shouldLock = isCoachUser ? (locked === true) : (locked !== false);
-    if (!shouldLock) return;
+    const d = pDoc.data();
+    const locked = d.premium_content_locked;
+    const feedbackNeeded = d.feedback_form_needed === true;
+    const shouldPremiumLock = isCoachUser ? (locked === true) : (locked !== false);
+    const shouldFeedbackLock = !isCoachUser && feedbackNeeded === true;
 
-    function addLock(el, label, sentFrom) {
+    function addPremiumLock(el, label, sentFrom) {
       if (!el || el.classList.contains("premium-section-locked")) return;
       el.classList.add("premium-section-locked");
       const overlay = document.createElement("div");
@@ -3178,9 +3293,31 @@ async function applyPremiumLock(playerDocId, userType) {
       el.appendChild(overlay);
     }
 
-    addLock(document.getElementById("poseContainer"), "Pose viewer only available for premium members", "sprintPoseViewer");
-    addLock(document.getElementById("sprintAnalysisLayout"), "Sprint analysis only available for premium members", "sprintAnalysis");
-    addLock(document.querySelector(".chart-section"), "Performance analytics only available for premium members", "sprintPerformanceAnalytics");
+    function addFeedbackLock(el, label) {
+      if (!el || el.classList.contains("premium-section-locked")) return;
+      el.classList.add("premium-section-locked");
+      const overlay = document.createElement("div");
+      overlay.className = "lock-overlay";
+      overlay.innerHTML = '<span class="material-symbols-outlined">lock</span><span>' + (label || "Complete feedback form") + "</span>";
+      if (!isCoachUser) {
+        const btn = document.createElement("a");
+        btn.className = "unlock-btn";
+        btn.textContent = "Complete feedback form";
+        btn.href = "feedbackForm.html?player=" + encodeURIComponent(playerDocId) + "&userType=player&previousPage=" + encodeURIComponent((window.location.pathname.split("/").pop() || "") + (window.location.search || ""));
+        overlay.appendChild(btn);
+      }
+      el.appendChild(overlay);
+    }
+
+    if (shouldPremiumLock) {
+      addPremiumLock(document.getElementById("poseContainer"), "Pose viewer only available for premium members", "sprintPoseViewer");
+      addPremiumLock(document.getElementById("sprintAnalysisLayout"), "Sprint analysis only available for premium members", "sprintAnalysis");
+      addPremiumLock(document.querySelector(".chart-section"), "Performance analytics only available for premium members", "sprintPerformanceAnalytics");
+    } else if (shouldFeedbackLock) {
+      addFeedbackLock(document.getElementById("poseContainer"), "Complete feedback form");
+      addFeedbackLock(document.getElementById("sprintAnalysisLayout"), "Complete feedback form");
+      addFeedbackLock(document.querySelector(".chart-section"), "Complete feedback form");
+    }
   } catch (err) {
     console.error("[PremiumLock] Error checking premium lock:", err);
   }
@@ -3390,7 +3527,7 @@ function toggleSprintAnalysisLayout() {
     requestAnimationFrame(() => {
       sizeSaPoseCanvas();
       sizeVelChart();
-      if (jointAngleChartInstance) jointAngleChartInstance.resize();
+      if (saAccelChartInstance) saAccelChartInstance.resize();
       render(performance.now());
       updateSprintAnalysisFullscreenUi();
     });
@@ -3410,24 +3547,31 @@ function toggleSprintAnalysisLayout() {
 safeOn("followCamBtn", "click", toggleSprintAnalysisLayout);
 safeOn("saExitSprintBtn", "click", toggleSprintAnalysisLayout);
 
+let _preSaChartMetric = null;
 function initSprintAnalysisMode() {
   const chartSection = document.querySelector(".chart-section");
   const saChartTop = document.getElementById("saChartTop");
   if (chartSection && saChartTop) saChartTop.appendChild(chartSection);
+
+  _preSaChartMetric = activeChartMetric;
+  setChartMetric("velocity");
+  const tabs = document.getElementById("chartModeTabs");
+  if (tabs) tabs.style.display = "none";
+
   sizeSaPoseCanvas();
-  initJointAngleChart();
+  initSaAccelChart();
   wireSaControls();
   requestAnimationFrame(() => {
     sizeSaPoseCanvas();
     sizeVelChart();
-    if (jointAngleChartInstance) jointAngleChartInstance.resize();
+    if (saAccelChartInstance) saAccelChartInstance.resize();
   });
 
   const wrapper = document.getElementById("saPoseCanvasWrapper");
   if (wrapper && typeof ResizeObserver !== "undefined") {
     const ro = new ResizeObserver(() => {
       sizeSaPoseCanvas();
-      if (jointAngleChartInstance) jointAngleChartInstance.resize();
+      if (saAccelChartInstance) saAccelChartInstance.resize();
     });
     ro.observe(wrapper);
     window._saResizeObserver = ro;
@@ -3442,7 +3586,13 @@ function teardownSprintAnalysisMode() {
   const chartSection = document.querySelector(".chart-section");
   const bottomRow = document.querySelector(".bottom-row");
   if (chartSection && bottomRow) bottomRow.appendChild(chartSection);
-  destroyJointAngleChart();
+
+  const tabs = document.getElementById("chartModeTabs");
+  if (tabs) tabs.style.display = "";
+  if (_preSaChartMetric) setChartMetric(_preSaChartMetric);
+  _preSaChartMetric = null;
+
+  destroySaAccelChart();
   sizeAll();
 }
 
@@ -3508,7 +3658,6 @@ function wireSaControls() {
       if (hitIdx !== null) {
         if (selectedJoints.has(hitIdx)) selectedJoints.delete(hitIdx);
         else if (selectedJoints.size < 3) selectedJoints.add(hitIdx);
-        initJointAngleChart();
         render(performance.now());
       }
     };
