@@ -179,6 +179,9 @@
     .chart-overlay-badge.hidden{opacity:0;pointer-events:none}
     .chartWrap{position:relative;min-height:280px;height:280px}
     .chartWrap canvas{width:100%!important;height:100%!important}
+    .chart-coming-soon{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(12,24,20,0.78);border-radius:6px;z-index:2;pointer-events:none}
+    .chart-coming-soon span{font-size:clamp(1.5rem,4.2vw,2.35rem);font-weight:800;color:rgba(255,255,255,0.34);letter-spacing:0.14em;text-transform:uppercase;font-family:'Inter',sans-serif;text-shadow:0 1px 0 rgba(0,0,0,0.25)}
+    .chart-coming-soon.hidden{display:none}
     @media (max-width:640px){.chart-header{flex-direction:column;align-items:flex-start}.chart-mode-tabs{gap:0.25rem}}
 
     /* ── Sprint Analysis Layout ─────────────── */
@@ -219,8 +222,18 @@
     .yt-bar-overlay-btn{height:28px;padding:0 12px;margin-right:4px;border:1px solid rgba(255,255,255,0.15);border-radius:6px;background:rgba(255,255,255,0.06);color:rgba(255,255,255,0.9);font-size:12px;font-weight:500;cursor:pointer;transition:var(--transition);touch-action:manipulation;user-select:none;white-space:nowrap}
     .yt-bar-overlay-btn:hover{background:rgba(255,255,255,0.12);border-color:rgba(255,255,255,0.25)}
     .yt-bar-overlay-btn.active{background:linear-gradient(135deg, var(--accent) 0%, #56a07a 100%);border-color:rgba(255,255,255,0.2);color:white}
-    .pro-overlay-popover{position:absolute;bottom:100%;right:0;margin-bottom:4px;padding:0.5rem;background:rgba(15,31,27,0.94);border:1px solid rgba(255,255,255,0.1);border-radius:8px;backdrop-filter:blur(16px);box-shadow:0 8px 24px rgba(0,0,0,0.4);z-index:101}
-    .pro-overlay-popover .overlay-select{min-width:140px}
+    .pro-overlay-popover{position:absolute;bottom:100%;right:0;margin-bottom:4px;padding:0.35rem 0.4rem;background:rgba(15,31,27,0.96);border:1px solid rgba(255,255,255,0.1);border-radius:8px;backdrop-filter:blur(16px);box-shadow:0 6px 20px rgba(0,0,0,0.35);z-index:101;width:max-content;min-width:8.5rem;max-width:min(11rem,78vw)}
+    .pro-overlay-label{font-size:0.62rem;font-weight:600;letter-spacing:0.06em;text-transform:uppercase;opacity:0.55;margin:0 0 0.35rem 0.15rem}
+    .pro-overlay-list{display:flex;flex-direction:column;gap:1px;max-height:min(220px,38vh);overflow-y:auto;overflow-x:hidden;padding-right:2px}
+    .pro-overlay-list::-webkit-scrollbar{width:5px}
+    .pro-overlay-list::-webkit-scrollbar-thumb{background:rgba(255,255,255,0.15);border-radius:3px}
+    .pro-overlay-option{display:flex;align-items:center;gap:0.3rem;width:100%;text-align:left;border:none;border-radius:6px;background:transparent;color:rgba(255,255,255,0.9);font-size:0.72rem;font-weight:500;padding:0.32rem 0.38rem;cursor:pointer;font-family:inherit;transition:background 0.12s ease}
+    .pro-overlay-option:hover{background:rgba(255,255,255,0.06)}
+    .pro-overlay-option.selected{background:rgba(76,140,106,0.32);color:#fff}
+    .pro-overlay-check{flex:0 0 1rem;width:1rem;font-size:0.95rem!important;line-height:1;color:var(--accent-light)}
+    .pro-overlay-option:not(.selected) .pro-overlay-check{color:transparent}
+    .pro-overlay-option-label{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+    .overlay-athlete-select-hidden{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0;opacity:0;pointer-events:none}
 
     /* Premium lock */
     .premium-section-locked{position:relative;pointer-events:none;user-select:none}
@@ -338,9 +351,9 @@
           <div class="slider-group">
             <div class="slider-row">
               <span class="slider-label">Speed</span>
-              <span id="poseSpeedValue" class="slider-value">1.0x</span>
+              <span id="poseSpeedValue" class="slider-value">0.25x</span>
             </div>
-            <input id="poseSpeedSlider" type="range" min="0" max="8" step="1" value="5"/>
+            <input id="poseSpeedSlider" type="range" min="0" max="8" step="1" value="2"/>
           </div>
           <div class="ctrl-hint">Drag to pan · Scroll to zoom</div>
         </div>
@@ -369,23 +382,14 @@
             <div style="position:relative;">
               <button id="proOverlayBtn" class="yt-bar-btn sprint-analysis-btn" title="Pro Overlay" style="font-size:0.6rem;width:auto;padding:0 0.45rem;border-radius:6px;font-weight:700;">Pro Overlay</button>
               <div id="proOverlayPopover" class="pro-overlay-popover" style="display:none;">
-                <label for="overlayAthleteSelect" style="display:block;font-size:0.7rem;opacity:0.7;margin-bottom:0.25rem;">Compare with</label>
-                <select id="overlayAthleteSelect" class="overlay-select" aria-label="Overlay professional athlete" style="font-size:0.75rem;padding:0.35rem 0.6rem;">
-                  <option value="none">No overlay</option>
-                  <optgroup label="Sprinters">
-                    <option value="bolt">Usain Bolt</option>
-                    <option value="fraser">Shelly-Ann Fraser-Pryce</option>
-                    <option value="thompson">Elaine Thompson-Herah</option>
-                  </optgroup>
-                  <optgroup label="Soccer">
-                    <option value="messi">Lionel Messi</option>
-                    <option value="ronaldo">Cristiano Ronaldo</option>
-                    <option value="mbappe">Kylian Mbappé</option>
-                  </optgroup>
+                <div class="pro-overlay-label">Compare with</div>
+                <div id="overlayAthleteList" class="pro-overlay-list" role="listbox" aria-label="Compare with athlete"></div>
+                <select id="overlayAthleteSelect" class="overlay-athlete-select-hidden" aria-hidden="true" tabindex="-1" title="Pro overlay selection">
+                  <option value="none" selected>None</option>
                 </select>
               </div>
             </div>
-            <button id="followCamBtn" class="yt-bar-btn sprint-analysis-btn pulsate-attention" title="View Sprint Analysis" style="font-size:0.6rem;width:auto;padding:0 0.45rem;border-radius:6px;font-weight:700;">View Sprint Analysis</button>
+            <button id="followCamBtn" class="yt-bar-btn sprint-analysis-btn pulsate-attention" title="View Sprint Analysis" style="display:none;font-size:0.6rem;width:auto;padding:0 0.45rem;border-radius:6px;font-weight:700;">View Sprint Analysis</button>
             <button class="yt-bar-btn" id="poseExpandBtn" title="Settings">
               <span class="material-symbols-outlined">tune</span>
             </button>
@@ -420,9 +424,9 @@
             <div class="slider-group">
               <div class="slider-row">
                 <span class="slider-label">Speed</span>
-                <span id="saSpeedValue" class="slider-value">1.0x</span>
+                <span id="saSpeedValue" class="slider-value">0.25x</span>
               </div>
-              <input id="saSpeedSlider" type="range" min="0" max="8" step="1" value="5"/>
+              <input id="saSpeedSlider" type="range" min="0" max="8" step="1" value="2"/>
             </div>
             <div class="btn-row" style="gap:0.3rem;">
               <button id="saResetViewBtn" class="icon-btn" title="Reset View">⟲</button>
@@ -483,9 +487,9 @@
           <div class="slider-group">
             <div class="slider-row">
               <span class="slider-label">Speed</span>
-              <span id="rawSpeedValue" class="slider-value">1.0x</span>
+              <span id="rawSpeedValue" class="slider-value">0.25x</span>
             </div>
-            <input id="rawSpeedSlider" type="range" min="0" max="8" step="1" value="5"/>
+            <input id="rawSpeedSlider" type="range" min="0" max="8" step="1" value="2"/>
           </div>
           <div class="slider-group" style="margin-top:0.5rem">
             <div class="slider-row">
@@ -546,12 +550,12 @@
             <button class="chart-tab" data-metric="acceleration">Accel</button>
             <button class="chart-tab" data-metric="stride-freq">Stride Freq</button>
             <button class="chart-tab" data-metric="stride-length">Stride Len</button>
-            <button class="chart-tab" data-metric="all">All</button>
           </div>
         </div>
       </div>
       <div class="chartWrap">
         <canvas id="velChart"></canvas>
+        <div id="velChartComingSoon" class="chart-coming-soon hidden" aria-hidden="true"><span>Coming soon</span></div>
       </div>
     </section>
   </div>
@@ -784,7 +788,7 @@ const rawCtx = rawCanvas ? rawCanvas.getContext("2d", { alpha: false }) : null;
 
 // Raw video player state (kept independent from the sprint pose renderer)
 const RAW_SPEEDS = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
-let rawSpeedIdx = 5; // 1.0x
+let rawSpeedIdx = 2; // 0.25x default
 let rawIsPlaying = false;
 let rawRvfcHandle = null;
 let rawTimeHandler = null;
@@ -1207,7 +1211,7 @@ function initRawVideoPlayerControls() {
 
   const speedSlider = document.getElementById("rawSpeedSlider");
   if (speedSlider) speedSlider.addEventListener("input", () => {
-    rawSpeedIdx = clamp(parseInt(speedSlider.value, 10) || 5, 0, RAW_SPEEDS.length - 1);
+    rawSpeedIdx = clamp(parseInt(speedSlider.value, 10) || 2, 0, RAW_SPEEDS.length - 1);
     try { rawVideoEl.playbackRate = RAW_SPEEDS[rawSpeedIdx] || 1; } catch (_) {}
     updateRawUi();
   });
@@ -1312,8 +1316,6 @@ let activeChartMetric = "velocity";
 const METRIC_PALETTE = {
   velocity:       { border: "#58c59a", bg: "rgba(88,197,154,0.13)",   label: "Speed (mph)",            unit: "mph"   },
   acceleration:   { border: "#63b3ed", bg: "rgba(99,179,237,0.13)",   label: "Acceleration (m/s²)",   unit: "m/s²" },
-  "stride-freq":  { border: "#e879f9", bg: "rgba(232,121,249,0.13)",  label: "Stride Frequency (Hz)",  unit: "Hz"    },
-  "stride-length":{ border: "#fb923c", bg: "rgba(251,146,60,0.13)",   label: "Stride Length (m)",      unit: "m"     },
 };
 
 function destroyVelocityChart() {
@@ -1344,39 +1346,399 @@ function computeAccelerationSeries() {
   });
 }
 
-/** Placeholder stride frequency (Hz) derived from velocity shape */
-function generatePlaceholderStrideFreq() {
-  if (!velocitySeries?.length) return [];
-  return velocitySeries.map((v, i) => {
-    if (!Number.isFinite(v) || v < 0.4) return null;
-    return 2.1 + (v / 11.5) * 2.3 + 0.11 * Math.sin(i * 0.88);
+/** Velocity (m/s) from position–time samples using central differences (interior) and one-sided at ends */
+function velocityFromTxData(data) {
+  const n = data.length;
+  const out = new Array(n).fill(null);
+  if (n < 2) return out;
+  for (let i = 0; i < n; i++) {
+    const t = +data[i].t, x = +data[i].x;
+    if (!Number.isFinite(t) || !Number.isFinite(x)) continue;
+    if (i === 0) {
+      const t1 = +data[1].t, x1 = +data[1].x;
+      if (Number.isFinite(t1) && Number.isFinite(x1) && Math.abs(t1 - t) > 1e-9) out[i] = (x1 - x) / (t1 - t);
+    } else if (i === n - 1) {
+      const t0 = +data[i - 1].t, x0 = +data[i - 1].x;
+      if (Number.isFinite(t0) && Number.isFinite(x0) && Math.abs(t - t0) > 1e-9) out[i] = (x - x0) / (t - t0);
+    } else {
+      const t0 = +data[i - 1].t, x0 = +data[i - 1].x, t2 = +data[i + 1].t, x2 = +data[i + 1].x;
+      if (Number.isFinite(t0) && Number.isFinite(x0) && Number.isFinite(t2) && Number.isFinite(x2) && t2 > t0) {
+        out[i] = (x2 - x0) / (t2 - t0);
+      }
+    }
+  }
+  return out;
+}
+
+/** Same smoothing as player data, then a = Δv/Δt using actual sample times (m/s²) */
+function computeAccelerationFromVelocityAndTime(vel, t) {
+  if (!vel?.length || vel.length < 2 || !t?.length || t.length !== vel.length) return [];
+  const smoothed = slidingMean(vel, 13);
+  return smoothed.map((v, i) => {
+    if (i === 0 || !Number.isFinite(v)) return null;
+    const prev = smoothed[i - 1];
+    const dt = t[i] - t[i - 1];
+    if (!Number.isFinite(dt) || dt <= 0 || !Number.isFinite(prev)) return null;
+    return (v - prev) / dt;
   });
 }
 
-/** Placeholder stride length (m) = velocity / stride_frequency */
-function generatePlaceholderStrideLength() {
-  if (!velocitySeries?.length) return [];
-  return velocitySeries.map((v, i) => {
-    if (!Number.isFinite(v) || v < 0.4) return null;
-    const freq = 2.1 + (v / 11.5) * 2.3;
-    return freq > 0 ? v / freq + 0.04 * Math.sin(i * 0.62) : null;
-  });
+/** Firebase Storage: ProfessionalOverlay/sprintingSims — see parseSprintingSimFilename */
+const PRO_OVERLAY_SPRINTING_SIMS_PATH = "ProfessionalOverlay/sprintingSims";
+let proOverlaySprintSimsListed = false;
+let proOverlayFilesByPlayerKey = new Map();
+/** @type {{ label: string, t: number[], xMeters: number[], velMps: number[], accelMps2: number[], fps: number, fileName: string, startingFramePro: number | null } | null} */
+let proOverlaySeries = null;
+
+const PRO_OVERLAY_LINE = { border: "rgba(255,214,80,0.95)", bg: "rgba(255,214,80,0.06)", dash: [7, 5] };
+
+/** Duration (s) of the player curve on the performance chart: same span as initVelocityChart / buildChartDatasets */
+function getAthleteChartDurationSec() {
+  if (!velocitySeries?.length) return null;
+  const effEnd = endFrame != null ? Math.min(endFrame, velocitySeries.length - 1) : velocitySeries.length - 1;
+  if (effEnd < startFrame) return null;
+  return (effEnd - startFrame) / CHART_VIDEO_FPS;
 }
 
-/** Reference peak values for professional athlete overlays */
-function getAthleteRef(metric) {
+/** First valid player velocity (m/s) in the chart window — for pro time alignment */
+function getPlayerStartVelocityMps() {
+  if (!velocitySeries?.length) return null;
+  const effEnd = endFrame != null ? Math.min(endFrame, velocitySeries.length - 1) : velocitySeries.length - 1;
+  for (let fi = startFrame; fi <= effEnd; fi++) {
+    const v = velocitySeries[fi];
+    if (Number.isFinite(v)) return v;
+  }
+  return null;
+}
+
+/**
+ * Match Storage names under sprintingSims. Supported forms (first_last … .json):
+ *   {distance}m_{fps}_fps.json       — usain_bolt_100m_60_fps.json
+ *   {distance}m_{run}_{fps}_fps.json — usain_bolt_100m_1_60_fps.json
+ *   {distance}m_{fps}fps.json        — usain_bolt_40m_60fps.json  (canonical)
+ *   {distance}m_{run}_{fps}fps.json  — usain_bolt_40m_1_60fps.json
+ */
+function parseSprintingSimFilename(name) {
+  let m = /^([^_]+)_([^_]+)_(\d+(?:\.\d+)?)m_(\d+)_(\d+)_fps\.json$/i.exec(name);
+  if (m) return { first: m[1], last: m[2], distance: m[3], number: m[4], fps: m[5] };
+  m = /^([^_]+)_([^_]+)_(\d+(?:\.\d+)?)m_(\d+)_fps\.json$/i.exec(name);
+  if (m) return { first: m[1], last: m[2], distance: m[3], number: null, fps: m[4] };
+  m = /^([^_]+)_([^_]+)_(\d+(?:\.\d+)?)m_(\d+)_(\d+)fps\.json$/i.exec(name);
+  if (m) return { first: m[1], last: m[2], distance: m[3], number: m[4], fps: m[5] };
+  m = /^([^_]+)_([^_]+)_(\d+(?:\.\d+)?)m_(\d+)fps\.json$/i.exec(name);
+  if (m) return { first: m[1], last: m[2], distance: m[3], number: null, fps: m[4] };
+  return null;
+}
+
+function formatOverlayPlayerLabel(first, last) {
+  const cap = (s) => (s && s.length ? s.charAt(0).toUpperCase() + s.slice(1).toLowerCase() : "");
+  return `${cap(first)} ${cap(last)}`.trim();
+}
+
+function overlayPlayerValueKey(first, last) {
+  return `${first.toLowerCase()}_${last.toLowerCase()}`;
+}
+
+function renderOverlayAthleteList() {
   const sel = document.getElementById("overlayAthleteSelect");
-  const overlay = sel?.value || "none";
-  if (overlay === "none") return null;
-  const DB = {
-    bolt:     { velocity: 27.8, acceleration: 44.7, "stride-freq": 4.64, "stride-length": 2.77 },
-    fraser:   { velocity: 23.6, acceleration: 37.5, "stride-freq": 4.49, "stride-length": 2.10 },
-    thompson: { velocity: 24.2, acceleration: 39.8, "stride-freq": 4.60, "stride-length": 2.15 },
-    messi:    { velocity: 22.5, acceleration: 34.5, "stride-freq": 4.30, "stride-length": 2.05 },
-    ronaldo:  { velocity: 22.9, acceleration: 35.8, "stride-freq": 4.25, "stride-length": 2.12 },
-    mbappe:   { velocity: 24.7, acceleration: 42.0, "stride-freq": 4.55, "stride-length": 2.25 },
+  const list = document.getElementById("overlayAthleteList");
+  if (!sel || !list) return;
+  list.innerHTML = "";
+  for (let i = 0; i < sel.options.length; i++) {
+    const opt = sel.options[i];
+    const row = document.createElement("button");
+    row.type = "button";
+    row.className = "pro-overlay-option";
+    row.dataset.value = opt.value;
+    row.setAttribute("role", "option");
+    const selected = sel.value === opt.value;
+    row.classList.toggle("selected", selected);
+    row.setAttribute("aria-selected", selected ? "true" : "false");
+    const check = document.createElement("span");
+    check.className = "pro-overlay-check material-symbols-outlined";
+    check.textContent = selected ? "check" : "";
+    check.setAttribute("aria-hidden", "true");
+    const lab = document.createElement("span");
+    lab.className = "pro-overlay-option-label";
+    lab.textContent = opt.text;
+    row.appendChild(check);
+    row.appendChild(lab);
+    row.addEventListener("click", (e) => {
+      e.stopPropagation();
+      if (sel.value === opt.value) return;
+      sel.value = opt.value;
+      sel.dispatchEvent(new Event("change", { bubbles: true }));
+    });
+    list.appendChild(row);
+  }
+}
+
+function updateOverlayAthleteListSelection() {
+  const sel = document.getElementById("overlayAthleteSelect");
+  const list = document.getElementById("overlayAthleteList");
+  if (!sel || !list) return;
+  const v = sel.value;
+  list.querySelectorAll(".pro-overlay-option").forEach((row) => {
+    const selected = row.dataset.value === v;
+    row.classList.toggle("selected", selected);
+    row.setAttribute("aria-selected", selected ? "true" : "false");
+    const check = row.querySelector(".pro-overlay-check");
+    if (check) check.textContent = selected ? "check" : "";
+  });
+}
+
+async function populateProOverlayAthleteDropdown() {
+  const sel = document.getElementById("overlayAthleteSelect");
+  if (!sel) return;
+  const prev = sel.value;
+  const byKey = new Map();
+  proOverlayFilesByPlayerKey = new Map();
+  try {
+    const folderRef = storage.ref(PRO_OVERLAY_SPRINTING_SIMS_PATH);
+    console.log("[ProOverlay] debug: listing Storage — bucket=%s fullPath=%s", folderRef.bucket, folderRef.fullPath);
+    const res = await folderRef.listAll();
+    const prefixPaths = res.prefixes.map((p) => p.fullPath);
+    const fileNames = res.items.map((it) => it.name);
+    console.log("[ProOverlay] debug: listAll() — prefixCount=%d subfolders=%o fileCount=%d fileNames=%o",
+      res.prefixes.length, prefixPaths, res.items.length, fileNames);
+    if (res.prefixes.length && !res.items.length) {
+      console.warn("[ProOverlay] debug: files may live under subfolders; listAll() only returns direct children. Expand prefixes or flatten JSON into this folder.");
+    }
+    for (const item of res.items) {
+      if (!item.name) continue;
+      if (!item.name.toLowerCase().endsWith(".json")) {
+        console.log("[ProOverlay] debug: skip (not .json):", item.name);
+        continue;
+      }
+      const p = parseSprintingSimFilename(item.name);
+      if (!p) {
+        console.log("[ProOverlay] debug: skip (filename does not match sprintingSim patterns, e.g. first_last_40m_60fps.json):", item.name);
+        continue;
+      }
+      const key = overlayPlayerValueKey(p.first, p.last);
+      if (!byKey.has(key)) byKey.set(key, { first: p.first, last: p.last });
+      if (!proOverlayFilesByPlayerKey.has(key)) proOverlayFilesByPlayerKey.set(key, []);
+      proOverlayFilesByPlayerKey.get(key).push(item.name);
+    }
+    console.log("[ProOverlay] debug: unique players parsed=%d keys=%o", byKey.size, Array.from(byKey.keys()));
+  } catch (e) {
+    console.warn("[ProOverlay] Could not list", PRO_OVERLAY_SPRINTING_SIMS_PATH, e);
+  }
+  const players = Array.from(byKey.values()).sort((a, b) =>
+    formatOverlayPlayerLabel(a.first, a.last).localeCompare(formatOverlayPlayerLabel(b.first, b.last), undefined, { sensitivity: "base" })
+  );
+  console.log("[ProOverlay] debug: final dropdown — optionCount=%d (including None) labels=%o",
+    players.length + 1,
+    ["None", ...players.map((p) => formatOverlayPlayerLabel(p.first, p.last))]);
+  sel.innerHTML = "";
+  const noneOpt = document.createElement("option");
+  noneOpt.value = "none";
+  noneOpt.textContent = "None";
+  noneOpt.selected = true;
+  sel.appendChild(noneOpt);
+  for (const pl of players) {
+    const opt = document.createElement("option");
+    opt.value = overlayPlayerValueKey(pl.first, pl.last);
+    opt.textContent = formatOverlayPlayerLabel(pl.first, pl.last);
+    sel.appendChild(opt);
+  }
+  const keys = new Set(["none", ...players.map((p) => overlayPlayerValueKey(p.first, p.last))]);
+  if (prev && keys.has(prev)) {
+    sel.value = prev;
+    noneOpt.selected = false;
+  } else {
+    sel.value = "none";
+  }
+  proOverlaySprintSimsListed = true;
+  renderOverlayAthleteList();
+  refreshChartOverlayBadge();
+  const proBtn = document.getElementById("proOverlayBtn");
+  if (proBtn) proBtn.classList.toggle("active", sel.value !== "none");
+  if (sel.value !== "none") {
+    try { await loadProOverlaySprintData(); } catch (e) { console.warn("[ProOverlay] load after populate failed:", e); }
+  }
+}
+
+async function loadProOverlaySprintData() {
+  const sel = document.getElementById("overlayAthleteSelect");
+  const key = sel?.value || "none";
+  proOverlaySeries = null;
+  if (key === "none" || !proOverlayFilesByPlayerKey.has(key)) return;
+  const files = [...(proOverlayFilesByPlayerKey.get(key) || [])].sort();
+  if (!files.length) return;
+  const loaded = await Promise.all(
+    files.map(async (fileName) => {
+      try {
+        const path = `${PRO_OVERLAY_SPRINTING_SIMS_PATH}/${fileName}`;
+        const url = await storage.ref(path).getDownloadURL();
+        const json = await (await fetch(url)).json();
+        const data = json.data;
+        if (!Array.isArray(data) || data.length < 2) return null;
+        return { json, data, fileName, len: data.length };
+      } catch (e) {
+        console.warn("[ProOverlay] skip file", fileName, e);
+        return null;
+      }
+    })
+  );
+  const best = loaded.filter(Boolean).sort((a, b) => b.len - a.len)[0];
+  if (!best) return;
+  const { json, data, fileName } = best;
+  const velMps = velocityFromTxData(data);
+  const t = data.map((p) => +p.t);
+  const xMeters = data.map((p) => +p.x);
+  const accelMps2 = computeAccelerationFromVelocityAndTime(velMps, t);
+  const sfp = json.starting_frame;
+  proOverlaySeries = {
+    label: json.athlete || sel.options[sel.selectedIndex]?.text || "Pro",
+    t,
+    xMeters,
+    velMps,
+    accelMps2,
+    fps: Number(json.fps) || 60,
+    fileName,
+    startingFramePro: Number.isFinite(sfp) && sfp >= 0 ? Math.floor(sfp) : null,
   };
-  return DB[overlay]?.[metric] ?? null;
+}
+
+/**
+ * Pro alignment index k and tAlign = t[k]: prefer json.starting_frame when present,
+ * else match pro velocity to the player's first valid velocity at/after startFrame (same as chart intent).
+ */
+function getProOverlayAlignment() {
+  if (!proOverlaySeries?.t?.length) return null;
+  const { t, velMps, startingFramePro } = proOverlaySeries;
+  const n = t.length;
+  let k = 0;
+  if (startingFramePro != null) {
+    k = Math.min(Math.max(0, startingFramePro), n - 1);
+  } else {
+    const vPlayerStart = getPlayerStartVelocityMps();
+    if (Number.isFinite(vPlayerStart)) {
+      let best = Infinity;
+      for (let i = 0; i < n; i++) {
+        const v = velMps[i];
+        if (!Number.isFinite(v)) continue;
+        const diff = Math.abs(v - vPlayerStart);
+        if (diff < best) {
+          best = diff;
+          k = i;
+        }
+      }
+    }
+  }
+  const tAlign = t[k];
+  return { k, tAlign, n };
+}
+
+/** Elapsed time (s) from the player's start_frame (aruco) to frameIdx — same as chart time axis. */
+function getPlayerElapsedSecFromStartFrame(frameIdx) {
+  return Math.max(0, (frameIdx - startFrame) / CHART_VIDEO_FPS);
+}
+
+/** Pro sample index for current player frame, using startFrame alignment and same k/tAlign as charts. */
+function getProOverlaySampleForPlayerFrame(frameIdx) {
+  const align = getProOverlayAlignment();
+  if (!align || !proOverlaySeries?.t?.length || !proOverlaySeries.xMeters?.length) return null;
+  const { k, tAlign, n } = align;
+  const { t, xMeters } = proOverlaySeries;
+  const T_max = getAthleteChartDurationSec();
+  let tElapsed = getPlayerElapsedSecFromStartFrame(frameIdx);
+  if (T_max != null && T_max > 0) tElapsed = Math.min(tElapsed, T_max);
+  const tTarget = tAlign + tElapsed;
+  let i = k;
+  for (let j = k; j < n; j++) {
+    if (t[j] <= tTarget) i = j;
+    else break;
+  }
+  return { i, k, xPro: xMeters[i], tAlign };
+}
+
+/** Normalized COM x at the player's start_frame (first valid at/after startFrame). */
+function getComNormXAtPlayerStartFrame() {
+  if (!comSeries.length) return null;
+  const hi = comSeries.length - 1;
+  const from = Math.min(Math.max(startFrame, 0), hi);
+  for (let f = from; f <= hi; f++) {
+    const pt = comSeries[f];
+    if (pt && pt.length >= 2 && Number.isFinite(pt[0])) return pt[0];
+  }
+  for (let f = from; f >= 0; f--) {
+    const pt = comSeries[f];
+    if (pt && pt.length >= 2 && Number.isFinite(pt[0])) return pt[0];
+  }
+  return null;
+}
+
+/**
+ * Horizontal position (normalized [0..1] x) for the pro reference line: same time alignment as charts;
+ * meters offset from alignment mapped across the ArUco span using distance.
+ */
+function getProOverlayDisplayNormX(frameIdx) {
+  const sample = getProOverlaySampleForPlayerFrame(frameIdx);
+  if (!sample || x1n == null || x2n == null) return null;
+  const { i, k } = sample;
+  const { xMeters } = proOverlaySeries;
+  if (!Number.isFinite(xMeters[i]) || !Number.isFinite(xMeters[k])) return null;
+  const xStart = getComNormXAtPlayerStartFrame();
+  if (!Number.isFinite(xStart)) return null;
+  const dxM = xMeters[i] - xMeters[k];
+  let spanM = arucoDist;
+  if (!Number.isFinite(spanM) || spanM <= 0) {
+    const nx = xMeters.length;
+    spanM = Math.max(1e-6, Math.abs(xMeters[nx - 1] - xMeters[k]));
+  }
+  const xNorm = xStart + (dxM / spanM) * (x2n - x1n);
+  return xNorm;
+}
+
+function isProOverlayPoseLineActive() {
+  const sel = document.getElementById("overlayAthleteSelect");
+  return sel && sel.value !== "none" && proOverlaySeries?.t?.length;
+}
+
+function drawProOverlayVerticalLinePose(ctx, frameIdx, W, H, mapNormXToCanvasX, groundYPx = null) {
+  if (!isProOverlayPoseLineActive() || yMid == null) return;
+  const xNorm = getProOverlayDisplayNormX(frameIdx);
+  if (!Number.isFinite(xNorm)) return;
+  const xPx = mapNormXToCanvasX(xNorm);
+  const groundY = Number.isFinite(groundYPx) ? groundYPx : mapY(yMid, W, H) * H;
+  ctx.save();
+  ctx.lineWidth = 2;
+  ctx.setLineDash(PRO_OVERLAY_LINE.dash);
+  ctx.strokeStyle = PRO_OVERLAY_LINE.border;
+  ctx.beginPath();
+  ctx.moveTo(xPx, 0);
+  ctx.lineTo(xPx, groundY);
+  ctx.stroke();
+  ctx.setLineDash([]);
+  ctx.restore();
+}
+
+/**
+ * Pro curve: pick alignment index k (|v_pro − v_player_start| min), shift time by t[k],
+ * then keep samples only while t − t[k] ≤ athlete chart duration (same seconds as player’s plot).
+ */
+function buildProOverlayChartPoints() {
+  if (!proOverlaySeries?.t?.length) return null;
+  const { t, velMps, accelMps2, label } = proOverlaySeries;
+  const align = getProOverlayAlignment();
+  if (!align) return null;
+  const { k, n } = align;
+
+  const tAlign = t[k];
+  const T_max = getAthleteChartDurationSec();
+
+  const proVelPts = [], proAccPts = [];
+  for (let i = k; i < n; i++) {
+    const tx = t[i] - tAlign;
+    if (T_max != null && T_max > 0 && tx > T_max + 1e-6) break;
+    const v = velMps[i], a = accelMps2[i];
+    if (Number.isFinite(tx) && Number.isFinite(v)) proVelPts.push({ x: tx, y: +(v * MS_TO_MPH).toFixed(3) });
+    if (Number.isFinite(tx) && Number.isFinite(a)) proAccPts.push({ x: tx, y: +(a).toFixed(3) });
+  }
+  if (!proVelPts.length && !proAccPts.length) return null;
+  return { label, proVelPts, proAccPts };
 }
 
 /** Update the overlay badge in the chart header */
@@ -1394,21 +1756,25 @@ function refreshChartOverlayBadge() {
   }
 }
 
+function refreshVelChartComingSoonOverlay() {
+  const el = document.getElementById("velChartComingSoon");
+  if (!el) return;
+  const show = activeChartMetric === "stride-freq" || activeChartMetric === "stride-length";
+  el.classList.toggle("hidden", !show);
+  el.setAttribute("aria-hidden", show ? "false" : "true");
+}
+
 /** Build Chart.js dataset array for the given metric */
 function buildChartDatasets(metric, timePoints) {
   const effStart = startFrame;
   const accelRaw = computeAccelerationSeries();
-  const sfRaw    = generatePlaceholderStrideFreq();
-  const slRaw    = generatePlaceholderStrideLength();
 
-  const velPts = [], accPts = [], sfPts = [], slPts = [];
+  const velPts = [], accPts = [];
   for (let i = 0; i < timePoints.length; i++) {
     const t = timePoints[i], fi = i + effStart;
-    const v = velocitySeries[fi], a = accelRaw[fi], sf = sfRaw[fi], sl = slRaw[fi];
+    const v = velocitySeries[fi], a = accelRaw[fi];
     velPts.push({ x: t, y: Number.isFinite(v)  ? +(v  * MS_TO_MPH).toFixed(3)   : null });
     accPts.push({ x: t, y: Number.isFinite(a)  ? +(a).toFixed(3) : null });
-    sfPts.push({ x:  t, y: Number.isFinite(sf) ? +sf.toFixed(3)  : null });
-    slPts.push({ x:  t, y: Number.isFinite(sl) ? +sl.toFixed(3)  : null });
   }
 
   const ds = (label, data, metric, extra = {}) => ({
@@ -1421,58 +1787,30 @@ function buildChartDatasets(metric, timePoints) {
     ...extra,
   });
 
-  const refLine = (label, pts, refVal) => {
-    const refData = pts.map(p => ({ x: p.x, y: refVal }));
-    return {
-      label,
-      data: refData,
-      borderColor: "rgba(255,200,80,0.85)",
-      backgroundColor: "transparent",
-      fill: false, tension: 0,
-      pointRadius: 0, pointHoverRadius: 4,
-      borderWidth: 1.5,
-      borderDash: [6, 4],
-    };
-  };
+  const pro = buildProOverlayChartPoints();
 
-  const sel = document.getElementById("overlayAthleteSelect");
-  const overlayLabel = sel?.value !== "none" ? sel?.options[sel.selectedIndex]?.text : null;
-
-  if (metric === "all") {
-    // Normalize each series to 0-100% for comparison
-    const norm = (pts) => {
-      const vals = pts.map(p => p.y).filter(Number.isFinite);
-      if (!vals.length) return pts;
-      const mn = Math.min(...vals), mx = Math.max(...vals), rng = mx - mn || 1;
-      return pts.map(p => ({ x: p.x, y: p.y != null && Number.isFinite(p.y) ? +((p.y - mn) / rng * 100).toFixed(2) : null }));
-    };
-    return {
-      datasets: [
-        ds("Speed",       norm(velPts), "velocity",       { fill: false }),
-        ds("Accel",       norm(accPts), "acceleration",   { fill: false }),
-        ds("Stride Freq", norm(sfPts),  "stride-freq",    { fill: false }),
-        ds("Stride Len",  norm(slPts),  "stride-length",  { fill: false }),
-      ],
-      yAxisLabel: "% of Max",
-    };
-  }
-
-  const ptsMap = { velocity: velPts, acceleration: accPts, "stride-freq": sfPts, "stride-length": slPts };
+  const ptsMap = { velocity: velPts, acceleration: accPts };
   const pts = ptsMap[metric];
   const { label } = METRIC_PALETTE[metric];
-  const datasets = [ds(label, pts, metric)];
+  const datasets = [ds("You", pts, metric)];
 
-  let refVal = getAthleteRef(metric);
-  if (refVal != null && overlayLabel) {
-    if (metric === "acceleration") refVal = refVal / MS_TO_MPH; // ref DB stores mph/s → m/s²
-    datasets.push(refLine(`${overlayLabel} ref`, pts, refVal));
+  if (pro) {
+    if (metric === "velocity" && pro.proVelPts?.length) {
+      datasets.push(ds(pro.label, pro.proVelPts, "velocity", { fill: false, borderColor: PRO_OVERLAY_LINE.border, borderDash: PRO_OVERLAY_LINE.dash, backgroundColor: PRO_OVERLAY_LINE.bg }));
+    }
+    if (metric === "acceleration" && pro.proAccPts?.length) {
+      datasets.push(ds(pro.label, pro.proAccPts, "acceleration", { fill: false, borderColor: PRO_OVERLAY_LINE.border, borderDash: PRO_OVERLAY_LINE.dash, backgroundColor: PRO_OVERLAY_LINE.bg }));
+    }
   }
+
   return { datasets, yAxisLabel: METRIC_PALETTE[metric].label };
 }
 
 function initVelocityChart() {
   destroyVelocityChart();
+  refreshVelChartComingSoonOverlay();
   if (!velChartCanvas || !velocitySeries?.length) return;
+  if (activeChartMetric === "stride-freq" || activeChartMetric === "stride-length") return;
 
   const effStart = startFrame;
   const effEnd = endFrame != null ? Math.min(endFrame, velocitySeries.length - 1) : velocitySeries.length - 1;
@@ -1481,7 +1819,7 @@ function initVelocityChart() {
 
   const { datasets, yAxisLabel } = buildChartDatasets(activeChartMetric, timePoints);
   const curTimeSec = Math.max(0, (curIdx - effStart) / CHART_VIDEO_FPS);
-  const showLegend = activeChartMetric === "all" || datasets.length > 1;
+  const showLegend = datasets.length > 1;
 
   velChartInstance = new Chart(velChartCanvas, {
     type: "line",
@@ -1490,7 +1828,7 @@ function initVelocityChart() {
       responsive: true,
       maintainAspectRatio: false,
       animation: { duration: 250, easing: "easeOutQuart" },
-      interaction: { mode: "index", intersect: false },
+      interaction: { mode: "nearest", intersect: false },
       plugins: {
         legend: {
           display: showLegend,
@@ -1512,11 +1850,16 @@ function initVelocityChart() {
           padding: 10,
           cornerRadius: 8,
           callbacks: {
-            title: (items) => `t = ${(+items[0].label).toFixed(2)}s`,
+            title: (items) => {
+              const px = items[0]?.parsed?.x;
+              if (px != null && Number.isFinite(px)) return `t = ${px.toFixed(2)}s`;
+              const lab = items[0]?.label;
+              return `t = ${Number(lab).toFixed(2)}s`;
+            },
             label: (ctx) => {
               const v = ctx.parsed.y;
               if (v == null || !Number.isFinite(v)) return null;
-              const unitMap = { velocity: "mph", acceleration: "m/s²", "stride-freq": "Hz", "stride-length": "m", all: "%" };
+              const unitMap = { velocity: "mph", acceleration: "m/s²" };
               const unit = unitMap[activeChartMetric] || "";
               return ` ${ctx.dataset.label}: ${v.toFixed(2)} ${unit}`;
             },
@@ -1547,7 +1890,7 @@ function initVelocityChart() {
           title: { display: true, text: yAxisLabel, color: "rgba(255,255,255,0.55)", font: { size: 10, family: "'Inter',sans-serif" } },
           ticks: { color: "rgba(255,255,255,0.5)", font: { size: 10 } },
           grid: { color: "rgba(255,255,255,0.05)" },
-          beginAtZero: activeChartMetric !== "all",
+          beginAtZero: true,
         },
       },
     },
@@ -1564,7 +1907,16 @@ function updateVelocityChartAnnotation(currentFrame) {
 
 function drawVelocityChart(currentFrame) {
   if (!velChartCanvas) return;
-  if (!velocitySeries?.length) { if (velChartInstance) destroyVelocityChart(); return; }
+  if (!velocitySeries?.length) {
+    if (velChartInstance) destroyVelocityChart();
+    refreshVelChartComingSoonOverlay();
+    return;
+  }
+  if (activeChartMetric === "stride-freq" || activeChartMetric === "stride-length") {
+    if (velChartInstance) destroyVelocityChart();
+    refreshVelChartComingSoonOverlay();
+    return;
+  }
   if (!velChartInstance) initVelocityChart();
   else updateVelocityChartAnnotation(currentFrame);
 }
@@ -1889,7 +2241,7 @@ window.addEventListener("resize", sizeAll);
 let curIdx = 0;           // frame index (driven by COM length)
 let fpsTarget = 60;       // base FPS for playback (match video-section)
 const SPEED_STEPS = [0.05, 0.1, 0.25, 0.5, 0.75, 1, 1.25, 1.5, 2];
-let speedMultiplier = 1;  // from poseSpeedSlider (index 5 = 1x)
+let speedMultiplier = 0.25;  // from poseSpeedSlider (index 2 = 0.25x default)
 let playing = false;
 let rafId = null;
 let lastTs = 0;
@@ -2371,6 +2723,10 @@ function drawPoseFrame(i) {
   drawComDotAndLine(i, W, H);
   drawComProgress(i, W, H);
 
+  if (isProOverlayPoseLineActive()) {
+    drawProOverlayVerticalLinePose(poseCtx, i, W, H, (xn) => mapX(xn) * W);
+  }
+
   if (tx) {
     restoreTransform(poseCtx);
   }
@@ -2492,6 +2848,10 @@ function drawSaPoseFrame(i) {
         ctx.stroke();
       }
     }
+  }
+
+  if (isProOverlayPoseLineActive()) {
+    drawProOverlayVerticalLinePose(ctx, i, W, H, (xn) => saMapX(xn, comX, W, H), saMapY(yMid, W, H));
   }
 
   drawSaAngleOverlays(ctx, frame, W, H);
@@ -2920,6 +3280,7 @@ async function loadAllForCurrentRep(){
   x1n = null; x2n = null; yMid = null; groundY = null; arucoDist = null;
   poseSeries = [];
   velocitySeries = [];
+  proOverlaySeries = null;
   startFrame = 0;
   endFrame = null;
   rawStartFrame = 0;
@@ -2953,6 +3314,10 @@ async function loadAllForCurrentRep(){
 
   // Video is optional; do not block COM viewer if missing.
   try { await loadVideo(); } catch (e) { console.warn("[Video] Optional load failed:", e?.message || e); }
+  const oSel = document.getElementById("overlayAthleteSelect");
+  if (oSel && oSel.value !== "none" && proOverlayFilesByPlayerKey && proOverlayFilesByPlayerKey.size) {
+    try { await loadProOverlaySprintData(); } catch (e) { console.warn("[ProOverlay] reload after rep:", e); }
+  }
   render(performance.now());
 }
 
@@ -3589,7 +3954,10 @@ function teardownSprintAnalysisMode() {
 
   const tabs = document.getElementById("chartModeTabs");
   if (tabs) tabs.style.display = "";
-  if (_preSaChartMetric) setChartMetric(_preSaChartMetric);
+  if (_preSaChartMetric) {
+    const m = _preSaChartMetric === "all" ? "velocity" : _preSaChartMetric;
+    setChartMetric(m);
+  }
   _preSaChartMetric = null;
 
   destroySaAccelChart();
@@ -3726,29 +4094,28 @@ function wireCtrlPanel(expandBtnId, collapseBtnId, panelId) {
 wireCtrlPanel('poseExpandBtn', 'poseCollapseBtn', 'poseCtrlPanel');
 wireCtrlPanel('rawExpandBtn', 'rawCollapseBtn', 'rawCtrlPanel');
 
-// Pro Overlay button: toggle popover
+// Pro Overlay button: toggle narrow list popover; load Storage list on first open
 (function(){
   const btn = document.getElementById('proOverlayBtn');
   const popover = document.getElementById('proOverlayPopover');
-  const select = document.getElementById('overlayAthleteSelect');
   if (!btn || !popover) return;
-  btn.onclick = (e) => {
+  btn.onclick = async (e) => {
     e.stopPropagation();
     const isOpen = popover.style.display !== 'none';
     popover.style.display = isOpen ? 'none' : 'block';
-    if (!isOpen && select) select.focus();
+    if (!isOpen) {
+      if (!proOverlaySprintSimsListed) {
+        try { await populateProOverlayAthleteDropdown(); } catch (err) { console.warn('[ProOverlay] populate failed:', err); }
+      } else {
+        renderOverlayAthleteList();
+      }
+      const firstOpt = document.querySelector('#overlayAthleteList .pro-overlay-option');
+      if (firstOpt) firstOpt.focus();
+    }
   };
   document.addEventListener('click', (e) => {
     if (popover && !popover.contains(e.target) && !btn.contains(e.target)) popover.style.display = 'none';
   });
-  if (select) select.addEventListener('change', () => {
-    const proBtn = document.getElementById('proOverlayBtn');
-    if (proBtn) proBtn.classList.toggle('active', select.value !== 'none');
-  });
-  if (select && select.value !== 'none') {
-    const proBtn = document.getElementById('proOverlayBtn');
-    if (proBtn) proBtn.classList.add('active');
-  }
 })();
 
 // Continuously sync pose YouTube bar frame label
@@ -4068,13 +4435,19 @@ document.querySelectorAll("#chartModeTabs .chart-tab").forEach(btn => {
 
 const overlayAthleteSelectEl = document.getElementById("overlayAthleteSelect");
 if (overlayAthleteSelectEl) {
-  overlayAthleteSelectEl.addEventListener("change", () => {
+  overlayAthleteSelectEl.addEventListener("change", async () => {
+    updateOverlayAthleteListSelection();
     refreshChartOverlayBadge();
+    try { await loadProOverlaySprintData(); } catch (e) { console.warn("[ProOverlay] load failed:", e); }
     destroyVelocityChart();
     if (velocitySeries?.length) initVelocityChart();
+    const proBtn = document.getElementById("proOverlayBtn");
+    if (proBtn) proBtn.classList.toggle("active", overlayAthleteSelectEl.value !== "none");
+    render(performance.now());
   });
 }
 
+renderOverlayAthleteList();
 // Initial badge state (may be already set if page loads with a selection)
 refreshChartOverlayBadge();
 </script>

@@ -569,6 +569,83 @@
             .lb-table .col-sessions { display: none; }
             .lb-card-header { padding: 1rem 1.25rem; }
         }
+
+        /* Feedback form lock (player view when feedback_form_needed is true) */
+        #overallLeaderboard.premium-section-locked,
+        #jumpLeaderboard.premium-section-locked,
+        #sprintLeaderboard.premium-section-locked,
+        #kickLeaderboard.premium-section-locked {
+            position: relative;
+            pointer-events: none;
+            user-select: none;
+            min-height: 12rem;
+        }
+        #overallLeaderboard.premium-section-locked > *,
+        #jumpLeaderboard.premium-section-locked > *,
+        #sprintLeaderboard.premium-section-locked > *,
+        #kickLeaderboard.premium-section-locked > * {
+            visibility: hidden;
+        }
+        #overallLeaderboard.premium-section-locked::before,
+        #jumpLeaderboard.premium-section-locked::before,
+        #sprintLeaderboard.premium-section-locked::before,
+        #kickLeaderboard.premium-section-locked::before {
+            content: '';
+            position: absolute;
+            inset: 0;
+            border-radius: var(--radius-xl);
+            background: rgba(0, 0, 0, 0.55);
+            z-index: 5;
+        }
+        #overallLeaderboard.premium-section-locked .lock-overlay,
+        #jumpLeaderboard.premium-section-locked .lock-overlay,
+        #sprintLeaderboard.premium-section-locked .lock-overlay,
+        #kickLeaderboard.premium-section-locked .lock-overlay {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 6;
+            pointer-events: none;
+            gap: 0.45rem;
+            visibility: visible;
+            padding: 1rem;
+        }
+        #overallLeaderboard.premium-section-locked .lock-overlay .material-symbols-outlined,
+        #jumpLeaderboard.premium-section-locked .lock-overlay .material-symbols-outlined,
+        #sprintLeaderboard.premium-section-locked .lock-overlay .material-symbols-outlined,
+        #kickLeaderboard.premium-section-locked .lock-overlay .material-symbols-outlined {
+            font-size: 2rem;
+            color: rgba(255, 255, 255, 0.88);
+        }
+        .lock-overlay .lock-msg {
+            font-size: 0.88rem;
+            color: rgba(255, 255, 255, 0.68);
+            font-weight: 500;
+            text-align: center;
+            max-width: 16rem;
+            line-height: 1.35;
+        }
+        .lock-overlay .unlock-btn {
+            pointer-events: auto;
+            cursor: pointer;
+            margin-top: 0.35rem;
+            padding: 0.55rem 1.25rem;
+            background: var(--accent);
+            color: #fff;
+            border: none;
+            border-radius: var(--radius-sm);
+            font-size: 0.88rem;
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: background 0.2s;
+        }
+        .lock-overlay .unlock-btn:hover {
+            background: var(--accent-light);
+        }
     </style>
 </head>
 <body>
@@ -1164,6 +1241,41 @@
 
         // ── Init ──
 
+        async function applyFeedbackLocksIfNeeded() {
+            if (isCoachView || !currentUserDocId) return;
+            try {
+                const pDoc = await db.collection('players').doc(currentUserDocId).get();
+                if (!pDoc.exists) return;
+                const need = pDoc.data().feedback_form_needed === true;
+                if (!need) return;
+                const prev = encodeURIComponent((window.location.pathname.split('/').pop() || '') + (window.location.search || ''));
+                const fbHref = 'feedbackForm.html?player=' + encodeURIComponent(currentUserDocId) + '&userType=player&previousPage=' + prev;
+                const sections = [overallLeaderboard, jumpLeaderboard, sprintLeaderboard, kickLeaderboard];
+                sections.forEach((el) => {
+                    if (!el || el.classList.contains('premium-section-locked')) return;
+                    el.classList.add('premium-section-locked');
+                    const ov = document.createElement('div');
+                    ov.className = 'lock-overlay';
+                    const icon = document.createElement('span');
+                    icon.className = 'material-symbols-outlined';
+                    icon.textContent = 'lock';
+                    const msg = document.createElement('span');
+                    msg.className = 'lock-msg';
+                    msg.textContent = 'Complete the feedback form to see leaderboard rankings.';
+                    const btn = document.createElement('a');
+                    btn.className = 'unlock-btn';
+                    btn.textContent = 'Complete feedback form';
+                    btn.href = fbHref;
+                    ov.appendChild(icon);
+                    ov.appendChild(msg);
+                    ov.appendChild(btn);
+                    el.appendChild(ov);
+                });
+            } catch (e) {
+                console.warn('[LB] applyFeedbackLocksIfNeeded:', e);
+            }
+        }
+
         async function initLeaderboard(coachId) {
             loadingState.style.display = '';
             emptyState.style.display = 'none';
@@ -1179,6 +1291,7 @@
                 console.log('Loaded player stats:', playersData);
                 renderAll(playersData);
                 loadingState.style.display = 'none';
+                await applyFeedbackLocksIfNeeded();
             } catch (e) {
                 console.error('Error initializing leaderboard:', e);
                 loadingState.style.display = 'none';

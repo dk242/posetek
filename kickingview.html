@@ -888,24 +888,6 @@
         .lock-overlay .unlock-btn:hover {
             background: var(--accent-light, #5ea87e);
         }
-
-        .header-nav-btn.leaderboard-feedback-locked {
-            position: relative;
-            flex-direction: column;
-            align-items: center;
-            gap: 0.15rem;
-            padding: 0.35rem 0.65rem;
-            line-height: 1.15;
-            white-space: normal;
-            max-width: 9rem;
-            text-align: center;
-        }
-        .header-nav-btn.leaderboard-feedback-locked .lb-lock-line {
-            display: block;
-            font-size: 0.65rem;
-            font-weight: 600;
-            color: rgba(255, 255, 255, 0.75);
-        }
     </style>
 </head>
 <body>
@@ -1021,11 +1003,11 @@
                     <div style="display: flex; flex-direction: column; gap: 0.65rem; flex: 1;">
                         <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
                             <div class="stat-value" id="avgJumpHeight">--</div>
-                            <div class="stat-label">Avg Jump Height (m)</div>
+                            <div class="stat-label">Avg Jump Height (in)</div>
                         </div>
                         <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
                             <div class="stat-value" id="maxJumpHeight">--</div>
-                            <div class="stat-label">Max Jump Height (m)</div>
+                            <div class="stat-label">Max Jump Height (in)</div>
                         </div>
                         <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
                             <div class="stat-value" id="totalJumps">--</div>
@@ -1192,11 +1174,11 @@
                             </div>
                             <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
                                 <div class="stat-value" id="avgKickSpeed">--</div>
-                                <div class="stat-label">Avg Ball Speed (m/s)</div>
+                                <div class="stat-label">Avg Ball Speed (mph)</div>
                             </div>
                             <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
                                 <div class="stat-value" id="maxKickSpeed">--</div>
-                                <div class="stat-label">Max Ball Speed (m/s)</div>
+                                <div class="stat-label">Max Ball Speed (mph)</div>
                             </div>
                             <div class="stat-item" style="background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.04)); padding: 0.75rem; border-radius: 12px; border: 1px solid var(--card-border);">
                                 <div class="stat-value" id="totalKicks">--</div>
@@ -1435,6 +1417,8 @@
 
         // ============ PERFORMANCE DASHBOARD FUNCTIONS ============
         let jumpHeightChart = null;
+        const M_TO_IN = 39.37007874015748;
+        const MS_TO_MPH = 2.23694;
         let angleComparisonChart = null;
         let sprintSpeedChart = null;
         let currentTimePeriod = 'month';
@@ -1720,10 +1704,10 @@
                 return;
             }
 
-            // Calculate statistics
+            // Calculate statistics (stored jump height is meters; display in inches)
             const jumpHeights = filteredReps.map(r => r.jumpHeight || 0);
-            const avgHeight = (jumpHeights.reduce((a, b) => a + b, 0) / jumpHeights.length).toFixed(3);
-            const maxHeight = Math.max(...jumpHeights).toFixed(3);
+            const avgHeight = ((jumpHeights.reduce((a, b) => a + b, 0) / jumpHeights.length) * M_TO_IN).toFixed(1);
+            const maxHeight = (Math.max(...jumpHeights) * M_TO_IN).toFixed(1);
 
             // Find best jump overall (not just in period)
             bestJumpRep = allJumpReps.reduce((best, current) => {
@@ -1769,7 +1753,7 @@
             }
 
             const labels = displayReps.map(r => r.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }));
-            const data = displayReps.map(r => r.jumpHeight || 0);
+            const data = displayReps.map(r => (r.jumpHeight || 0) * M_TO_IN);
 
             if (jumpHeightChart) {
                 jumpHeightChart.destroy();
@@ -1780,7 +1764,7 @@
                 data: {
                     labels: labels,
                     datasets: [{
-                        label: 'Jump Height (m)',
+                        label: 'Jump Height (in)',
                         data: data,
                         borderColor: '#4c8c6a',
                         backgroundColor: 'rgba(76, 140, 106, 0.1)',
@@ -1811,7 +1795,7 @@
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
                             callbacks: {
                                 label: function(context) {
-                                    return 'Height: ' + context.parsed.y.toFixed(3) + ' m';
+                                    return 'Height: ' + context.parsed.y.toFixed(1) + ' in';
                                 }
                             }
                         }
@@ -1948,8 +1932,8 @@
                 return;
             }
 
-            // Calculate statistics
-            const speeds = filteredReps.map(r => r.velocity || 0);
+            // Calculate statistics (velocity stored as m/s; display mph)
+            const speeds = filteredReps.map(r => (r.velocity || 0) * MS_TO_MPH);
             const nonZeroSpeeds = speeds.filter(s => s > 0);
             // Exclude reps with launch angle 180 ± 1 when computing avg launch angle.
             // Per rep, use the smaller of angle vs (180 - angle) so the average reflects
@@ -1972,8 +1956,8 @@
             const midPoint = Math.floor(filteredReps.length / 2);
             const firstHalf = filteredReps.slice(midPoint);
             const secondHalf = filteredReps.slice(0, midPoint);
-            const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((sum, r) => sum + (r.velocity || 0), 0) / firstHalf.length : 0;
-            const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((sum, r) => sum + (r.velocity || 0), 0) / secondHalf.length : 0;
+            const firstAvg = firstHalf.length > 0 ? firstHalf.reduce((sum, r) => sum + (r.velocity || 0) * MS_TO_MPH, 0) / firstHalf.length : 0;
+            const secondAvg = secondHalf.length > 0 ? secondHalf.reduce((sum, r) => sum + (r.velocity || 0) * MS_TO_MPH, 0) / secondHalf.length : 0;
             const trendPercent = firstAvg > 0 ? ((secondAvg - firstAvg) / firstAvg * 100).toFixed(1) : 0;
             const trendText = trendPercent > 0 ? `↗ +${trendPercent}%` : trendPercent < 0 ? `↘ ${trendPercent}%` : '→ 0%';
 
@@ -2010,14 +1994,14 @@
                 const rep = leftFootReps.find(r => 
                     r.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) === date
                 );
-                return rep ? rep.velocity : null;
+                return rep ? rep.velocity * MS_TO_MPH : null;
             });
 
             const rightData = allDates.map(date => {
                 const rep = rightFootReps.find(r => 
                     r.createdAt.toLocaleDateString('en-US', { month: 'short', day: 'numeric' }) === date
                 );
-                return rep ? rep.velocity : null;
+                return rep ? rep.velocity * MS_TO_MPH : null;
             });
 
             if (kickSpeedChart) {
@@ -2060,7 +2044,7 @@
             if (datasets.length === 0) {
                 datasets.push({
                     label: 'Ball Speed',
-                    data: sortedReps.map(r => r.velocity),
+                    data: sortedReps.map(r => (r.velocity || 0) * MS_TO_MPH),
                     borderColor: '#4c8c6a',
                     backgroundColor: 'rgba(76, 140, 106, 0.1)',
                     tension: 0.4,
@@ -2086,7 +2070,7 @@
                             beginAtZero: true,
                             title: {
                                 display: true,
-                                text: 'Speed (m/s)',
+                                text: 'Speed (mph)',
                                 color: 'rgba(255, 255, 255, 0.7)'
                             },
                             ticks: { color: 'rgba(255, 255, 255, 0.7)' },
@@ -2106,7 +2090,7 @@
                             backgroundColor: 'rgba(0, 0, 0, 0.8)',
                             callbacks: {
                                 label: function(context) {
-                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + ' m/s';
+                                    return context.dataset.label + ': ' + context.parsed.y.toFixed(1) + ' mph';
                                 }
                             }
                         }
@@ -3412,24 +3396,12 @@
             lbParams.set('userType', userTypeParam);
             leaderboardHref += '?' + lbParams.toString();
 
-            const encodedPrevPage = encodeURIComponent((window.location.pathname.split('/').pop() || '') + (window.location.search || ''));
-            const feedbackFormHref = playerDocId
-                ? 'feedbackForm.html?player=' + encodeURIComponent(playerDocId) + '&userType=player&previousPage=' + encodedPrevPage
-                : 'feedbackForm.html?previousPage=' + encodedPrevPage;
-
             const lbBtn = document.getElementById('leaderboardBtn');
             if (lbBtn) {
-                if (isFeedbackFormLocked && playerDocId) {
-                    lbBtn.href = feedbackFormHref;
-                    lbBtn.classList.add('leaderboard-feedback-locked');
-                    lbBtn.title = 'Complete feedback form to unlock leaderboards';
-                    lbBtn.innerHTML = '<span class="material-symbols-outlined">lock</span><span class="lb-lock-line"><span>Complete feedback form</span></span>';
-                } else {
-                    lbBtn.href = leaderboardHref;
-                    lbBtn.classList.remove('leaderboard-feedback-locked');
-                    lbBtn.title = 'Leaderboards';
-                    lbBtn.innerHTML = '<span class="material-symbols-outlined">leaderboard</span><span>Leaderboard</span>';
-                }
+                lbBtn.href = leaderboardHref;
+                lbBtn.classList.remove('leaderboard-feedback-locked');
+                lbBtn.title = 'Leaderboards';
+                lbBtn.innerHTML = '<span class="material-symbols-outlined">leaderboard</span><span>Leaderboard</span>';
             }
 
             const links = [
@@ -3438,10 +3410,7 @@
             if (isCoach) {
                 links.push({ href: `coachesview.html?userType=coach`, text: 'Player Roster', icon: 'people' });
             }
-            const leaderboardsMenuHref = (isFeedbackFormLocked && playerDocId) ? feedbackFormHref : leaderboardHref;
-            const leaderboardsMenuText = (isFeedbackFormLocked && playerDocId) ? 'Complete feedback form' : 'Leaderboards';
-            const leaderboardsMenuIcon = (isFeedbackFormLocked && playerDocId) ? 'lock' : 'leaderboard';
-            links.push({ href: leaderboardsMenuHref, text: leaderboardsMenuText, icon: leaderboardsMenuIcon });
+            links.push({ href: leaderboardHref, text: 'Leaderboards', icon: 'leaderboard' });
 
             links.forEach((a, idx) => {
                 const link = document.createElement('a');
