@@ -1754,74 +1754,61 @@
     function restartPlayTimer() {
       if (rawMaxFrame == 0) { recalcTiming(); }
 
-      // Clean previous handlers/timers
       stopRawPlaybackCleanup();
 
-      // Set playbackRate so underlying decoder can use hardware playback when possible
-      if (rawVideoEl) rawVideoEl.playbackRate = SPEED_OPTIONS[rawSpeedIdx] || 1;
+      // Use seek-step playback: browsers don't reliably decode new frames from
+      // a hidden (display:none) video during native play(), but they always
+      // decode on seek.  Step through frames with a timer, seek the video to
+      // each frame time, and draw once the seek completes.
+      const stepMs = Math.max(20, Math.round(baseIntervalMs / (SPEED_OPTIONS[rawSpeedIdx] || 1)));
+      let seekBusy = false;
 
-      // If browser supports requestVideoFrameCallback, use it for smooth decoded-frame drawing
-      if (rawVideoEl && typeof rawVideoEl.requestVideoFrameCallback === 'function') {
-        const onFrame = (now, metadata) => {
-          const t = rawVideoEl.currentTime || 0;
-          rawCurrentFrame = timeToFrameIdx(t);
-          rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
-          const rawFrameSlider = document.getElementById('rawFrameSlider');
-          const rawFrameSliderValue = document.getElementById('rawFrameSliderValue');
-          if (rawFrameSlider) rawFrameSlider.value = rawCurrentFrame.toString();
-          if (rawFrameSliderValue) rawFrameSliderValue.textContent = rawCurrentFrame.toString();
-          drawRawFrameToCanvas();
-          const duration = rawDuration || rawVideoEl.duration || 0;
-          if (t >= duration - 1e-3) {
-            rawIsPlaying = false;
-            document.getElementById('rawPlayPauseBtn').textContent = '▶';
-            return;
-          }
-          rawRvfcHandle = rawVideoEl.requestVideoFrameCallback(onFrame);
-        };
-        try { rawVideoEl.play().catch(()=>{}); } catch (e) {}
-        rawRvfcHandle = rawVideoEl.requestVideoFrameCallback(onFrame);
-        return;
-      }
-
-      // Fallback: listen to timeupdate and use a small interval as backup
-      if (rawVideoEl) {
-        rawTimeHandler = () => {
-          const t = rawVideoEl.currentTime || 0;
-          rawCurrentFrame = timeToFrameIdx(t);
-          rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
-          const rawFrameSlider = document.getElementById('rawFrameSlider');
-          const rawFrameSliderValue = document.getElementById('rawFrameSliderValue');
-          if (rawFrameSlider) rawFrameSlider.value = rawCurrentFrame.toString();
-          if (rawFrameSliderValue) rawFrameSliderValue.textContent = rawCurrentFrame.toString();
-          drawRawFrameToCanvas();
-        };
-        rawVideoEl.addEventListener('timeupdate', rawTimeHandler);
-        try { rawVideoEl.play().catch(()=>{}); } catch (e) {}
-      }
-
-      // Small interval backup to ensure UI updates if timeupdate is infrequent
-      rawPlayFallbackInterval = setInterval(()=>{
-        if (!rawVideoEl) return;
-        const t = rawVideoEl.currentTime || 0;
-        rawCurrentFrame = timeToFrameIdx(t);
-        rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+      const onSeeked = () => {
+        seekBusy = false;
         drawRawFrameToCanvas();
-      }, Math.max(20, Math.round(baseIntervalMs / (SPEED_OPTIONS[rawSpeedIdx]||1))));
+      };
+      rawVideoEl.addEventListener('seeked', onSeeked);
+      rawTimeHandler = onSeeked;
+
+      rawPlayFallbackInterval = setInterval(() => {
+        if (!rawVideoEl || !rawIsPlaying) return;
+        if (seekBusy) return;
+
+        rawCurrentFrame++;
+        if (rawCurrentFrame > rawMaxFrame) {
+          rawIsPlaying = false;
+          document.getElementById('rawPlayPauseBtn').textContent = '▶';
+          stopRawPlaybackCleanup();
+          return;
+        }
+
+        rawFrameLabel.textContent = `Frame: ${rawCurrentFrame}`;
+        const rawFrameSlider = document.getElementById('rawFrameSlider');
+        const rawFrameSliderValue = document.getElementById('rawFrameSliderValue');
+        if (rawFrameSlider) rawFrameSlider.value = rawCurrentFrame.toString();
+        if (rawFrameSliderValue) rawFrameSliderValue.textContent = rawCurrentFrame.toString();
+
+        const targetTime = frameIdxToTime(rawCurrentFrame);
+        seekBusy = true;
+        rawVideoEl.currentTime = targetTime;
+      }, stepMs);
     }
 
     function stopRawPlaybackCleanup() {
-      // Cancel rVFC
+      // Cancel rVFC (unused now but kept for safety)
       try { if (rawRvfcHandle && rawVideoEl && typeof rawVideoEl.cancelVideoFrameCallback === 'function') rawVideoEl.cancelVideoFrameCallback(rawRvfcHandle); } catch(e){}
       rawRvfcHandle = null;
-      // Remove timeupdate handler
-      try { if (rawTimeHandler && rawVideoEl) rawVideoEl.removeEventListener('timeupdate', rawTimeHandler); } catch(e){}
+      // Remove seeked/timeupdate handler attached during playback
+      try { if (rawTimeHandler && rawVideoEl) {
+        rawVideoEl.removeEventListener('seeked', rawTimeHandler);
+        rawVideoEl.removeEventListener('timeupdate', rawTimeHandler);
+      }} catch(e){}
       rawTimeHandler = null;
-      // Clear fallback interval
+      // Clear step-timer interval
       if (rawPlayFallbackInterval) { clearInterval(rawPlayFallbackInterval); rawPlayFallbackInterval = null; }
       // Clear legacy interval
       if (rawPlayTimer) { clearInterval(rawPlayTimer); rawPlayTimer = null; }
-      // Pause the underlying video (UI uses canvas draws)
+      // Pause the underlying video
       try { if (rawVideoEl) rawVideoEl.pause(); } catch(e){}
     }
 
