@@ -1,0 +1,800 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/images/logo.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Book a Performance Test — PoseTek</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #ffffff;
+            --off-white: #f7f8f6;
+            --green-dark: #1a3a2e;
+            --green-mid: #2d5e4a;
+            --green-accent: #4c8c6a;
+            --green-light: #e8f3ee;
+            --text-dark: #111111;
+            --text-mid: #444444;
+            --error: #b33a3a;
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-dark);
+            background: linear-gradient(165deg, var(--white) 40%, var(--green-light) 100%);
+            min-height: 100vh;
+            line-height: 1.5;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1rem 5%;
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(26, 58, 46, 0.08);
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            font-size: 1.35rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            text-decoration: none;
+            letter-spacing: -0.5px;
+        }
+
+        .logo span { color: var(--green-accent); }
+
+        .back-link {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--green-dark);
+            text-decoration: none;
+        }
+
+        .back-link:hover { color: var(--green-mid); }
+
+        main {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 2rem 1.25rem 4rem;
+        }
+
+        .page-intro {
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+
+        .page-intro .eyebrow {
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.5rem;
+        }
+
+        .page-intro h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .page-intro p {
+            font-size: 0.95rem;
+            color: var(--text-mid);
+        }
+
+        .form-card {
+            background: var(--white);
+            border-radius: 20px;
+            border: 1px solid rgba(26, 58, 46, 0.1);
+            box-shadow: 0 12px 40px rgba(26, 58, 46, 0.08);
+            overflow: hidden;
+        }
+
+        .form-section {
+            padding: 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(26, 58, 46, 0.08);
+        }
+
+        .form-section:last-of-type { border-bottom: none; }
+
+        .form-section h2 {
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 1rem;
+        }
+
+        .calendar-nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.75rem;
+        }
+
+        .calendar-nav button {
+            width: 36px;
+            height: 36px;
+            border-radius: 10px;
+            border: 1px solid rgba(26, 58, 46, 0.12);
+            background: var(--off-white);
+            cursor: pointer;
+            font-size: 1rem;
+            color: var(--green-dark);
+            transition: var(--transition);
+        }
+
+        .calendar-nav button:hover {
+            background: var(--green-light);
+            border-color: var(--green-accent);
+        }
+
+        .calendar-nav button:focus-visible {
+            outline: 2px solid var(--green-accent);
+            outline-offset: 2px;
+        }
+
+        #calendarMonthLabel {
+            font-weight: 600;
+            font-size: 1rem;
+            color: var(--text-dark);
+        }
+
+        .calendar-weekdays {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+            margin-bottom: 6px;
+            font-size: 0.68rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            text-align: center;
+        }
+
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+            gap: 4px;
+        }
+
+        .calendar-grid button {
+            aspect-ratio: 1;
+            max-height: 44px;
+            border-radius: 10px;
+            border: 1px solid transparent;
+            background: var(--off-white);
+            font-family: inherit;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-dark);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .calendar-grid button:hover:not(:disabled) {
+            background: var(--green-light);
+            border-color: rgba(76, 140, 106, 0.35);
+        }
+
+        .calendar-grid button.other-month {
+            color: #aaa;
+            background: transparent;
+            cursor: default;
+        }
+
+        .calendar-grid button.today {
+            border-color: var(--green-accent);
+        }
+
+        .calendar-grid button.selected {
+            background: var(--green-dark);
+            color: var(--white);
+            font-weight: 600;
+        }
+
+        .calendar-grid button:disabled {
+            opacity: 0.35;
+            cursor: not-allowed;
+        }
+
+        .selected-date-readout {
+            margin-top: 0.85rem;
+            font-size: 0.88rem;
+            color: var(--text-mid);
+        }
+
+        .selected-date-readout strong {
+            color: var(--green-dark);
+        }
+
+        label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .field { margin-bottom: 1rem; }
+
+        .field:last-child { margin-bottom: 0; }
+
+        select, input[type="text"], input[type="email"], input[type="tel"] {
+            width: 100%;
+            padding: 0.75rem 0.9rem;
+            font-size: 1rem;
+            font-family: inherit;
+            border: 1px solid rgba(26, 58, 46, 0.15);
+            border-radius: 12px;
+            background: var(--white);
+            color: var(--text-dark);
+            transition: var(--transition);
+        }
+
+        select {
+            cursor: pointer;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%231a3a2e' d='M6 8L1 3h10z'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 14px center;
+            padding-right: 2.5rem;
+        }
+
+        select:focus, input:focus {
+            outline: none;
+            border-color: var(--green-accent);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.2);
+        }
+
+        .row-2 {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.75rem;
+        }
+
+        @media (max-width: 480px) {
+            .row-2 { grid-template-columns: 1fr; }
+        }
+
+        .payment-note {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+            margin-top: 0.5rem;
+            line-height: 1.45;
+        }
+
+        .payment-price {
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--green-dark);
+            margin-bottom: 0.75rem;
+        }
+
+        .payment-hint {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+            margin-bottom: 0.75rem;
+            line-height: 1.45;
+        }
+
+        .payment-element-wrap {
+            min-height: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        #payment-element {
+            margin-bottom: 0.25rem;
+        }
+
+        #stripePaymentError {
+            margin-top: 0.35rem;
+        }
+
+        .booking-sealed .booking-sealable {
+            pointer-events: none;
+            opacity: 0.72;
+        }
+
+        .submit-wrap {
+            padding: 0 1.5rem 1.5rem;
+        }
+
+        .btn-submit {
+            width: 100%;
+            padding: 0.95rem 1.5rem;
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            color: var(--white);
+            background: var(--green-dark);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(26, 58, 46, 0.25);
+        }
+
+        .btn-submit:hover:not(:disabled) {
+            background: var(--green-mid);
+            transform: translateY(-1px);
+        }
+
+        .btn-submit:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+        }
+
+        .error-msg {
+            font-size: 0.8rem;
+            color: var(--error);
+            margin-top: 0.35rem;
+            display: none;
+        }
+
+        .error-msg.visible { display: block; }
+
+        .field.has-error input,
+        .field.has-error select {
+            border-color: var(--error);
+        }
+
+        #successPanel {
+            display: none;
+            text-align: center;
+            padding: 3rem 1.5rem;
+        }
+
+        #successPanel.visible { display: block; }
+
+        #bookingForm.hidden { display: none; }
+
+        .success-icon {
+            width: 64px;
+            height: 64px;
+            margin: 0 auto 1rem;
+            background: var(--green-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.75rem;
+        }
+
+        #successPanel h2 {
+            font-size: 1.35rem;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        #successPanel p {
+            color: var(--text-mid);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+        }
+
+        #successPanel a {
+            color: var(--green-dark);
+            font-weight: 600;
+        }
+
+        footer {
+            text-align: center;
+            padding: 2rem;
+            font-size: 0.82rem;
+            color: var(--text-mid);
+        }
+
+        footer a { color: var(--green-accent); }
+    </style>
+</head>
+<body>
+    <header>
+        <a href="performanceTesting.html" class="logo">Pose<span>Tek</span></a>
+        <a href="performanceTesting.html" class="back-link">← Back</a>
+    </header>
+
+    <main>
+        <div class="page-intro" id="pageIntro">
+            <p class="eyebrow">Performance testing</p>
+            <h1>Book your time slot</h1>
+            <p>Pick a date, choose a time, and complete your details to reserve your 10-minute diagnostic.</p>
+        </div>
+
+        <div class="form-card" id="bookingCard">
+            <form id="bookingForm" novalidate>
+                <input type="hidden" name="appointmentDate" id="appointmentDate" value="">
+
+                <div class="form-section booking-sealable">
+                    <h2>Select a date</h2>
+                    <div class="calendar-nav" aria-label="Calendar month">
+                        <button type="button" id="calPrev" aria-label="Previous month">‹</button>
+                        <span id="calendarMonthLabel" role="status"></span>
+                        <button type="button" id="calNext" aria-label="Next month">›</button>
+                    </div>
+                    <div class="calendar-weekdays" aria-hidden="true">
+                        <span>Sun</span><span>Mon</span><span>Tue</span><span>Wed</span><span>Thu</span><span>Fri</span><span>Sat</span>
+                    </div>
+                    <div class="calendar-grid" id="calendarGrid" role="grid" aria-label="Calendar dates"></div>
+                    <p class="selected-date-readout" id="dateReadout">Select a day to continue.</p>
+                    <p class="error-msg" id="dateError" style="margin-top: 0.5rem;">Please select a date from the calendar.</p>
+                </div>
+
+                <div class="form-section booking-sealable">
+                    <h2>Time slot</h2>
+                    <div class="field" id="timeField">
+                        <label for="timeSlot">Available times</label>
+                        <select id="timeSlot" name="timeSlot" required disabled>
+                            <option value="">First select a date above</option>
+                        </select>
+                        <p class="error-msg" id="timeError">Please choose a time slot.</p>
+                    </div>
+                </div>
+
+                <div class="form-section booking-sealable">
+                    <h2>Your details</h2>
+                    <div class="field" id="nameField">
+                        <label for="fullName">Full name <span aria-hidden="true">*</span></label>
+                        <input type="text" id="fullName" name="fullName" autocomplete="name" required placeholder="Jordan Smith">
+                        <p class="error-msg" id="nameError">Please enter your name.</p>
+                    </div>
+                    <div class="field" id="emailField">
+                        <label for="email">Email <span aria-hidden="true">*</span></label>
+                        <input type="email" id="email" name="email" autocomplete="email" required placeholder="you@example.com">
+                        <p class="error-msg" id="emailError">Please enter a valid email.</p>
+                    </div>
+                </div>
+
+                <div class="form-section" id="paymentSection">
+                    <h2>Payment</h2>
+                    <p class="payment-price" id="paymentPriceLine" aria-live="polite"></p>
+                    <p class="payment-hint" id="paymentHint">Fill in your booking details above, then use the button below to load Stripe’s secure card form. Your card number never touches PoseTek.</p>
+                    <div id="payment-element" class="payment-element-wrap" role="region" aria-label="Secure card payment"></div>
+                    <p class="error-msg" id="stripePaymentError"></p>
+                    <p class="payment-note">Payments are processed by <a href="https://stripe.com" target="_blank" rel="noopener">Stripe</a>. Card details stay on Stripe’s systems — we never store your full card number.</p>
+                </div>
+
+                <div class="submit-wrap">
+                    <button type="submit" class="btn-submit" id="submitBtn">Continue to secure payment</button>
+                </div>
+            </form>
+
+            <div id="successPanel">
+                <div class="success-icon" aria-hidden="true">✓</div>
+                <h2>You're booked</h2>
+                <p id="successSummary">We'll send a confirmation email with location details and what to bring.</p>
+                <p><a href="performanceTesting.html">← Back to performance testing</a></p>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>© 2026 PoseTek · <a href="privacy.html">Privacy</a></p>
+    </footer>
+
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        (function () {
+            const MONTHS = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            const WEEKDAYS = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
+
+            let viewYear = new Date().getFullYear();
+            let viewMonth = new Date().getMonth();
+            let selectedDate = null;
+
+            const grid = document.getElementById('calendarGrid');
+            const monthLabel = document.getElementById('calendarMonthLabel');
+            const dateReadout = document.getElementById('dateReadout');
+            const hiddenDate = document.getElementById('appointmentDate');
+            const timeSelect = document.getElementById('timeSlot');
+            const form = document.getElementById('bookingForm');
+            const successPanel = document.getElementById('successPanel');
+
+            function pad(n) { return n < 10 ? '0' + n : String(n); }
+
+            function formatReadout(d) {
+                return WEEKDAYS[d.getDay()] + ', ' + MONTHS[d.getMonth()] + ' ' + d.getDate() + ', ' + d.getFullYear();
+            }
+
+            function isSameDay(a, b) {
+                return a.getFullYear() === b.getFullYear() && a.getMonth() === b.getMonth() && a.getDate() === b.getDate();
+            }
+
+            function startOfToday() {
+                const t = new Date();
+                t.setHours(0, 0, 0, 0);
+                return t;
+            }
+
+            function buildTimeOptions() {
+                timeSelect.innerHTML = '';
+                const opt0 = document.createElement('option');
+                opt0.value = '';
+                opt0.textContent = 'Choose a time';
+                timeSelect.appendChild(opt0);
+
+                for (let h = 9; h <= 17; h++) {
+                    for (let m of [0, 30]) {
+                        if (h === 17 && m > 0) continue;
+                        const label = (h % 12 || 12) + ':' + (m === 0 ? '00' : '30') + ' ' + (h < 12 ? 'AM' : 'PM');
+                        const opt = document.createElement('option');
+                        opt.value = label;
+                        opt.textContent = label;
+                        timeSelect.appendChild(opt);
+                    }
+                }
+                timeSelect.disabled = false;
+            }
+
+            function renderCalendar() {
+                monthLabel.textContent = MONTHS[viewMonth] + ' ' + viewYear;
+                grid.innerHTML = '';
+
+                const first = new Date(viewYear, viewMonth, 1);
+                const startPad = first.getDay();
+                const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+                const today = startOfToday();
+
+                const totalCells = Math.ceil((startPad + daysInMonth) / 7) * 7;
+
+                for (let i = 0; i < totalCells; i++) {
+                    const dayNum = i - startPad + 1;
+                    const btn = document.createElement('button');
+                    btn.type = 'button';
+
+                    if (dayNum < 1 || dayNum > daysInMonth) {
+                        const prevMonthDays = new Date(viewYear, viewMonth, 0).getDate();
+                        const d = dayNum < 1 ? prevMonthDays + dayNum : dayNum - daysInMonth;
+                        btn.textContent = d;
+                        btn.classList.add('other-month');
+                        btn.disabled = true;
+                        btn.setAttribute('tabindex', '-1');
+                    } else {
+                        const d = new Date(viewYear, viewMonth, dayNum);
+                        btn.textContent = dayNum;
+                        if (isSameDay(d, today)) btn.classList.add('today');
+                        if (d < today) {
+                            btn.disabled = true;
+                        } else {
+                            btn.addEventListener('click', function () {
+                                selectedDate = d;
+                                hiddenDate.value = d.getFullYear() + '-' + pad(d.getMonth() + 1) + '-' + pad(d.getDate());
+                                grid.querySelectorAll('button.selected').forEach(b => b.classList.remove('selected'));
+                                btn.classList.add('selected');
+                                dateReadout.innerHTML = 'Selected: <strong>' + formatReadout(d) + '</strong>';
+                                dateReadout.style.color = '';
+                                document.getElementById('dateError').classList.remove('visible');
+                                buildTimeOptions();
+                            });
+                            if (selectedDate && isSameDay(d, selectedDate)) btn.classList.add('selected');
+                        }
+                    }
+                    grid.appendChild(btn);
+                }
+            }
+
+            document.getElementById('calPrev').addEventListener('click', function () {
+                viewMonth--;
+                if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+                renderCalendar();
+            });
+
+            document.getElementById('calNext').addEventListener('click', function () {
+                viewMonth++;
+                if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+                renderCalendar();
+            });
+
+            /** Replace with your Stripe publishable key (Dashboard → Developers → API keys). */
+            const STRIPE_PUBLISHABLE_KEY = 'pk_test_YOUR_PUBLISHABLE_KEY';
+            /** Deploy createPerformanceTestPaymentIntent and paste the function URL here. */
+            const CREATE_PI_URL = 'https://us-central1-YOUR_PROJECT_ID.cloudfunctions.net/createPerformanceTestPaymentIntent';
+
+            let stripeInstance = null;
+            let elements = null;
+            let paymentStepReady = false;
+            let payButtonLabel = '';
+
+            function showStripeErr(msg) {
+                const el = document.getElementById('stripePaymentError');
+                if (!el) return;
+                el.textContent = msg || '';
+                el.classList.toggle('visible', !!msg);
+            }
+
+            function sealBookingFields() {
+                form.classList.add('booking-sealed');
+            }
+
+            async function maybeHandlePaymentReturn() {
+                if (typeof Stripe === 'undefined') return false;
+                const params = new URLSearchParams(window.location.search);
+                const secret = params.get('payment_intent_client_secret');
+                if (!secret) return false;
+
+                try {
+                    const stripe = Stripe(STRIPE_PUBLISHABLE_KEY);
+                    const { paymentIntent } = await stripe.retrievePaymentIntent(secret);
+
+                    if (paymentIntent && paymentIntent.status === 'succeeded') {
+                        history.replaceState(null, '', window.location.pathname);
+                        const meta = paymentIntent.metadata || {};
+                        const email = meta.email || '';
+                        const appt = meta.appointmentDate || '';
+                        const slot = meta.timeSlot || '';
+                        let summary = "You're booked. We'll send a confirmation with location details.";
+                        if (appt && slot) {
+                            summary = appt + ' at ' + slot + '. Confirmation will be sent to ' + (email || 'your email') + '.';
+                        } else if (email) {
+                            summary = 'Confirmation will be sent to ' + email + '.';
+                        }
+                        document.getElementById('successSummary').textContent = summary;
+                        form.classList.add('hidden');
+                        document.getElementById('pageIntro').style.display = 'none';
+                        successPanel.classList.add('visible');
+                        return true;
+                    }
+
+                    history.replaceState(null, '', window.location.pathname);
+                    showStripeErr('Payment was not completed. You can try again below.');
+                } catch (err) {
+                    history.replaceState(null, '', window.location.pathname);
+                    showStripeErr('Could not verify payment status. If you were charged, contact support.');
+                }
+                return false;
+            }
+
+            function showErr(fieldId, errId, show) {
+                const field = document.getElementById(fieldId);
+                const err = document.getElementById(errId);
+                if (!field || !err) return;
+                field.classList.toggle('has-error', show);
+                err.classList.toggle('visible', show);
+            }
+
+            form.addEventListener('submit', async function (e) {
+                e.preventDefault();
+                showStripeErr('');
+
+                showErr('timeField', 'timeError', false);
+                showErr('nameField', 'nameError', false);
+                showErr('emailField', 'emailError', false);
+
+                const dateErr = document.getElementById('dateError');
+                let ok = true;
+                if (!hiddenDate.value) {
+                    dateReadout.style.color = 'var(--error)';
+                    dateErr.classList.add('visible');
+                    ok = false;
+                } else {
+                    dateReadout.style.color = '';
+                    dateErr.classList.remove('visible');
+                }
+
+                if (!timeSelect.value) {
+                    showErr('timeField', 'timeError', true);
+                    ok = false;
+                }
+
+                const name = document.getElementById('fullName').value.trim();
+                if (!name) {
+                    showErr('nameField', 'nameError', true);
+                    ok = false;
+                }
+
+                const email = document.getElementById('email').value.trim();
+                if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                    showErr('emailField', 'emailError', true);
+                    ok = false;
+                }
+
+                if (!ok) return;
+
+                if (typeof Stripe === 'undefined') {
+                    showStripeErr('Payment system failed to load. Refresh the page and try again.');
+                    return;
+                }
+
+                if (CREATE_PI_URL.indexOf('YOUR_PROJECT_ID') !== -1 || STRIPE_PUBLISHABLE_KEY.indexOf('YOUR_PUBLISHABLE_KEY') !== -1) {
+                    showStripeErr('Stripe is not configured yet: set STRIPE_PUBLISHABLE_KEY and CREATE_PI_URL in this page, and deploy createPerformanceTestPaymentIntent.');
+                    return;
+                }
+
+                const submitBtn = document.getElementById('submitBtn');
+
+                if (!paymentStepReady) {
+                    submitBtn.disabled = true;
+                    submitBtn.textContent = 'Loading secure form…';
+                    try {
+                        const res = await fetch(CREATE_PI_URL, {
+                            method: 'POST',
+                            headers: { 'Content-Type': 'application/json' },
+                            body: JSON.stringify({
+                                fullName: name,
+                                email: email,
+                                appointmentDate: hiddenDate.value,
+                                timeSlot: timeSelect.value,
+                            }),
+                        });
+                        const data = await res.json().catch(function () { return {}; });
+                        if (!res.ok) {
+                            throw new Error(data.error || 'Could not start payment');
+                        }
+                        if (!data.clientSecret) {
+                            throw new Error('Invalid response from payment server');
+                        }
+
+                        stripeInstance = Stripe(STRIPE_PUBLISHABLE_KEY);
+                        elements = stripeInstance.elements({
+                            clientSecret: data.clientSecret,
+                            appearance: {
+                                theme: 'stripe',
+                                variables: {
+                                    colorPrimary: '#1a3a2e',
+                                    borderRadius: '12px',
+                                },
+                            },
+                        });
+                        const paymentElement = elements.create('payment');
+                        document.getElementById('paymentHint').style.display = 'none';
+                        paymentElement.mount('#payment-element');
+
+                        const cents = typeof data.amountCents === 'number' ? data.amountCents : 5000;
+                        const dollars = (cents / 100).toFixed(2);
+                        document.getElementById('paymentPriceLine').textContent = 'Amount due: $' + dollars + ' USD';
+
+                        paymentStepReady = true;
+                        payButtonLabel = 'Pay $' + dollars + ' — confirm booking';
+                        sealBookingFields();
+                        submitBtn.textContent = payButtonLabel;
+                        submitBtn.disabled = false;
+                    } catch (err) {
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = 'Continue to secure payment';
+                        showStripeErr(err.message || 'Something went wrong. Please try again.');
+                    }
+                    return;
+                }
+
+                submitBtn.disabled = true;
+                submitBtn.textContent = 'Processing…';
+
+                const returnUrl = window.location.origin + window.location.pathname;
+                const { error } = await stripeInstance.confirmPayment({
+                    elements: elements,
+                    confirmParams: {
+                        return_url: returnUrl,
+                        receipt_email: email,
+                    },
+                });
+
+                if (error) {
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = payButtonLabel || 'Confirm booking';
+                    showStripeErr(error.message);
+                }
+            });
+
+            (async function init() {
+                if (await maybeHandlePaymentReturn()) return;
+                renderCalendar();
+            })();
+        })();
+    </script>
+</body>
+</html>

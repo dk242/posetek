@@ -1,0 +1,2300 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/images/logo.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoseTek - Kicking Biomechanics Analysis</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #ffffff;
+            --off-white: #f7f8f6;
+            --green-dark: #1a3a2e;
+            --green-mid: #2d5e4a;
+            --green-accent: #4c8c6a;
+            --green-light: #e8f3ee;
+            --text-dark: #111111;
+            --text-mid: #444444;
+            --gold: #c8a24e;
+            --gold-light: #faf3e0;
+            --transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            color: var(--text-dark);
+            background-color: var(--white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        /* ── Navigation ── */
+        nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 1.2rem 5%;
+            position: fixed;
+            width: 100%;
+            z-index: 100;
+            background-color: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            transition: var(--transition);
+            top: 0;
+            left: 0;
+            border-bottom: 1px solid rgba(26, 58, 46, 0.08);
+        }
+
+        .nav-scrolled {
+            box-shadow: 0 2px 20px rgba(26, 58, 46, 0.08);
+        }
+
+        .brand-container {
+            display: flex;
+            align-items: center;
+            gap: 14px;
+        }
+
+        .logo {
+            font-family: 'Inter', sans-serif;
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            letter-spacing: -0.5px;
+            text-decoration: none;
+        }
+
+        .logo span { color: var(--green-accent); }
+
+        .nav-cta {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--white);
+            background-color: var(--green-dark);
+            padding: 0.55rem 1.4rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .nav-cta:hover {
+            background-color: var(--green-mid);
+            transform: translateY(-1px);
+        }
+
+        /* ── Hero ── */
+        .hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 100px 7% 60px;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(165deg, var(--white) 55%, var(--green-light) 100%);
+        }
+
+        .hero-inner {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 1300px;
+            margin: 0 auto;
+            gap: 4rem;
+        }
+
+        .hero-text {
+            flex: 1;
+            max-width: 600px;
+        }
+
+        .hero-eyebrow {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 1.2rem;
+        }
+
+        .hero-title {
+            font-size: 3.4rem;
+            font-weight: 800;
+            line-height: 1.08;
+            color: var(--text-dark);
+            margin-bottom: 1.4rem;
+            letter-spacing: -1.5px;
+        }
+
+        .hero-title em {
+            font-style: normal;
+            color: var(--green-dark);
+        }
+
+        .hero-subtitle {
+            font-size: 1.15rem;
+            font-weight: 400;
+            color: var(--text-mid);
+            line-height: 1.75;
+            margin-bottom: 2rem;
+            max-width: 480px;
+        }
+
+        .hero-proof {
+            display: flex;
+            gap: 2rem;
+            margin-bottom: 2.4rem;
+            flex-wrap: wrap;
+        }
+
+        .hero-proof-item {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.88rem;
+            color: var(--text-mid);
+            font-weight: 500;
+        }
+
+        .hero-proof-icon {
+            width: 22px;
+            height: 22px;
+            background: var(--green-light);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.7rem;
+            color: var(--green-dark);
+            flex-shrink: 0;
+        }
+
+        .hero-actions {
+            display: flex;
+            gap: 1rem;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        @keyframes ring-pulse {
+            0%   { transform: translate(-50%, -50%) scale(1);   opacity: 0.55; }
+            100% { transform: translate(-50%, -50%) scale(1.85); opacity: 0; }
+        }
+
+        @keyframes arrow-nudge {
+            0%, 100% { transform: translateX(0); }
+            50%       { transform: translateX(5px); }
+        }
+
+        .btn-primary {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.05rem;
+            font-weight: 600;
+            color: var(--white);
+            background-color: var(--green-dark);
+            padding: 0.95rem 2.2rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(26, 58, 46, 0.3);
+            overflow: visible;
+            border: none;
+            cursor: pointer;
+        }
+
+        .btn-primary::before,
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 100%; height: 100%;
+            border-radius: 50px;
+            border: 2px solid rgba(76, 140, 106, 0.7);
+            animation: ring-pulse 3.6s ease-out infinite;
+            pointer-events: none;
+        }
+
+        .btn-primary::after { animation-delay: 1.8s; }
+
+        .btn-primary:hover {
+            background-color: var(--green-mid);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(26, 58, 46, 0.4);
+        }
+
+        .btn-primary:hover::before,
+        .btn-primary:hover::after { animation-play-state: paused; }
+
+        .btn-primary .btn-arrow {
+            display: inline-block;
+            animation: arrow-nudge 1.2s ease-in-out infinite;
+        }
+
+        .btn-secondary {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--green-dark);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .btn-secondary:hover {
+            color: var(--green-mid);
+            gap: 10px;
+        }
+
+        .hero-visual {
+            flex: 1;
+            max-width: 520px;
+            position: relative;
+        }
+
+        .hero-carousel {
+            border-radius: 22px;
+            overflow: hidden;
+            box-shadow: 0 30px 70px rgba(26, 58, 46, 0.2), 0 8px 24px rgba(0, 0, 0, 0.12);
+            border: 1px solid rgba(76, 140, 106, 0.15);
+            transition: var(--transition);
+            position: relative;
+            background: var(--green-dark);
+            aspect-ratio: 16 / 11;
+        }
+
+        .hero-carousel:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 44px 88px rgba(26, 58, 46, 0.28), 0 12px 32px rgba(0, 0, 0, 0.15);
+        }
+
+        .hero-slide {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            transition: opacity 0.8s ease;
+        }
+
+        .hero-slide.active { opacity: 1; }
+
+        .hero-slide img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+
+        .hero-carousel-dots {
+            position: absolute;
+            bottom: 14px;
+            left: 50%;
+            transform: translateX(-50%);
+            display: flex;
+            gap: 8px;
+            z-index: 2;
+        }
+
+        .hero-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.4);
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            padding: 0;
+        }
+
+        .hero-dot.active {
+            background: var(--white);
+            transform: scale(1.3);
+        }
+
+        .hero-badge {
+            position: absolute;
+            bottom: -16px;
+            left: 24px;
+            background: var(--white);
+            border: 1px solid var(--green-light);
+            border-radius: 14px;
+            padding: 0.85rem 1.3rem;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .hero-badge-icon {
+            width: 38px;
+            height: 38px;
+            background: var(--green-light);
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.1rem;
+        }
+
+        .hero-badge-text {
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            line-height: 1.3;
+        }
+
+        .hero-badge-text span {
+            display: block;
+            font-weight: 400;
+            color: var(--text-mid);
+            font-size: 0.72rem;
+        }
+
+        /* ── Section shared ── */
+        .section-fade {
+            opacity: 0;
+            transform: translateY(60px);
+            transition: opacity 0.8s ease-out, transform 0.8s ease-out;
+        }
+
+        .section-fade.visible {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .section-label {
+            display: inline-block;
+            font-size: 0.78rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2.5px;
+            margin-bottom: 1rem;
+        }
+
+        .section-title {
+            font-size: 2.6rem;
+            font-weight: 700;
+            line-height: 1.15;
+            color: var(--text-dark);
+            letter-spacing: -1px;
+            margin-bottom: 1.2rem;
+        }
+
+        .section-title em {
+            font-style: normal;
+            color: var(--green-dark);
+        }
+
+        /* ── Problem Section ── */
+        .problem-section {
+            padding: 7rem 7%;
+            background-color: var(--white);
+        }
+
+        .problem-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .problem-inner .section-title {
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .problem-subtitle {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: var(--text-mid);
+            max-width: 620px;
+            margin: 0 auto 3.5rem;
+        }
+
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .problem-card {
+            text-align: left;
+            padding: 2rem;
+            border-radius: 18px;
+            border: 1px solid rgba(26, 58, 46, 0.08);
+            background: var(--off-white);
+            transition: var(--transition);
+        }
+
+        .problem-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 16px 40px rgba(26, 58, 46, 0.08);
+        }
+
+        .problem-icon {
+            width: 48px;
+            height: 48px;
+            background: var(--green-light);
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            margin-bottom: 1.2rem;
+        }
+
+        .problem-card h3 {
+            font-size: 1.15rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.6rem;
+        }
+
+        .problem-card p {
+            font-size: 0.95rem;
+            line-height: 1.7;
+            color: var(--text-mid);
+        }
+
+        .problem-card .strikethrough {
+            text-decoration: line-through;
+            opacity: 0.5;
+        }
+
+        .problem-card .replacement {
+            color: var(--green-dark);
+            font-weight: 600;
+        }
+
+        /* ── How It Works ── */
+        .how-section {
+            padding: 7rem 7%;
+            background-color: var(--off-white);
+        }
+
+        .how-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .how-header {
+            text-align: center;
+            margin-bottom: 4rem;
+        }
+
+        .how-header .section-title {
+            margin-bottom: 0.8rem;
+        }
+
+        .how-header p {
+            font-size: 1.1rem;
+            color: var(--text-mid);
+            max-width: 560px;
+            margin: 0 auto;
+        }
+
+        .how-steps {
+            display: flex;
+            flex-direction: column;
+            gap: 4rem;
+        }
+
+        .how-step {
+            display: flex;
+            align-items: center;
+            gap: 4rem;
+        }
+
+        .how-step:nth-child(even) {
+            flex-direction: row-reverse;
+        }
+
+        .how-step-visual {
+            flex: 1;
+            max-width: 480px;
+        }
+
+        .how-step-image {
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 16px 48px rgba(26, 58, 46, 0.12), 0 2px 8px rgba(26, 58, 46, 0.06);
+            border: 1px solid rgba(26, 58, 46, 0.08);
+        }
+
+        .how-step-image img {
+            display: block;
+            width: 100%;
+            height: auto;
+        }
+
+        .how-step-content {
+            flex: 1;
+        }
+
+        .step-number {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            background: var(--green-dark);
+            color: var(--white);
+            font-size: 1.1rem;
+            font-weight: 700;
+            margin-bottom: 1.2rem;
+        }
+
+        .how-step-content h3 {
+            font-size: 1.8rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.8rem;
+            letter-spacing: -0.5px;
+        }
+
+        .how-step-content h3 em {
+            font-style: normal;
+            color: var(--green-dark);
+        }
+
+        .how-step-content p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: var(--text-mid);
+            max-width: 440px;
+        }
+
+        .how-step-details {
+            list-style: none;
+            margin-top: 1.2rem;
+        }
+
+        .how-step-details li {
+            font-size: 0.95rem;
+            color: var(--text-mid);
+            padding: 0.4rem 0;
+            padding-left: 1.6rem;
+            position: relative;
+        }
+
+        .how-step-details li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--green-accent);
+            font-weight: 700;
+        }
+
+        /* ── Analysis Pillars ── */
+        .pillars-section {
+            padding: 7rem 7%;
+            background-color: var(--white);
+        }
+
+        .pillars-inner {
+            max-width: 1100px;
+            margin: 0 auto;
+        }
+
+        .pillars-header {
+            text-align: center;
+            margin-bottom: 3.5rem;
+            max-width: 720px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .pillars-header .section-title {
+            margin-bottom: 1rem;
+        }
+
+        .pillars-header p {
+            font-size: 1.1rem;
+            color: var(--text-mid);
+            max-width: 580px;
+            margin: 0 auto;
+            line-height: 1.75;
+        }
+
+        .pillars-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2rem;
+        }
+
+        .pillar-card {
+            border-radius: 22px;
+            overflow: hidden;
+            border: 1px solid rgba(26, 58, 46, 0.08);
+            background: var(--off-white);
+            transition: var(--transition);
+        }
+
+        .pillar-card:hover {
+            transform: translateY(-6px);
+            box-shadow: 0 20px 50px rgba(26, 58, 46, 0.1);
+        }
+
+        .pillar-image {
+            width: 100%;
+            height: 0;
+            padding-bottom: 62%;
+            position: relative;
+            overflow: hidden;
+            background: #0f231b;
+        }
+
+        .pillar-image img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center center;
+            transition: var(--transition);
+        }
+
+        .pillar-card:hover .pillar-image img {
+            transform: scale(1.02);
+        }
+
+        .pillar-body {
+            padding: 1.8rem;
+        }
+
+        .pillar-tag {
+            display: inline-block;
+            font-size: 0.72rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.6rem;
+        }
+
+        .pillar-body h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.6rem;
+            letter-spacing: -0.3px;
+        }
+
+        .pillar-body p {
+            font-size: 0.92rem;
+            line-height: 1.7;
+            color: var(--text-mid);
+        }
+
+        /* ── Pro Comparison Section ── */
+        .comparison-section {
+            padding: 7rem 7%;
+            background: linear-gradient(180deg, var(--off-white) 0%, var(--white) 100%);
+        }
+
+        .comparison-inner {
+            max-width: 900px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .comparison-inner .section-title {
+            margin-bottom: 1rem;
+        }
+
+        .comparison-inner > p {
+            font-size: 1.1rem;
+            color: var(--text-mid);
+            max-width: 600px;
+            margin: 0 auto 3rem;
+            line-height: 1.75;
+        }
+
+        .comparison-metrics {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 1.5rem;
+            max-width: 700px;
+            margin: 0 auto;
+        }
+
+        .comparison-metric {
+            text-align: left;
+            padding: 1.6rem;
+            border-radius: 16px;
+            background: var(--white);
+            border: 1px solid rgba(26, 58, 46, 0.08);
+            transition: var(--transition);
+        }
+
+        .comparison-metric:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 12px 32px rgba(26, 58, 46, 0.08);
+        }
+
+        .comparison-metric-icon {
+            font-size: 1.6rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .comparison-metric h4 {
+            font-size: 1.05rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .comparison-metric p {
+            font-size: 0.88rem;
+            line-height: 1.65;
+            color: var(--text-mid);
+        }
+
+        /* ── Pricing Section ── */
+        .pricing-section {
+            padding: 7rem 7%;
+            background: linear-gradient(180deg, var(--white) 0%, var(--green-light) 100%);
+        }
+
+        .pricing-inner {
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .pricing-header {
+            text-align: center;
+            margin-bottom: 3rem;
+        }
+
+        .pricing-header p {
+            font-size: 1.1rem;
+            color: var(--text-mid);
+            max-width: 520px;
+            margin: 0 auto;
+        }
+
+        .pricing-card {
+            background: var(--white);
+            border-radius: 22px;
+            padding: 2.5rem;
+            border: 2px solid var(--green-accent);
+            box-shadow: 0 12px 40px rgba(26, 58, 46, 0.12);
+            transition: var(--transition);
+            position: relative;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 50px rgba(26, 58, 46, 0.15);
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -13px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: var(--green-dark);
+            color: var(--white);
+            font-size: 0.72rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            padding: 5px 16px;
+            border-radius: 50px;
+            white-space: nowrap;
+        }
+
+        .pricing-card-name {
+            font-size: 1.1rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .pricing-card-desc {
+            font-size: 0.88rem;
+            color: var(--text-mid);
+            margin-bottom: 1.5rem;
+            line-height: 1.5;
+        }
+
+        .pricing-amount {
+            display: flex;
+            align-items: baseline;
+            gap: 4px;
+            margin-bottom: 1.5rem;
+        }
+
+        .pricing-dollar {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            line-height: 1;
+        }
+
+        .pricing-value {
+            font-size: 3.2rem;
+            font-weight: 800;
+            color: var(--green-dark);
+            line-height: 1;
+            letter-spacing: -2px;
+        }
+
+        .pricing-per {
+            font-size: 0.95rem;
+            color: var(--text-mid);
+            margin-left: 4px;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            font-size: 0.92rem;
+            color: var(--text-mid);
+            padding: 0.5rem 0;
+            padding-left: 1.6rem;
+            position: relative;
+            border-bottom: 1px solid rgba(26, 58, 46, 0.05);
+        }
+
+        .pricing-features li:last-child { border-bottom: none; }
+
+        .pricing-features li::before {
+            content: '✓';
+            position: absolute;
+            left: 0;
+            color: var(--green-accent);
+            font-weight: 700;
+        }
+
+        .pricing-btn {
+            display: block;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            padding: 0.9rem;
+            border-radius: 50px;
+            text-decoration: none;
+            transition: var(--transition);
+            cursor: pointer;
+            border: none;
+            background: var(--green-dark);
+            color: var(--white);
+            box-shadow: 0 4px 16px rgba(26, 58, 46, 0.25);
+        }
+
+        .pricing-btn:hover {
+            background: var(--green-mid);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(26, 58, 46, 0.3);
+        }
+
+        /* ── Upload Section ── */
+        .upload-section {
+            padding: 5rem 7%;
+            background-color: var(--white);
+        }
+
+        .upload-inner {
+            max-width: 680px;
+            margin: 0 auto;
+        }
+
+        .upload-header {
+            text-align: center;
+            margin-bottom: 2.5rem;
+        }
+
+        .upload-header p {
+            font-size: 1rem;
+            color: var(--text-mid);
+            max-width: 500px;
+            margin: 0 auto;
+            line-height: 1.7;
+        }
+
+        .upload-steps {
+            display: flex;
+            justify-content: center;
+            gap: 0;
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+
+        .upload-step-indicator {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            flex: 1;
+            max-width: 160px;
+            position: relative;
+        }
+
+        .upload-step-indicator:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 20px;
+            left: calc(50% + 24px);
+            width: calc(100% - 48px);
+            height: 2px;
+            background: rgba(26, 58, 46, 0.12);
+            z-index: 0;
+        }
+
+        .upload-step-indicator.completed:not(:last-child)::after {
+            background: var(--green-accent);
+        }
+
+        .upload-step-num {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--off-white);
+            border: 2px solid rgba(26, 58, 46, 0.12);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            font-weight: 700;
+            color: var(--text-mid);
+            margin-bottom: 0.6rem;
+            position: relative;
+            z-index: 1;
+            transition: var(--transition);
+        }
+
+        .upload-step-indicator.active .upload-step-num {
+            background: var(--green-dark);
+            border-color: var(--green-dark);
+            color: var(--white);
+        }
+
+        .upload-step-indicator.completed .upload-step-num {
+            background: var(--green-accent);
+            border-color: var(--green-accent);
+            color: var(--white);
+        }
+
+        .upload-step-label {
+            font-size: 0.78rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            text-align: center;
+        }
+
+        .upload-step-indicator.active .upload-step-label {
+            color: var(--green-dark);
+        }
+
+        .upload-panel {
+            background: var(--off-white);
+            border-radius: 22px;
+            padding: 2.5rem;
+            border: 1px solid rgba(26, 58, 46, 0.08);
+            min-height: 320px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .upload-panel[hidden] { display: none; }
+
+        /* Step 1: Create Account */
+        .auth-form {
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .auth-form h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+            text-align: center;
+        }
+
+        .auth-form > p {
+            font-size: 0.92rem;
+            color: var(--text-mid);
+            text-align: center;
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group {
+            margin-bottom: 1rem;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 0.82rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.35rem;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 0.75rem 1rem;
+            border-radius: 12px;
+            border: 1px solid rgba(26, 58, 46, 0.18);
+            font-size: 0.95rem;
+            font-family: inherit;
+            color: var(--text-dark);
+            background: var(--white);
+            transition: var(--transition);
+        }
+
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--green-accent);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.15);
+        }
+
+        .auth-submit {
+            width: 100%;
+            padding: 0.85rem;
+            border-radius: 50px;
+            border: none;
+            background: var(--green-dark);
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            margin-top: 0.5rem;
+        }
+
+        .auth-submit:hover:not(:disabled) {
+            background: var(--green-mid);
+            transform: translateY(-1px);
+        }
+
+        .auth-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .auth-status {
+            font-size: 0.85rem;
+            text-align: center;
+            margin-top: 0.8rem;
+            min-height: 1.3em;
+        }
+
+        .auth-status.error { color: #b42318; }
+        .auth-status.success { color: var(--green-mid); }
+
+        /* Step 2: Payment */
+        .payment-panel {
+            text-align: center;
+            width: 100%;
+            max-width: 380px;
+        }
+
+        .payment-panel h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .payment-panel > p {
+            font-size: 0.92rem;
+            color: var(--text-mid);
+            margin-bottom: 1.5rem;
+        }
+
+        .payment-summary {
+            background: var(--white);
+            border-radius: 14px;
+            padding: 1.2rem 1.5rem;
+            border: 1px solid rgba(26, 58, 46, 0.1);
+            margin-bottom: 1.5rem;
+            text-align: left;
+        }
+
+        .payment-summary-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0.4rem 0;
+        }
+
+        .payment-summary-row span:first-child {
+            font-size: 0.92rem;
+            color: var(--text-mid);
+        }
+
+        .payment-summary-row span:last-child {
+            font-size: 0.92rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .payment-summary-total {
+            border-top: 1px solid rgba(26, 58, 46, 0.1);
+            margin-top: 0.4rem;
+            padding-top: 0.6rem;
+        }
+
+        .payment-summary-total span:last-child {
+            font-size: 1.15rem;
+            font-weight: 800;
+            color: var(--green-dark);
+        }
+
+        .payment-btn {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 50px;
+            border: none;
+            background: var(--green-dark);
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(26, 58, 46, 0.25);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .payment-btn:hover:not(:disabled) {
+            background: var(--green-mid);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 24px rgba(26, 58, 46, 0.3);
+        }
+
+        .payment-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .payment-secure {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+            margin-top: 0.8rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 4px;
+        }
+
+        /* Step 3: Upload */
+        .dropzone-panel {
+            width: 100%;
+            text-align: center;
+        }
+
+        .dropzone-panel h3 {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.4rem;
+        }
+
+        .dropzone-panel > p {
+            font-size: 0.92rem;
+            color: var(--text-mid);
+            margin-bottom: 1.5rem;
+        }
+
+        .dropzone {
+            border: 2px dashed rgba(76, 140, 106, 0.4);
+            border-radius: 18px;
+            padding: 3rem 2rem;
+            background: var(--white);
+            transition: var(--transition);
+            cursor: pointer;
+            position: relative;
+        }
+
+        .dropzone:hover,
+        .dropzone.dragover {
+            border-color: var(--green-accent);
+            background: var(--green-light);
+        }
+
+        .dropzone-icon {
+            font-size: 2.5rem;
+            margin-bottom: 0.8rem;
+        }
+
+        .dropzone-text {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.3rem;
+        }
+
+        .dropzone-hint {
+            font-size: 0.85rem;
+            color: var(--text-mid);
+        }
+
+        .dropzone-hint strong {
+            color: var(--green-dark);
+        }
+
+        .dropzone input[type="file"] {
+            position: absolute;
+            inset: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .upload-file-info {
+            display: none;
+            align-items: center;
+            gap: 12px;
+            margin-top: 1rem;
+            padding: 0.8rem 1.2rem;
+            background: var(--white);
+            border-radius: 12px;
+            border: 1px solid rgba(26, 58, 46, 0.1);
+        }
+
+        .upload-file-info.visible {
+            display: flex;
+        }
+
+        .upload-file-icon {
+            font-size: 1.4rem;
+        }
+
+        .upload-file-details {
+            flex: 1;
+            text-align: left;
+        }
+
+        .upload-file-name {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        .upload-file-size {
+            font-size: 0.78rem;
+            color: var(--text-mid);
+        }
+
+        .upload-file-remove {
+            background: none;
+            border: none;
+            color: var(--text-mid);
+            cursor: pointer;
+            font-size: 1.2rem;
+            padding: 4px;
+            transition: var(--transition);
+        }
+
+        .upload-file-remove:hover {
+            color: #b42318;
+        }
+
+        .upload-submit {
+            width: 100%;
+            padding: 0.9rem;
+            border-radius: 50px;
+            border: none;
+            background: var(--green-dark);
+            color: var(--white);
+            font-size: 1rem;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 16px rgba(26, 58, 46, 0.25);
+            margin-top: 1.2rem;
+            display: none;
+        }
+
+        .upload-submit.visible {
+            display: block;
+        }
+
+        .upload-submit:hover:not(:disabled) {
+            background: var(--green-mid);
+            transform: translateY(-2px);
+        }
+
+        .upload-submit:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .upload-progress {
+            display: none;
+            margin-top: 1rem;
+        }
+
+        .upload-progress.visible {
+            display: block;
+        }
+
+        .upload-progress-bar {
+            width: 100%;
+            height: 6px;
+            border-radius: 3px;
+            background: rgba(26, 58, 46, 0.1);
+            overflow: hidden;
+        }
+
+        .upload-progress-fill {
+            height: 100%;
+            border-radius: 3px;
+            background: var(--green-accent);
+            transition: width 0.3s ease;
+            width: 0%;
+        }
+
+        .upload-progress-text {
+            font-size: 0.82rem;
+            color: var(--text-mid);
+            margin-top: 0.4rem;
+            text-align: center;
+        }
+
+        .upload-success {
+            display: none;
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .upload-success.visible {
+            display: block;
+        }
+
+        .upload-success-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-success h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+        }
+
+        .upload-success p {
+            font-size: 1rem;
+            color: var(--text-mid);
+            line-height: 1.7;
+        }
+
+        /* ── Guarantee ── */
+        .guarantee-section {
+            padding: 5rem 7%;
+            background-color: var(--off-white);
+        }
+
+        .guarantee-inner {
+            max-width: 760px;
+            margin: 0 auto;
+            text-align: center;
+            padding: 3rem;
+            border-radius: 22px;
+            background: var(--green-dark);
+            color: var(--white);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .guarantee-inner::before {
+            content: '';
+            position: absolute;
+            top: -60px;
+            right: -60px;
+            width: 180px;
+            height: 180px;
+            border-radius: 50%;
+            background: rgba(76, 140, 106, 0.15);
+            pointer-events: none;
+        }
+
+        .guarantee-inner::after {
+            content: '';
+            position: absolute;
+            bottom: -40px;
+            left: -40px;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            background: rgba(76, 140, 106, 0.1);
+            pointer-events: none;
+        }
+
+        .guarantee-icon {
+            width: 64px;
+            height: 64px;
+            background: rgba(76, 140, 106, 0.2);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            margin: 0 auto 1.5rem;
+        }
+
+        .guarantee-inner h2 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            letter-spacing: -0.5px;
+            position: relative;
+        }
+
+        .guarantee-inner p {
+            font-size: 1.05rem;
+            line-height: 1.8;
+            color: rgba(255, 255, 255, 0.8);
+            max-width: 520px;
+            margin: 0 auto;
+            position: relative;
+        }
+
+        /* ── Final CTA ── */
+        .cta-section {
+            padding: 7rem 7%;
+            background: var(--white);
+        }
+
+        .cta-inner {
+            max-width: 700px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .cta-inner .section-title {
+            font-size: 2.8rem;
+            margin-bottom: 1rem;
+        }
+
+        .cta-inner p {
+            font-size: 1.1rem;
+            color: var(--text-mid);
+            margin-bottom: 2.5rem;
+            line-height: 1.75;
+        }
+
+        .cta-inner .btn-primary {
+            font-size: 1.15rem;
+            padding: 1.1rem 2.8rem;
+        }
+
+        /* ── Footer ── */
+        footer {
+            background-color: var(--green-dark);
+            color: rgba(255, 255, 255, 0.65);
+            text-align: center;
+            padding: 2.5rem 5%;
+            font-size: 0.85rem;
+        }
+
+        footer a {
+            color: var(--green-accent);
+            text-decoration: none;
+        }
+
+        /* ── Responsive ── */
+        @media (max-width: 900px) {
+            .hero {
+                padding: 100px 5% 50px;
+            }
+
+            .hero-inner {
+                flex-direction: column;
+                gap: 3rem;
+                text-align: center;
+            }
+
+            .hero-text { max-width: 100%; }
+
+            .hero-subtitle {
+                max-width: 100%;
+                margin-left: auto;
+                margin-right: auto;
+            }
+
+            .hero-proof { justify-content: center; }
+
+            .hero-actions { justify-content: center; }
+
+            .hero-title { font-size: 2.4rem; }
+
+            .hero-visual {
+                max-width: 100%;
+                width: 100%;
+            }
+
+            .hero-badge { left: 50%; transform: translateX(-50%); }
+
+            .problem-grid {
+                grid-template-columns: 1fr;
+                max-width: 480px;
+                margin: 0 auto;
+            }
+
+            .how-step,
+            .how-step:nth-child(even) {
+                flex-direction: column;
+                gap: 2rem;
+            }
+
+            .how-step-visual { max-width: 100%; }
+
+            .how-step-content h3 { font-size: 1.5rem; }
+
+            .pillars-grid {
+                grid-template-columns: 1fr;
+                max-width: 420px;
+                margin: 0 auto;
+            }
+
+            .comparison-metrics {
+                grid-template-columns: 1fr;
+                max-width: 400px;
+            }
+
+            .section-title { font-size: 2rem; }
+
+            .cta-inner .section-title { font-size: 2.2rem; }
+
+            .guarantee-inner { padding: 2.5rem 1.8rem; }
+
+            .upload-panel { padding: 2rem 1.5rem; }
+
+            .upload-steps { gap: 0.5rem; }
+
+            .upload-step-indicator:not(:last-child)::after {
+                width: calc(100% - 32px);
+                left: calc(50% + 16px);
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <nav id="mainNav">
+            <div class="brand-container">
+                <a href="index.html" class="logo">Pose<span>Tek</span></a>
+            </div>
+            <a href="#upload" class="nav-cta">Upload Video →</a>
+        </nav>
+    </header>
+
+    <main>
+        <!-- ═══ HERO ═══ -->
+        <section class="hero">
+            <div class="hero-inner">
+                <div class="hero-text">
+                    <span class="hero-eyebrow">Kicking Biomechanics Analysis</span>
+                    <h1 class="hero-title">Kick Like<br>the Pros.<br><em>Powered by Science.</em></h1>
+                    <p class="hero-subtitle">Upload a side-view video of your power kick, grass-cutter, or driven long ball. Our biomechanics engine overlays your technique against elite players — and tells you exactly how to unlock the next level of performance.</p>
+                    <div class="hero-proof">
+                        <div class="hero-proof-item">
+                            <div class="hero-proof-icon">🎥</div>
+                            One video, full analysis
+                        </div>
+                        <div class="hero-proof-item">
+                            <div class="hero-proof-icon">⚡</div>
+                            Pro overlay comparison
+                        </div>
+                        <div class="hero-proof-item">
+                            <div class="hero-proof-icon">🎯</div>
+                            Power optimization cues
+                        </div>
+                    </div>
+                    <div class="hero-actions">
+                        <a href="#upload" class="btn-primary">Upload Video Now <span class="btn-arrow">→</span></a>
+                        <a href="#how-it-works" class="btn-secondary">See How It Works ↓</a>
+                    </div>
+                </div>
+                <div class="hero-visual">
+                    <div class="hero-carousel" id="heroCarousel">
+                        <div class="hero-slide active"><img src="images/pose_strike.png" alt="Biomechanical kick analysis with pose overlay"></div>
+                        <div class="hero-slide"><img src="images/backswing.png" alt="Backswing phase analysis"></div>
+                        <div class="hero-slide"><img src="images/contact.png" alt="Ball contact point analysis"></div>
+                        <div class="hero-slide"><img src="images/analysiskick.PNG" alt="Full kick biomechanics breakdown"></div>
+                        <div class="hero-carousel-dots">
+                            <button class="hero-dot active" data-index="0"></button>
+                            <button class="hero-dot" data-index="1"></button>
+                            <button class="hero-dot" data-index="2"></button>
+                            <button class="hero-dot" data-index="3"></button>
+                        </div>
+                    </div>
+                    <div class="hero-badge">
+                        <div class="hero-badge-icon">⚽</div>
+                        <div class="hero-badge-text">
+                            One-time $29 analysis
+                            <span>Pro-grade kicking feedback</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ PROBLEM ═══ -->
+        <section class="problem-section section-fade">
+            <div class="problem-inner">
+                <span class="section-label">The Problem</span>
+                <h2 class="section-title">You Can Feel It's Not Right,<br>But You Can't <em>See Why</em></h2>
+                <p class="problem-subtitle">You've watched pros strike the ball a thousand times. You've been told "follow through" and "get over the ball." But without seeing your own mechanics side-by-side with elite form, you're training blind.</p>
+                <div class="problem-grid">
+                    <div class="problem-card">
+                        <div class="problem-icon">👻</div>
+                        <h3>Invisible Power Leaks</h3>
+                        <p>Poor hip rotation timing, incorrect plant-foot distance, and early deceleration are invisible to the naked eye — but they're costing you 20-30% of your power output.</p>
+                    </div>
+                    <div class="problem-card">
+                        <div class="problem-icon">🗣</div>
+                        <h3>Vague Coaching Cues</h3>
+                        <p><span class="strikethrough">"Strike through the ball"</span> — but what does that actually mean for <span class="replacement">your body, your mechanics, your specific weak point?</span> Generic advice doesn't fix individual problems.</p>
+                    </div>
+                    <div class="problem-card">
+                        <div class="problem-icon">🔁</div>
+                        <h3>Repeating Bad Habits</h3>
+                        <p>Without quantified feedback, practice doesn't make perfect — it makes permanent. Hundreds of reps with flawed technique only deepens the pattern.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ HOW IT WORKS ═══ -->
+        <section id="how-it-works" class="how-section">
+            <div class="how-inner">
+                <div class="how-header section-fade">
+                    <span class="section-label">How It Works</span>
+                    <h2 class="section-title">Three Steps to a <em>Pro-Level Kick</em></h2>
+                    <p>Upload one video. Get a complete biomechanical breakdown with pro overlays and specific cues to optimize your power output.</p>
+                </div>
+
+                <div class="how-steps">
+                    <div class="how-step section-fade">
+                        <div class="how-step-visual">
+                            <div class="how-step-image">
+                                <img src="images/pose_strike.png" alt="Side-view video of a power kick">
+                            </div>
+                        </div>
+                        <div class="how-step-content">
+                            <div class="step-number">1</div>
+                            <h3>Film Your Kick from the <em>Side</em></h3>
+                            <p>Set up any camera or phone at a perpendicular side view. Capture one clean power kick, grass-cutter, or driven long ball. That's all we need.</p>
+                            <ul class="how-step-details">
+                                <li>Side view, full body in frame</li>
+                                <li>Any phone camera works</li>
+                                <li>Power kick, grass-cutter, or driven ball</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="how-step section-fade">
+                        <div class="how-step-visual">
+                            <div class="how-step-image">
+                                <img src="images/backswing.png" alt="Biomechanical analysis with pro overlay">
+                            </div>
+                        </div>
+                        <div class="how-step-content">
+                            <div class="step-number">2</div>
+                            <h3>We Run the <em>Biomechanics Engine</em></h3>
+                            <p>Our technology extracts your joint angles, timing, and body positions frame-by-frame — then overlays your mechanics against professional kickers to show exactly where power is being lost.</p>
+                            <ul class="how-step-details">
+                                <li>Frame-by-frame pose estimation</li>
+                                <li>Pro technique overlay comparison</li>
+                                <li>Power chain efficiency scoring</li>
+                                <li>Phase-by-phase breakdown</li>
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="how-step section-fade">
+                        <div class="how-step-visual">
+                            <div class="how-step-image">
+                                <img src="images/contact.png" alt="Curated feedback report">
+                            </div>
+                        </div>
+                        <div class="how-step-content">
+                            <div class="step-number">3</div>
+                            <h3>Get Your <em>Curated Feedback</em></h3>
+                            <p>Receive a detailed report with specific, actionable cues tailored to your mechanics. Not generic advice — precise adjustments mapped to the phases of your kick where you're leaving power on the table.</p>
+                            <ul class="how-step-details">
+                                <li>Specific coaching cues for your body</li>
+                                <li>Visual side-by-side with pro form</li>
+                                <li>Priority fixes ranked by impact</li>
+                                <li>Drills to ingrain new patterns</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ ANALYSIS PILLARS ═══ -->
+        <section class="pillars-section section-fade">
+            <div class="pillars-inner">
+                <div class="pillars-header">
+                    <span class="section-label">What We Analyze</span>
+                    <h2 class="section-title">Every Phase of Your Kick, <em>Quantified</em></h2>
+                    <p>We don't just watch your kick — we measure it. Every joint angle, every timing window, every force vector through the entire kinetic chain.</p>
+                </div>
+                <div class="pillars-grid">
+                    <div class="pillar-card">
+                        <div class="pillar-image">
+                            <img src="images/pose_strike.png" alt="Approach and plant foot analysis">
+                        </div>
+                        <div class="pillar-body">
+                            <span class="pillar-tag">Approach & Plant</span>
+                            <h3>The Foundation of Power</h3>
+                            <p>Plant-foot distance, angle of approach, and hip positioning at plant determine 40% of your kick power. We measure exactly where yours stands vs. the pros.</p>
+                        </div>
+                    </div>
+                    <div class="pillar-card">
+                        <div class="pillar-image">
+                            <img src="images/backswing.png" alt="Backswing and hip rotation analysis">
+                        </div>
+                        <div class="pillar-body">
+                            <span class="pillar-tag">Backswing & Hip Drive</span>
+                            <h3>Loading the Kinetic Chain</h3>
+                            <p>Hip-to-shoulder separation, knee flexion angle at peak backswing, and rotational velocity through the hips — the engine behind every powerful strike.</p>
+                        </div>
+                    </div>
+                    <div class="pillar-card">
+                        <div class="pillar-image">
+                            <img src="images/contact.png" alt="Ball contact and follow-through analysis">
+                        </div>
+                        <div class="pillar-body">
+                            <span class="pillar-tag">Contact & Follow-Through</span>
+                            <h3>Transferring Maximum Force</h3>
+                            <p>Foot speed at contact, ankle lock angle, and follow-through trajectory determine whether all that stored energy actually makes it into the ball — or leaks away.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ PRO COMPARISON ═══ -->
+        <section class="comparison-section section-fade">
+            <div class="comparison-inner">
+                <span class="section-label">Pro Overlay Technology</span>
+                <h2 class="section-title">See Exactly How Your Kick<br>Compares to the <em>Elite</em></h2>
+                <p>Our engine doesn't just analyze your kick in isolation. We overlay your mechanics against professional kickers so you can see — frame by frame — where the gap is and how to close it.</p>
+                <div class="comparison-metrics">
+                    <div class="comparison-metric">
+                        <div class="comparison-metric-icon">⚡</div>
+                        <h4>Peak Foot Speed</h4>
+                        <p>Compare your foot velocity at the moment of impact against elite benchmarks. Most players lose 15-25% of potential speed before contact.</p>
+                    </div>
+                    <div class="comparison-metric">
+                        <div class="comparison-metric-icon">🔄</div>
+                        <h4>Hip Rotation Timing</h4>
+                        <p>Pros initiate hip rotation 80-120ms before contact. See where your rotation timing falls and how to optimize the sequence.</p>
+                    </div>
+                    <div class="comparison-metric">
+                        <div class="comparison-metric-icon">📐</div>
+                        <h4>Joint Angle Precision</h4>
+                        <p>Knee flexion, ankle plantarflexion, trunk lean — every angle is measured and compared against the optimal ranges used by professional strikers.</p>
+                    </div>
+                    <div class="comparison-metric">
+                        <div class="comparison-metric-icon">🎯</div>
+                        <h4>Power Chain Efficiency</h4>
+                        <p>Energy flows from ground through hips, to knee, to foot. We quantify how much power transfers through each link vs. how much leaks away.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ PRICING ═══ -->
+        <section id="pricing" class="pricing-section section-fade">
+            <div class="pricing-inner">
+                <div class="pricing-header">
+                    <span class="section-label">Simple Pricing</span>
+                    <h2 class="section-title">One Video. One <em>Complete Analysis.</em></h2>
+                    <p>No subscriptions. No hidden fees. Upload your kick and get a full pro-grade biomechanical report.</p>
+                </div>
+                <div class="pricing-card">
+                    <div class="pricing-badge">Full Biomechanics Report</div>
+                    <div class="pricing-card-name">Kicking Analysis</div>
+                    <p class="pricing-card-desc">Complete biomechanical breakdown of one kick with pro overlay comparison and curated feedback</p>
+                    <div class="pricing-amount">
+                        <span class="pricing-dollar">$</span>
+                        <span class="pricing-value">29</span>
+                        <span class="pricing-per">one-time</span>
+                    </div>
+                    <ul class="pricing-features">
+                        <li>Full kinetic chain analysis</li>
+                        <li>Pro technique overlay comparison</li>
+                        <li>Phase-by-phase breakdown</li>
+                        <li>Specific coaching cues for your body</li>
+                        <li>Priority fixes ranked by power impact</li>
+                        <li>Corrective drills & training plan</li>
+                    </ul>
+                    <a href="#upload" class="pricing-btn">Upload Video Now →</a>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ GUARANTEE ═══ -->
+        <section class="guarantee-section section-fade">
+            <div class="guarantee-inner">
+                <div class="guarantee-icon">🛡</div>
+                <h2>Actionable Insights — Guaranteed</h2>
+                <p>If your report doesn't contain at least three specific, actionable changes you can make to improve your kick power, we'll refund you in full. No questions asked.</p>
+            </div>
+        </section>
+
+        <!-- ═══ UPLOAD SECTION ═══ -->
+        <section id="upload" class="upload-section">
+            <div class="upload-inner">
+                <div class="upload-header">
+                    <span class="section-label">Get Started</span>
+                    <h2 class="section-title">Upload Your <em>Kick</em></h2>
+                    <p>Create an account, complete payment, then drop in your side-view video. You'll receive your full analysis within 48 hours.</p>
+                </div>
+
+                <div class="upload-steps" id="uploadSteps">
+                    <div class="upload-step-indicator active" data-step="1">
+                        <div class="upload-step-num">1</div>
+                        <div class="upload-step-label">Create Account</div>
+                    </div>
+                    <div class="upload-step-indicator" data-step="2">
+                        <div class="upload-step-num">2</div>
+                        <div class="upload-step-label">Payment</div>
+                    </div>
+                    <div class="upload-step-indicator" data-step="3">
+                        <div class="upload-step-num">3</div>
+                        <div class="upload-step-label">Upload Video</div>
+                    </div>
+                </div>
+
+                <!-- Step 1: Create Account -->
+                <div class="upload-panel" id="panelAuth">
+                    <div class="auth-form">
+                        <h3>Create Your Account</h3>
+                        <p>Sign up to unlock your kicking analysis.</p>
+                        <form id="authForm" novalidate>
+                            <div class="form-group">
+                                <label for="authEmail">Email</label>
+                                <input type="email" id="authEmail" name="email" placeholder="you@email.com" autocomplete="email" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="authPassword">Password</label>
+                                <input type="password" id="authPassword" name="password" placeholder="Min. 6 characters" autocomplete="new-password" required minlength="6">
+                            </div>
+                            <button type="submit" class="auth-submit" id="authSubmit">Create Account</button>
+                        </form>
+                        <p class="auth-status" id="authStatus"></p>
+                    </div>
+                </div>
+
+                <!-- Step 2: Payment -->
+                <div class="upload-panel" id="panelPayment" hidden>
+                    <div class="payment-panel">
+                        <h3>Complete Payment</h3>
+                        <p>One-time payment to unlock your kicking analysis.</p>
+                        <div class="payment-summary">
+                            <div class="payment-summary-row">
+                                <span>Kicking Biomechanics Analysis</span>
+                                <span>$29.00</span>
+                            </div>
+                            <div class="payment-summary-row">
+                                <span>Pro overlay comparison</span>
+                                <span>Included</span>
+                            </div>
+                            <div class="payment-summary-row payment-summary-total">
+                                <span>Total</span>
+                                <span>$29.00</span>
+                            </div>
+                        </div>
+                        <button class="payment-btn" id="paymentBtn">
+                            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+                            Pay $29 with Stripe
+                        </button>
+                        <div class="payment-secure">🔒 Secured by Stripe. Your card info never touches our servers.</div>
+                    </div>
+                </div>
+
+                <!-- Step 3: Upload Video -->
+                <div class="upload-panel" id="panelUpload" hidden>
+                    <div class="dropzone-panel" id="dropzonePanel">
+                        <h3>Drop Your Video</h3>
+                        <p>Upload a side-view video of your kick. One video per analysis.</p>
+                        <div class="dropzone" id="dropzone">
+                            <input type="file" id="videoInput" accept="video/*">
+                            <div class="dropzone-icon">🎥</div>
+                            <div class="dropzone-text">Drag & drop your video here</div>
+                            <div class="dropzone-hint">or click to browse · <strong>MP4, MOV</strong> · max 500MB</div>
+                        </div>
+                        <div class="upload-file-info" id="fileInfo">
+                            <div class="upload-file-icon">🎬</div>
+                            <div class="upload-file-details">
+                                <div class="upload-file-name" id="fileName"></div>
+                                <div class="upload-file-size" id="fileSize"></div>
+                            </div>
+                            <button class="upload-file-remove" id="fileRemove" title="Remove file">✕</button>
+                        </div>
+                        <button class="upload-submit" id="uploadSubmit">Submit for Analysis →</button>
+                        <div class="upload-progress" id="uploadProgress">
+                            <div class="upload-progress-bar">
+                                <div class="upload-progress-fill" id="progressFill"></div>
+                            </div>
+                            <div class="upload-progress-text" id="progressText">Uploading...</div>
+                        </div>
+                    </div>
+                    <div class="upload-success" id="uploadSuccess">
+                        <div class="upload-success-icon">✅</div>
+                        <h3>Video Submitted Successfully</h3>
+                        <p>Your kicking biomechanics analysis is being processed. You'll receive your full report with pro overlays and curated feedback at your email within 48 hours.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ═══ FINAL CTA ═══ -->
+        <section class="cta-section section-fade">
+            <div class="cta-inner">
+                <span class="section-label">Ready to Unlock More Power?</span>
+                <h2 class="section-title">Stop Guessing. Start Kicking<br>Like the <em>Pros.</em></h2>
+                <p>One video is all it takes. See exactly where you're losing power and get the specific adjustments to optimize your technique for maximum output.</p>
+                <a href="#upload" class="btn-primary">Upload Video Now <span class="btn-arrow">→</span></a>
+            </div>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2026 PoseTek · <a href="index.html">Home</a> · <a href="privacy.html">Privacy Policy</a></p>
+    </footer>
+
+    <!-- Firebase + Stripe -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    <script src="https://js.stripe.com/v3/"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const db = firebase.firestore();
+    </script>
+
+    <script>
+        /* ── Nav scroll ── */
+        const nav = document.getElementById('mainNav');
+        window.addEventListener('scroll', () => {
+            nav.classList.toggle('nav-scrolled', window.scrollY > 20);
+        }, { passive: true });
+
+        /* ── Fade-in observer ── */
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) entry.target.classList.add('visible');
+            });
+        }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+
+        document.querySelectorAll('.section-fade').forEach(el => observer.observe(el));
+
+        if (window.innerWidth <= 768) {
+            document.querySelectorAll('.section-fade').forEach(el => el.classList.add('visible'));
+        }
+
+        /* ── Hero carousel ── */
+        const heroSlides = document.querySelectorAll('.hero-slide');
+        const heroDots = document.querySelectorAll('.hero-dot');
+        let heroIndex = 0;
+
+        function goToHeroSlide(i) {
+            heroSlides[heroIndex].classList.remove('active');
+            heroDots[heroIndex].classList.remove('active');
+            heroIndex = i;
+            heroSlides[heroIndex].classList.add('active');
+            heroDots[heroIndex].classList.add('active');
+        }
+
+        heroDots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                clearInterval(heroInterval);
+                goToHeroSlide(parseInt(dot.dataset.index));
+                heroInterval = setInterval(() => goToHeroSlide((heroIndex + 1) % heroSlides.length), 3500);
+            });
+        });
+
+        let heroInterval = setInterval(() => goToHeroSlide((heroIndex + 1) % heroSlides.length), 3500);
+
+        /* ── Upload flow state ── */
+        let currentStep = 1;
+        let userEmail = '';
+        let selectedFile = null;
+
+        const stepIndicators = document.querySelectorAll('.upload-step-indicator');
+        const panelAuth = document.getElementById('panelAuth');
+        const panelPayment = document.getElementById('panelPayment');
+        const panelUpload = document.getElementById('panelUpload');
+
+        function setStep(step) {
+            currentStep = step;
+            stepIndicators.forEach(ind => {
+                const s = parseInt(ind.dataset.step);
+                ind.classList.remove('active', 'completed');
+                if (s < step) ind.classList.add('completed');
+                if (s === step) ind.classList.add('active');
+            });
+            panelAuth.hidden = step !== 1;
+            panelPayment.hidden = step !== 2;
+            panelUpload.hidden = step !== 3;
+        }
+
+        /* ── Step 1: Account creation (Firebase Auth) ── */
+        const authForm = document.getElementById('authForm');
+        const authEmail = document.getElementById('authEmail');
+        const authPassword = document.getElementById('authPassword');
+        const authSubmit = document.getElementById('authSubmit');
+        const authStatus = document.getElementById('authStatus');
+
+        function setAuthStatus(msg, kind) {
+            authStatus.textContent = msg || '';
+            authStatus.className = 'auth-status' + (kind ? ' ' + kind : '');
+        }
+
+        authForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            setAuthStatus('');
+
+            const email = authEmail.value.trim();
+            const password = authPassword.value;
+
+            if (!email || !authEmail.checkValidity()) {
+                setAuthStatus('Please enter a valid email.', 'error');
+                return;
+            }
+            if (password.length < 6) {
+                setAuthStatus('Password must be at least 6 characters.', 'error');
+                return;
+            }
+
+            authSubmit.disabled = true;
+            authSubmit.textContent = 'Creating account...';
+
+            try {
+                const cred = await firebase.auth().createUserWithEmailAndPassword(email, password);
+                userEmail = email;
+
+                await db.collection('kickingAnalysisUsers').doc(cred.user.uid).set({
+                    email: email,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    analysisStatus: 'pending_payment'
+                });
+
+                setAuthStatus('Account created!', 'success');
+                setTimeout(() => setStep(2), 600);
+            } catch (err) {
+                if (err.code === 'auth/email-already-in-use') {
+                    try {
+                        await firebase.auth().signInWithEmailAndPassword(email, password);
+                        userEmail = email;
+                        setAuthStatus('Signed in!', 'success');
+                        setTimeout(() => setStep(2), 600);
+                    } catch (signInErr) {
+                        setAuthStatus('Email already in use. Check your password.', 'error');
+                        authSubmit.disabled = false;
+                        authSubmit.textContent = 'Create Account';
+                    }
+                } else {
+                    setAuthStatus('Something went wrong. Please try again.', 'error');
+                    authSubmit.disabled = false;
+                    authSubmit.textContent = 'Create Account';
+                }
+            }
+        });
+
+        /* ── Step 2: Stripe payment ── */
+        const paymentBtn = document.getElementById('paymentBtn');
+        const STRIPE_BTN_HTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> Pay $29 with Stripe';
+
+        paymentBtn.addEventListener('click', async () => {
+            paymentBtn.disabled = true;
+            paymentBtn.textContent = 'Redirecting to Stripe...';
+
+            try {
+                const stripe = Stripe('pk_live_YOUR_STRIPE_KEY');
+                const { error } = await stripe.redirectToCheckout({
+                    lineItems: [{ price: 'price_YOUR_PRICE_ID', quantity: 1 }],
+                    mode: 'payment',
+                    successUrl: window.location.origin + window.location.pathname + '?payment=success#upload',
+                    cancelUrl: window.location.origin + window.location.pathname + '?payment=cancelled#upload',
+                    customerEmail: userEmail
+                });
+
+                if (error) {
+                    console.error('Stripe error:', error);
+                    paymentBtn.disabled = false;
+                    paymentBtn.innerHTML = STRIPE_BTN_HTML;
+                }
+            } catch (err) {
+                console.error('Payment error:', err);
+                paymentBtn.disabled = false;
+                paymentBtn.innerHTML = STRIPE_BTN_HTML;
+            }
+        });
+
+        /* ── Handle Stripe return ── */
+        const urlParams = new URLSearchParams(window.location.search);
+        if (urlParams.get('payment') === 'success') {
+            firebase.auth().onAuthStateChanged(async (user) => {
+                if (user) {
+                    userEmail = user.email;
+                    await db.collection('kickingAnalysisUsers').doc(user.uid).update({
+                        analysisStatus: 'paid',
+                        paidAt: firebase.firestore.FieldValue.serverTimestamp()
+                    });
+                    setStep(3);
+                } else {
+                    setStep(1);
+                }
+            });
+            window.history.replaceState({}, '', window.location.pathname + '#upload');
+        }
+
+        /* ── Step 3: Video upload ── */
+        const dropzone = document.getElementById('dropzone');
+        const videoInput = document.getElementById('videoInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const fileNameEl = document.getElementById('fileName');
+        const fileSizeEl = document.getElementById('fileSize');
+        const fileRemove = document.getElementById('fileRemove');
+        const uploadSubmit = document.getElementById('uploadSubmit');
+        const uploadProgress = document.getElementById('uploadProgress');
+        const progressFill = document.getElementById('progressFill');
+        const progressText = document.getElementById('progressText');
+        const dropzonePanel = document.getElementById('dropzonePanel');
+        const uploadSuccess = document.getElementById('uploadSuccess');
+
+        function formatBytes(bytes) {
+            if (bytes < 1024) return bytes + ' B';
+            if (bytes < 1048576) return (bytes / 1024).toFixed(1) + ' KB';
+            return (bytes / 1048576).toFixed(1) + ' MB';
+        }
+
+        function handleFile(file) {
+            if (!file || !file.type.startsWith('video/')) return;
+            if (file.size > 500 * 1024 * 1024) {
+                alert('File too large. Maximum size is 500MB.');
+                return;
+            }
+            selectedFile = file;
+            fileNameEl.textContent = file.name;
+            fileSizeEl.textContent = formatBytes(file.size);
+            fileInfo.classList.add('visible');
+            uploadSubmit.classList.add('visible');
+        }
+
+        dropzone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropzone.classList.add('dragover');
+        });
+
+        dropzone.addEventListener('dragleave', () => {
+            dropzone.classList.remove('dragover');
+        });
+
+        dropzone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropzone.classList.remove('dragover');
+            if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+        });
+
+        videoInput.addEventListener('change', () => {
+            if (videoInput.files.length) handleFile(videoInput.files[0]);
+        });
+
+        fileRemove.addEventListener('click', () => {
+            selectedFile = null;
+            videoInput.value = '';
+            fileInfo.classList.remove('visible');
+            uploadSubmit.classList.remove('visible');
+        });
+
+        uploadSubmit.addEventListener('click', async () => {
+            if (!selectedFile) return;
+
+            uploadSubmit.disabled = true;
+            uploadSubmit.textContent = 'Uploading...';
+            uploadProgress.classList.add('visible');
+
+            const user = firebase.auth().currentUser;
+            if (!user) {
+                alert('Session expired. Please sign in again.');
+                setStep(1);
+                return;
+            }
+
+            try {
+                const storageRef = firebase.storage().ref();
+                const ext = selectedFile.name.split('.').pop();
+                const uploadRef = storageRef.child(`kicking-analysis/${user.uid}/kick.${ext}`);
+                const uploadTask = uploadRef.put(selectedFile);
+
+                uploadTask.on('state_changed',
+                    (snapshot) => {
+                        const pct = Math.round((snapshot.bytesTransferred / snapshot.totalBytes) * 100);
+                        progressFill.style.width = pct + '%';
+                        progressText.textContent = `Uploading... ${pct}%`;
+                    },
+                    (error) => {
+                        console.error('Upload error:', error);
+                        progressText.textContent = 'Upload failed. Please try again.';
+                        uploadSubmit.disabled = false;
+                        uploadSubmit.textContent = 'Submit for Analysis →';
+                    },
+                    async () => {
+                        const downloadURL = await uploadTask.snapshot.ref.getDownloadURL();
+
+                        await db.collection('kickingAnalysisUsers').doc(user.uid).update({
+                            analysisStatus: 'uploaded',
+                            videoUrl: downloadURL,
+                            uploadedAt: firebase.firestore.FieldValue.serverTimestamp()
+                        });
+
+                        progressText.textContent = 'Upload complete!';
+                        setTimeout(() => {
+                            dropzonePanel.style.display = 'none';
+                            uploadSuccess.classList.add('visible');
+                        }, 800);
+                    }
+                );
+            } catch (err) {
+                console.error('Upload error:', err);
+                progressText.textContent = 'Upload failed. Please try again.';
+                uploadSubmit.disabled = false;
+                uploadSubmit.textContent = 'Submit for Analysis →';
+            }
+        });
+    </script>
+</body>
+</html>
