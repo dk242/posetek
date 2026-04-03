@@ -715,6 +715,13 @@
 
         .next-step-text strong { color: var(--text-dark); font-weight: 600; }
 
+        .upload-success-purchase {
+            margin-top: 1.75rem;
+            max-width: 320px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
         /* ── Responsive ── */
         @media (max-width: 580px) {
             .wizard-outer  { padding: 1.4rem 4% 3rem; }
@@ -1022,17 +1029,17 @@
                         <div class="next-steps">
                             <div class="next-step-item">
                                 <div class="next-step-num">1</div>
-                                <p class="next-step-text"><strong>Check your email</strong> — confirmation sent to your inbox.</p>
-                            </div>
-                            <div class="next-step-item">
-                                <div class="next-step-num">2</div>
                                 <p class="next-step-text"><strong>Analysis within 48 hrs</strong> — our engine processes and reviews your kick.</p>
                             </div>
                             <div class="next-step-item">
-                                <div class="next-step-num">3</div>
+                                <div class="next-step-num">2</div>
                                 <p class="next-step-text"><strong>Apply the changes</strong> — specific, plain-English adjustments matched to your mechanics.</p>
                             </div>
                         </div>
+                        <button type="button" class="btn-primary upload-success-purchase" id="purchaseAnotherKickBtn" aria-label="Purchase another kick analysis">
+                            Purchase another kick
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
                     </div>
                 </div>
             </div>
@@ -1075,8 +1082,39 @@
         const circles   = { 1: document.getElementById('circle1'), 2: document.getElementById('circle2'), 3: document.getElementById('circle3') };
 
         let currentStep = 1;
+        /* Hoisted for resetStep3UploadUi + payment callback (may run before Step 3 consts exist) */
+        var selectedFile = null;
 
         const CHECK = `<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>`;
+
+        /** Clears upload success state so user can submit another video (e.g. after repurchase). Safe before Step 3 DOM refs are assigned. */
+        function resetStep3UploadUi() {
+            selectedFile = null;
+            const pf = document.getElementById('profileUploadForm');
+            const success = document.getElementById('uploadSuccess');
+            const progress = document.getElementById('uploadProgress');
+            const fill = document.getElementById('progressFill');
+            const text = document.getElementById('progressText');
+            const submit = document.getElementById('profileSubmit');
+            const status = document.getElementById('profileStatus');
+            const vi = document.getElementById('videoInput');
+            const fi = document.getElementById('fileInfo');
+            if (pf) pf.style.display = '';
+            if (success) success.classList.remove('visible');
+            if (progress) progress.classList.remove('visible');
+            if (fill) fill.style.width = '0%';
+            if (text) text.textContent = 'Uploading…';
+            if (submit) {
+                submit.disabled = false;
+                submit.innerHTML = 'Submit for Analysis <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+            }
+            if (status) {
+                status.textContent = '';
+                status.className = 'status-msg';
+            }
+            if (vi) vi.value = '';
+            if (fi) fi.classList.remove('visible');
+        }
 
         function goToStep(next, dir = 'forward') {
             const prev = currentStep;
@@ -1337,7 +1375,10 @@
 
         /* Handle Stripe return (?payment=success) */
         const urlParams = new URLSearchParams(window.location.search);
-        if (urlParams.get('payment') === 'success') {
+        const paymentQuery = urlParams.get('payment');
+        console.log('[kickingAnalysis_upload] URL ?payment=', JSON.stringify(paymentQuery), paymentQuery === 'success' ? '→ matches success' : '→ does not match "success"');
+        if (paymentQuery === 'success') {
+            console.log('[kickingAnalysis_upload] payment=success branch: waiting for auth to apply Firestore increment');
             window.history.replaceState({}, '', window.location.pathname);
             auth.onAuthStateChanged(async (user) => {
                 if (user) {
@@ -1350,7 +1391,12 @@
                         lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
                         updatedAt: firebase.firestore.FieldValue.serverTimestamp()
                     }, { merge: true });
+                    console.log('[kickingAnalysis_upload] Firestore increment ran: availableAnalysisUploads +1 for uid', user.uid);
+                } else {
+                    console.log('[kickingAnalysis_upload] payment=success but no Firebase user — Firestore increment skipped');
                 }
+                /* Reset upload UI so another kick can be submitted after repurchase */
+                resetStep3UploadUi();
                 /* Skip directly to step 3 */
                 panels[1].classList.remove('active'); panels[1].style.display = 'none';
                 panels[2].style.display = 'none';
@@ -1382,8 +1428,6 @@
         const progressText   = document.getElementById('progressText');
         const dropzoneWrap   = document.getElementById('dropzoneWrap');
         const uploadSuccess  = document.getElementById('uploadSuccess');
-
-        let selectedFile = null;
 
         function setProfileStatus(msg, kind) {
             profileStatus.textContent = msg || '';
@@ -1428,6 +1472,10 @@
             selectedFile = null;
             videoInput.value = '';
             fileInfo.classList.remove('visible');
+        });
+
+        document.getElementById('purchaseAnotherKickBtn').addEventListener('click', () => {
+            goToStep(2, 'backward');
         });
 
         profileForm.addEventListener('submit', async (e) => {

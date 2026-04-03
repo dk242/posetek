@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <link rel="icon" type="image/svg+xml" href="/images/logo.svg">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PoseTek - Training Session Analysis</title>
+    <title>PoseTek — Quantify Soccer Athletic Performance</title>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
     <style>
         :root {
@@ -437,6 +437,14 @@
             font-weight: 600;
             margin: 0 0 0.75rem;
             line-height: 1.4;
+        }
+
+        .hero-signup-disclaimer {
+            font-size: 0.78rem;
+            line-height: 1.45;
+            color: var(--text-mid);
+            margin: 0 0 0.85rem;
+            max-width: 36rem;
         }
 
         .hero-offer-fieldset {
@@ -927,7 +935,7 @@
             transform: scale(1);
         }
 
-        /* ── Shared section titles (aligned with performanceTesting) ── */
+        /* ── Shared section titles ── */
         .section-fade {
             opacity: 0;
             transform: translateY(48px);
@@ -961,87 +969,6 @@
         .section-title em {
             font-style: normal;
             color: var(--green-dark);
-        }
-
-        /* ── Problem ── */
-        .problem-section {
-            padding: 6rem 7%;
-            background-color: var(--white);
-        }
-
-        .problem-inner {
-            max-width: 1100px;
-            margin: 0 auto;
-            text-align: center;
-        }
-
-        .problem-inner .section-title {
-            max-width: 720px;
-            margin-left: auto;
-            margin-right: auto;
-        }
-
-        .problem-subtitle {
-            font-size: 1.1rem;
-            line-height: 1.8;
-            color: var(--text-mid);
-            max-width: 620px;
-            margin: 0 auto 3rem;
-        }
-
-        .problem-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 2rem;
-        }
-
-        .problem-card {
-            text-align: left;
-            padding: 2rem;
-            border-radius: 18px;
-            border: 1px solid rgba(26, 58, 46, 0.08);
-            background: var(--off-white);
-            transition: var(--transition);
-        }
-
-        .problem-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 16px 40px rgba(26, 58, 46, 0.08);
-        }
-
-        .problem-icon {
-            width: 48px;
-            height: 48px;
-            background: var(--green-light);
-            border-radius: 14px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 1.3rem;
-            margin-bottom: 1.2rem;
-        }
-
-        .problem-card h3 {
-            font-size: 1.15rem;
-            font-weight: 700;
-            color: var(--text-dark);
-            margin-bottom: 0.6rem;
-        }
-
-        .problem-card p {
-            font-size: 0.95rem;
-            line-height: 1.7;
-            color: var(--text-mid);
-        }
-
-        .problem-card .strikethrough {
-            text-decoration: line-through;
-            opacity: 0.5;
-        }
-
-        .problem-card .replacement {
-            color: var(--green-dark);
-            font-weight: 600;
         }
 
         /* ── How intro ── */
@@ -1589,12 +1516,6 @@
                 font-size: 2rem;
             }
 
-            .problem-grid {
-                grid-template-columns: 1fr;
-                max-width: 480px;
-                margin: 0 auto;
-            }
-
             .pillars-grid {
                 grid-template-columns: 1fr;
                 max-width: 420px;
@@ -1716,7 +1637,7 @@
             <div class="brand-container">
                 <div class="logo">Pose<span>Tek</span></div>
             </div>
-            <a href="kickai.html" class="nav-cta">Launch PoseTek →</a>
+            <a href="#signup" class="nav-cta">Sign up</a>
         </nav>
     </header>
 
@@ -1727,9 +1648,9 @@
             <canvas id="bgPoseCanvas"></canvas>
             <div class="hero-inner">
                 <div class="hero-text">
-                    <span class="hero-eyebrow">Club practice testing</span>
-                    <h1 class="hero-title">Get tested at practice, receive a curated plan to improve. <em>Guaranteed.</em></h1>
-                    <p class="hero-subtitle">Your coach runs a quick 5-minute data capture after practice using our technology. Within 2 days, your personalized results — jump, sprint, and kick biomechanics, efficiency scores, and a concrete improvement plan — are ready on your dashboard, built by a Stanford-trained mechanical engineer, former D1 soccer player, and our proprietary AI.</p>
+                    <span class="hero-eyebrow">Soccer athletic performance</span>
+                    <h1 class="hero-title">Quantify and improve athletic performance that actually transfers to the game. </h1>
+                    <p class="hero-subtitle">We quantify jump, sprint, and kick mechanics tied to on-field soccer performance and give you scored results and clear priorities for what to adjust. Your coach runs a quick 5-minute data capture after practice using our technology. Within 2 days, your results are live on our website: biomechanical breakdowns, quantified metrics, scored results, and guidance on efficiency and output — built by a Stanford-trained mechanical engineer, former D1 soccer player, and our proprietary AI.</p>
                     <div class="hero-proof">
                         <div class="hero-proof-item"><span class="hero-proof-icon">⚡</span> ~5 min capture</div>
                         <div class="hero-proof-item"><span class="hero-proof-icon">📊</span> Dashboard in 2 days</div>
@@ -1738,12 +1659,12 @@
                     </div>
                     <div class="hero-pricing">
                         <span class="hero-pricing-label">Pricing</span>
-                        <p class="hero-pricing-text"><strong>$45</strong> diagnostic at practice · <strong>$55</strong> bundle with 3-week follow-up testing · Full jump, sprint &amp; kick analysis — same pipeline as our <a href="performanceTesting.html" class="inline-link">in-facility testing</a>. <strong>Money-back guarantee.</strong></p>
+                        <p class="hero-pricing-text"><strong>$45</strong> diagnostic at practice · <strong>$55</strong> bundle with 3-week follow-up testing · Full jump, sprint &amp; kick analysis — quantified biomechanics, scores, and adjustment priorities on your dashboard. <strong>Money-back guarantee.</strong></p>
                     </div>
                     <div class="hero-hero-links">
                         <a href="#how-it-works">How it works ↓</a>
                         <a href="#pricing">Full pricing ↓</a>
-                        <a href="performanceTesting.html">In-facility testing →</a>
+                        <a href="#signup">Sign up →</a>
                     </div>
                     <div class="hero-actions" id="signup">
                         <div class="hero-waitlist-slot">
@@ -1752,6 +1673,7 @@
                             </div>
                             <div class="hero-waitlist-active" id="heroWaitlistActive" hidden>
                                 <p class="hero-coach-context" id="heroCoachContext" hidden></p>
+                                <p class="hero-signup-disclaimer">No payment today — you pay when your results are ready; we&apos;ll confirm payment then.</p>
                                 <form class="hero-waitlist-form hero-waitlist-form--stacked" id="heroWaitlistForm" novalidate>
                                     <fieldset class="hero-offer-fieldset">
                                         <legend class="hero-offer-legend">Choose offer</legend>
@@ -1787,11 +1709,11 @@
                 <div class="hero-stage">
                     <div class="hero-carousel-inset">
                         <div class="hero-carousel" id="heroCarousel">
-                            <div class="hero-slide active"><img src="images/jumpPoseRawVid.png" alt="Vertical jump with pose tracking on raw video"></div>
-                            <div class="hero-slide"><img src="images/jumpAnalysisMetrics.png" alt="Jump height and joint metrics"></div>
+                            <div class="hero-slide active"><img src="images/jumpAnalysisMetrics.png" alt="Jump height and joint metrics"></div>
                             <div class="hero-slide"><img src="images/pose_strike.png" alt="Kick with pose tracking overlay"></div>
                             <div class="hero-slide"><img src="images/backswing.png" alt="Kick backswing analysis"></div>
-                            <div class="hero-slide"><img src="images/stats.png" alt="Performance metrics radar chart"></div>
+                            <div class="hero-slide"><img src="images/contact.png" alt="Kicking contact phase — joint angles and technique analysis"></div>
+                            <div class="hero-slide"><img src="images/sprintBreakdown.png" alt="Sprint toe-off breakdown — form and coaching cues"></div>
                             <div class="hero-carousel-dots">
                                 <button class="hero-dot active" data-index="0"></button>
                                 <button class="hero-dot" data-index="1"></button>
@@ -1805,37 +1727,11 @@
             </div>
         </section>
 
-        <!-- Problem (aligned with performanceTesting) -->
-        <section class="problem-section section-fade">
-            <div class="problem-inner">
-                <span class="section-label">The Problem</span>
-                <h2 class="section-title">Generic Training Doesn't Make<br>Better <em>Soccer Players</em></h2>
-                <p class="problem-subtitle">Speed trainers and weight rooms improve general fitness — not necessarily the movements that win on the pitch. We measure soccer-specific athleticism so you know what to fix.</p>
-                <div class="problem-grid">
-                    <div class="problem-card">
-                        <div class="problem-icon">🏋️</div>
-                        <h3>Expensive &amp; Scattered</h3>
-                        <p>Different coaches, different apps, no single picture of how you move. We give you one clear report tied to your actual game.</p>
-                    </div>
-                    <div class="problem-card">
-                        <div class="problem-icon">🎯</div>
-                        <h3>Not Soccer-Specific</h3>
-                        <p>Most training improves <span class="strikethrough">general athleticism</span>. You need <span class="replacement">athleticism optimized for soccer</span> — the same lens we use in our lab testing.</p>
-                    </div>
-                    <div class="problem-card">
-                        <div class="problem-icon">🔍</div>
-                        <h3>No Measurement</h3>
-                        <p>Without quantified jump and kick mechanics, you're guessing which drills work. We show you the numbers and a plan — at practice or <a href="performanceTesting.html" class="inline-link">in our facility</a>.</p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
         <section id="how-it-works" class="how-intro-section section-fade">
             <div class="how-intro-inner">
                 <span class="section-label">How It Works</span>
                 <h2 class="section-title">Four Steps to <em>Better Performance</em></h2>
-                <p>The same biomechanical pipeline as our performance diagnostic — jump and kick analysis, weak-link identification, and a periodized plan — delivered after a quick capture at the end of practice.</p>
+                <p>We quantify soccer-relevant athleticism and give you the tools to improve — scored metrics, adjustment priorities, and efficiency guidance — delivered on our website after a quick capture at the end of practice.</p>
             </div>
         </section>
 
@@ -1858,16 +1754,16 @@
             <div class="postestimation-content">
                 <span class="section-number">Step 02</span>
                 <h2>We Analyze <em>Everything</em></h2>
-                <p>Our system processes your data using the same biomechanical analysis as our in-person performance testing. For your jump, we break down loading mechanics, takeoff angles, and explosive power. For your kick, we quantify plant-foot positioning, hip rotation, backswing, and follow-through — pinpointing exactly where technique is costing you.</p>
+                <p>Our system processes your data with biomechanical analysis. For your jump, we break down loading mechanics, takeoff angles, and explosive power. For your kick, we quantify plant-foot positioning, hip rotation, backswing, and follow-through — pinpointing exactly where technique is costing you.</p>
             </div>
         </section>
 
         <section class="tripod-section">
-            <div class="tripod-image" style="background-image: url('images/progressOverTime.png')"></div>
+            <div class="tripod-image" style="background-image: url('images/SprintAnalysis.png')"></div>
             <div class="tripod-content">
                 <span class="section-number">Step 03</span>
                 <h2>Results on Your <em>Dashboard</em></h2>
-                <p>Within 2 days, your full results are live on your personal dashboard — efficiency scores, weak-link identification, and a personalized improvement plan with specific coaching cues and corrective drills. Built by a Stanford-trained mechanical engineer, former D1 soccer player, and our proprietary AI system.</p>
+                <p>Within 2 days, your full results are live on our website — a breakdown of your biomechanics with quantification, scoring across key metrics, and clear guidance on what to adjust to improve efficiency and output. Built by a Stanford-trained mechanical engineer, former D1 soccer player, and our proprietary AI system.</p>
             </div>
         </section>
 
@@ -1880,7 +1776,7 @@
             <div class="postestimation-content">
                 <span class="section-number">Step 04</span>
                 <h2>Come Back &amp; <em>See the Difference</em></h2>
-                <p>Three weeks later, your coach runs the same quick capture at practice. We quantify exactly how your jump and kick mechanics have improved — side-by-side with your first test — and fine-tune your program for the next phase. Bundle pricing saves you money vs. booking follow-up separately (same structure as our <a href="performanceTesting.html" class="inline-link">in-facility follow-up</a>).</p>
+                <p>Three weeks later, your coach runs the same quick capture at practice. We show how your jump and kick metrics and scores have shifted — side-by-side with your first test — with updated adjustment priorities on the site.</p>
             </div>
         </section>
 
@@ -1900,12 +1796,12 @@
                         <div class="pillar-body">
                             <span class="pillar-tag">Jump</span>
                             <h3>Explosive Power, Optimized</h3>
-                            <p>Not just "jump higher." We analyze loading mechanics, takeoff angles, and landing patterns to build power that translates to headers, duels, and changing direction — same methodology as our performance diagnostic.</p>
+                            <p>Not just "jump higher." We analyze loading mechanics, takeoff angles, and landing patterns to build power that translates to headers, duels, and changing direction.</p>
                         </div>
                     </div>
                     <div class="pillar-card">
                         <div class="pillar-image">
-                            <img src="images/sprinting.PNG" alt="Sprint mechanics analysis">
+                            <img src="images/sprintBreakdown.png" alt="Sprint mechanics analysis">
                         </div>
                         <div class="pillar-body">
                             <span class="pillar-tag">Sprint</span>
@@ -1920,7 +1816,7 @@
                         <div class="pillar-body">
                             <span class="pillar-tag">Kick</span>
                             <h3>Strike with Precision &amp; Power</h3>
-                            <p>We quantify plant-foot positioning, hip rotation, and follow-through. Harder, more accurate shots and passes — with less injury risk from poor form.</p>
+                            <p>We quantify plant-foot positioning, hip rotation, and follow-through. Harder, more accurate shots and passes.</p>
                         </div>
                     </div>
                 </div>
@@ -1933,21 +1829,21 @@
                 <div class="pricing-header">
                     <span class="section-label">Simple Pricing</span>
                     <h2 class="section-title">Invest in Your <em>Game</em></h2>
-                    <p>No subscriptions. Same deliverables as our in-facility test for jump &amp; kick — capture happens at practice instead.</p>
+                    <p>No subscriptions. One flat fee for jump, sprint &amp; kick analysis from your post-practice capture.</p>
                 </div>
                 <div class="pricing-cards">
                     <div class="pricing-card">
                         <div class="pricing-card-name">Practice diagnostic</div>
-                        <p class="pricing-card-desc">Post-practice capture, full analysis, personalized plan on your dashboard</p>
+                        <p class="pricing-card-desc">Post-practice capture; quantified biomechanics, scores, and adjustment priorities on your dashboard</p>
                         <div class="pricing-amount">
                             <span class="pricing-dollar">$</span>
                             <span class="pricing-value">45</span>
                         </div>
                         <ul class="pricing-features">
                             <li>~5 min jump &amp; kick capture after practice</li>
-                            <li>Results &amp; plan on dashboard within 2 days</li>
-                            <li>Quantified metrics &amp; weak-link identification</li>
-                            <li>Periodized plan with cues &amp; corrective drills</li>
+                            <li>Full results on the website within 2 days</li>
+                            <li>Biomechanical quantification &amp; scored metrics</li>
+                            <li>What to adjust for efficiency &amp; output</li>
                             <li>Money-back guarantee</li>
                         </ul>
                         <a href="#signup" class="pricing-btn pricing-btn-secondary">Sign up</a>
@@ -1965,13 +1861,13 @@
                             <li>Everything in Practice diagnostic</li>
                             <li>Follow-up capture at practice (~3 weeks)</li>
                             <li>Before/after technique comparison</li>
-                            <li>Adjusted program for next phase</li>
+                            <li>Updated scores &amp; adjustment priorities vs. first test</li>
                             <li>Quantified improvement scores</li>
                         </ul>
                         <a href="#signup" class="pricing-btn pricing-btn-primary">Sign up — bundle</a>
                     </div>
                 </div>
-                <p class="pricing-footnote">Want only the follow-up later? Add it à la carte — or save by bundling today. <a href="performanceTesting.html" class="inline-link">Prefer lab testing with sprint included?</a></p>
+                <p class="pricing-footnote">Want only the follow-up later? Add it à la carte — or save by bundling today.</p>
             </div>
         </section>
 
@@ -1980,7 +1876,7 @@
             <div class="guarantee-inner">
                 <div class="guarantee-icon">🛡</div>
                 <h2>You Will Get Better — Or Your Money Back</h2>
-                <p>We stand behind our process. If you follow the plan and don't see measurable improvement in your biomechanics, we'll refund you in full. No questions asked — same guarantee as our <a href="performanceTesting.html">in-facility performance testing</a>.</p>
+                <p>We stand behind our process. If you don't see measurable improvement in your biomechanics, we'll refund you in full. No questions asked.</p>
             </div>
         </section>
 
@@ -1989,7 +1885,7 @@
             <div class="cta-inner">
                 <span class="section-label">Ready?</span>
                 <h2 class="section-title">Your Next Breakthrough Starts at <em>Practice</em></h2>
-                <p>Enter your email above to get on the list. Questions? Compare with our full diagnostic including sprint at our facility.</p>
+                <p>Enter your email above to get on the list. Questions? Explore the <a href="kickai.html" class="inline-link">PoseTek mobile app</a>.</p>
                 <a href="#signup">Sign up with email ↑</a>
             </div>
         </section>
@@ -2040,7 +1936,7 @@
     </div>
 
     <footer>
-        <p>&copy; 2026 PoseTek · <a href="kickai.html">Launch App</a> · <a href="performanceTesting.html">Performance testing</a> · <a href="privacy.html">Privacy Policy</a></p>
+        <p>&copy; 2026 PoseTek · <a href="kickai.html">Launch App</a> · <a href="privacy.html">Privacy Policy</a></p>
     </footer>
 
     <script>
@@ -2109,7 +2005,6 @@
         // Scroll Indicators
         const snapSections = [
             document.querySelector('.hero-container'),
-            document.querySelector('.problem-section'),
             document.querySelector('#how-it-works'),
             document.querySelector('#what-we-analyze'),
             document.querySelector('#pricing'),
