@@ -2372,8 +2372,9 @@
         const EXIT_MS  = 450;
         const PAUSE_MS = 800;
         const FRAME_MS = 40;
-        const ALPHA    = 0.55;
-        const SCALE_F  = 1.9;
+        const ALPHA         = 0.55;
+        const SCALE_F_SPRINT = 1.9;   /* sprint stays full size */
+        const SCALE_F_JK     = 1.7;   /* jump/kick slightly smaller */
 
         function resizeCanvas() {
             canvas.width  = canvas.offsetWidth  || window.innerWidth;
@@ -2382,22 +2383,24 @@
         resizeCanvas();
         window.addEventListener('resize', resizeCanvas, { passive: true });
 
-        function getLayout() {
+        function getLayout(sf) {
             const cH = canvas.height, cW = canvas.width;
-            const scale = cH * SCALE_F;
+            const scale = cH * sf;
+            /* inX: pose x=0.5 midline centred in canvas (sprint resting position) */
             const inX     = cW * 0.5 - 0.5 * scale;
+            /* inXShift: jump/kick shifted left ~2 inches toward the hero text */
+            const inXShift = inX - cW * 0.14;
             const inY     = cH * 0.5  - 0.52 * scale;
             const inYLow  = cH * 0.72 - 0.52 * scale;
             const belowY  = cH + 40;
             const aboveY  = -scale - 40;
             const rightX  = cW + 40;
             const leftX   = -scale - 40;
-            return { scale, inX, inY, inYLow, belowY, aboveY, rightX, leftX };
+            return { scale, inX, inXShift, inY, inYLow, belowY, aboveY, rightX, leftX };
         }
 
-        function drawFigure(pts, xOff, yOff) {
+        function drawFigure(pts, xOff, yOff, scale) {
             if (!pts || !pts.length) return;
-            const { scale } = getLayout();
             ctx.save();
             ctx.globalAlpha = ALPHA;
             ctx.lineCap = 'round';
@@ -2431,9 +2434,12 @@
 
         function loop(ts) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const { inX, inY, inYLow, belowY, aboveY, rightX, leftX } = getLayout();
             const seqType = sequences[seqIdx] ? sequences[seqIdx].type : 'jump';
+            const sf = (seqType === 'sprint') ? SCALE_F_SPRINT : SCALE_F_JK;
+            const { scale, inX, inXShift, inY, inYLow, belowY, aboveY, rightX, leftX } = getLayout(sf);
             const activeY = (seqType === 'sprint') ? inY : inYLow;
+            /* jump and kick sit left of centre, closer to the hero text; sprint stays centred */
+            const activeX = (seqType === 'sprint') ? inX : inXShift;
 
             switch (phase) {
 
@@ -2451,7 +2457,7 @@
                             const nType = sequences[seqIdx].type;
                             const nY = (nType === 'sprint') ? inY : inYLow;
                             if (nType === 'jump') {
-                                posX = inX; posY = belowY;
+                                posX = inXShift; posY = belowY;
                             } else if (nType === 'kick') {
                                 posX = leftX; posY = nY;
                             } else {
@@ -2466,19 +2472,19 @@
                 case P_ENTER: {
                     const t = Math.min(1, (ts - phaseT0) / ENTER_MS);
                     if (sequences[seqIdx].type === 'jump') {
-                        posX = inX;
+                        posX = inXShift;
                         posY = belowY + (inYLow - belowY) * easeOut(t);
                     } else if (sequences[seqIdx].type === 'kick') {
-                        posX = leftX + (inX - leftX) * easeOut(t);
+                        posX = leftX + (inXShift - leftX) * easeOut(t);
                         posY = inYLow;
                     } else {
                         posX = rightX + (inX - rightX) * easeOut(t);
                         posY = inY;
                     }
-                    drawFigure(sequences[seqIdx].frames[0], posX, posY);
+                    drawFigure(sequences[seqIdx].frames[0], posX, posY, scale);
                     if (t >= 1) {
                         phase = P_PLAY; phaseT0 = ts; lastAdv = ts;
-                        frameIdx = 0; posX = inX; posY = activeY;
+                        frameIdx = 0; posX = activeX; posY = activeY;
                     }
                     break;
                 }
@@ -2494,12 +2500,12 @@
                             frameLimit = Math.min(f.length, 200);
                         }
                     }
-                    drawFigure(f[Math.min(frameIdx, frameLimit - 1)], inX, activeY);
+                    drawFigure(f[Math.min(frameIdx, frameLimit - 1)], activeX, activeY, scale);
                     if (ts - lastAdv >= FRAME_MS) {
                         frameIdx++; lastAdv = ts;
                         if (frameIdx >= frameLimit) {
                             phase = P_EXIT; phaseT0 = ts;
-                            posX = inX; posY = activeY;
+                            posX = activeX; posY = activeY;
                         }
                     }
                     break;
@@ -2509,16 +2515,16 @@
                     const t = Math.min(1, (ts - phaseT0) / EXIT_MS);
                     const f = sequences[seqIdx].frames;
                     if (sequences[seqIdx].type === 'jump') {
-                        posX = inX;
+                        posX = inXShift;
                         posY = inYLow + (aboveY - inYLow) * easeIn(t);
                     } else if (sequences[seqIdx].type === 'kick') {
-                        posX = inX + (rightX - inX) * easeIn(t);
+                        posX = inXShift + (rightX - inXShift) * easeIn(t);
                         posY = inYLow;
                     } else {
                         posX = inX + (leftX - inX) * easeIn(t);
                         posY = inY;
                     }
-                    drawFigure(f[frameLimit - 1], posX, posY);
+                    drawFigure(f[frameLimit - 1], posX, posY, scale);
                     if (t >= 1) { phase = P_PAUSE; phaseT0 = ts; }
                     break;
                 }
