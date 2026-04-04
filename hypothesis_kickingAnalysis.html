@@ -124,11 +124,14 @@
 
         .hero-inner {
             display: flex;
-            align-items: center;
+            align-items: flex-start;
             width: 100%;
             max-width: 1300px;
             margin: 0 auto;
             gap: 4rem;
+            padding-top: 1rem;
+            position: relative;
+            z-index: 1;
         }
 
         .hero-text {
@@ -278,10 +281,45 @@
             gap: 10px;
         }
 
-        .hero-visual {
+        .hero-stage {
             flex: 1;
-            max-width: 520px;
             position: relative;
+            min-height: 580px;
+        }
+
+        #bgPoseCanvas {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 0;
+            pointer-events: none;
+        }
+
+        .hero-carousel-inset {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 88%;
+            max-width: 520px;
+            z-index: 3;
+            border-radius: 18px;
+            overflow: hidden;
+            box-shadow: 0 28px 70px rgba(0,0,0,0.42), 0 6px 22px rgba(0,0,0,0.28);
+            border: 2px solid rgba(255,255,255,0.22);
+        }
+
+        .hero-carousel-inset .hero-carousel {
+            border-radius: 0;
+            box-shadow: none;
+            border: none;
+            aspect-ratio: 4 / 3;
+        }
+
+        .hero-carousel-inset .hero-carousel:hover {
+            transform: none;
+            box-shadow: none;
         }
 
         .hero-carousel {
@@ -344,8 +382,9 @@
 
         .hero-badge {
             position: absolute;
-            bottom: -16px;
-            left: 24px;
+            top: calc(50% + 210px);
+            left: 6%;
+            z-index: 4;
             background: var(--white);
             border: 1px solid var(--green-light);
             border-radius: 14px;
@@ -1118,12 +1157,24 @@
 
             .hero-title { font-size: 2.4rem; }
 
-            .hero-visual {
-                max-width: 100%;
+            .hero-stage {
+                min-height: 360px;
                 width: 100%;
             }
 
-            .hero-badge { left: 50%; transform: translateX(-50%); }
+            .hero-carousel-inset {
+                width: 90%;
+                max-width: 420px;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+            }
+
+            .hero-badge {
+                top: calc(50% + 160px);
+                left: 50%;
+                transform: translateX(-50%);
+            }
 
             .problem-grid {
                 grid-template-columns: 1fr;
@@ -1182,6 +1233,7 @@
     <main>
         <!-- ═══ HERO ═══ -->
         <section class="hero">
+            <canvas id="bgPoseCanvas"></canvas>
             <div class="hero-inner">
                 <div class="hero-text">
                     <span class="hero-eyebrow">Kicking Biomechanics Analysis</span>
@@ -1206,17 +1258,19 @@
                         <a href="#how-it-works" class="btn-secondary">See How It Works ↓</a>
                     </div>
                 </div>
-                <div class="hero-visual">
-                    <div class="hero-carousel" id="heroCarousel">
-                        <div class="hero-slide active"><img src="images/pose_strike.png" alt="Biomechanical kick analysis with pose overlay"></div>
-                        <div class="hero-slide"><img src="images/backswing.png" alt="Backswing phase analysis"></div>
-                        <div class="hero-slide"><img src="images/contact.png" alt="Ball contact point analysis"></div>
-                        <div class="hero-slide"><img src="images/analysiskick.PNG" alt="Full kick biomechanics breakdown"></div>
-                        <div class="hero-carousel-dots">
-                            <button class="hero-dot active" data-index="0"></button>
-                            <button class="hero-dot" data-index="1"></button>
-                            <button class="hero-dot" data-index="2"></button>
-                            <button class="hero-dot" data-index="3"></button>
+                <div class="hero-stage">
+                    <div class="hero-carousel-inset">
+                        <div class="hero-carousel" id="heroCarousel">
+                            <div class="hero-slide active"><img src="images/pose_strike.png" alt="Biomechanical kick analysis with pose overlay"></div>
+                            <div class="hero-slide"><img src="images/backswing.png" alt="Backswing phase analysis"></div>
+                            <div class="hero-slide"><img src="images/contact.png" alt="Ball contact point analysis"></div>
+                            <div class="hero-slide"><img src="images/analysiskick.PNG" alt="Full kick biomechanics breakdown"></div>
+                            <div class="hero-carousel-dots">
+                                <button class="hero-dot active" data-index="0"></button>
+                                <button class="hero-dot" data-index="1"></button>
+                                <button class="hero-dot" data-index="2"></button>
+                                <button class="hero-dot" data-index="3"></button>
+                            </div>
                         </div>
                     </div>
                     <div class="hero-badge">
@@ -1467,8 +1521,10 @@
         <p>&copy; 2026 PoseTek · <a href="index.html">Home</a> · <a href="privacy.html">Privacy Policy</a></p>
     </footer>
 
-    <!-- Firebase (Firestore for app waitlist) -->
+    <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script>
         const firebaseConfig = {
@@ -1605,6 +1661,312 @@
                 'hypothesis_kickingAnalysis_app_waitlist'
             );
         });
+    </script>
+
+    <!-- Background Pose Animation -->
+    <script>
+    (function () {
+        'use strict';
+
+        const POSE_CONNECTIONS = [
+            /* torso */
+            [11,12],[12,24],[24,23],[23,11],
+            /* L arm */
+            [11,13],[13,15],[15,17],[15,19],[15,21],[17,19],
+            /* R arm */
+            [12,14],[14,16],[16,18],[16,20],[16,22],[18,20],
+            /* L leg */
+            [23,25],[25,27],[27,29],[27,31],[29,31],
+            /* R leg */
+            [24,26],[26,28],[28,30],[28,32],[30,32]
+        ];
+
+        const CONN_COLORS = [
+            '#4ade80','#4ade80','#4ade80','#4ade80',
+            '#4d90d4','#4d90d4','#4d90d4','#4d90d4','#4d90d4','#4d90d4',
+            '#e8834d','#e8834d','#e8834d','#e8834d','#e8834d','#e8834d',
+            '#9b72c4','#9b72c4','#9b72c4','#9b72c4','#9b72c4',
+            '#d4aa40','#d4aa40','#d4aa40','#d4aa40','#d4aa40'
+        ];
+
+        const FBConfig = {
+            apiKey: 'AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs',
+            authDomain: 'kickai-69dd0.firebaseapp.com',
+            projectId: 'kickai-69dd0',
+            storageBucket: 'kickai-69dd0.firebasestorage.app',
+            messagingSenderId: '839600313930',
+            appId: '1:839600313930:web:13b1e94c2c540561e3f8b3'
+        };
+
+        let fbApp;
+        try { fbApp = firebase.app('bgAnim'); }
+        catch (_) { fbApp = firebase.initializeApp(FBConfig, 'bgAnim'); }
+        const fbStorage = fbApp.storage();
+        const fbAuth    = fbApp.auth();
+
+        const canvas = document.getElementById('bgPoseCanvas');
+        const ctx    = canvas.getContext('2d');
+
+        /*  Sequences
+           type 'jump'   — enters from below, exits upward
+           type 'sprint' — enters from right, exits to left     */
+        const sequences = [
+            { type: 'jump',   frames: [] },
+            { type: 'sprint', frames: [] },
+            { type: 'kick',   frames: [] }
+        ];
+        let seqIdx = sequences.length - 1;
+
+        const P_PAUSE = 0, P_ENTER = 1, P_PLAY = 2, P_EXIT = 3;
+        let phase    = P_PAUSE;
+        let frameIdx = 0;
+        let frameLimit = 0;
+        let posX     = 0;
+        let posY     = 0;
+        let phaseT0  = performance.now();
+        let lastAdv  = 0;
+
+        const ENTER_MS = 600;
+        const EXIT_MS  = 450;
+        const PAUSE_MS = 800;
+        const FRAME_MS = 40;
+        const ALPHA    = 0.55;
+        const SCALE_F  = 1.9;
+
+        function resizeCanvas() {
+            canvas.width  = canvas.offsetWidth  || window.innerWidth;
+            canvas.height = canvas.offsetHeight || window.innerHeight;
+        }
+        resizeCanvas();
+        window.addEventListener('resize', resizeCanvas, { passive: true });
+
+        function getLayout() {
+            const cH = canvas.height, cW = canvas.width;
+            const scale = cH * SCALE_F;
+            const inX      = cW * 0.5 - 0.5 * scale;
+            const inXShift = inX - cW * 0.14;
+            const inY      = cH * 0.5 - 0.52 * scale;
+            const inYLow   = cH * 0.72 - 0.52 * scale;
+            const belowY   = cH + 40;
+            const aboveY   = -scale - 40;
+            const rightX   = cW + 40;
+            const leftX    = -scale - 40;
+            return { scale, inX, inXShift, inY, inYLow, belowY, aboveY, rightX, leftX };
+        }
+
+        function drawFigure(pts, xOff, yOff) {
+            if (!pts || !pts.length) return;
+            const { scale } = getLayout();
+            ctx.save();
+            ctx.globalAlpha = ALPHA;
+            ctx.lineCap = 'round';
+            ctx.lineJoin = 'round';
+            const lw = Math.max(2.5, scale * 0.007);
+            for (let ci = 0; ci < POSE_CONNECTIONS.length; ci++) {
+                const [a, b] = POSE_CONNECTIONS[ci];
+                const A = pts[a], B = pts[b];
+                if (!A || !B) continue;
+                ctx.strokeStyle = CONN_COLORS[ci];
+                ctx.lineWidth   = lw;
+                ctx.beginPath();
+                ctx.moveTo(A[0] * scale + xOff, A[1] * scale + yOff);
+                ctx.lineTo(B[0] * scale + xOff, B[1] * scale + yOff);
+                ctx.stroke();
+            }
+            ctx.fillStyle = '#00ff66';
+            const r = Math.max(3, scale * 0.008);
+            for (let i = 0; i < 33 && i < pts.length; i++) {
+                const p = pts[i];
+                if (!p) continue;
+                ctx.beginPath();
+                ctx.arc(p[0] * scale + xOff, p[1] * scale + yOff, r, 0, Math.PI * 2);
+                ctx.fill();
+            }
+            ctx.restore();
+        }
+
+        const easeOut = t => 1 - Math.pow(1 - t, 3);
+        const easeIn  = t => t * t * t;
+
+        function loop(ts) {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            const { inX, inXShift, inY, inYLow, belowY, aboveY, rightX, leftX } = getLayout();
+            const seqType = sequences[seqIdx] ? sequences[seqIdx].type : 'jump';
+            const activeY = (seqType === 'sprint') ? inY : inYLow;
+            const activeX = (seqType === 'sprint') ? inX : inXShift;
+
+            switch (phase) {
+
+                case P_PAUSE:
+                    if (ts - phaseT0 >= PAUSE_MS) {
+                        let found = false;
+                        for (let i = 1; i <= sequences.length; i++) {
+                            const candidate = (seqIdx + i) % sequences.length;
+                            if (sequences[candidate].frames.length) {
+                                seqIdx = candidate; found = true; break;
+                            }
+                        }
+                        if (found) {
+                            phase = P_ENTER; phaseT0 = ts; frameIdx = 0;
+                            const nType = sequences[seqIdx].type;
+                            const nY = (nType === 'sprint') ? inY : inYLow;
+                            if (nType === 'jump') {
+                                posX = inXShift; posY = belowY;
+                            } else if (nType === 'kick') {
+                                posX = leftX; posY = nY;
+                            } else {
+                                posX = rightX; posY = nY;
+                            }
+                        } else {
+                            phaseT0 = ts;
+                        }
+                    }
+                    break;
+
+                case P_ENTER: {
+                    const t = Math.min(1, (ts - phaseT0) / ENTER_MS);
+                    if (sequences[seqIdx].type === 'jump') {
+                        posX = inXShift;
+                        posY = belowY + (inYLow - belowY) * easeOut(t);
+                    } else if (sequences[seqIdx].type === 'kick') {
+                        posX = leftX + (inXShift - leftX) * easeOut(t);
+                        posY = inYLow;
+                    } else {
+                        posX = rightX + (inX - rightX) * easeOut(t);
+                        posY = inY;
+                    }
+                    drawFigure(sequences[seqIdx].frames[0], posX, posY);
+                    if (t >= 1) {
+                        phase = P_PLAY; phaseT0 = ts; lastAdv = ts;
+                        frameIdx = 0; posX = activeX; posY = activeY;
+                    }
+                    break;
+                }
+
+                case P_PLAY: {
+                    const f = sequences[seqIdx].frames;
+                    if (frameIdx === 0) {
+                        if (sequences[seqIdx].type === 'sprint') {
+                            frameLimit = Math.max(1, Math.floor(f.length * 0.55));
+                        } else if (sequences[seqIdx].type === 'kick') {
+                            frameLimit = Math.min(f.length, 150);
+                        } else {
+                            frameLimit = Math.min(f.length, 200);
+                        }
+                    }
+                    drawFigure(f[Math.min(frameIdx, frameLimit - 1)], activeX, activeY);
+                    if (ts - lastAdv >= FRAME_MS) {
+                        frameIdx++; lastAdv = ts;
+                        if (frameIdx >= frameLimit) {
+                            phase = P_EXIT; phaseT0 = ts;
+                            posX = activeX; posY = activeY;
+                        }
+                    }
+                    break;
+                }
+
+                case P_EXIT: {
+                    const t = Math.min(1, (ts - phaseT0) / EXIT_MS);
+                    const f = sequences[seqIdx].frames;
+                    if (sequences[seqIdx].type === 'jump') {
+                        posX = inXShift;
+                        posY = inYLow + (aboveY - inYLow) * easeIn(t);
+                    } else if (sequences[seqIdx].type === 'kick') {
+                        posX = inXShift + (rightX - inXShift) * easeIn(t);
+                        posY = inYLow;
+                    } else {
+                        posX = inX + (leftX - inX) * easeIn(t);
+                        posY = inY;
+                    }
+                    drawFigure(f[frameLimit - 1], posX, posY);
+                    if (t >= 1) { phase = P_PAUSE; phaseT0 = ts; }
+                    break;
+                }
+            }
+            requestAnimationFrame(loop);
+        }
+
+        function parseFrames(raw) {
+            if (!Array.isArray(raw)) return [];
+            return raw.map(frame => {
+                if (!Array.isArray(frame)) return null;
+                return frame.map(p => {
+                    if (!p) return null;
+                    if (Array.isArray(p)) {
+                        const [x, y] = p;
+                        if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+                        if (x < -0.3 || x > 1.3 || y < -0.3 || y > 1.8) return null;
+                        return [x, y];
+                    }
+                    if (typeof p === 'object') {
+                        const { x, y } = p;
+                        if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
+                        if (x < -0.3 || x > 1.3 || y < -0.3 || y > 1.8) return null;
+                        return [x, y];
+                    }
+                    return null;
+                });
+            }).filter(f => f && f.some(Boolean));
+        }
+
+        async function fetchJSON(path) {
+            const url = await fbStorage.ref(path).getDownloadURL();
+            return (await fetch(url)).json();
+        }
+
+        async function loadAllPoses() {
+            const uid = '1lhMLY7Efl59arkzO5Wh';
+            try { await fbAuth.signInAnonymously(); }
+            catch (err) { console.warn('[bgAnim] auth failed:', err); return; }
+
+            const jumpPaths = [
+                uid + '/jump/session1/kick1/pose.json',
+                uid + '/jump/session1/pose.json'
+            ];
+            for (const p of jumpPaths) {
+                try {
+                    const parsed = parseFrames(await fetchJSON(p));
+                    if (parsed.length) {
+                        sequences[0].frames = parsed;
+                        phaseT0 = performance.now();
+                        break;
+                    }
+                } catch (_) {}
+            }
+            if (!sequences[0].frames.length) console.warn('[bgAnim] jump pose not found');
+
+            const sprintPaths = [
+                uid + '/sprintWork/session1/kick1/pose.json',
+                uid + '/sprintWork/session1/pose.json',
+                uid + '/sprint/session1/kick1/pose.json',
+                uid + '/sprint/session1/pose.json'
+            ];
+            for (const p of sprintPaths) {
+                try {
+                    const parsed = parseFrames(await fetchJSON(p));
+                    if (parsed.length) { sequences[1].frames = parsed; break; }
+                } catch (_) {}
+            }
+            if (!sequences[1].frames.length) console.warn('[bgAnim] sprint pose not found');
+
+            const kickPaths = [
+                uid + '/deadballShot/session1/kick1/pose.json',
+                uid + '/instep/session1/kick1/pose.json',
+                uid + '/kick/session1/kick1/pose.json',
+                uid + '/kick/session1/pose.json'
+            ];
+            for (const p of kickPaths) {
+                try {
+                    const parsed = parseFrames(await fetchJSON(p));
+                    if (parsed.length) { sequences[2].frames = parsed; break; }
+                } catch (_) {}
+            }
+            if (!sequences[2].frames.length) console.warn('[bgAnim] kick pose not found');
+        }
+
+        requestAnimationFrame(loop);
+        loadAllPoses();
+    })();
     </script>
 </body>
 </html>
