@@ -1241,6 +1241,7 @@
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+  <script src="premiumCheckout.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <!-- Three.js for 3D visualization -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
@@ -3381,7 +3382,10 @@
             const btn = document.createElement('a');
             btn.className = 'unlock-btn';
             btn.textContent = 'Unlock Features';
-            btn.href = 'premiumInfo.html?player=' + encodeURIComponent(playerDocId) + '&sentFrom=' + encodeURIComponent(sentFrom);
+            btn.href = '#';
+            if (window.PoseTekPremiumCheckout) {
+              window.PoseTekPremiumCheckout.bindUnlockButton(btn, playerDocId);
+            }
             ov.appendChild(btn);
           }
           el.appendChild(ov);

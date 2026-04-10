@@ -574,6 +574,7 @@
 <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
 <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+<script src="premiumCheckout.js"></script>
 
 <script>
 /** =========================
@@ -3654,7 +3655,10 @@ async function applyPremiumLock(playerDocId, userType) {
         const btn = document.createElement("a");
         btn.className = "unlock-btn";
         btn.textContent = "Unlock Features";
-        btn.href = "premiumInfo.html?player=" + encodeURIComponent(playerDocId) + "&sentFrom=" + encodeURIComponent(sentFrom);
+        btn.href = "#";
+        if (window.PoseTekPremiumCheckout) {
+          window.PoseTekPremiumCheckout.bindUnlockButton(btn, playerDocId);
+        }
         overlay.appendChild(btn);
       }
       el.appendChild(overlay);

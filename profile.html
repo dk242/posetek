@@ -1679,6 +1679,7 @@
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
+    <script src="premiumCheckout.js"></script>
     
     <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -2059,7 +2060,10 @@
                         btn.className = 'unlock-btn';
                         if (lockMode === 'premium') {
                             btn.textContent = 'Unlock Features';
-                            btn.href = 'premiumInfo.html?player=' + encodeURIComponent(playerDocId) + '&sentFrom=' + encodeURIComponent(sentFrom);
+                            btn.href = '#';
+                            if (window.PoseTekPremiumCheckout) {
+                                window.PoseTekPremiumCheckout.bindUnlockButton(btn, playerDocId);
+                            }
                         } else {
                             btn.textContent = 'Complete feedback form';
                             btn.href = 'feedbackForm.html?player=' + encodeURIComponent(playerDocId) + '&userType=player&previousPage=' + encodeURIComponent((window.location.pathname.split('/').pop() || '') + (window.location.search || ''));

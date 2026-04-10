@@ -1216,6 +1216,7 @@
     
     <!-- Chart.js for visualizations -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="premiumCheckout.js"></script>
 
     <script>
        const firebaseConfig = {
@@ -3485,7 +3486,10 @@
                     const btn = document.createElement('a');
                     btn.className = 'unlock-btn';
                     btn.textContent = 'Unlock Features';
-                    btn.href = 'premiumInfo.html?player=' + encodeURIComponent(playerDocId) + '&sentFrom=' + encodeURIComponent(sentFrom);
+                    btn.href = '#';
+                    if (window.PoseTekPremiumCheckout) {
+                        window.PoseTekPremiumCheckout.bindUnlockButton(btn, playerDocId);
+                    }
                     overlay.appendChild(btn);
                 }
                 el.appendChild(overlay);

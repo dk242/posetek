@@ -67,7 +67,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   const session = event.data.object;
 
   // client_reference_id is set to the player's Firestore doc ID
-  // before redirecting to Stripe (see premiumInfo.html)
+  // before redirecting to Stripe (see createPremiumCheckoutSession + premiumCheckout.js)
   const playerDocId = session.client_reference_id;
   const customerEmail = session.customer_details?.email || null;
   const amountPaid = session.amount_total ? session.amount_total / 100 : null;
@@ -178,6 +178,96 @@ exports.createPerformanceTestPaymentIntent = functions.https.onRequest(
       console.error("createPerformanceTestPaymentIntent failed:", err);
       return res.status(500).json({
         error: "Could not start payment. Please try again later.",
+      });
+    }
+  }
+);
+
+/**
+ * createPremiumCheckoutSession
+ *
+ * Creates a Stripe Checkout Session (one-time payment) with client_reference_id = player
+ * Firestore doc ID. Webhook checkout.session.completed unlocks premium (see stripeWebhook).
+ *
+ * Configure optional price override (cents):
+ *   firebase functions:config:set premium.amount_cents="3000"
+ * Public site URL for success/cancel redirects:
+ *   firebase functions:config:set site.public_url="https://yourdomain.com"
+ */
+exports.createPremiumCheckoutSession = functions.https.onRequest(
+  async (req, res) => {
+    res.set("Access-Control-Allow-Origin", "*");
+    res.set("Access-Control-Allow-Methods", "POST, OPTIONS");
+    res.set("Access-Control-Allow-Headers", "Content-Type");
+
+    if (req.method === "OPTIONS") {
+      return res.status(204).send("");
+    }
+
+    if (req.method !== "POST") {
+      return res.status(405).json({ error: "Method not allowed" });
+    }
+
+    let body = req.body;
+    if (typeof body === "string") {
+      try {
+        body = JSON.parse(body);
+      } catch (e) {
+        return res.status(400).json({ error: "Invalid JSON body" });
+      }
+    }
+
+    const playerDocId =
+      body && body.playerDocId ? String(body.playerDocId).trim() : "";
+    if (!playerDocId) {
+      return res.status(400).json({ error: "playerDocId required" });
+    }
+
+    let siteUrl =
+      (functions.config().site && functions.config().site.public_url) ||
+      "https://kickai-69dd0.web.app";
+    siteUrl = siteUrl.replace(/\/$/, "");
+
+    const amountCents = Number(
+      functions.config().premium?.amount_cents || 3000
+    );
+
+    const stripeClient = stripe(functions.config().stripe.secret_key);
+
+    const successUrl = `${siteUrl}/profile.html?userType=player&player=${encodeURIComponent(
+      playerDocId
+    )}&premiumCheckout=success`;
+    const cancelUrl = `${siteUrl}/profile.html?userType=player&player=${encodeURIComponent(
+      playerDocId
+    )}&premiumCheckout=cancelled`;
+
+    try {
+      const session = await stripeClient.checkout.sessions.create({
+        mode: "payment",
+        client_reference_id: playerDocId,
+        line_items: [
+          {
+            price_data: {
+              currency: "usd",
+              product_data: {
+                name: "PoseTek Premium Access",
+                description:
+                  "Full premium analysis features for your athlete profile",
+              },
+              unit_amount: amountCents,
+            },
+            quantity: 1,
+          },
+        ],
+        success_url: successUrl,
+        cancel_url: cancelUrl,
+      });
+
+      return res.status(200).json({ url: session.url });
+    } catch (err) {
+      console.error("createPremiumCheckoutSession failed:", err);
+      return res.status(500).json({
+        error: "Could not start checkout. Please try again later.",
       });
     }
   }
