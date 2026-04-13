@@ -200,135 +200,29 @@
             max-width: 520px;
         }
 
-        .hero-waitlist-slot {
-            flex: 1 1 100%;
-            width: 100%;
-            min-width: 0;
-        }
-
-        .hero-waitlist-active {
-            width: 100%;
-            transition: opacity 0.45s ease, transform 0.45s ease;
-        }
-
-        .hero-waitlist-active.hero-waitlist-active--exit {
-            opacity: 0;
-            transform: translateY(-4px);
-        }
-
-        .hero-waitlist-success-panel {
-            display: none;
+        a.hero-signup-cta {
+            display: inline-flex;
             align-items: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            width: 100%;
-            opacity: 0;
-            transition: opacity 0.45s ease;
-        }
-
-        .hero-waitlist-success-panel:not([hidden]) {
-            display: flex;
-        }
-
-        .hero-waitlist-success-panel.is-visible {
-            opacity: 1;
-        }
-
-        .hero-waitlist-check-icon {
-            flex-shrink: 0;
-            width: 2.5rem;
-            height: 2.5rem;
-            display: block;
-        }
-
-        .hero-waitlist-success-label {
-            font-size: 1rem;
-            font-weight: 600;
-            color: var(--green-dark);
-            line-height: 1.4;
-        }
-
-        @media (prefers-reduced-motion: reduce) {
-            .hero-waitlist-active,
-            .hero-waitlist-success-panel {
-                transition: none;
-            }
-            .hero-waitlist-active.hero-waitlist-active--exit {
-                transform: none;
-            }
-        }
-
-        .hero-waitlist-form {
-            display: flex;
-            flex: 1 1 100%;
-            gap: 0.65rem;
-            align-items: stretch;
-            min-width: 0;
-        }
-
-        .hero-waitlist-email {
-            flex: 1 1 auto;
-            min-width: 0;
-            font-size: 1rem;
-            font-family: inherit;
-            padding: 0.8rem 1.1rem;
-            border-radius: 50px;
-            border: 1px solid rgba(26, 58, 46, 0.22);
-            background: var(--white);
-            color: var(--text-dark);
-            transition: var(--transition);
-        }
-
-        .hero-waitlist-email::placeholder {
-            color: #888;
-        }
-
-        .hero-waitlist-email:focus {
-            outline: none;
-            border-color: var(--green-accent);
-            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.2);
-        }
-
-        .hero-waitlist-submit {
-            flex-shrink: 0;
-            font-size: 1rem;
+            justify-content: center;
+            font-size: 0.95rem;
             font-weight: 600;
             font-family: inherit;
             color: var(--white);
             background-color: var(--green-dark);
-            padding: 0.8rem 1.5rem;
+            padding: 0.8rem 1.6rem;
             border-radius: 50px;
             border: none;
             cursor: pointer;
             transition: var(--transition);
             box-shadow: 0 4px 20px rgba(26, 58, 46, 0.3);
+            white-space: nowrap;
+            text-decoration: none;
         }
 
-        .hero-waitlist-submit:hover:not(:disabled) {
+        a.hero-signup-cta:hover {
             background-color: var(--green-mid);
             transform: translateY(-2px);
             box-shadow: 0 8px 28px rgba(26, 58, 46, 0.4);
-        }
-
-        .hero-waitlist-submit:disabled {
-            opacity: 0.65;
-            cursor: not-allowed;
-            transform: none;
-        }
-
-        .hero-waitlist-status {
-            flex: 1 1 100%;
-            font-size: 0.9rem;
-            margin: 0;
-            min-height: 1.4em;
-        }
-
-        .hero-waitlist-status.error {
-            color: #b42318;
-        }
-
-        .hero-waitlist-status.success {
-            color: var(--green-mid);
         }
 
         .btn-secondary {
@@ -1376,25 +1270,6 @@
         .cta-waitlist-status.error { color: #b42318; }
         .cta-waitlist-status.success { color: var(--green-mid); }
 
-        .cta-waitlist-success-panel {
-            display: none;
-            align-items: center;
-            justify-content: center;
-            gap: 0.75rem;
-            flex-wrap: wrap;
-            width: 100%;
-            opacity: 0;
-            transition: opacity 0.45s ease;
-        }
-
-        .cta-waitlist-success-panel:not([hidden]) {
-            display: flex;
-        }
-
-        .cta-waitlist-success-panel.is-visible {
-            opacity: 1;
-        }
-
         /* ── Footer ── */
         footer {
             background-color: var(--green-dark);
@@ -1434,15 +1309,6 @@
             .hero-actions {
                 justify-content: center;
                 padding: 0 0.5rem;
-            }
-
-            .hero-waitlist-form {
-                flex-direction: column;
-                width: 100%;
-            }
-
-            .hero-waitlist-submit {
-                width: 100%;
             }
 
             .hero-title { font-size: 2.4rem; }
@@ -1528,7 +1394,7 @@
             <div class="brand-container">
                 <a href="index.html" class="logo">Pose<span>Tek</span></a>
             </div>
-            <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+            <a href="hypothesis_kickingAnalysisSubscription_signup.html" class="nav-cta js-kick-signup-href">Begin your free trial</a>
         </nav>
     </header>
 
@@ -1562,22 +1428,7 @@
                         </div>
                     </div>
                     <div class="hero-actions">
-                        <div class="hero-waitlist-slot">
-                            <div class="hero-waitlist-active" id="heroWaitlistActive">
-                                <form class="hero-waitlist-form" id="heroWaitlistForm" novalidate>
-                                    <input type="email" class="hero-waitlist-email" id="heroWaitlistEmail" name="email" placeholder="Enter your email" autocomplete="email" required aria-label="Email address">
-                                    <button type="submit" class="hero-waitlist-submit" id="heroWaitlistSubmit">Join Waitlist</button>
-                                </form>
-                            </div>
-                            <div class="hero-waitlist-success-panel" id="heroWaitlistSuccessPanel" hidden role="status" aria-live="polite">
-                                <svg class="hero-waitlist-check-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                    <circle cx="12" cy="12" r="11" fill="#e8f3ee" stroke="#1a3a2e" stroke-width="1.5"/>
-                                    <path fill="none" stroke="#1a3a2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 12.5l3 3 7-7"/>
-                                </svg>
-                                <span class="hero-waitlist-success-label">You're on the list. We'll be in touch.</span>
-                            </div>
-                        </div>
-                        <p class="hero-waitlist-status" id="heroWaitlistStatus" role="status" aria-live="polite"></p>
+                        <a href="hypothesis_kickingAnalysisSubscription_signup.html" class="hero-signup-cta js-kick-signup-href">Begin your free trial</a>
                         <a href="#how-it-works" class="btn-secondary">See How It Works <span>&#8595;</span></a>
                     </div>
                 </div>
@@ -1869,7 +1720,7 @@
                             <li class="disabled">Driven long ball analysis</li>
                             <li class="disabled">Unlimited analyses</li>
                         </ul>
-                        <a href="#waitlist" class="pricing-btn pricing-btn--secondary">Join Waitlist</a>
+                        <a href="hypothesis_kickingAnalysisSubscription_signup.html" class="pricing-btn pricing-btn--secondary js-kick-signup-href">Begin your free trial</a>
                     </div>
                     <div class="pricing-card pricing-card--featured">
                         <div class="pricing-badge">Most Popular</div>
@@ -1892,32 +1743,19 @@
                             <li>Priority fixes ranked by impact</li>
                             <li>Corrective drills & training plan</li>
                         </ul>
-                        <a href="#waitlist" class="pricing-btn pricing-btn--primary">Join Waitlist</a>
+                        <a href="hypothesis_kickingAnalysisSubscription_signup.html" class="pricing-btn pricing-btn--primary js-kick-signup-href">Begin your free trial</a>
                     </div>
                 </div>
             </div>
         </section>
 
-        <!-- FINAL CTA / WAITLIST -->
-        <section id="waitlist" class="cta-section section-fade">
+        <!-- FINAL CTA -->
+        <section id="cta-signup" class="cta-section section-fade">
             <div class="cta-inner">
                 <span class="section-label">Ready to Unlock More Power?</span>
                 <h2 class="section-title">Stop Guessing. Start Kicking<br>Like the <em>Pros.</em></h2>
                 <p>Open the app, take your shots, and let our technology do the rest. See exactly where you're losing power and get the specific adjustments to optimize your technique.</p>
-                <div id="ctaWaitlistActive">
-                    <form class="cta-waitlist-form" id="ctaWaitlistForm" novalidate>
-                        <input type="email" class="cta-waitlist-email" id="ctaWaitlistEmail" name="email" placeholder="Enter your email" autocomplete="email" required aria-label="Email address">
-                        <button type="submit" class="cta-waitlist-submit" id="ctaWaitlistSubmit">Join Waitlist</button>
-                    </form>
-                    <p class="cta-waitlist-status" id="ctaWaitlistStatus" role="status" aria-live="polite"></p>
-                </div>
-                <div class="cta-waitlist-success-panel" id="ctaWaitlistSuccessPanel" hidden role="status" aria-live="polite">
-                    <svg class="hero-waitlist-check-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <circle cx="12" cy="12" r="11" fill="#e8f3ee" stroke="#1a3a2e" stroke-width="1.5"/>
-                        <path fill="none" stroke="#1a3a2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 12.5l3 3 7-7"/>
-                    </svg>
-                    <span class="hero-waitlist-success-label">You're on the list. We'll be in touch.</span>
-                </div>
+                <a href="hypothesis_kickingAnalysisSubscription_signup.html" class="cta-waitlist-submit js-kick-signup-href" style="display:inline-flex;text-decoration:none;max-width:480px;margin:0 auto;">Sign up for your free trial</a>
             </div>
         </section>
     </main>
@@ -1926,24 +1764,75 @@
         <p>&copy; 2026 PoseTek &middot; <a href="index.html">Home</a> &middot; <a href="privacy.html">Privacy Policy</a></p>
     </footer>
 
-    <!-- Firebase -->
+    <!-- Firebase (hero background animation uses app, auth, storage; funnel uses Firestore via named app) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
-            authDomain: "kickai-69dd0.firebaseapp.com",
-            projectId: "kickai-69dd0",
-            storageBucket: "kickai-69dd0.firebasestorage.app",
-            messagingSenderId: "839600313930",
-            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
-            measurementId: "G-RX99K62ZEH"
-        };
 
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
+    <script>
+        /* Signup links: create funnel Firestore doc on click, then navigate (named app avoids clashing with hero / signup page Firebase) */
+        (function () {
+            var FUNNEL_COLLECTION = 'hypothesis_kickingAnalysisSubscription';
+            var FB_FUNNEL = {
+                apiKey: 'AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs',
+                authDomain: 'kickai-69dd0.firebaseapp.com',
+                projectId: 'kickai-69dd0',
+                storageBucket: 'kickai-69dd0.firebasestorage.app',
+                messagingSenderId: '839600313930',
+                appId: '1:839600313930:web:13b1e94c2c540561e3f8b3'
+            };
+            var funnelApp;
+            try {
+                funnelApp = firebase.app('funnelLandingKickingAnalysis');
+            } catch (err) {
+                funnelApp = firebase.initializeApp(FB_FUNNEL, 'funnelLandingKickingAnalysis');
+            }
+            var db = funnelApp.firestore();
+            var UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id', 'gclid', 'fbclid', 'msclkid', 'ttclid'];
+            function collectUtm() {
+                var params = new URLSearchParams(window.location.search || '');
+                var utm = {};
+                UTM_KEYS.forEach(function (k) {
+                    var v = params.get(k);
+                    if (v) utm[k] = v;
+                });
+                return utm;
+            }
+            function getSourceParam() {
+                var v = new URLSearchParams(window.location.search || '').get('source');
+                return v && v.trim() ? v.trim() : null;
+            }
+            document.querySelectorAll('a.js-kick-signup-href').forEach(function (a) {
+                var base = (a.getAttribute('href') || '').split('?')[0];
+                var q = window.location.search || '';
+                a.href = base + q;
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var params = new URLSearchParams(window.location.search || '');
+                    if (!params.get('sid')) {
+                        params.set('sid', db.collection(FUNNEL_COLLECTION).doc().id);
+                    }
+                    var sid = params.get('sid');
+                    var payload = {
+                        page: 'hypothesis_kickingAnalysisSubscription_signup',
+                        utm: collectUtm(),
+                        lastStep: 0,
+                        funnelStep: 'signup_session_started',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    var src = getSourceParam();
+                    if (src) payload.source = src;
+                    db.collection(FUNNEL_COLLECTION).doc(sid).set(payload, { merge: true }).then(function () {
+                        window.location.href = base + '?' + params.toString();
+                    }).catch(function (err) {
+                        console.error('Funnel doc pre-create error:', err);
+                        window.location.href = base + '?' + params.toString();
+                    });
+                });
+            });
+        })();
     </script>
 
     <script>
@@ -1988,102 +1877,6 @@
         });
 
         let heroInterval = setInterval(() => goToHeroSlide((heroIndex + 1) % heroSlides.length), 3500);
-
-        /* ── Waitlist: shared helpers ── */
-        function setStatus(el, msg, kind) {
-            el.textContent = msg || '';
-            el.className = el.className.replace(/ ?(error|success)/g, '') + (kind ? ' ' + kind : '');
-        }
-
-        function revealSuccess(activeEl, successEl) {
-            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            let swapped = false;
-            let fallbackTimer = null;
-
-            const swap = () => {
-                if (swapped) return;
-                swapped = true;
-                if (fallbackTimer != null) clearTimeout(fallbackTimer);
-                activeEl.setAttribute('hidden', '');
-                successEl.removeAttribute('hidden');
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => successEl.classList.add('is-visible'));
-                });
-            };
-
-            if (reduced) { swap(); return; }
-
-            activeEl.classList.add('hero-waitlist-active--exit');
-            fallbackTimer = setTimeout(swap, 500);
-            activeEl.addEventListener('transitionend', (ev) => {
-                if (ev.propertyName !== 'opacity') return;
-                swap();
-            }, { once: true });
-        }
-
-        async function handleWaitlistSubmit(emailInput, submitBtn, statusEl, activeEl, successEl, source) {
-            setStatus(statusEl, '');
-            const email = emailInput.value.trim();
-
-            if (!email || !emailInput.checkValidity()) {
-                setStatus(statusEl, 'Please enter a valid email address.', 'error');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            let succeeded = false;
-
-            try {
-                await db.collection('kickingAnalysisWaitlist').add({
-                    email: email,
-                    source: source,
-                    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                succeeded = true;
-                emailInput.value = '';
-                setStatus(statusEl, '', '');
-                revealSuccess(activeEl, successEl);
-            } catch (err) {
-                console.error('Firestore waitlist error:', err);
-                setStatus(statusEl, 'Something went wrong. Please try again.', 'error');
-            } finally {
-                if (!succeeded) submitBtn.disabled = false;
-            }
-        }
-
-        /* ── Hero waitlist ── */
-        const heroWaitlistForm = document.getElementById('heroWaitlistForm');
-        const heroWaitlistEmail = document.getElementById('heroWaitlistEmail');
-        const heroWaitlistSubmit = document.getElementById('heroWaitlistSubmit');
-        const heroWaitlistStatus = document.getElementById('heroWaitlistStatus');
-        const heroWaitlistActive = document.getElementById('heroWaitlistActive');
-        const heroWaitlistSuccessPanel = document.getElementById('heroWaitlistSuccessPanel');
-
-        heroWaitlistForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleWaitlistSubmit(
-                heroWaitlistEmail, heroWaitlistSubmit, heroWaitlistStatus,
-                heroWaitlistActive, heroWaitlistSuccessPanel,
-                'hypothesis_kickingAnalysisSubscription_hero'
-            );
-        });
-
-        /* ── CTA waitlist ── */
-        const ctaWaitlistForm = document.getElementById('ctaWaitlistForm');
-        const ctaWaitlistEmail = document.getElementById('ctaWaitlistEmail');
-        const ctaWaitlistSubmit = document.getElementById('ctaWaitlistSubmit');
-        const ctaWaitlistStatus = document.getElementById('ctaWaitlistStatus');
-        const ctaWaitlistActive = document.getElementById('ctaWaitlistActive');
-        const ctaWaitlistSuccessPanel = document.getElementById('ctaWaitlistSuccessPanel');
-
-        ctaWaitlistForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleWaitlistSubmit(
-                ctaWaitlistEmail, ctaWaitlistSubmit, ctaWaitlistStatus,
-                ctaWaitlistActive, ctaWaitlistSuccessPanel,
-                'hypothesis_kickingAnalysisSubscription_cta'
-            );
-        });
     </script>
     <!-- Background Pose Animation -->
     <script>
@@ -2129,12 +1922,9 @@
         const canvas = document.getElementById('bgPoseCanvas');
         const ctx    = canvas.getContext('2d');
 
-        const sequences = [
-            { type: 'jump',   frames: [] },
-            { type: 'sprint', frames: [] },
-            { type: 'kick',   frames: [] }
-        ];
-        let seqIdx = sequences.length - 1;
+        let kickFrames = [];
+        /** Alternate normal kick vs. same pose reflected horizontally between cycles. */
+        let displayMirror = false;
 
         const P_PAUSE = 0, P_ENTER = 1, P_PLAY = 2, P_EXIT = 3;
         let phase    = P_PAUSE;
@@ -2173,9 +1963,15 @@
             return { scale, inX, inXShift, inY, inYLow, belowY, aboveY, rightX, leftX };
         }
 
-        function drawFigure(pts, xOff, yOff) {
+        /** Reflect normalized x across the vertical midline (y-axis in a y-up diagram). */
+        function mirrorNormX(x) {
+            return 1 - x;
+        }
+
+        function drawFigure(pts, xOff, yOff, mirrorX) {
             if (!pts || !pts.length) return;
             const { scale } = getLayout();
+            const nx = mirrorX ? mirrorNormX : function (x) { return x; };
             ctx.save();
             ctx.globalAlpha = ALPHA;
             ctx.lineCap = 'round';
@@ -2188,8 +1984,8 @@
                 ctx.strokeStyle = CONN_COLORS[ci];
                 ctx.lineWidth   = lw;
                 ctx.beginPath();
-                ctx.moveTo(A[0] * scale + xOff, A[1] * scale + yOff);
-                ctx.lineTo(B[0] * scale + xOff, B[1] * scale + yOff);
+                ctx.moveTo(nx(A[0]) * scale + xOff, A[1] * scale + yOff);
+                ctx.lineTo(nx(B[0]) * scale + xOff, B[1] * scale + yOff);
                 ctx.stroke();
             }
             ctx.fillStyle = '#00ff66';
@@ -2198,7 +1994,7 @@
                 const p = pts[i];
                 if (!p) continue;
                 ctx.beginPath();
-                ctx.arc(p[0] * scale + xOff, p[1] * scale + yOff, r, 0, Math.PI * 2);
+                ctx.arc(nx(p[0]) * scale + xOff, p[1] * scale + yOff, r, 0, Math.PI * 2);
                 ctx.fill();
             }
             ctx.restore();
@@ -2209,52 +2005,29 @@
 
         function loop(ts) {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
-            const { inX, inXShift, inY, inYLow, belowY, aboveY, rightX, leftX } = getLayout();
-            const seqType = sequences[seqIdx] ? sequences[seqIdx].type : 'jump';
-            const activeY = (seqType === 'sprint') ? inY : inYLow;
-            const activeX = (seqType === 'sprint') ? inX : inXShift;
+            if (!kickFrames.length) {
+                requestAnimationFrame(loop);
+                return;
+            }
+
+            const { inXShift, inYLow, rightX, leftX } = getLayout();
+            const activeX = inXShift;
+            const activeY = inYLow;
 
             switch (phase) {
 
                 case P_PAUSE:
                     if (ts - phaseT0 >= PAUSE_MS) {
-                        let found = false;
-                        for (let i = 1; i <= sequences.length; i++) {
-                            const candidate = (seqIdx + i) % sequences.length;
-                            if (sequences[candidate].frames.length) {
-                                seqIdx = candidate; found = true; break;
-                            }
-                        }
-                        if (found) {
-                            phase = P_ENTER; phaseT0 = ts; frameIdx = 0;
-                            const nType = sequences[seqIdx].type;
-                            const nY = (nType === 'sprint') ? inY : inYLow;
-                            if (nType === 'jump') {
-                                posX = inXShift; posY = belowY;
-                            } else if (nType === 'kick') {
-                                posX = leftX; posY = nY;
-                            } else {
-                                posX = rightX; posY = nY;
-                            }
-                        } else {
-                            phaseT0 = ts;
-                        }
+                        phase = P_ENTER; phaseT0 = ts; frameIdx = 0;
+                        posX = leftX; posY = activeY;
                     }
                     break;
 
                 case P_ENTER: {
                     const t = Math.min(1, (ts - phaseT0) / ENTER_MS);
-                    if (sequences[seqIdx].type === 'jump') {
-                        posX = inXShift;
-                        posY = belowY + (inYLow - belowY) * easeOut(t);
-                    } else if (sequences[seqIdx].type === 'kick') {
-                        posX = leftX + (inXShift - leftX) * easeOut(t);
-                        posY = inYLow;
-                    } else {
-                        posX = rightX + (inX - rightX) * easeOut(t);
-                        posY = inY;
-                    }
-                    drawFigure(sequences[seqIdx].frames[0], posX, posY);
+                    posX = leftX + (inXShift - leftX) * easeOut(t);
+                    posY = inYLow;
+                    drawFigure(kickFrames[0], posX, posY, displayMirror);
                     if (t >= 1) {
                         phase = P_PLAY; phaseT0 = ts; lastAdv = ts;
                         frameIdx = 0; posX = activeX; posY = activeY;
@@ -2263,17 +2036,11 @@
                 }
 
                 case P_PLAY: {
-                    const f = sequences[seqIdx].frames;
+                    const f = kickFrames;
                     if (frameIdx === 0) {
-                        if (sequences[seqIdx].type === 'sprint') {
-                            frameLimit = Math.max(1, Math.floor(f.length * 0.55));
-                        } else if (sequences[seqIdx].type === 'kick') {
-                            frameLimit = Math.min(f.length, 150);
-                        } else {
-                            frameLimit = Math.min(f.length, 200);
-                        }
+                        frameLimit = Math.min(f.length, 150);
                     }
-                    drawFigure(f[Math.min(frameIdx, frameLimit - 1)], activeX, activeY);
+                    drawFigure(f[Math.min(frameIdx, frameLimit - 1)], activeX, activeY, displayMirror);
                     if (ts - lastAdv >= FRAME_MS) {
                         frameIdx++; lastAdv = ts;
                         if (frameIdx >= frameLimit) {
@@ -2286,19 +2053,15 @@
 
                 case P_EXIT: {
                     const t = Math.min(1, (ts - phaseT0) / EXIT_MS);
-                    const f = sequences[seqIdx].frames;
-                    if (sequences[seqIdx].type === 'jump') {
-                        posX = inXShift;
-                        posY = inYLow + (aboveY - inYLow) * easeIn(t);
-                    } else if (sequences[seqIdx].type === 'kick') {
-                        posX = inXShift + (rightX - inXShift) * easeIn(t);
-                        posY = inYLow;
-                    } else {
-                        posX = inX + (leftX - inX) * easeIn(t);
-                        posY = inY;
+                    const f = kickFrames;
+                    posX = inXShift + (rightX - inXShift) * easeIn(t);
+                    posY = inYLow;
+                    drawFigure(f[frameLimit - 1], posX, posY, displayMirror);
+                    if (t >= 1) {
+                        phase = P_PAUSE;
+                        phaseT0 = ts;
+                        displayMirror = !displayMirror;
                     }
-                    drawFigure(f[frameLimit - 1], posX, posY);
-                    if (t >= 1) { phase = P_PAUSE; phaseT0 = ts; }
                     break;
                 }
             }
@@ -2338,36 +2101,6 @@
             try { await fbAuth.signInAnonymously(); }
             catch (err) { console.warn('[bgAnim] auth failed:', err); return; }
 
-            const jumpPaths = [
-                uid + '/jump/session1/kick1/pose.json',
-                uid + '/jump/session1/pose.json'
-            ];
-            for (const p of jumpPaths) {
-                try {
-                    const parsed = parseFrames(await fetchJSON(p));
-                    if (parsed.length) {
-                        sequences[0].frames = parsed;
-                        phaseT0 = performance.now();
-                        break;
-                    }
-                } catch (_) {}
-            }
-            if (!sequences[0].frames.length) console.warn('[bgAnim] jump pose not found');
-
-            const sprintPaths = [
-                uid + '/sprintWork/session1/kick1/pose.json',
-                uid + '/sprintWork/session1/pose.json',
-                uid + '/sprint/session1/kick1/pose.json',
-                uid + '/sprint/session1/pose.json'
-            ];
-            for (const p of sprintPaths) {
-                try {
-                    const parsed = parseFrames(await fetchJSON(p));
-                    if (parsed.length) { sequences[1].frames = parsed; break; }
-                } catch (_) {}
-            }
-            if (!sequences[1].frames.length) console.warn('[bgAnim] sprint pose not found');
-
             const kickPaths = [
                 uid + '/deadballShot/session1/kick1/pose.json',
                 uid + '/instep/session1/kick1/pose.json',
@@ -2377,10 +2110,15 @@
             for (const p of kickPaths) {
                 try {
                     const parsed = parseFrames(await fetchJSON(p));
-                    if (parsed.length) { sequences[2].frames = parsed; break; }
+                    if (parsed.length) {
+                        kickFrames = parsed;
+                        phaseT0 = performance.now();
+                        displayMirror = false;
+                        break;
+                    }
                 } catch (_) {}
             }
-            if (!sequences[2].frames.length) console.warn('[bgAnim] kick pose not found');
+            if (!kickFrames.length) console.warn('[bgAnim] kick pose not found');
         }
 
         requestAnimationFrame(loop);
