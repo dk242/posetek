@@ -1,0 +1,1061 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="icon" type="image/svg+xml" href="/images/logo.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PoseTek — Athleticism subscription</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --white: #ffffff;
+            --off-white: #f7f8f6;
+            --green-dark: #1a3a2e;
+            --green-mid: #2d5e4a;
+            --green-accent: #4c8c6a;
+            --green-light: #e8f3ee;
+            --text-dark: #111111;
+            --text-mid: #444444;
+            --text-light: #888888;
+            --border: rgba(26, 58, 46, 0.14);
+            --transition: all 0.35s cubic-bezier(0.165, 0.84, 0.44, 1);
+            --step-transition: 420ms cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            background: var(--off-white);
+            color: var(--text-dark);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .topbar {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 0 5%;
+            height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            position: sticky;
+            top: 0;
+            z-index: 50;
+        }
+
+        .logo {
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: var(--green-dark);
+            text-decoration: none;
+            letter-spacing: -0.4px;
+        }
+
+        .logo span { color: var(--green-accent); }
+
+        .back-link {
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--text-mid);
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: var(--transition);
+        }
+
+        .back-link:hover { color: var(--green-dark); }
+
+        .progress-wrap {
+            background: var(--white);
+            border-bottom: 1px solid var(--border);
+            padding: 1.25rem 5%;
+        }
+
+        .progress-inner { max-width: 640px; margin: 0 auto; }
+
+        .step-track {
+            display: flex;
+            align-items: flex-start;
+        }
+
+        .step-item {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            position: relative;
+            gap: 0.4rem;
+        }
+
+        .step-item:not(:last-child)::after {
+            content: '';
+            position: absolute;
+            top: 17px;
+            left: calc(50% + 22px);
+            right: calc(-50% + 22px);
+            height: 2px;
+            background: var(--border);
+            transition: background var(--step-transition);
+        }
+
+        .step-item.completed:not(:last-child)::after {
+            background: var(--green-accent);
+        }
+
+        .step-circle {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            border: 2px solid var(--border);
+            background: var(--white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.82rem;
+            font-weight: 700;
+            color: var(--text-light);
+            transition: var(--step-transition);
+            position: relative;
+            z-index: 1;
+            flex-shrink: 0;
+        }
+
+        .step-item.active .step-circle {
+            border-color: var(--green-dark);
+            background: var(--green-dark);
+            color: var(--white);
+        }
+
+        .step-item.completed .step-circle {
+            border-color: var(--green-accent);
+            background: var(--green-accent);
+            color: var(--white);
+        }
+
+        .step-label {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: var(--text-light);
+            text-align: center;
+            letter-spacing: 0.2px;
+            transition: color var(--step-transition);
+        }
+
+        .step-item.active .step-label { color: var(--green-dark); }
+        .step-item.completed .step-label { color: var(--green-accent); }
+
+        .wizard-outer {
+            flex: 1;
+            display: flex;
+            align-items: flex-start;
+            justify-content: center;
+            padding: 2.2rem 5% 4rem;
+        }
+
+        .wizard-viewport {
+            width: 100%;
+            max-width: 580px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .step-panel {
+            width: 100%;
+            display: none;
+            opacity: 0;
+        }
+
+        .step-panel.active {
+            display: block;
+            opacity: 1;
+            transform: translateX(0);
+        }
+
+        .step-panel.entering {
+            display: block;
+            opacity: 0;
+            transform: translateX(56px);
+            transition: opacity var(--step-transition), transform var(--step-transition);
+        }
+
+        .step-panel.entering-back {
+            display: block;
+            opacity: 0;
+            transform: translateX(-56px);
+            transition: opacity var(--step-transition), transform var(--step-transition);
+        }
+
+        .step-panel.exiting {
+            display: block;
+            opacity: 0;
+            transform: translateX(-56px);
+            transition: opacity var(--step-transition), transform var(--step-transition);
+            pointer-events: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+        }
+
+        .step-panel.exiting-back {
+            display: block;
+            opacity: 0;
+            transform: translateX(56px);
+            transition: opacity var(--step-transition), transform var(--step-transition);
+            pointer-events: none;
+            position: absolute;
+            top: 0; left: 0; width: 100%;
+        }
+
+        .card {
+            background: var(--white);
+            border-radius: 22px;
+            border: 1px solid var(--border);
+            box-shadow: 0 4px 24px rgba(26, 58, 46, 0.07);
+            padding: 2.2rem 2.4rem;
+        }
+
+        .card-eyebrow {
+            font-size: 0.7rem;
+            font-weight: 700;
+            color: var(--green-accent);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            margin-bottom: 0.45rem;
+        }
+
+        .card-title {
+            font-size: 1.6rem;
+            font-weight: 800;
+            color: var(--text-dark);
+            letter-spacing: -0.5px;
+            line-height: 1.18;
+            margin-bottom: 0.4rem;
+        }
+
+        .card-title em { font-style: normal; color: var(--green-dark); }
+
+        .card-sub {
+            font-size: 0.9rem;
+            color: var(--text-mid);
+            line-height: 1.65;
+            margin-bottom: 1.8rem;
+        }
+
+        .auth-mode-tabs {
+            display: flex;
+            gap: 0;
+            margin-bottom: 1.35rem;
+            border-radius: 12px;
+            padding: 4px;
+            background: var(--green-light);
+            border: 1px solid var(--border);
+        }
+
+        .auth-mode-tab {
+            flex: 1;
+            font-family: inherit;
+            font-size: 0.86rem;
+            font-weight: 600;
+            padding: 0.58rem 0.65rem;
+            border: none;
+            border-radius: 9px;
+            background: transparent;
+            color: var(--text-mid);
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .auth-mode-tab:hover { color: var(--green-dark); }
+
+        .auth-mode-tab.active {
+            background: var(--white);
+            color: var(--green-dark);
+            box-shadow: 0 1px 4px rgba(26, 58, 46, 0.1);
+        }
+
+        #accountForm.auth-mode-login .form-row-2 {
+            grid-template-columns: 1fr;
+        }
+
+        #accountForm.auth-mode-login #authConfirmWrap {
+            display: none;
+        }
+
+        #accountForm.auth-mode-login #authNameRow {
+            display: none;
+        }
+
+        .field-section {
+            font-size: 0.68rem;
+            font-weight: 700;
+            color: var(--text-light);
+            text-transform: uppercase;
+            letter-spacing: 1.5px;
+            margin: 1.5rem 0 0.7rem;
+        }
+
+        .form-row {
+            display: grid;
+            gap: 0.7rem;
+            margin-bottom: 0.7rem;
+        }
+
+        .form-row-2 { grid-template-columns: 1fr 1fr; }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 0.3rem;
+        }
+
+        label {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-dark);
+        }
+
+        input[type="email"],
+        input[type="password"],
+        input[type="text"],
+        input[type="number"],
+        select {
+            font-family: inherit;
+            font-size: 0.93rem;
+            padding: 0.72rem 0.95rem;
+            border: 1.5px solid var(--border);
+            border-radius: 11px;
+            background: var(--white);
+            color: var(--text-dark);
+            transition: var(--transition);
+            -webkit-appearance: none;
+            appearance: none;
+            width: 100%;
+        }
+
+        input::placeholder { color: var(--text-light); }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--green-accent);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.14);
+        }
+
+        select {
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' viewBox='0 0 24 24' fill='none' stroke='%23666' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+            background-repeat: no-repeat;
+            background-position: right 0.85rem center;
+            padding-right: 2.2rem;
+            cursor: pointer;
+        }
+
+        .status-msg {
+            font-size: 0.82rem;
+            min-height: 1.2em;
+            margin-top: 0.45rem;
+        }
+
+        .status-msg.error   { color: #b42318; }
+        .status-msg.success { color: var(--green-mid); }
+
+        .btn-primary {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            width: 100%;
+            font-family: inherit;
+            font-size: 0.97rem;
+            font-weight: 700;
+            color: var(--white);
+            background: var(--green-dark);
+            border: none;
+            border-radius: 50px;
+            padding: 0.9rem 1.4rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(26, 58, 46, 0.26);
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            background: var(--green-mid);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 26px rgba(26, 58, 46, 0.36);
+        }
+
+        .btn-primary:disabled {
+            opacity: 0.55;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .btn-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-family: inherit;
+            font-size: 0.86rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            background: none;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            padding: 0;
+            margin-bottom: 1.2rem;
+        }
+
+        .btn-back:hover { color: var(--green-dark); }
+
+        /* Step 2 terminal: payment error — no forward navigation */
+        .card-payment-error {
+            text-align: center;
+            padding-top: 0.25rem;
+        }
+
+        .payment-error-icon {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 1.35rem;
+            color: #b42318;
+        }
+
+        .payment-error-icon svg {
+            display: block;
+        }
+
+        .payment-error-heading {
+            font-size: 1.08rem;
+            font-weight: 600;
+            color: var(--text-mid);
+            line-height: 1.65;
+            max-width: 26rem;
+            margin: 0 auto;
+        }
+
+        body.step-terminal .topbar a,
+        body.step-terminal footer a {
+            pointer-events: none;
+            cursor: default;
+            opacity: 0.45;
+        }
+
+        .app-download-intro {
+            font-size: 0.92rem;
+            color: var(--text-mid);
+            line-height: 1.65;
+            margin-bottom: 1.25rem;
+        }
+
+        .store-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .store-buttons a {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            padding: 0.85rem 1.2rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 0.95rem;
+            text-decoration: none;
+            transition: var(--transition);
+        }
+
+        .store-buttons a.app-ios {
+            background: var(--text-dark);
+            color: var(--white);
+        }
+
+        .store-buttons a.app-ios:hover { opacity: 0.92; transform: translateY(-1px); }
+
+        .store-buttons a.app-android {
+            background: var(--white);
+            color: var(--green-dark);
+            border: 1.5px solid var(--border);
+            box-shadow: 0 2px 12px rgba(26, 58, 46, 0.08);
+        }
+
+        .store-buttons a.app-android:hover {
+            border-color: var(--green-accent);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 580px) {
+            .wizard-outer { padding: 1.4rem 4% 3rem; }
+            .card { padding: 1.6rem 1.3rem; }
+            .form-row-2 { grid-template-columns: 1fr; }
+            .step-label { display: none; }
+            .card-title { font-size: 1.35rem; }
+        }
+    </style>
+</head>
+<body>
+
+    <header class="topbar">
+        <a href="hypothesis_athleticismSubscription.html" class="logo">Pose<span>Tek</span></a>
+        <a href="hypothesis_athleticismSubscription.html" class="back-link">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+            Back
+        </a>
+    </header>
+
+    <div class="progress-wrap">
+        <div class="progress-inner">
+            <div class="step-track" id="stepTrack">
+                <div class="step-item active" data-step="1">
+                    <div class="step-circle" id="circle1">1</div>
+                    <span class="step-label">Account &amp; profile</span>
+                </div>
+                <div class="step-item" data-step="2">
+                    <div class="step-circle" id="circle2">2</div>
+                    <span class="step-label">Free trial</span>
+                </div>
+                <div class="step-item" data-step="3">
+                    <div class="step-circle" id="circle3">3</div>
+                    <span class="step-label">Download app</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="wizard-outer">
+        <div class="wizard-viewport" id="wizardViewport">
+
+            <div class="step-panel active" id="panel1">
+                <div class="card">
+                    <p class="card-eyebrow">Step 1 of 3</p>
+
+                    <div class="auth-mode-tabs" role="tablist" aria-label="Account">
+                        <button type="button" class="auth-mode-tab active" id="authModeCreate" role="tab" aria-selected="true" data-mode="create">Create account</button>
+                        <button type="button" class="auth-mode-tab" id="authModeLogin" role="tab" aria-selected="false" data-mode="login">Sign in</button>
+                    </div>
+
+                    <h1 class="card-title" id="authCardTitle">Create your <em>account</em></h1>
+                    <p class="card-sub" id="authCardSub">Use your email and password. We&apos;ll save your profile for athleticism tracking.</p>
+
+                    <form id="accountForm" novalidate>
+                        <div class="form-row form-row-2" id="authNameRow">
+                            <div class="form-group">
+                                <label for="authFirstName">First name</label>
+                                <input type="text" id="authFirstName" placeholder="First name" autocomplete="given-name" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="authLastName">Last name</label>
+                                <input type="text" id="authLastName" placeholder="Last name" autocomplete="family-name" required>
+                            </div>
+                        </div>
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="authEmail">Email</label>
+                                <input type="email" id="authEmail" placeholder="you@email.com" autocomplete="email" required>
+                            </div>
+                        </div>
+                        <div class="form-row form-row-2">
+                            <div class="form-group">
+                                <label for="authPassword">Password</label>
+                                <input type="password" id="authPassword" placeholder="Min. 6 characters" autocomplete="new-password" required minlength="6">
+                            </div>
+                            <div class="form-group" id="authConfirmWrap">
+                                <label for="authPasswordConfirm">Confirm</label>
+                                <input type="password" id="authPasswordConfirm" placeholder="Repeat password" autocomplete="new-password" required>
+                            </div>
+                        </div>
+
+                        <p class="field-section">Your profile</p>
+                        <div class="form-row form-row-2">
+                            <div class="form-group">
+                                <label for="fieldAge">Age</label>
+                                <input type="number" id="fieldAge" placeholder="e.g. 16" min="1" max="99" required inputmode="numeric">
+                            </div>
+                            <div class="form-group">
+                                <label for="fieldPosition">Field position</label>
+                                <select id="fieldPosition" required aria-label="Field position">
+                                    <option value="" disabled selected>Select position</option>
+                                    <option value="Goalkeeper">Goalkeeper</option>
+                                    <option value="Center Back">Center Back</option>
+                                    <option value="Full Back">Full Back</option>
+                                    <option value="Wing Back">Wing Back</option>
+                                    <option value="Defensive Midfielder">Defensive Midfielder</option>
+                                    <option value="Central Midfielder">Central Midfielder</option>
+                                    <option value="Attacking Midfielder">Attacking Midfielder</option>
+                                    <option value="Winger">Winger</option>
+                                    <option value="Striker">Striker</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <p class="status-msg" id="accountStatus" role="status" aria-live="polite"></p>
+
+                        <button type="submit" class="btn-primary" id="accountSubmit">
+                            Continue
+                            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                        </button>
+                    </form>
+                </div>
+            </div>
+
+            <div class="step-panel" id="panel2">
+                <div class="card card-payment-error">
+                    <p class="card-eyebrow">Step 2 of 3</p>
+                    <div class="payment-error-icon" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="56" height="56" fill="none" stroke="currentColor" stroke-width="1.65" stroke-linecap="round" stroke-linejoin="round">
+                            <circle cx="12" cy="12" r="10"/>
+                            <line x1="15" y1="9" x2="9" y2="15"/>
+                            <line x1="9" y1="9" x2="15" y2="15"/>
+                        </svg>
+                    </div>
+                    <h2 class="payment-error-heading" role="alert">We&apos;re sorry, we aren&apos;t able to process your payment right now. Please try again later.</h2>
+                </div>
+            </div>
+
+            <div class="step-panel" id="panel3">
+                <div class="card">
+                    <button type="button" class="btn-back" id="backToStep2">
+                        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                        Back
+                    </button>
+                    <p class="card-eyebrow">Step 3 of 3</p>
+                    <h2 class="card-title">Download the <em>app</em></h2>
+                    <p class="app-download-intro">Install PoseTek on your phone to capture sessions, view your diagnostics, and follow your plan. Use the same email and password you just created.</p>
+                    <div class="store-buttons">
+                        <a class="app-ios" id="appStoreLink" href="https://apps.apple.com/search?term=PoseTek" target="_blank" rel="noopener noreferrer">Download on the App Store</a>
+                        <a class="app-android" id="playStoreLink" href="https://play.google.com/store/search?q=PoseTek&amp;c=apps" target="_blank" rel="noopener noreferrer">Get it on Google Play</a>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <footer style="text-align:center; padding:1.4rem 5%; font-size:0.8rem; color:var(--text-light); border-top:1px solid var(--border);">
+        &copy; 2026 PoseTek &middot;
+        <a href="index.html" style="color:var(--green-accent);text-decoration:none;">Home</a> &middot;
+        <a href="privacy.html" style="color:var(--green-accent);text-decoration:none;">Privacy Policy</a>
+    </footer>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script>
+        firebase.initializeApp({
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        });
+        const db = firebase.firestore();
+        const auth = firebase.auth();
+    </script>
+
+    <script>
+        const COLLECTION = 'hypothesis_athleticismSubscription';
+        const UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id', 'gclid', 'fbclid', 'msclkid', 'ttclid'];
+
+        function collectUtmFromSearch() {
+            const params = new URLSearchParams(window.location.search || '');
+            const utm = {};
+            UTM_KEYS.forEach(function (k) {
+                const v = params.get(k);
+                if (v) utm[k] = v;
+            });
+            return utm;
+        }
+
+        /** Optional landing param ?source= — from hypothesis_athleticismSubscription.html links */
+        function getOptionalSourceFromSearch() {
+            const v = new URLSearchParams(window.location.search || '').get('source');
+            return v && v.trim() ? v.trim() : null;
+        }
+
+        /** Create funnel doc as soon as the signup page loads; merge-only refresh if doc already exists (e.g. created on landing click). */
+        async function ensureFunnelDocInitialized() {
+            docRef = ensureSessionDocAndUrl();
+            const snap = await docRef.get();
+            const utm = collectUtmFromSearch();
+            const sourceTag = getOptionalSourceFromSearch();
+            if (!snap.exists) {
+                const payload = {
+                    page: 'hypothesis_athleticismSubscription_signup',
+                    utm: utm,
+                    lastStep: 0,
+                    funnelStep: 'signup_session_started',
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                if (sourceTag) payload.source = sourceTag;
+                await docRef.set(payload, { merge: true });
+            } else {
+                const patch = {
+                    utm: utm,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+                if (sourceTag) patch.source = sourceTag;
+                await docRef.set(patch, { merge: true });
+            }
+        }
+
+        function ensureSessionDocAndUrl() {
+            const params = new URLSearchParams(window.location.search);
+            let sid = params.get('sid');
+            if (!sid) {
+                sid = db.collection(COLLECTION).doc().id;
+                params.set('sid', sid);
+                history.replaceState(null, '', window.location.pathname + '?' + params.toString());
+            }
+            return db.collection(COLLECTION).doc(sid);
+        }
+
+        let docRef = ensureSessionDocAndUrl();
+        ensureFunnelDocInitialized().catch(function (err) {
+            console.error('Funnel session init error:', err);
+        });
+
+        const CHECK = '<svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="20 6 9 17 4 12"/></svg>';
+
+        const panels = { 1: document.getElementById('panel1'), 2: document.getElementById('panel2'), 3: document.getElementById('panel3') };
+        const stepItems = document.querySelectorAll('.step-item');
+        const circles = { 1: document.getElementById('circle1'), 2: document.getElementById('circle2'), 3: document.getElementById('circle3') };
+
+        let currentStep = 1;
+
+        function goToStep(next, dir) {
+            const prev = currentStep;
+            if (next === prev) return;
+
+            const exitCls = dir === 'forward' ? 'exiting' : 'exiting-back';
+            const enterCls = dir === 'forward' ? 'entering' : 'entering-back';
+
+            const vp = document.getElementById('wizardViewport');
+            vp.style.minHeight = panels[prev].offsetHeight + 'px';
+
+            panels[prev].classList.remove('active');
+            panels[prev].classList.add(exitCls);
+
+            panels[next].style.display = 'block';
+            panels[next].classList.add(enterCls);
+            void panels[next].offsetHeight;
+            panels[next].classList.remove(enterCls);
+            panels[next].classList.add('active');
+
+            panels[prev].addEventListener('transitionend', function done() {
+                panels[prev].classList.remove(exitCls);
+                panels[prev].style.display = 'none';
+                panels[prev].removeEventListener('transitionend', done);
+                vp.style.minHeight = '';
+            }, { once: true });
+
+            currentStep = next;
+            stepItems.forEach(function (item) {
+                const s = parseInt(item.dataset.step, 10);
+                item.classList.remove('active', 'completed');
+                if (s < next) {
+                    item.classList.add('completed');
+                    circles[s].innerHTML = CHECK;
+                } else if (s === next) {
+                    item.classList.add('active');
+                    circles[s].textContent = String(s);
+                } else {
+                    circles[s].textContent = String(s);
+                }
+            });
+
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+            document.body.classList.toggle('step-terminal', next === 2);
+        }
+
+        async function recordPaymentUnavailableStep() {
+            docRef = ensureSessionDocAndUrl();
+            const user = auth.currentUser;
+            const patch = {
+                lastStep: 2,
+                funnelStep: 'payment_unavailable',
+                paymentUnavailableAt: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            const sourceSignUp = getOptionalSourceFromSearch();
+            if (sourceSignUp) patch.source = sourceSignUp;
+            if (user) {
+                patch.firebaseUid = user.uid;
+                patch.email = user.email || null;
+            }
+            await docRef.set(patch, { merge: true });
+        }
+
+        function generateSignupCode(len) {
+            len = len || 6;
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZabcdefghjkmnpqrstuvwxyz23456789';
+            let s = '';
+            for (let i = 0; i < len; i++) s += chars[Math.floor(Math.random() * chars.length)];
+            return s;
+        }
+
+        async function createOrMergePlayerOnSignup(uid, email, firstName, lastName) {
+            const ref = db.collection('players').doc(uid);
+            const snap = await ref.get();
+            const common = {
+                authenticationUID: uid,
+                userUID: uid,
+                email: email,
+                signupEmail: email,
+                firstName: firstName.trim(),
+                lastName: lastName.trim(),
+                coachUID: '',
+                sport: '',
+                registered: true,
+                premium_content_locked: false,
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if (!snap.exists) {
+                await ref.set(Object.assign({}, common, {
+                    signupCode: generateSignupCode(),
+                    best_reps: { jump_height: 0, strike_velocity: 0 },
+                    stats: { jump_height: 0, strike_velocity: 0 }
+                }), { merge: true });
+            } else {
+                await ref.set(common, { merge: true });
+            }
+        }
+
+        async function syncPlayerOnLogin(uid, email) {
+            await db.collection('players').doc(uid).set({
+                authenticationUID: uid,
+                userUID: uid,
+                email: email,
+                signupEmail: email,
+                lastLogin: firebase.firestore.FieldValue.serverTimestamp(),
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            }, { merge: true });
+        }
+
+        async function mergeKickingAnalysisUserLight(uid, email) {
+            const ref = db.collection('kickingAnalysisUsers').doc(uid);
+            const snap = await ref.get();
+            const payload = {
+                email: email,
+                updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+            };
+            if (!snap.exists) {
+                payload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                payload.availableAnalysisUploads = 0;
+            }
+            await ref.set(payload, { merge: true });
+        }
+
+        const accountForm = document.getElementById('accountForm');
+        const accountStatus = document.getElementById('accountStatus');
+        const accountSubmit = document.getElementById('accountSubmit');
+        const authModeCreate = document.getElementById('authModeCreate');
+        const authModeLogin = document.getElementById('authModeLogin');
+        const authCardTitle = document.getElementById('authCardTitle');
+        const authCardSub = document.getElementById('authCardSub');
+        const authPassword = document.getElementById('authPassword');
+        const authPasswordConfirm = document.getElementById('authPasswordConfirm');
+        const authFirstName = document.getElementById('authFirstName');
+        const authLastName = document.getElementById('authLastName');
+
+        const ARROW_SVG = '<svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="9 18 15 12 9 6"/></svg>';
+
+        let authMode = 'create';
+
+        function setAccountStatus(msg, kind) {
+            accountStatus.textContent = msg || '';
+            accountStatus.className = 'status-msg' + (kind ? ' ' + kind : '');
+        }
+
+        function resetAccountSubmitButton() {
+            accountSubmit.disabled = false;
+            accountSubmit.innerHTML = (authMode === 'login' ? 'Continue ' : 'Continue ') + ARROW_SVG;
+        }
+
+        function setAuthMode(mode) {
+            authMode = mode;
+            const isLogin = mode === 'login';
+            authModeCreate.classList.toggle('active', !isLogin);
+            authModeLogin.classList.toggle('active', isLogin);
+            authModeCreate.setAttribute('aria-selected', !isLogin);
+            authModeLogin.setAttribute('aria-selected', isLogin);
+            accountForm.classList.toggle('auth-mode-login', isLogin);
+
+            if (isLogin) {
+                authCardTitle.innerHTML = 'Sign in to <em>continue</em>';
+                authCardSub.textContent = 'Use your PoseTek email and password. Your age and position are saved for this signup flow.';
+                authPassword.placeholder = 'Your password';
+                authPassword.setAttribute('autocomplete', 'current-password');
+                authPassword.removeAttribute('minlength');
+                authPasswordConfirm.removeAttribute('required');
+                authPasswordConfirm.disabled = true;
+                authFirstName.removeAttribute('required');
+                authLastName.removeAttribute('required');
+            } else {
+                authCardTitle.innerHTML = 'Create your <em>account</em>';
+                authCardSub.textContent = 'Use your email and password. We\'ll save your profile for athleticism tracking.';
+                authPassword.placeholder = 'Min. 6 characters';
+                authPassword.setAttribute('autocomplete', 'new-password');
+                authPassword.setAttribute('minlength', '6');
+                authPasswordConfirm.setAttribute('required', 'required');
+                authPasswordConfirm.disabled = false;
+                authFirstName.setAttribute('required', 'required');
+                authLastName.setAttribute('required', 'required');
+            }
+            setAccountStatus('');
+            resetAccountSubmitButton();
+        }
+
+        authModeCreate.addEventListener('click', function () { setAuthMode('create'); });
+        authModeLogin.addEventListener('click', function () { setAuthMode('login'); });
+
+        accountForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            setAccountStatus('');
+
+            const email = document.getElementById('authEmail').value.trim();
+            const pw = authPassword.value;
+            const pwc = authPasswordConfirm.value;
+            const firstName = authFirstName.value.trim();
+            const lastName = authLastName.value.trim();
+            const ageRaw = document.getElementById('fieldAge').value;
+            const position = document.getElementById('fieldPosition').value;
+            const age = parseInt(ageRaw, 10);
+
+            if (!email || !document.getElementById('authEmail').checkValidity()) {
+                setAccountStatus('Please enter a valid email address.', 'error');
+                return;
+            }
+            if (!pw) {
+                setAccountStatus('Please enter your password.', 'error');
+                return;
+            }
+            if (!position) {
+                setAccountStatus('Please select your field position.', 'error');
+                return;
+            }
+            if (!ageRaw || isNaN(age) || age < 1 || age > 99) {
+                setAccountStatus('Please enter a valid age (1–99).', 'error');
+                return;
+            }
+
+            if (authMode === 'create') {
+                if (!firstName || !lastName) {
+                    setAccountStatus('Please enter your first and last name.', 'error');
+                    return;
+                }
+                if (pw.length < 6) {
+                    setAccountStatus('Password must be at least 6 characters.', 'error');
+                    return;
+                }
+                if (pw !== pwc) {
+                    setAccountStatus('Passwords do not match.', 'error');
+                    return;
+                }
+            }
+
+            accountSubmit.disabled = true;
+            accountSubmit.textContent = authMode === 'login' ? 'Signing in…' : 'Creating account…';
+
+            try {
+                let uid;
+
+                if (authMode === 'login') {
+                    const cred = await auth.signInWithEmailAndPassword(email, pw);
+                    uid = cred.user.uid;
+                } else {
+                    try {
+                        const cred = await auth.createUserWithEmailAndPassword(email, pw);
+                        uid = cred.user.uid;
+                    } catch (err) {
+                        if (err.code === 'auth/email-already-in-use') {
+                            const cred = await auth.signInWithEmailAndPassword(email, pw);
+                            uid = cred.user.uid;
+                        } else {
+                            throw err;
+                        }
+                    }
+                }
+
+                await mergeKickingAnalysisUserLight(uid, email);
+
+                if (authMode === 'create') {
+                    await createOrMergePlayerOnSignup(uid, email, firstName, lastName);
+                } else {
+                    await syncPlayerOnLogin(uid, email);
+                }
+
+                await db.collection('players').doc(uid).set({
+                    age: age,
+                    position: position,
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                }, { merge: true });
+
+                docRef = ensureSessionDocAndUrl();
+                const utm = collectUtmFromSearch();
+                const snap = await docRef.get();
+
+                const funnelPayload = {
+                    page: 'hypothesis_athleticismSubscription_signup',
+                    firebaseUid: uid,
+                    email: email,
+                    age: age,
+                    position: position,
+                    utm: utm,
+                    lastStep: 1,
+                    funnelStep: 'account_and_profile_complete',
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                const sourceTag = getOptionalSourceFromSearch();
+                if (sourceTag) funnelPayload.source = sourceTag;
+
+                if (authMode === 'create') {
+                    funnelPayload.firstName = firstName;
+                    funnelPayload.lastName = lastName;
+                }
+
+                if (!snap.exists) {
+                    funnelPayload.createdAt = firebase.firestore.FieldValue.serverTimestamp();
+                }
+
+                await docRef.set(funnelPayload, { merge: true });
+
+                try {
+                    await recordPaymentUnavailableStep();
+                } catch (err) {
+                    console.error('Firestore payment step error:', err);
+                }
+
+                goToStep(2, 'forward');
+            } catch (err) {
+                console.error('Account error:', err);
+                let msg = 'Something went wrong. Please try again.';
+                if (err.code === 'auth/wrong-password') msg = 'Wrong password for that email.';
+                else if (err.code === 'auth/invalid-email') msg = 'Please enter a valid email address.';
+                else if (err.code === 'auth/user-not-found' && authMode === 'login') {
+                    msg = 'No account with this email. Use “Create account” or check your email.';
+                } else if (err.code === 'auth/too-many-requests') msg = 'Too many attempts. Try again in a few minutes.';
+                else if (err.code === 'auth/user-disabled') msg = 'This account has been disabled.';
+                setAccountStatus(msg, 'error');
+            } finally {
+                resetAccountSubmitButton();
+            }
+        });
+
+        document.getElementById('backToStep2').addEventListener('click', function () {
+            goToStep(2, 'backward');
+        });
+    </script>
+</body>
+</html>

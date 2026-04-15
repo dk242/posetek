@@ -146,6 +146,10 @@
             color: var(--green-dark);
         }
 
+        .hero-title em.hero-title-green-light {
+            color: var(--green-accent);
+        }
+
         .hero-subtitle {
             font-size: 1.15rem;
             font-weight: 400;
@@ -153,6 +157,10 @@
             line-height: 1.75;
             margin-bottom: 2rem;
             max-width: 500px;
+        }
+
+        .hero-subtitle .hero-subtitle-accent {
+            color: var(--green-accent);
         }
 
         .hero-proof {
@@ -258,6 +266,31 @@
             opacity: 0.65;
             cursor: not-allowed;
             transform: none;
+        }
+
+        a.hero-signup-cta {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.95rem;
+            font-weight: 600;
+            font-family: inherit;
+            color: var(--white);
+            background-color: var(--green-dark);
+            padding: 0.8rem 1.6rem;
+            border-radius: 50px;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 4px 20px rgba(26, 58, 46, 0.3);
+            white-space: nowrap;
+            text-decoration: none;
+        }
+
+        a.hero-signup-cta:hover {
+            background-color: var(--green-mid);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 28px rgba(26, 58, 46, 0.4);
         }
 
         .hero-waitlist-status {
@@ -725,7 +758,7 @@
 
         .pillars-grid {
             display: grid;
-            grid-template-columns: repeat(3, 1fr);
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
             gap: 2rem;
         }
 
@@ -791,6 +824,15 @@
             font-size: 0.92rem;
             line-height: 1.7;
             color: var(--text-mid);
+        }
+
+        .pillar-title-simple {
+            margin: 0;
+            font-size: 1.12rem;
+            font-weight: 700;
+            text-align: center;
+            color: var(--text-dark);
+            letter-spacing: -0.3px;
         }
 
         /* ── Pricing Section ── */
@@ -1237,7 +1279,7 @@
             <div class="brand-container">
                 <a href="index.html" class="logo">Pose<span>Tek</span></a>
             </div>
-            <a href="#waitlist" class="nav-cta">Join Waitlist</a>
+            <a href="hypothesis_athleticismSubscription_signup.html" class="nav-cta js-ath-signup-href">Begin your free trial</a>
         </nav>
     </header>
 
@@ -1248,39 +1290,28 @@
             <div class="hero-inner">
                 <div class="hero-text">
                     <span class="hero-eyebrow">Soccer Athleticism Tracking</span>
-                    <h1 class="hero-title">You're Spending Thousands<br>on Training.<br><em>Is It Actually Working?</em></h1>
-                    <p class="hero-subtitle">Speed trainers. Gym coaches. Agility programs. You're investing in everything — but how do you know it's translating to the field? PoseTek gives you monthly biomechanical diagnostics so you can finally see what's working, what's not, and what to fix.</p>
+                    <h1 class="hero-title">Curated athletic performance insights<br><em class="hero-title-green-light">that translate to your game.</em></h1>
+                    <p class="hero-subtitle">Speed trainers. Gym coaches. Agility programs. You're investing in everything — but how do you know it's translating to the field? PoseTek gives you biomechanical insights into inefficiencies and muscular weaknesses and a curated plan to improve with <span class="hero-subtitle-accent">nothing</span> but your <span class="hero-subtitle-accent">smartphone</span>.</p>
                     <div class="hero-proof">
                         <div class="hero-proof-item">
-                            <div class="hero-proof-icon">📊</div>
-                            Monthly diagnostics
+                            <div class="hero-proof-icon">📱</div>
+                            Live performance from your phone
                         </div>
                         <div class="hero-proof-item">
-                            <div class="hero-proof-icon">📈</div>
-                            Track progress over time
+                            <div class="hero-proof-icon">⚽</div>
+                            Soccer athletic test suite
                         </div>
                         <div class="hero-proof-item">
-                            <div class="hero-proof-icon">🏃</div>
-                            Sprint, jump &amp; kick analysis
+                            <div class="hero-proof-icon">🎯</div>
+                            Weak-spot biomechanical insight
+                        </div>
+                        <div class="hero-proof-item">
+                            <div class="hero-proof-icon">🌱</div>
+                            Plan that grows with you
                         </div>
                     </div>
                     <div class="hero-actions">
-                        <div class="hero-waitlist-slot">
-                            <div class="hero-waitlist-active" id="heroWaitlistActive">
-                                <form class="hero-waitlist-form" id="heroWaitlistForm" novalidate>
-                                    <input type="email" class="hero-waitlist-email" id="heroWaitlistEmail" name="email" placeholder="Enter your email" autocomplete="email" required aria-label="Email address">
-                                    <button type="submit" class="hero-waitlist-submit" id="heroWaitlistSubmit">Join Waitlist</button>
-                                </form>
-                            </div>
-                            <div class="hero-waitlist-success-panel" id="heroWaitlistSuccessPanel" hidden role="status" aria-live="polite">
-                                <svg class="hero-waitlist-check-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                                    <circle cx="12" cy="12" r="11" fill="#e8f3ee" stroke="#1a3a2e" stroke-width="1.5"/>
-                                    <path fill="none" stroke="#1a3a2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 12.5l3 3 7-7"/>
-                                </svg>
-                                <span class="hero-waitlist-success-label">You're on the list. We'll be in touch.</span>
-                            </div>
-                        </div>
-                        <p class="hero-waitlist-status" id="heroWaitlistStatus" role="status" aria-live="polite"></p>
+                        <a href="hypothesis_athleticismSubscription_signup.html" class="hero-signup-cta js-ath-signup-href">Begin your free trial</a>
                         <a href="#how-it-works" class="btn-secondary">See How It Works <span>&#8595;</span></a>
                     </div>
                 </div>
@@ -1343,8 +1374,8 @@
             <div class="how-inner">
                 <div class="how-header section-fade">
                     <span class="section-label">How It Works</span>
-                    <h2 class="section-title">A Monthly System to <em>Prove Your Progress</em></h2>
-                    <p>Get tested. See where you stand. Train with purpose. Come back and measure the improvement. Every single month — so you always know what's working.</p>
+                    <h2 class="section-title">Test <em>Whenever &amp; Wherever</em> — Feedback That Adapts</h2>
+                    <p>Run your diagnostics on your schedule, from anywhere, with nothing but your phone — get immediate feedback and a plan that updates as you grow, so you can improve on your own schedule.</p>
                 </div>
 
                 <div class="how-steps">
@@ -1357,11 +1388,13 @@
                         <div class="how-step-content">
                             <div class="step-number">1</div>
                             <h3>Take the <em>10-Minute Diagnostic</em></h3>
-                            <p>Book your monthly slot and show up. In 10 minutes, we capture your movement across the three pillars that define soccer athleticism:</p>
+                            <p>Use the app to measure, quantify, and get graded on your game-relevant athletic performance through a full diagnostic suite — not generic fitness, but numbers that map to the pitch.</p>
                             <ul class="how-step-details">
-                                <li>Vertical jump mechanics & explosive power</li>
-                                <li>Sprint biomechanics & acceleration patterns</li>
-                                <li>Ball-striking technique & power transfer</li>
+                                <li>Explosive power</li>
+                                <li>Change of direction</li>
+                                <li>Acceleration</li>
+                                <li>Top speed</li>
+                                <li>Power transfer mechanics</li>
                             </ul>
                         </div>
                     </div>
@@ -1375,13 +1408,12 @@
                         <div class="how-step-content">
                             <div class="step-number">2</div>
                             <h3>See Your Weak Spots & <em>Get a Targeted Plan</em></h3>
-                            <p>We benchmark every metric against D1-level standards so you know exactly where you stand — and where the gap is. Then you get a specific plan to close it before your next test.</p>
+                            <p>We go beyond scores to show the biomechanical patterns that are limiting your power, speed, and efficiency, and what to do about them: cues, drills, and priorities aimed at those weak links.</p>
                             <ul class="how-step-details">
-                                <li>Sprint stride angle, contact time & hip drive vs D1 norms</li>
-                                <li>D1 & pro-standard comparison across every metric</li>
+                                <li>compare with the pros on every metric</li>
                                 <li>Biomechanical weak-link identification</li>
-                                <li>Targeted corrective program for the month ahead</li>
-                                <li>Specific cues to share with your trainers</li>
+                                <li>Targeted corrective program that evolves with your results</li>
+                                <li>Specific cues to push you towards optimal movement patterns</li>
                             </ul>
                         </div>
                     </div>
@@ -1394,12 +1426,12 @@
                         </div>
                         <div class="how-step-content">
                             <div class="step-number">3</div>
-                            <h3>Come Back Monthly & <em>Track the Improvement</em></h3>
-                            <p>Every month, you retest on the same metrics. You see exactly what improved, what didn't, and whether your training investments are actually paying off. Your plan updates based on real data — not guesswork.</p>
+                            <h3>Retest <em>When You Want</em> &amp; Track Real Gains</h3>
+                            <p>Run the same metrics again on your timeline — after a training block, mid-season, or whenever you need a check-in. You see exactly what improved, what didn't, and whether your work is paying off. Your plan keeps updating from real data, not guesswork.</p>
                             <ul class="how-step-details">
-                                <li>Month-over-month progress on every metric</li>
+                                <li>Progress over time on every metric</li>
                                 <li>See which training is translating to game performance</li>
-                                <li>Updated plan that adapts to your progress</li>
+                                <li>Plan updates as your numbers change</li>
                                 <li>Long-term trend tracking toward D1 benchmarks</li>
                             </ul>
                         </div>
@@ -1408,43 +1440,45 @@
             </div>
         </section>
 
-        <!-- ═══ ANALYSIS PILLARS ═══ -->
+        <!-- ═══ DIAGNOSTIC SUITE ═══ -->
         <section class="pillars-section section-fade">
             <div class="pillars-inner">
                 <div class="pillars-header">
                     <span class="section-label">What We Track</span>
-                    <h2 class="section-title">The Three Pillars of <em>Soccer Athleticism</em></h2>
-                    <p>We don't measure generic fitness. Every metric is tied directly to on-field performance — the specific athletic qualities that separate D1 players from everyone else.</p>
+                    <h2 class="section-title">A Full Suite for <em>Game-Ready Performance</em></h2>
+                    <p>One diagnostic covers the athletic qualities that actually show up on the pitch — measured, scored, and benchmarked so you know what to train next.</p>
                 </div>
                 <div class="pillars-grid">
                     <div class="pillar-card">
                         <div class="pillar-image">
-                            <img src="images/jumpAnalysisMetrics.png" alt="Jump analysis">
+                            <img src="images/jumpAnalysisMetrics.png" alt="Explosive power">
                         </div>
                         <div class="pillar-body">
-                            <span class="pillar-tag">Jump</span>
-                            <h3>Explosive Power, Tracked</h3>
-                            <p>Loading mechanics, takeoff angles, and landing patterns — tracked month-over-month. See whether your gym work is translating to the explosive power that wins headers and creates separation.</p>
+                            <h3 class="pillar-title-simple">Explosive power</h3>
                         </div>
                     </div>
                     <div class="pillar-card">
                         <div class="pillar-image">
-                            <img src="images/sprintBreakdown.png" alt="Sprint pose mechanics analysis">
+                            <img src="images/SprintAnalysis.png" alt="Speed — velocity and sprint analysis">
                         </div>
                         <div class="pillar-body">
-                            <span class="pillar-tag">Sprint</span>
-                            <h3>Speed That Translates</h3>
-                            <p>Stride angle, ground contact time, hip extension, and acceleration posture — the biomechanical numbers behind your speed. See whether your speed training is producing faster mechanics on the pitch, not just on the track.</p>
+                            <h3 class="pillar-title-simple">Speed</h3>
                         </div>
                     </div>
                     <div class="pillar-card">
                         <div class="pillar-image">
-                            <img src="images/backswing.png" alt="Kick analysis">
+                            <img src="images/sprintBreakdown.png" alt="Agility — sprint mechanics breakdown">
                         </div>
                         <div class="pillar-body">
-                            <span class="pillar-tag">Kick</span>
-                            <h3>Strike Power & Precision</h3>
-                            <p>Plant-foot positioning, hip rotation, and follow-through mechanics — quantified and tracked. See how your technique evolves and where power is still being left on the table.</p>
+                            <h3 class="pillar-title-simple">Agility</h3>
+                        </div>
+                    </div>
+                    <div class="pillar-card">
+                        <div class="pillar-image">
+                            <img src="images/backswing.png" alt="Power transfer">
+                        </div>
+                        <div class="pillar-body">
+                            <h3 class="pillar-title-simple">Power transfer</h3>
                         </div>
                     </div>
                 </div>
@@ -1470,7 +1504,7 @@
                     </div>
                     <ul class="pricing-features">
                         <li>Monthly 10-minute biomechanical diagnostic</li>
-                        <li>Jump, sprint & kick analysis every session</li>
+                        <li>Full athletic diagnostic suite every session — explosive power, speed, agility &amp; power transfer</li>
                         <li>D1 & pro-standard comparison for every metric</li>
                         <li>Biomechanical weak-link identification</li>
                         <li>Targeted monthly training plan</li>
@@ -1479,7 +1513,7 @@
                         <li>Long-term trend analysis toward D1 benchmarks</li>
                         <li>Cancel anytime — no commitment</li>
                     </ul>
-                    <a href="#waitlist" class="pricing-btn">Join Waitlist</a>
+                    <a href="hypothesis_athleticismSubscription_signup.html" class="pricing-btn js-ath-signup-href">Begin your free trial</a>
                 </div>
                 <p style="text-align: center; font-size: 0.88rem; color: var(--text-mid); margin-top: 1.5rem;">
                     $60/month — less than a single session with most speed trainers. Cancel anytime.
@@ -1492,30 +1526,17 @@
             <div class="guarantee-inner">
                 <div class="guarantee-icon">🛡</div>
                 <h2>See Measurable Progress — Or Cancel Anytime</h2>
-                <p>We track your jump, sprint, and kick metrics month over month and benchmark you against D1 standards. If after three months of following the plan you don't see measurable improvement, we'll refund your last month. No questions asked.</p>
+                <p>We track these athletic metrics over time and benchmark you against D1 standards. If after three months of following the plan you don't see measurable improvement, we'll refund your last month. No questions asked.</p>
             </div>
         </section>
 
-        <!-- ═══ FINAL CTA / WAITLIST ═══ -->
-        <section id="waitlist" class="cta-section section-fade">
+        <!-- ═══ FINAL CTA ═══ -->
+        <section id="cta-signup" class="cta-section section-fade">
             <div class="cta-inner">
                 <span class="section-label">Ready to Train With Proof?</span>
                 <h2 class="section-title">Stop Guessing. Start Tracking.<br><em>Know What's Working.</em></h2>
                 <p>You're already investing hundreds in speed trainers, gym coaches, and agility programs. For $60/month, finally get the data that shows you whether it's all translating to the field — and what to fix if it's not.</p>
-                <div id="ctaWaitlistActive">
-                    <form class="cta-waitlist-form" id="ctaWaitlistForm" novalidate>
-                        <input type="email" class="cta-waitlist-email" id="ctaWaitlistEmail" name="email" placeholder="Enter your email" autocomplete="email" required aria-label="Email address">
-                        <button type="submit" class="cta-waitlist-submit" id="ctaWaitlistSubmit">Join Waitlist</button>
-                    </form>
-                    <p class="cta-waitlist-status" id="ctaWaitlistStatus" role="status" aria-live="polite"></p>
-                </div>
-                <div class="cta-waitlist-success-panel" id="ctaWaitlistSuccessPanel" hidden role="status" aria-live="polite">
-                    <svg class="hero-waitlist-check-icon" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-                        <circle cx="12" cy="12" r="11" fill="#e8f3ee" stroke="#1a3a2e" stroke-width="1.5"/>
-                        <path fill="none" stroke="#1a3a2e" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" d="M7 12.5l3 3 7-7"/>
-                    </svg>
-                    <span class="hero-waitlist-success-label">You're on the list. We'll be in touch.</span>
-                </div>
+                <a href="hypothesis_athleticismSubscription_signup.html" class="cta-waitlist-submit js-ath-signup-href" style="display:inline-flex;text-decoration:none;max-width:480px;margin:0 auto;">Sign up for your free trial</a>
             </div>
         </section>
     </main>
@@ -1524,27 +1545,83 @@
         <p>&copy; 2026 PoseTek &middot; <a href="index.html">Home</a> &middot; <a href="privacy.html">Privacy Policy</a></p>
     </footer>
 
-    <!-- Firebase -->
+    <!-- Firebase (hero background animation uses app, auth, storage) -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-storage-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
-    <script>
-        const firebaseConfig = {
-            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
-            authDomain: "kickai-69dd0.firebaseapp.com",
-            projectId: "kickai-69dd0",
-            storageBucket: "kickai-69dd0.firebasestorage.app",
-            messagingSenderId: "839600313930",
-            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
-            measurementId: "G-RX99K62ZEH"
-        };
-
-        firebase.initializeApp(firebaseConfig);
-        const db = firebase.firestore();
-    </script>
 
     <script>
+        /* Landing query: ?source={string} — read here; full query string is forwarded to signup below */
+        var ATHLETICISM_SUBSCRIPTION_SOURCE = (function () {
+            var p = new URLSearchParams(window.location.search || '');
+            var s = p.get('source');
+            return s && s.trim() ? s.trim() : null;
+        })();
+
+        /* Signup links: create funnel Firestore doc on click, then navigate (named app avoids clashing with hero / signup page Firebase) */
+        (function () {
+            var FUNNEL_COLLECTION = 'hypothesis_athleticismSubscription';
+            var FB_FUNNEL = {
+                apiKey: 'AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs',
+                authDomain: 'kickai-69dd0.firebaseapp.com',
+                projectId: 'kickai-69dd0',
+                storageBucket: 'kickai-69dd0.firebasestorage.app',
+                messagingSenderId: '839600313930',
+                appId: '1:839600313930:web:13b1e94c2c540561e3f8b3'
+            };
+            var funnelApp;
+            try {
+                funnelApp = firebase.app('funnelLanding');
+            } catch (err) {
+                funnelApp = firebase.initializeApp(FB_FUNNEL, 'funnelLanding');
+            }
+            var db = funnelApp.firestore();
+            var UTM_KEYS = ['utm_source', 'utm_medium', 'utm_campaign', 'utm_term', 'utm_content', 'utm_id', 'gclid', 'fbclid', 'msclkid', 'ttclid'];
+            function collectUtm() {
+                var params = new URLSearchParams(window.location.search || '');
+                var utm = {};
+                UTM_KEYS.forEach(function (k) {
+                    var v = params.get(k);
+                    if (v) utm[k] = v;
+                });
+                return utm;
+            }
+            function getSourceParam() {
+                var v = new URLSearchParams(window.location.search || '').get('source');
+                return v && v.trim() ? v.trim() : null;
+            }
+            document.querySelectorAll('a.js-ath-signup-href').forEach(function (a) {
+                var base = (a.getAttribute('href') || '').split('?')[0];
+                var q = window.location.search || '';
+                a.href = base + q;
+                a.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    var params = new URLSearchParams(window.location.search || '');
+                    if (!params.get('sid')) {
+                        params.set('sid', db.collection(FUNNEL_COLLECTION).doc().id);
+                    }
+                    var sid = params.get('sid');
+                    var payload = {
+                        page: 'hypothesis_athleticismSubscription_signup',
+                        utm: collectUtm(),
+                        lastStep: 0,
+                        funnelStep: 'signup_session_started',
+                        createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                        updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                    };
+                    var src = getSourceParam();
+                    if (src) payload.source = src;
+                    db.collection(FUNNEL_COLLECTION).doc(sid).set(payload, { merge: true }).then(function () {
+                        window.location.href = base + '?' + params.toString();
+                    }).catch(function (err) {
+                        console.error('Funnel doc pre-create error:', err);
+                        window.location.href = base + '?' + params.toString();
+                    });
+                });
+            });
+        })();
+
         /* ── Nav scroll ── */
         const nav = document.getElementById('mainNav');
         window.addEventListener('scroll', () => {
@@ -1586,102 +1663,6 @@
         });
 
         let heroInterval = setInterval(() => goToHeroSlide((heroIndex + 1) % heroSlides.length), 3500);
-
-        /* ── Waitlist: shared helpers ── */
-        function setStatus(el, msg, kind) {
-            el.textContent = msg || '';
-            el.className = el.className.replace(/ ?(error|success)/g, '') + (kind ? ' ' + kind : '');
-        }
-
-        function revealSuccess(activeEl, successEl) {
-            const reduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-            let swapped = false;
-            let fallbackTimer = null;
-
-            const swap = () => {
-                if (swapped) return;
-                swapped = true;
-                if (fallbackTimer != null) clearTimeout(fallbackTimer);
-                activeEl.setAttribute('hidden', '');
-                successEl.removeAttribute('hidden');
-                requestAnimationFrame(() => {
-                    requestAnimationFrame(() => successEl.classList.add('is-visible'));
-                });
-            };
-
-            if (reduced) { swap(); return; }
-
-            activeEl.classList.add('hero-waitlist-active--exit');
-            fallbackTimer = setTimeout(swap, 500);
-            activeEl.addEventListener('transitionend', (ev) => {
-                if (ev.propertyName !== 'opacity') return;
-                swap();
-            }, { once: true });
-        }
-
-        async function handleWaitlistSubmit(emailInput, submitBtn, statusEl, activeEl, successEl, source) {
-            setStatus(statusEl, '');
-            const email = emailInput.value.trim();
-
-            if (!email || !emailInput.checkValidity()) {
-                setStatus(statusEl, 'Please enter a valid email address.', 'error');
-                return;
-            }
-
-            submitBtn.disabled = true;
-            let succeeded = false;
-
-            try {
-                await db.collection('athleticismSubscriptionWaitlist').add({
-                    email: email,
-                    source: source,
-                    submittedAt: firebase.firestore.FieldValue.serverTimestamp()
-                });
-                succeeded = true;
-                emailInput.value = '';
-                setStatus(statusEl, '', '');
-                revealSuccess(activeEl, successEl);
-            } catch (err) {
-                console.error('Firestore waitlist error:', err);
-                setStatus(statusEl, 'Something went wrong. Please try again.', 'error');
-            } finally {
-                if (!succeeded) submitBtn.disabled = false;
-            }
-        }
-
-        /* ── Hero waitlist ── */
-        const heroWaitlistForm = document.getElementById('heroWaitlistForm');
-        const heroWaitlistEmail = document.getElementById('heroWaitlistEmail');
-        const heroWaitlistSubmit = document.getElementById('heroWaitlistSubmit');
-        const heroWaitlistStatus = document.getElementById('heroWaitlistStatus');
-        const heroWaitlistActive = document.getElementById('heroWaitlistActive');
-        const heroWaitlistSuccessPanel = document.getElementById('heroWaitlistSuccessPanel');
-
-        heroWaitlistForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleWaitlistSubmit(
-                heroWaitlistEmail, heroWaitlistSubmit, heroWaitlistStatus,
-                heroWaitlistActive, heroWaitlistSuccessPanel,
-                'hypothesis_athleticismSubscription_hero'
-            );
-        });
-
-        /* ── CTA waitlist ── */
-        const ctaWaitlistForm = document.getElementById('ctaWaitlistForm');
-        const ctaWaitlistEmail = document.getElementById('ctaWaitlistEmail');
-        const ctaWaitlistSubmit = document.getElementById('ctaWaitlistSubmit');
-        const ctaWaitlistStatus = document.getElementById('ctaWaitlistStatus');
-        const ctaWaitlistActive = document.getElementById('ctaWaitlistActive');
-        const ctaWaitlistSuccessPanel = document.getElementById('ctaWaitlistSuccessPanel');
-
-        ctaWaitlistForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            handleWaitlistSubmit(
-                ctaWaitlistEmail, ctaWaitlistSubmit, ctaWaitlistStatus,
-                ctaWaitlistActive, ctaWaitlistSuccessPanel,
-                'hypothesis_athleticismSubscription_cta'
-            );
-        });
     </script>
 
     <!-- Background Pose Animation -->
