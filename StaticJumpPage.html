@@ -970,7 +970,7 @@
     <div id="repsBar" class="reps-bar" aria-label="Repetitions"></div>
     <div class="frames-container">
       <div class="video-container">
-        <video id="rawVideo" preload="auto" playsinline muted style="display:none" crossorigin="anonymous"></video>
+        <video id="rawVideo" preload="auto" playsinline muted style="position:absolute;width:1px;height:1px;opacity:0;pointer-events:none;overflow:hidden;" crossorigin="anonymous"></video>
   <canvas id="rawFrameCanvas" width="480" height="270" style="width:100%;height:auto;border-radius:8px;background:#000"></canvas>
         <div id="videoLoadingIndicator" style="position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);color:#fff;font-weight:600;display:none;z-index:5;background:rgba(0,0,0,0.8);padding:1rem 1.5rem;border-radius:8px;border:1px solid rgba(255,255,255,0.2);">Loading video...</div>
         <button id="videoFullscreenBtn" class="fullscreen-btn" title="Fullscreen Video">⛶</button>
@@ -1805,14 +1805,21 @@
     function restartPlayTimer() {
       if (rawMaxFrame == 0) { recalcTiming(); }
 
+      // Guard: video metadata not yet loaded — abort and reset button
+      if (rawMaxFrame == 0) {
+        rawIsPlaying = false;
+        const ppBtn = document.getElementById('rawPlayPauseBtn');
+        if (ppBtn) ppBtn.textContent = '▶';
+        return;
+      }
+
       stopRawPlaybackCleanup();
 
-      // Use seek-step playback: browsers don't reliably decode new frames from
-      // a hidden (display:none) video during native play(), but they always
-      // decode on seek.  Step through frames with a timer, seek the video to
-      // each frame time, and draw once the seek completes.
+      // Use seek-step playback: step through frames with a timer, seek the
+      // video to each frame time, and draw once the seek completes.
       const stepMs = Math.max(20, Math.round(baseIntervalMs / (SPEED_OPTIONS[rawSpeedIdx] || 1)));
       let seekBusy = false;
+      let seekBusyAt = 0; // timestamp when seekBusy was set
 
       const onSeeked = () => {
         seekBusy = false;
@@ -1823,10 +1830,19 @@
 
       rawPlayFallbackInterval = setInterval(() => {
         if (!rawVideoEl || !rawIsPlaying) return;
-        if (seekBusy) return;
+
+        // Mobile safety: if seeked never fired, force-clear after 3× stepMs
+        if (seekBusy) {
+          if (performance.now() - seekBusyAt > stepMs * 3) {
+            seekBusy = false;
+          } else {
+            return;
+          }
+        }
 
         rawCurrentFrame++;
-        if (rawCurrentFrame > rawMaxFrame) {
+        // Only stop when we have a valid max and have exceeded it
+        if (rawMaxFrame > 0 && rawCurrentFrame > rawMaxFrame) {
           rawIsPlaying = false;
           document.getElementById('rawPlayPauseBtn').textContent = '▶';
           stopRawPlaybackCleanup();
@@ -1841,6 +1857,7 @@
 
         const targetTime = frameIdxToTime(rawCurrentFrame);
         seekBusy = true;
+        seekBusyAt = performance.now();
         rawVideoEl.currentTime = targetTime;
       }, stepMs);
     }
