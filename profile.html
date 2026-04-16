@@ -1592,7 +1592,7 @@
                 <div class="insight-stack">
             <div class="card chart-card">
                 <h2 class="card-title">Skill Radar Chart</h2>
-                <div class="chart-container">
+                <div class="chart-container" id="skillRadarChartContainer">
                     <canvas id="spiderChart"></canvas>
                 </div>
             </div>
@@ -2035,6 +2035,7 @@
         // Players default to locked (must explicitly have premium_content_locked=false to unlock).
         // Coaches default to unlocked (must explicitly have premium_content_locked=true to lock).
         // When premium does not apply, feedback_form_needed can lock the same sections (players only).
+        // Skill radar: locked only when feedback is pending — never the Stripe / premium pathway.
         async function applyPremiumLock(playerDocId) {
             if (!playerDocId) return;
             try {
@@ -2054,9 +2055,9 @@
 
                 const urlParamsForLock = new URLSearchParams(window.location.search);
                 const urlUserTypeForLock = urlParamsForLock.get('userType');
-                const lockMode = shouldPremiumLock ? 'premium' : 'feedback';
+                const mainLockMode = shouldPremiumLock ? 'premium' : 'feedback';
 
-                function addSectionLock(el, label, sentFrom) {
+                function addSectionLock(el, label, mode, sentFrom) {
                     if (!el || el.classList.contains('premium-section-locked')) return;
                     el.classList.add('premium-section-locked');
                     const overlay = document.createElement('div');
@@ -2065,7 +2066,7 @@
                     if (urlUserTypeForLock === 'player') {
                         const btn = document.createElement('a');
                         btn.className = 'unlock-btn';
-                        if (lockMode === 'premium') {
+                        if (mode === 'premium') {
                             btn.textContent = 'Unlock Features';
                             btn.href = '#';
                             if (window.PoseTekPremiumCheckout) {
@@ -2082,19 +2083,24 @@
 
                 const premiumLabel = 'Premium Content';
                 const feedbackLabel = 'Complete feedback form';
-                const label = lockMode === 'premium' ? premiumLabel : feedbackLabel;
+                const mainLabel = mainLockMode === 'premium' ? premiumLabel : feedbackLabel;
 
                 // Physical Profile — lock only the pose canvas area
-                addSectionLock(document.querySelector('#physicalProfileCard .pose-visual'), label, 'profilePoseViewer');
+                addSectionLock(document.querySelector('#physicalProfileCard .pose-visual'), mainLabel, mainLockMode, 'profilePoseViewer');
 
-                // 3. Player Snapshot — lock only the info-grid
-                addSectionLock(document.getElementById('snapshotInfoGrid'), label, 'profileSnapshot');
+                // Player Snapshot — lock only the info-grid
+                addSectionLock(document.getElementById('snapshotInfoGrid'), mainLabel, mainLockMode, 'profileSnapshot');
 
-                // 4. Assigned Drills — lock only the tasks container
-                addSectionLock(document.getElementById('tasksContainer'), label, 'profileDrills');
+                // Assigned Drills — lock only the tasks container
+                addSectionLock(document.getElementById('tasksContainer'), mainLabel, mainLockMode, 'profileDrills');
 
-                // 5. IDP — lock only the idp content area
-                addSectionLock(document.getElementById('idpContent'), label, 'profileIDP');
+                // IDP — lock only the idp content area
+                addSectionLock(document.getElementById('idpContent'), mainLabel, mainLockMode, 'profileIDP');
+
+                // Skill radar — feedback form only (not shown when only premium / Stripe applies)
+                if (shouldFeedbackLock) {
+                    addSectionLock(document.getElementById('skillRadarChartContainer'), feedbackLabel, 'feedback', 'profileSkillRadar');
+                }
 
             } catch (err) {
                 console.error('[PremiumLock] Error checking premium lock:', err);

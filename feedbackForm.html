@@ -1060,6 +1060,9 @@
         window.auth = auth;
         window.db = db;
 
+        /** Set when side nav loads player doc; submit handler may refetch if still null. */
+        let feedbackFormCoachUID = null;
+
         // --- Side nav wiring (same as StaticJumpPage.html) ---
         (function sideNavSetup() {
             const waitForAuth = () => new Promise((resolve) => {
@@ -1102,10 +1105,13 @@
                 const isPlayer = userType === 'player';
 
                 let coachUID = null;
-                if (isPlayer && playerParam) {
+                if (playerParam) {
                     try {
                         const pDoc = await db.collection('players').doc(playerParam).get();
-                        if (pDoc.exists) coachUID = pDoc.data().coachUID || null;
+                        if (pDoc.exists) {
+                            coachUID = pDoc.data().coachUID || null;
+                            feedbackFormCoachUID = coachUID;
+                        }
                     } catch (e) { /* ignore */ }
                 }
 
@@ -1314,6 +1320,16 @@
             const playerId = urlParams.get('player') || null;
             const returnTo = sanitizePreviousPageReturn(urlParams.get('previousPage'));
 
+            let coachUIDForPayload = feedbackFormCoachUID;
+            if (playerId && !coachUIDForPayload) {
+                try {
+                    const pSnap = await db.collection('players').doc(playerId).get();
+                    if (pSnap.exists) coachUIDForPayload = pSnap.data().coachUID || null;
+                } catch (e) {
+                    console.warn('[feedbackForm] Could not load coachUID for player:', e);
+                }
+            }
+
             const comeBackVal = document.querySelector('input[name="comeBackNextWeek"]:checked')?.value;
             const approachLabels = {
                 same_as_last_week: 'Do the same thing as last week',
@@ -1339,6 +1355,7 @@
 
             const payload = {
                 playerId,
+                coachUID: coachUIDForPayload || null,
                 comeBackNextWeek: comeBackVal,
                 nextWeekApproach,
                 differentDataDetails,
