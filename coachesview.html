@@ -1290,7 +1290,8 @@
                 // 1. Add player to coach's members array
                 const coachRef = db.collection('coaches').doc(coachId);
                 batch.update(coachRef, {
-                    members: firebase.firestore.FieldValue.arrayUnion(playerId)
+                    members: firebase.firestore.FieldValue.arrayUnion(playerId),
+                    numberMembers: firebase.firestore.FieldValue.increment(1)
                 });
 
                 // 2. Update player's coachUID if not already set
@@ -1371,7 +1372,8 @@
                 // 2. Add player to coach's members array
                 const coachRef = db.collection('coaches').doc(coachId);
                 batch.update(coachRef, {
-                    members: firebase.firestore.FieldValue.arrayUnion(playerRef.id)
+                    members: firebase.firestore.FieldValue.arrayUnion(playerRef.id),
+                    numberMembers: firebase.firestore.FieldValue.increment(1)
                 });
 
                 // 3. If coach has an organization, add player to organization

@@ -1,0 +1,958 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "w8lex8gzl7");
+    </script>
+    <title>PoseTek — Add player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #0f2721;
+            --primary-soft: #16342c;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --accent-light: #6fb38d;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.65);
+            --text-faint: rgba(255, 255, 255, 0.42);
+            --card-border: rgba(255, 255, 255, 0.08);
+            --input-bg: rgba(255, 255, 255, 0.04);
+            --input-bg-focus: rgba(255, 255, 255, 0.07);
+            --input-border: rgba(255, 255, 255, 0.1);
+            --transition: all 0.25s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(76, 140, 106, 0.3);
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary);
+            color: var(--text-light);
+            -webkit-font-smoothing: antialiased;
+            height: 100%;
+            max-height: 100dvh;
+            line-height: 1.45;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background:
+                radial-gradient(ellipse 70% 50% at 15% 0%, rgba(76, 140, 106, 0.14), transparent 60%),
+                radial-gradient(ellipse 60% 55% at 90% 100%, rgba(76, 140, 106, 0.1), transparent 60%);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body.auth-loading #appRoot {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        header {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            flex-shrink: 0;
+            padding: 1rem 2rem;
+            z-index: 100;
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.35rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            max-width: 1080px;
+            margin: 0 auto;
+            padding: 0 2rem 2rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        .form-hero {
+            flex-shrink: 0;
+            margin-bottom: 2rem;
+            max-width: 640px;
+        }
+
+        .form-hero .eyebrow {
+            display: inline-block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.18em;
+            text-transform: uppercase;
+            color: var(--accent-light);
+            margin-bottom: 0.75rem;
+        }
+
+        .form-hero h1 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(1.75rem, 4vw, 2.6rem);
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-bottom: 0.5rem;
+            line-height: 1.1;
+        }
+
+        .form-hero p {
+            color: var(--text-muted);
+            font-size: clamp(0.9rem, 1.4vw, 1rem);
+            max-width: 36rem;
+            line-height: 1.5;
+        }
+
+        .form-stage-wrap {
+            flex-shrink: 0;
+        }
+
+        .field-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 1.25rem 1.25rem;
+        }
+
+        .field-grid .form-group.col-6 { grid-column: span 6; }
+        .field-grid .form-group.col-4 { grid-column: span 4; }
+        .field-grid .form-group.col-3 { grid-column: span 3; }
+        .field-grid .form-group.col-2 { grid-column: span 2; }
+
+        .sheet-form-label {
+            display: block;
+            font-size: 0.7rem;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            text-transform: uppercase;
+            color: var(--text-muted);
+            margin-bottom: 0.45rem;
+        }
+
+        .sheet-form-label .optional {
+            font-weight: 400;
+            text-transform: none;
+            letter-spacing: 0;
+            color: var(--text-faint);
+            margin-left: 0.35rem;
+        }
+
+        .required-mark {
+            color: var(--accent-light);
+            margin-left: 0.2rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.85rem 0;
+            border-radius: 0;
+            border: none;
+            border-bottom: 1px solid var(--input-border);
+            background: transparent;
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 1.05rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-bottom-color: var(--accent-light);
+        }
+
+        .input-field::placeholder {
+            color: var(--text-faint);
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .height-row {
+            display: flex;
+            align-items: baseline;
+            gap: 0.75rem;
+        }
+
+        .height-row .form-group {
+            flex: 1;
+        }
+
+        .height-sep {
+            color: var(--text-faint);
+            font-weight: 400;
+            font-size: 1.05rem;
+        }
+
+        .submit-row {
+            margin-top: 2.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.6rem;
+            padding: 0.9rem 2.25rem;
+            border-radius: 999px;
+            background: var(--accent-light);
+            color: var(--primary);
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 600;
+            font-size: 0.95rem;
+            cursor: pointer;
+            transition: var(--transition);
+            touch-action: manipulation;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            background: #82c3a2;
+            transform: translateY(-1px);
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .spinner {
+            display: none;
+            width: 16px;
+            height: 16px;
+            border: 2px solid rgba(26, 58, 46, 0.25);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            padding: 0.65rem 0.85rem;
+            border-radius: 8px;
+            font-size: 0.82rem;
+            font-weight: 500;
+            margin-bottom: 1rem;
+            flex-shrink: 0;
+            display: none;
+        }
+
+        .message.error {
+            background: rgba(220, 53, 69, 0.15);
+            border: 1px solid rgba(255, 138, 154, 0.35);
+            color: #ffc9c9;
+        }
+
+        /* Form stage + success overlay */
+        .form-stage {
+            position: relative;
+        }
+
+        #addPlayerForm {
+            transition: opacity 0.45s ease, transform 0.45s ease;
+        }
+
+        #addPlayerForm.is-hidden {
+            opacity: 0;
+            transform: translateY(8px);
+            pointer-events: none;
+            position: absolute;
+            left: 0;
+            right: 0;
+            visibility: hidden;
+        }
+
+        .success-celebration {
+            position: absolute;
+            inset: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 2rem 0.5rem;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.5s ease, visibility 0.5s ease;
+            pointer-events: none;
+        }
+
+        .success-celebration.is-visible {
+            opacity: 1;
+            visibility: visible;
+            pointer-events: auto;
+        }
+
+        .success-celebration.is-fading-out {
+            opacity: 0;
+            transition: opacity 0.55s ease;
+        }
+
+        .success-celebration .check-wrap {
+            width: clamp(72px, 12vmin, 96px);
+            height: clamp(72px, 12vmin, 96px);
+            border-radius: 50%;
+            background: linear-gradient(145deg, rgba(76, 140, 106, 0.95), rgba(45, 94, 74, 0.95));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            box-shadow:
+                0 24px 60px rgba(0, 0, 0, 0.35),
+                0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+            transform: scale(0);
+        }
+
+        .success-celebration.is-visible .check-wrap {
+            animation: checkPop 0.65s cubic-bezier(0.34, 1.56, 0.64, 1) forwards;
+        }
+
+        .success-celebration .check-wrap svg {
+            width: clamp(28px, 8vmin, 40px);
+            height: clamp(28px, 8vmin, 40px);
+            stroke: #fff;
+            stroke-width: 3;
+            fill: none;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+        }
+
+        .success-celebration h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: clamp(1.1rem, 2vw, 1.35rem);
+            font-weight: 600;
+            color: var(--text-light);
+            max-width: 28rem;
+            line-height: 1.3;
+            opacity: 0;
+            transform: translateY(12px);
+        }
+
+        .success-celebration.is-visible h2 {
+            animation: fadeInUp 0.5s ease 0.2s forwards;
+        }
+
+        @keyframes checkPop {
+            0% { transform: scale(0); }
+            70% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Login modal (kickai-style) */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26, 58, 46, 0.97), rgba(45, 94, 74, 0.95));
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-modal {
+            background: linear-gradient(145deg, rgba(26, 58, 46, 0.95), rgba(45, 94, 74, 0.9));
+            padding: 0;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            transform: scale(0.95) translateY(20px);
+            transition: var(--transition);
+            border: 1px solid rgba(76, 140, 106, 0.2);
+        }
+
+        .modal-overlay.active .auth-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-content-wrapper {
+            padding: 2.5rem 2rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff, #4c8c6a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-form .form-group label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .login-form .input-field {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .login-error {
+            color: #ffb4b4;
+            font-size: 0.88rem;
+            margin-top: 0.75rem;
+            display: none;
+        }
+
+        #mainContent {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        #coachGate {
+            display: none;
+            flex: 1;
+            min-height: 0;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0.5rem;
+        }
+
+        #coachGate.active {
+            display: flex;
+        }
+
+        .gate-card {
+            max-width: 420px;
+            padding: 2rem;
+            border: 1px solid var(--card-border);
+            border-radius: 16px;
+            background: rgba(255, 255, 255, 0.03);
+        }
+
+        .gate-card p {
+            color: var(--text-muted);
+            margin-bottom: 0.75rem;
+            font-size: 0.95rem;
+        }
+
+        .gate-card p.strong {
+            color: var(--text-light);
+            font-weight: 600;
+            font-size: 1.1rem;
+            margin-bottom: 1rem;
+        }
+
+        .gate-card .submit-btn {
+            margin-top: 1rem;
+        }
+
+        #appRoot {
+            transition: opacity 0.25s ease;
+        }
+
+        @media (max-width: 720px) {
+            header {
+                padding: 1rem 1.25rem;
+            }
+            .page-shell {
+                padding: 0 1.25rem 1.5rem;
+                justify-content: flex-start;
+            }
+            .form-hero {
+                margin-bottom: 1.5rem;
+            }
+            .field-grid {
+                gap: 1rem;
+            }
+            .field-grid .form-group.col-6,
+            .field-grid .form-group.col-4,
+            .field-grid .form-group.col-3,
+            .field-grid .form-group.col-2 {
+                grid-column: span 12;
+            }
+            .field-grid .form-group.half-on-mobile {
+                grid-column: span 6;
+            }
+            .submit-row {
+                margin-top: 1.75rem;
+            }
+            .submit-btn {
+                width: 100%;
+            }
+            /* Prevent iOS zoom on focus without blowing layout */
+            .input-field {
+                font-size: max(1rem, 16px);
+            }
+        }
+
+        @media (max-height: 640px) and (min-width: 721px) {
+            .form-hero {
+                margin-bottom: 1.25rem;
+            }
+            .form-hero h1 {
+                font-size: clamp(1.4rem, 3vw, 1.9rem);
+            }
+            .form-hero p {
+                font-size: 0.88rem;
+            }
+            .field-grid {
+                gap: 0.9rem;
+            }
+            .input-field {
+                padding: 0.65rem 0;
+                font-size: 0.98rem;
+            }
+            .submit-row {
+                margin-top: 1.5rem;
+            }
+        }
+    </style>
+</head>
+<body class="auth-loading">
+    <header>
+        <a href="index.html" class="logo">PoseTek</a>
+    </header>
+
+    <div id="loginOverlay" class="modal-overlay">
+        <div class="auth-modal">
+            <div class="modal-content-wrapper">
+                <h2 class="modal-title">Coach login</h2>
+                <form class="login-form" id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" class="input-field" required autocomplete="email" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="input-field" required autocomplete="current-password" placeholder="Password">
+                    </div>
+                    <div class="login-error" id="loginError" role="alert"></div>
+                    <button type="submit" class="submit-btn" id="loginSubmit">
+                        <span>Sign in</span>
+                        <span class="spinner" id="loginSpinner"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <main class="page-shell" id="appRoot">
+        <div id="coachGate">
+            <div class="gate-card">
+                <p class="strong">Coach account required</p>
+                <p>This page is only for coaches. Sign in with a coach account, or use the main site to register.</p>
+                <a href="kickai.html" class="submit-btn" style="text-decoration:none;">Go to Kick AI</a>
+            </div>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="form-hero">
+                <span class="eyebrow">Quest</span>
+                <h1>Add a player</h1>
+                <p>Create a profile for a new athlete on your roster.</p>
+            </div>
+
+            <div id="formError" class="message error" role="alert"></div>
+
+            <div class="form-stage-wrap">
+                <div class="form-stage" id="formStage">
+                    <form id="addPlayerForm" novalidate>
+                        <div class="field-grid">
+                            <div class="form-group col-6">
+                                <label class="sheet-form-label" for="firstName">First name<span class="required-mark">*</span></label>
+                                <input type="text" id="firstName" class="input-field" required autocomplete="given-name" placeholder="Jordan">
+                            </div>
+                            <div class="form-group col-6">
+                                <label class="sheet-form-label" for="lastName">Last name<span class="required-mark">*</span></label>
+                                <input type="text" id="lastName" class="input-field" required autocomplete="family-name" placeholder="Taylor">
+                            </div>
+                            <div class="form-group col-4 half-on-mobile">
+                                <label class="sheet-form-label" for="age">Age<span class="required-mark">*</span></label>
+                                <input type="number" id="age" class="input-field" required min="1" max="120" inputmode="numeric" placeholder="18">
+                            </div>
+                            <div class="form-group col-4 half-on-mobile">
+                                <label class="sheet-form-label" for="weight">Weight <span class="optional">lbs</span></label>
+                                <input type="number" id="weight" class="input-field" min="0" max="800" step="0.1" inputmode="decimal" placeholder="Optional">
+                            </div>
+                            <div class="form-group col-4">
+                                <label class="sheet-form-label" for="heightFeet">Height <span class="optional">optional</span></label>
+                                <div class="height-row">
+                                    <div class="form-group">
+                                        <input type="number" id="heightFeet" class="input-field" min="0" max="8" placeholder="Ft" inputmode="numeric">
+                                    </div>
+                                    <span class="height-sep">′</span>
+                                    <div class="form-group">
+                                        <input type="number" id="heightInches" class="input-field" min="0" max="11" placeholder="In" inputmode="numeric">
+                                    </div>
+                                    <span class="height-sep">″</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="submit-row">
+                            <button type="submit" class="submit-btn" id="createBtn">
+                                <span>Create profile</span>
+                                <span class="spinner" id="createSpinner"></span>
+                            </button>
+                        </div>
+                    </form>
+
+                    <div class="success-celebration" id="successCelebration" aria-live="polite">
+                        <div class="check-wrap">
+                            <svg viewBox="0 0 24 24">
+                                <polyline points="20 6 9 17 4 12"></polyline>
+                            </svg>
+                        </div>
+                        <h2 id="successMessage">Your profile has been created</h2>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script>
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+
+        function generateCode(prefix = 'PLR', length = 4) {
+            const chars = 'ABCDEFGHJKLMNPQRSTUVWXYZ0123456789';
+            let result = prefix;
+            for (let i = 0; i < length; i++) {
+                result += chars.charAt(Math.floor(Math.random() * chars.length));
+            }
+            return result;
+        }
+
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const loginSubmit = document.getElementById('loginSubmit');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const coachGate = document.getElementById('coachGate');
+        const mainContent = document.getElementById('mainContent');
+        const formError = document.getElementById('formError');
+        const addPlayerForm = document.getElementById('addPlayerForm');
+        const successCelebration = document.getElementById('successCelebration');
+        const successMessage = document.getElementById('successMessage');
+        const createBtn = document.getElementById('createBtn');
+        const createSpinner = document.getElementById('createSpinner');
+
+        function showLoading(btn, spinner) {
+            btn.disabled = true;
+            const label = btn.querySelector('span:first-child');
+            if (label) label.style.opacity = '0.5';
+            spinner.style.display = 'block';
+        }
+
+        function hideLoading(btn, spinner) {
+            btn.disabled = false;
+            const label = btn.querySelector('span:first-child');
+            if (label) label.style.opacity = '1';
+            spinner.style.display = 'none';
+        }
+
+        function showModal(overlay) {
+            document.body.style.overflow = 'hidden';
+            overlay.classList.add('active');
+        }
+
+        function hideModal(overlay) {
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        async function fetchCoachForUser(uid) {
+            const q = await db.collection('coaches').where('userUID', '==', uid).limit(1).get();
+            if (q.empty) return null;
+            const doc = q.docs[0];
+            return { id: doc.id, data: doc.data(), ref: doc.ref };
+        }
+
+        function applyCoachUI(coachExists) {
+            coachGate.classList.remove('active');
+            mainContent.style.display = 'none';
+            if (coachExists) {
+                mainContent.style.display = 'flex';
+            } else {
+                coachGate.classList.add('active');
+            }
+        }
+
+        async function syncUIForUser(user) {
+            if (!user) {
+                applyCoachUI(false);
+                coachGate.classList.remove('active');
+                mainContent.style.display = 'none';
+                showModal(loginOverlay);
+                return;
+            }
+
+            hideModal(loginOverlay);
+            const coach = await fetchCoachForUser(user.uid);
+            applyCoachUI(!!coach);
+        }
+
+        let authReady = false;
+
+        auth.onAuthStateChanged(async (user) => {
+            if (!authReady) {
+                authReady = true;
+                document.body.classList.remove('auth-loading');
+            }
+            await syncUIForUser(user);
+        });
+
+        loginForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            loginError.style.display = 'none';
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            showLoading(loginSubmit, loginSpinner);
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                const user = auth.currentUser;
+                const coachQuery = await db.collection('coaches').where('userUID', '==', user.uid).limit(1).get();
+                const playerQuery = await db.collection('players').where('authenticationUID', '==', user.uid).limit(1).get();
+
+                if (coachQuery.empty && playerQuery.empty) {
+                    await auth.signOut();
+                    throw new Error('Account not found in system');
+                }
+                if (coachQuery.empty) {
+                    await auth.signOut();
+                    throw new Error('This page is for coaches only. Please sign in with a coach account.');
+                }
+
+                await db.collection('coaches').doc(coachQuery.docs[0].id).update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                hideModal(loginOverlay);
+                applyCoachUI(true);
+                mainContent.style.display = 'flex';
+                coachGate.classList.remove('active');
+            } catch (err) {
+                loginError.textContent = err.message || 'Sign in failed';
+                loginError.style.display = 'block';
+            } finally {
+                hideLoading(loginSubmit, loginSpinner);
+            }
+        });
+
+        addPlayerForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            formError.style.display = 'none';
+
+            const user = auth.currentUser;
+            if (!user) {
+                showModal(loginOverlay);
+                return;
+            }
+
+            const firstName = document.getElementById('firstName').value.trim();
+            const lastName = document.getElementById('lastName').value.trim();
+            const age = parseInt(document.getElementById('age').value, 10);
+            const hf = document.getElementById('heightFeet').value;
+            const hi = document.getElementById('heightInches').value;
+            const weightVal = document.getElementById('weight').value;
+
+            if (!firstName || !lastName) {
+                formError.textContent = 'Please enter first and last name.';
+                formError.style.display = 'block';
+                return;
+            }
+            if (!Number.isFinite(age) || age < 1 || age > 120) {
+                formError.textContent = 'Please enter a valid age.';
+                formError.style.display = 'block';
+                return;
+            }
+
+            const feet = hf === '' ? null : parseInt(hf, 10);
+            const inches = hi === '' ? null : parseInt(hi, 10);
+            if (feet !== null && (feet < 0 || feet > 8)) {
+                formError.textContent = 'Feet must be between 0 and 8.';
+                formError.style.display = 'block';
+                return;
+            }
+            if (inches !== null && (inches < 0 || inches > 11)) {
+                formError.textContent = 'Inches must be between 0 and 11.';
+                formError.style.display = 'block';
+                return;
+            }
+
+            let weight = null;
+            if (weightVal !== '') {
+                weight = parseFloat(weightVal);
+                if (!Number.isFinite(weight) || weight < 0) {
+                    formError.textContent = 'Please enter a valid weight.';
+                    formError.style.display = 'block';
+                    return;
+                }
+            }
+
+            showLoading(createBtn, createSpinner);
+
+            try {
+                const coachInfo = await fetchCoachForUser(user.uid);
+                if (!coachInfo) {
+                    throw new Error('Coach session expired. Please sign in again.');
+                }
+
+                const coachData = coachInfo.data;
+                const coachId = coachInfo.id;
+                const playerCode = generateCode('PLR', 4);
+
+                const playerRef = db.collection('players').doc();
+                const playerData = {
+                    firstName,
+                    lastName,
+                    age,
+                    code: playerCode,
+                    coachUID: user.uid,
+                    createdAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    updatedAt: firebase.firestore.FieldValue.serverTimestamp()
+                };
+
+                if (feet !== null || inches !== null) {
+                    playerData.height = {
+                        feet: feet !== null ? feet : 0,
+                        inches: inches !== null ? inches : 0
+                    };
+                }
+
+                if (weight !== null) {
+                    playerData.weight = weight;
+                }
+
+                if (coachData.org) {
+                    playerData.org = coachData.org;
+                }
+
+                const batch = db.batch();
+                batch.set(playerRef, playerData);
+
+                const coachRef = db.collection('coaches').doc(coachId);
+                batch.update(coachRef, {
+                    members: firebase.firestore.FieldValue.arrayUnion(playerRef.id),
+                    numberMembers: firebase.firestore.FieldValue.increment(1)
+                });
+
+                if (coachData.org) {
+                    batch.update(coachData.org, {
+                        players: firebase.firestore.FieldValue.arrayUnion(playerRef.id)
+                    });
+                }
+
+                await batch.commit();
+
+                successMessage.textContent = `Your profile has been created, ${firstName} ${lastName}`;
+                successCelebration.classList.remove('is-fading-out');
+                addPlayerForm.classList.add('is-hidden');
+                successCelebration.classList.add('is-visible');
+
+                setTimeout(() => {
+                    successCelebration.classList.add('is-fading-out');
+                }, 2000);
+
+                setTimeout(() => {
+                    successCelebration.classList.remove('is-visible', 'is-fading-out');
+                    addPlayerForm.classList.remove('is-hidden');
+                    addPlayerForm.reset();
+                    successMessage.textContent = 'Your profile has been created';
+                }, 2600);
+            } catch (err) {
+                console.error(err);
+                formError.textContent = err.message || 'Could not create profile.';
+                formError.style.display = 'block';
+            } finally {
+                hideLoading(createBtn, createSpinner);
+            }
+        });
+    </script>
+</body>
+</html>

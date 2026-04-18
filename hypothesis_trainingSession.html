@@ -352,7 +352,7 @@
         .hero-stage {
             flex: 1;
             position: relative;
-            min-height: 580px;
+            min-height: 640px;
         }
 
         #bgPoseCanvas {
@@ -369,8 +369,8 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 88%;
-            max-width: 520px;
+            width: 94%;
+            max-width: 680px;
             z-index: 3;
             border-radius: 18px;
             overflow: hidden;
@@ -450,7 +450,7 @@
 
         .hero-badge {
             position: absolute;
-            top: calc(50% + 210px);
+            top: calc(50% + 278px);
             left: 6%;
             z-index: 4;
             background: var(--white);
@@ -461,6 +461,8 @@
             display: flex;
             align-items: center;
             gap: 10px;
+            transform: scale(1.5);
+            transform-origin: left center;
         }
 
         .hero-badge-icon {
@@ -1325,17 +1327,18 @@
             }
 
             .hero-carousel-inset {
-                width: 90%;
-                max-width: 420px;
+                width: 94%;
+                max-width: 500px;
                 top: 50%;
                 left: 50%;
                 transform: translate(-50%, -50%);
             }
 
             .hero-badge {
-                top: calc(50% + 160px);
+                top: calc(50% + 200px);
                 left: 50%;
-                transform: translateX(-50%);
+                transform: translateX(-50%) scale(1);
+                transform-origin: center center;
             }
 
             .problem-grid {
@@ -1424,7 +1427,8 @@
                             <div class="hero-slide active"><img src="images/pose_strike.png" alt="Biomechanical kick analysis"></div>
                             <div class="hero-slide"><img src="images/jumpAnalysisMetrics.png" alt="Jump takeoff analysis metrics"></div>
                             <div class="hero-slide"><img src="images/sprintBreakdown.png" alt="Sprint mechanics pose analysis"></div>
-                            <div class="hero-slide"><img src="images/sprintBreakdown.png" alt="Sprint stride breakdown analysis"></div>
+                            <div class="hero-slide"><img src="images/stats.png" alt="Skill radar chart — current vs previous month"></div>
+                            <div class="hero-slide"><img src="images/contact.png" alt="Kicking contact analysis with body angles"></div>
                             <div class="hero-slide"><img src="images/jumpanalysis.PNG" alt="Full jump analysis view"></div>
                             <div class="hero-carousel-dots">
                                 <button class="hero-dot active" data-index="0"></button>
@@ -1432,13 +1436,14 @@
                                 <button class="hero-dot" data-index="2"></button>
                                 <button class="hero-dot" data-index="3"></button>
                                 <button class="hero-dot" data-index="4"></button>
+                                <button class="hero-dot" data-index="5"></button>
                             </div>
                         </div>
                     </div>
                     <div class="hero-badge">
                         <div class="hero-badge-icon">⚽</div>
                         <div class="hero-badge-text">
-                            $29/mo add-on · First month 50% off
+                            $49/mo add-on · First month 50% off
                             <span>Coach-led testing after training each month</span>
                         </div>
                     </div>
@@ -1602,10 +1607,10 @@
                     <p class="pricing-card-desc">Add PoseTek to your existing coaching or private training — your coach runs testing after training once per month; you get benchmarking, a personalized plan, and long-term progress tracking.</p>
                     <div class="pricing-amount">
                         <span class="pricing-dollar">$</span>
-                        <span class="pricing-value">29</span>
+                        <span class="pricing-value">49</span>
                         <span class="pricing-per">/month</span>
                     </div>
-                    <p class="pricing-intro-offer"><strong>First month 50% off</strong> — pay <strong>$14.50</strong> to start, then <strong>$29/month</strong> after that.</p>
+                    <p class="pricing-intro-offer"><strong>First month 50% off</strong> — pay <strong>$24.50</strong> to start, then <strong>$49/month</strong> after that.</p>
                     <ul class="pricing-features">
                         <li>Once-per-month diagnostic after training (coach-led capture)</li>
                         <li>Full athletic diagnostic suite every month — explosive power, speed, agility &amp; power transfer</li>
@@ -1620,7 +1625,7 @@
                     <a href="#addon-signup" class="pricing-btn">Add tracking to your sessions</a>
                 </div>
                 <p style="text-align: center; font-size: 0.88rem; color: var(--text-mid); margin-top: 1.5rem;">
-                    $29/month as an add-on to your sessions — first month half price. Cancel anytime.
+                    $49/month as an add-on to your sessions — first month half price. Cancel anytime.
                 </p>
             </div>
         </section>
@@ -1639,7 +1644,7 @@
             <div class="cta-inner">
                 <span class="section-label">Ready to Train With Proof?</span>
                 <h2 class="section-title">Stop Guessing. Start Tracking.<br><em>Know What's Working.</em></h2>
-                <p>You're already investing in coaching and private training. For <strong>$29/month</strong> add-on (<strong>$14.50</strong> first month), get coach-led monthly testing and the data that shows whether it's translating to the field — and what to fix if it's not.</p>
+                <p>You're already investing in coaching and private training. For <strong>$49/month</strong> add-on (<strong>$24.50</strong> first month), get coach-led monthly testing and the data that shows whether it's translating to the field — and what to fix if it's not.</p>
                 <p class="cta-coach-note" id="addonCoachContext" hidden></p>
                 <div class="cta-signup-slot" id="addonSignupSlot">
                     <div class="cta-signup-form-wrap" id="addonFormWrap">
@@ -1747,7 +1752,7 @@
                         name: name,
                         email: email,
                         coach: coach,
-                        offer: 'sessionAddon29',
+                        offer: 'sessionAddon49',
                         submittedAt: firebase.firestore.FieldValue.serverTimestamp()
                     };
                     db.collection('hypothesis_trainingSession').add(payload).then(function () {

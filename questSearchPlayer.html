@@ -1,0 +1,957 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="mobile-web-app-capable" content="yes">
+    <script type="text/javascript">
+    (function(c,l,a,r,i,t,y){
+        c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+        t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+        y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+    })(window, document, "clarity", "script", "w8lex8gzl7");
+    </script>
+    <title>PoseTek — Quest · Select player</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0" rel="stylesheet" />
+    <style>
+        :root {
+            --primary: #1a3a2e;
+            --secondary: #2d5e4a;
+            --accent: #4c8c6a;
+            --accent-light: #5ea87e;
+            --text-light: #ffffff;
+            --text-muted: rgba(255, 255, 255, 0.7);
+            --text-dark: #1a1a1a;
+            --card-bg: rgba(255, 255, 255, 0.08);
+            --card-border: rgba(255, 255, 255, 0.1);
+            --sheet-bg: linear-gradient(145deg, rgba(26, 58, 46, 0.96), rgba(45, 94, 74, 0.9));
+            --sheet-border: rgba(76, 140, 106, 0.35);
+            --sheet-header-bg: linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.08));
+            --sheet-muted: rgba(255, 255, 255, 0.58);
+            --sheet-text: rgba(255, 255, 255, 0.94);
+            --sheet-input-bg: rgba(0, 0, 0, 0.22);
+            --sheet-input-border: rgba(255, 255, 255, 0.14);
+            --transition: all 0.3s cubic-bezier(0.165, 0.84, 0.44, 1);
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            -webkit-tap-highlight-color: rgba(76, 140, 106, 0.3);
+        }
+
+        html {
+            height: 100%;
+            overflow: hidden;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: var(--primary);
+            color: var(--text-light);
+            -webkit-font-smoothing: antialiased;
+            height: 100%;
+            max-height: 100dvh;
+            line-height: 1.45;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            padding: env(safe-area-inset-top) env(safe-area-inset-right) env(safe-area-inset-bottom) env(safe-area-inset-left);
+        }
+
+        body::before {
+            content: '';
+            position: fixed;
+            inset: 0;
+            background: radial-gradient(ellipse 80% 60% at 20% 10%, rgba(76, 140, 106, 0.08), transparent),
+                radial-gradient(ellipse 60% 50% at 80% 80%, rgba(76, 140, 106, 0.05), transparent);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        body.auth-loading #appRoot {
+            opacity: 0;
+            pointer-events: none;
+        }
+
+        header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-shrink: 0;
+            padding: 0.45rem 1rem;
+            background: rgba(15, 31, 27, 0.85);
+            z-index: 100;
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--card-border);
+        }
+
+        .logo {
+            font-family: 'Poppins', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            letter-spacing: -0.5px;
+            background: linear-gradient(135deg, var(--text-light), var(--accent-light));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-decoration: none;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .header-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            padding: 0.45rem 0.85rem;
+            background: var(--card-bg);
+            border: 1px solid var(--card-border);
+            border-radius: 8px;
+            color: var(--text-muted);
+            font-family: 'Inter', sans-serif;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .header-btn:hover {
+            background: rgba(255, 255, 255, 0.12);
+            color: var(--text-light);
+        }
+
+        .live-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.35rem;
+            font-size: 0.72rem;
+            font-weight: 600;
+            color: var(--accent-light);
+            opacity: 0;
+            transition: opacity 0.2s ease;
+        }
+
+        .live-badge.visible {
+            opacity: 1;
+        }
+
+        .live-dot {
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            background: #4ade80;
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.8);
+            animation: pulseDot 2s ease-in-out infinite;
+        }
+
+        @keyframes pulseDot {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.55; }
+        }
+
+        .page-shell {
+            position: relative;
+            z-index: 1;
+            flex: 1;
+            min-height: 0;
+            width: 100%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 1rem 1.25rem 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .roster-toolbar {
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
+            flex-shrink: 0;
+        }
+
+        .search-wrapper {
+            position: relative;
+            width: 100%;
+            max-width: 360px;
+        }
+
+        .search-wrapper .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 0.85rem;
+            transform: translateY(-50%);
+            font-size: 1.15rem;
+            color: rgba(255, 255, 255, 0.5);
+            pointer-events: none;
+        }
+
+        .sheet-card {
+            background: var(--sheet-bg);
+            border-radius: 12px;
+            box-shadow:
+                0 18px 48px rgba(0, 0, 0, 0.28),
+                0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+            border: 1px solid var(--sheet-border);
+            overflow: hidden;
+            margin-bottom: 0;
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+        }
+
+        .sheet-card-header {
+            padding: 0.45rem 0.85rem 0.4rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            background: var(--sheet-header-bg);
+        }
+
+        .sheet-card-header h2 {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.88rem;
+            font-weight: 600;
+            color: var(--sheet-text);
+            line-height: 1.25;
+        }
+
+        .sheet-card-body {
+            padding: 0.5rem 0.85rem 0.55rem;
+        }
+
+        .input-field {
+            width: 100%;
+            padding: 0.4rem 0.55rem;
+            border-radius: 8px;
+            border: 1px solid var(--sheet-input-border);
+            background: var(--sheet-input-bg);
+            color: var(--text-light);
+            font-family: inherit;
+            font-size: 0.85rem;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.12) inset;
+        }
+
+        .input-field:focus {
+            outline: none;
+            border-color: var(--accent);
+            box-shadow: 0 0 0 3px rgba(76, 140, 106, 0.18), 0 4px 14px rgba(0, 0, 0, 0.1) inset;
+        }
+
+        .input-field::placeholder {
+            color: rgba(255, 255, 255, 0.42);
+        }
+
+        .search-input {
+            padding: 0.6rem 0.85rem 0.6rem 2.5rem;
+            border-radius: 12px;
+            font-size: 0.9rem;
+            background: rgba(255, 255, 255, 0.06);
+            border: 1px solid rgba(255, 255, 255, 0.12);
+            box-shadow: 0 4px 14px rgba(0, 0, 0, 0.18) inset;
+        }
+
+        .form-group {
+            margin-bottom: 0.35rem;
+        }
+
+        .submit-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            width: 100%;
+            margin-top: 0.25rem;
+            padding: 0.5rem 1rem;
+            border-radius: 10px;
+            background: linear-gradient(135deg, #ffffff, #e8f5e9);
+            color: var(--primary);
+            border: none;
+            font-family: 'Inter', sans-serif;
+            font-weight: 700;
+            font-size: 0.88rem;
+            cursor: pointer;
+            transition: var(--transition);
+            box-shadow: 0 6px 22px rgba(0, 0, 0, 0.25), 0 0 0 1px rgba(255, 255, 255, 0.12) inset;
+            touch-action: manipulation;
+        }
+
+        .submit-btn:hover:not(:disabled) {
+            filter: brightness(1.03);
+            transform: translateY(-2px);
+            box-shadow: 0 10px 28px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.18) inset;
+        }
+
+        .submit-btn:disabled {
+            opacity: 0.65;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .submit-btn .spinner {
+            display: none;
+            width: 18px;
+            height: 18px;
+            border: 2px solid rgba(26, 58, 46, 0.25);
+            border-radius: 50%;
+            border-top-color: var(--primary);
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .players-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+            gap: 0.75rem;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            flex: 1;
+            min-height: 0;
+            padding: 0.25rem 0.25rem 0.5rem 0;
+            align-content: start;
+        }
+
+        .player-card {
+            background-color: var(--card-bg);
+            border-radius: 14px;
+            padding: 1rem 0.85rem;
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--card-border);
+            transition: var(--transition);
+            cursor: pointer;
+            touch-action: manipulation;
+            -webkit-user-select: none;
+            user-select: none;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            gap: 0.5rem;
+            min-height: 0;
+        }
+
+        .player-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+            border-color: var(--accent);
+        }
+
+        .player-card:active {
+            transform: translateY(-1px) scale(0.99);
+        }
+
+        .player-avatar {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: linear-gradient(145deg, rgba(76, 140, 106, 0.35), rgba(45, 94, 74, 0.55));
+            border: 1px solid rgba(255, 255, 255, 0.14);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: rgba(255, 255, 255, 0.82);
+            flex-shrink: 0;
+        }
+
+        .player-avatar .material-symbols-outlined {
+            font-size: 2.25rem;
+            font-variation-settings: 'FILL' 1;
+        }
+
+        .player-name {
+            font-family: 'Poppins', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 600;
+            color: var(--text-light);
+            line-height: 1.2;
+            word-break: break-word;
+        }
+
+        .player-age {
+            font-size: 0.78rem;
+            font-weight: 500;
+            color: var(--text-muted);
+            letter-spacing: 0.02em;
+        }
+
+        .empty-state {
+            grid-column: 1 / -1;
+            text-align: center;
+            padding: 1.5rem 0.75rem;
+            color: var(--sheet-muted);
+            font-size: 0.88rem;
+        }
+
+        @media (min-width: 1200px) {
+            .players-grid {
+                grid-template-columns: repeat(6, minmax(0, 1fr));
+            }
+        }
+
+        @media (max-width: 520px) {
+            .page-shell {
+                padding: 0.75rem 0.85rem 1rem;
+                gap: 0.75rem;
+            }
+            .players-grid {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+                gap: 0.6rem;
+            }
+            .player-card {
+                padding: 0.75rem 0.6rem;
+            }
+            .player-avatar {
+                width: 52px;
+                height: 52px;
+            }
+            .player-avatar .material-symbols-outlined {
+                font-size: 2rem;
+            }
+        }
+
+        /* Login modal */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, rgba(26, 58, 46, 0.97), rgba(45, 94, 74, 0.95));
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: var(--transition);
+        }
+
+        .modal-overlay.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .auth-modal {
+            background: linear-gradient(145deg, rgba(26, 58, 46, 0.95), rgba(45, 94, 74, 0.9));
+            padding: 0;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 440px;
+            max-height: 90vh;
+            overflow: hidden;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5),
+                0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+            transform: scale(0.95) translateY(20px);
+            transition: var(--transition);
+            border: 1px solid rgba(76, 140, 106, 0.2);
+        }
+
+        .modal-overlay.active .auth-modal {
+            transform: scale(1) translateY(0);
+        }
+
+        .modal-content-wrapper {
+            padding: 2.5rem 2rem;
+            max-height: 90vh;
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+
+        .modal-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, #ffffff, #4c8c6a);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .login-form .form-group label {
+            display: block;
+            font-size: 0.88rem;
+            font-weight: 600;
+            margin-bottom: 0.4rem;
+            color: rgba(255, 255, 255, 0.9);
+        }
+
+        .login-form .input-field {
+            background: rgba(0, 0, 0, 0.2);
+        }
+
+        .login-error {
+            color: #ffb4b4;
+            font-size: 0.88rem;
+            margin-top: 0.75rem;
+            display: none;
+        }
+
+        #mainContent {
+            flex: 1;
+            min-height: 0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            gap: 1.5rem;
+        }
+
+        #coachGate {
+            display: none;
+            flex: 1;
+            min-height: 0;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            padding: 0.5rem;
+        }
+
+        #coachGate.active {
+            display: flex;
+        }
+
+        #coachGate p {
+            color: var(--text-muted);
+            margin-bottom: 0.5rem;
+            font-size: 0.82rem;
+        }
+
+        #coachGate .sheet-card-body {
+            padding: 0.75rem 1rem;
+        }
+
+        #appRoot {
+            transition: opacity 0.25s ease;
+        }
+
+        @media (max-width: 520px) {
+            header {
+                padding: 0.4rem 0.85rem;
+            }
+            .input-field {
+                font-size: max(0.85rem, 16px);
+            }
+        }
+
+    </style>
+</head>
+<body class="auth-loading">
+    <header>
+        <a href="index.html" class="logo">PoseTek</a>
+        <div class="header-actions">
+            <span id="liveBadge" class="live-badge" aria-live="polite"><span class="live-dot"></span> Live</span>
+            <button type="button" class="header-btn" id="headerAuthBtn" hidden>
+                <span class="material-symbols-outlined" style="font-size:1.1rem;">login</span>
+                <span id="headerAuthLabel">Login</span>
+            </button>
+        </div>
+    </header>
+
+    <div id="loginOverlay" class="modal-overlay">
+        <div class="auth-modal">
+            <div class="modal-content-wrapper">
+                <h2 class="modal-title">Coach login</h2>
+                <form class="login-form" id="loginForm" novalidate>
+                    <div class="form-group">
+                        <label for="loginEmail">Email</label>
+                        <input type="email" id="loginEmail" class="input-field" required autocomplete="email" placeholder="you@example.com">
+                    </div>
+                    <div class="form-group">
+                        <label for="loginPassword">Password</label>
+                        <input type="password" id="loginPassword" class="input-field" required autocomplete="current-password" placeholder="Password">
+                    </div>
+                    <div class="login-error" id="loginError" role="alert"></div>
+                    <button type="submit" class="submit-btn" id="loginSubmit">
+                        <span>Sign in</span>
+                        <span class="spinner" id="loginSpinner"></span>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <main class="page-shell" id="appRoot">
+        <div id="coachGate">
+            <div class="sheet-card">
+                <div class="sheet-card-body">
+                    <p style="color: var(--sheet-text); font-weight: 600;">Coach account required</p>
+                    <p>This page is only for coaches. Sign in with a coach account, or use the main site to register.</p>
+                    <a href="kickai.html" class="submit-btn" style="display:inline-flex; width:auto; text-decoration:none;">Go to Kick AI</a>
+                </div>
+            </div>
+        </div>
+
+        <div id="mainContent" style="display: none;">
+            <div class="roster-toolbar">
+                <div class="search-wrapper">
+                    <span class="material-symbols-outlined search-icon">search</span>
+                    <input type="search" id="playerSearch" class="input-field search-input" placeholder="Search players" autocomplete="off" aria-label="Search players">
+                </div>
+            </div>
+
+            <div id="playersGrid" class="players-grid" aria-live="polite"></div>
+        </div>
+    </main>
+
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore-compat.js"></script>
+    <script>
+        const QUEST_CACHE_KEY = 'posetek.quest.rosterCache.v1';
+
+        function readCache() {
+            try {
+                return JSON.parse(sessionStorage.getItem(QUEST_CACHE_KEY)) || null;
+            } catch (e) {
+                return null;
+            }
+        }
+
+        function writeCache(c) {
+            try {
+                c.updatedAt = Date.now();
+                sessionStorage.setItem(QUEST_CACHE_KEY, JSON.stringify(c));
+            } catch (e) {
+                console.warn('quest roster cache write failed', e);
+            }
+        }
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyBSfyXyhmD4kYGRSg-jOmGeLeOO8hX0-Gs",
+            authDomain: "kickai-69dd0.firebaseapp.com",
+            projectId: "kickai-69dd0",
+            storageBucket: "kickai-69dd0.firebasestorage.app",
+            messagingSenderId: "839600313930",
+            appId: "1:839600313930:web:13b1e94c2c540561e3f8b3",
+            measurementId: "G-RX99K62ZEH"
+        };
+
+        firebase.initializeApp(firebaseConfig);
+        const auth = firebase.auth();
+        const db = firebase.firestore();
+        const FieldPath = firebase.firestore.FieldPath;
+
+        const loginOverlay = document.getElementById('loginOverlay');
+        const loginForm = document.getElementById('loginForm');
+        const loginError = document.getElementById('loginError');
+        const loginSubmit = document.getElementById('loginSubmit');
+        const loginSpinner = document.getElementById('loginSpinner');
+        const headerAuthBtn = document.getElementById('headerAuthBtn');
+        const headerAuthLabel = document.getElementById('headerAuthLabel');
+        const coachGate = document.getElementById('coachGate');
+        const mainContent = document.getElementById('mainContent');
+        const playersGrid = document.getElementById('playersGrid');
+        const playerSearch = document.getElementById('playerSearch');
+        const liveBadge = document.getElementById('liveBadge');
+
+        let coachDocUnsub = null;
+        let currentCoachDocId = null;
+
+        function showLoading(btn, spinner) {
+            btn.disabled = true;
+            const label = btn.querySelector('span:first-child');
+            if (label) label.style.opacity = '0.5';
+            spinner.style.display = 'block';
+        }
+
+        function hideLoading(btn, spinner) {
+            btn.disabled = false;
+            const label = btn.querySelector('span:first-child');
+            if (label) label.style.opacity = '1';
+            spinner.style.display = 'none';
+        }
+
+        function showModal(overlay) {
+            document.body.style.overflow = 'hidden';
+            overlay.classList.add('active');
+        }
+
+        function hideModal(overlay) {
+            overlay.classList.remove('active');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function membersEqual(a, b) {
+            if (!a || !b || a.length !== b.length) return false;
+            const sa = [...a].sort();
+            const sb = [...b].sort();
+            return sa.every((id, i) => id === sb[i]);
+        }
+
+        async function fetchCoachForUser(uid) {
+            const q = await db.collection('coaches').where('userUID', '==', uid).limit(1).get();
+            if (q.empty) return null;
+            const doc = q.docs[0];
+            return { id: doc.id, data: doc.data(), ref: doc.ref };
+        }
+
+        async function batchFetchPlayers(ids, playersMap) {
+            const batchSize = 10;
+            for (let i = 0; i < ids.length; i += batchSize) {
+                const batch = ids.slice(i, i + batchSize);
+                const snap = await db.collection('players').where(FieldPath.documentId(), 'in', batch).get();
+                snap.forEach(function (doc) {
+                    const pd = doc.data();
+                    playersMap[doc.id] = {
+                        id: doc.id,
+                        firstName: pd.firstName || '',
+                        lastName: pd.lastName || '',
+                        code: pd.code || '',
+                        age: (typeof pd.age === 'number') ? pd.age : (pd.age != null ? Number(pd.age) : null)
+                    };
+                });
+            }
+        }
+
+        function getSearchQuery() {
+            return (playerSearch && playerSearch.value) ? playerSearch.value.trim().toLowerCase() : '';
+        }
+
+        function renderGrid(cache) {
+            if (!playersGrid || !cache || !cache.players) return;
+            const q = getSearchQuery();
+            const memberOrder = cache.members || [];
+            const list = memberOrder.map(function (id) { return cache.players[id]; }).filter(Boolean);
+
+            const filtered = q
+                ? list.filter(function (p) {
+                    const name = ((p.firstName || '') + ' ' + (p.lastName || '')).toLowerCase();
+                    const code = (p.code || '').toLowerCase();
+                    return name.includes(q) || code.includes(q);
+                })
+                : list;
+
+            playersGrid.innerHTML = '';
+            if (filtered.length === 0) {
+                const empty = document.createElement('div');
+                empty.className = 'empty-state';
+                empty.textContent = list.length === 0
+                    ? 'No players yet. Add players from Quest Add Player.'
+                    : 'No matches. Try a different search.';
+                playersGrid.appendChild(empty);
+                return;
+            }
+
+            function escapeHtml(s) {
+                return String(s == null ? '' : s)
+                    .replace(/&/g, '&amp;')
+                    .replace(/</g, '&lt;')
+                    .replace(/>/g, '&gt;')
+                    .replace(/"/g, '&quot;')
+                    .replace(/'/g, '&#39;');
+            }
+
+            filtered.forEach(function (p) {
+                const card = document.createElement('div');
+                card.className = 'player-card';
+                card.setAttribute('role', 'button');
+                card.tabIndex = 0;
+                const fullName = (String(p.firstName || '') + ' ' + String(p.lastName || '')).trim() || 'Unnamed player';
+                const ageText = (Number.isFinite(p.age) && p.age > 0) ? (p.age + ' yrs') : '—';
+                card.setAttribute('aria-label', fullName + ', ' + ageText);
+                card.innerHTML =
+                    '<div class="player-avatar" aria-hidden="true">' +
+                        '<span class="material-symbols-outlined">person</span>' +
+                    '</div>' +
+                    '<div class="player-name">' + escapeHtml(fullName) + '</div>' +
+                    '<div class="player-age">' + escapeHtml(ageText) + '</div>';
+                function go() {
+                    window.location.href = 'questViewBiomechanics.html?player=' + encodeURIComponent(p.id);
+                }
+                card.addEventListener('click', go);
+                card.addEventListener('keydown', function (e) {
+                    if (e.key === 'Enter' || e.key === ' ') {
+                        e.preventDefault();
+                        go();
+                    }
+                });
+                playersGrid.appendChild(card);
+            });
+        }
+
+        function stopRoster() {
+            if (coachDocUnsub) {
+                try { coachDocUnsub(); } catch (e) {}
+                coachDocUnsub = null;
+            }
+            currentCoachDocId = null;
+            if (liveBadge) liveBadge.classList.remove('visible');
+        }
+
+        function startRoster(user) {
+            stopRoster();
+            if (!user) return;
+
+            const cacheWarm = readCache();
+            if (cacheWarm && cacheWarm.coachUid === user.uid && cacheWarm.players && Object.keys(cacheWarm.players).length) {
+                renderGrid(cacheWarm);
+            } else {
+                playersGrid.innerHTML = '<div class="empty-state">Loading roster…</div>';
+            }
+
+            fetchCoachForUser(user.uid).then(function (coachInfo) {
+                if (!coachInfo || !user || auth.currentUser.uid !== user.uid) return;
+                currentCoachDocId = coachInfo.id;
+
+                coachDocUnsub = db.collection('coaches').doc(coachInfo.id).onSnapshot(async function (snap) {
+                    if (!snap.exists) return;
+                    const d = snap.data();
+                    const nextMembers = d.members || [];
+                    const nm = typeof d.numberMembers === 'number' ? d.numberMembers : nextMembers.length;
+
+                    let c = readCache();
+                    if (!c || c.coachUid !== user.uid) {
+                        c = { coachId: coachInfo.id, coachUid: user.uid, members: [], players: {}, numberMembers: 0 };
+                    }
+                    c.coachId = coachInfo.id;
+
+                    if (membersEqual(nextMembers, c.members) && nm === c.numberMembers) {
+                        if (liveBadge) liveBadge.classList.add('visible');
+                        return;
+                    }
+
+                    const newIds = nextMembers.filter(function (id) { return !c.players[id]; });
+                    const removedIds = c.members.filter(function (id) { return nextMembers.indexOf(id) === -1; });
+                    removedIds.forEach(function (id) { delete c.players[id]; });
+
+                    c.members = nextMembers.slice();
+                    c.numberMembers = nm;
+
+                    if (newIds.length) {
+                        await batchFetchPlayers(newIds, c.players);
+                    }
+
+                    writeCache(c);
+                    renderGrid(c);
+                    if (liveBadge) liveBadge.classList.add('visible');
+                }, function (err) {
+                    console.error('Coach snapshot error', err);
+                });
+            }).catch(function (e) {
+                console.error(e);
+                playersGrid.innerHTML = '<div class="empty-state">Could not load roster.</div>';
+            });
+        }
+
+        if (playerSearch) {
+            playerSearch.addEventListener('input', function () {
+                const c = readCache();
+                if (c && c.coachUid === (auth.currentUser && auth.currentUser.uid)) renderGrid(c);
+            });
+        }
+
+        function applyCoachUI(coachExists) {
+            coachGate.classList.remove('active');
+            mainContent.style.display = 'none';
+            if (coachExists) {
+                mainContent.style.display = 'flex';
+            } else {
+                coachGate.classList.add('active');
+            }
+        }
+
+        function updateHeaderAuth(user) {
+            headerAuthBtn.hidden = false;
+            if (user) {
+                headerAuthLabel.textContent = 'Logout';
+                headerAuthBtn.querySelector('.material-symbols-outlined').textContent = 'logout';
+                headerAuthBtn.onclick = function () {
+                    stopRoster();
+                    auth.signOut().then(function () { window.location.reload(); });
+                };
+            } else {
+                headerAuthLabel.textContent = 'Login';
+                headerAuthBtn.querySelector('.material-symbols-outlined').textContent = 'login';
+                headerAuthBtn.onclick = function () { showModal(loginOverlay); };
+            }
+        }
+
+        async function syncUIForUser(user) {
+            if (!user) {
+                stopRoster();
+                applyCoachUI(false);
+                coachGate.classList.remove('active');
+                mainContent.style.display = 'none';
+                showModal(loginOverlay);
+                updateHeaderAuth(null);
+                return;
+            }
+
+            hideModal(loginOverlay);
+            const coach = await fetchCoachForUser(user.uid);
+            updateHeaderAuth(user);
+            applyCoachUI(!!coach);
+            if (coach) {
+                startRoster(user);
+            } else {
+                stopRoster();
+            }
+        }
+
+        let authReady = false;
+
+        auth.onAuthStateChanged(async function (user) {
+            if (!authReady) {
+                authReady = true;
+                document.body.classList.remove('auth-loading');
+            }
+            await syncUIForUser(user);
+        });
+
+        loginForm.addEventListener('submit', async function (e) {
+            e.preventDefault();
+            loginError.style.display = 'none';
+            const email = document.getElementById('loginEmail').value.trim();
+            const password = document.getElementById('loginPassword').value;
+
+            showLoading(loginSubmit, loginSpinner);
+            try {
+                await auth.signInWithEmailAndPassword(email, password);
+                const user = auth.currentUser;
+                const coachQuery = await db.collection('coaches').where('userUID', '==', user.uid).limit(1).get();
+                const playerQuery = await db.collection('players').where('authenticationUID', '==', user.uid).limit(1).get();
+
+                if (coachQuery.empty && playerQuery.empty) {
+                    await auth.signOut();
+                    throw new Error('Account not found in system');
+                }
+                if (coachQuery.empty) {
+                    await auth.signOut();
+                    throw new Error('This page is for coaches only. Please sign in with a coach account.');
+                }
+
+                await db.collection('coaches').doc(coachQuery.docs[0].id).update({
+                    lastLogin: firebase.firestore.FieldValue.serverTimestamp()
+                });
+
+                hideModal(loginOverlay);
+                applyCoachUI(true);
+                mainContent.style.display = 'flex';
+                coachGate.classList.remove('active');
+                updateHeaderAuth(user);
+                startRoster(user);
+            } catch (err) {
+                loginError.textContent = err.message || 'Sign in failed';
+                loginError.style.display = 'block';
+            } finally {
+                hideLoading(loginSubmit, loginSpinner);
+            }
+        });
+
+        window.addEventListener('beforeunload', function () {
+            stopRoster();
+        });
+    </script>
+</body>
+</html>
