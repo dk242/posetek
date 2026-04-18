@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>PoseTek — 6×3 Banner</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;700;800;900&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body {
+      background: #0a0a0a;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      min-height: 100vh;
+      gap: 1.2rem;
+      padding: 1.5rem;
+    }
+    canvas {
+      max-width: 100%;
+      border: 1px solid rgba(255,255,255,0.08);
+      border-radius: 4px;
+    }
+    .controls {
+      display: flex;
+      gap: 0.75rem;
+    }
+    button {
+      padding: 0.55rem 1.4rem;
+      background: #4ade80;
+      color: #0d1f18;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      font-family: 'Inter', sans-serif;
+      letter-spacing: 0.3px;
+    }
+    button:hover { background: #22c55e; }
+    p {
+      color: rgba(255,255,255,0.35);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.78rem;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="banner" width="3600" height="1800"></canvas>
+  <div class="controls">
+    <button onclick="downloadBanner()">Download PNG (1800×900)</button>
+  </div>
+  <p>Designed at 600 DPI → prints at 6" × 3"</p>
+
+  <script>
+    // ── Same connection table + colours as hypothesis_trainingSession.html ──
+    const POSE_CONNECTIONS = [
+      /* torso */
+      [11,12],[12,24],[24,23],[23,11],
+      /* L arm */
+      [11,13],[13,15],[15,17],[15,19],[15,21],[17,19],
+      /* R arm */
+      [12,14],[14,16],[16,18],[16,20],[16,22],[18,20],
+      /* L leg */
+      [23,25],[25,27],[27,29],[27,31],[29,31],
+      /* R leg */
+      [24,26],[26,28],[28,30],[28,32],[30,32]
+    ];
+    const CONN_COLORS = [
+      '#4ade80','#4ade80','#4ade80','#4ade80',
+      '#4d90d4','#4d90d4','#4d90d4','#4d90d4','#4d90d4','#4d90d4',
+      '#e8834d','#e8834d','#e8834d','#e8834d','#e8834d','#e8834d',
+      '#9b72c4','#9b72c4','#9b72c4','#9b72c4','#9b72c4',
+      '#d4aa40','#d4aa40','#d4aa40','#d4aa40','#d4aa40'
+    ];
+
+    // ── KICK — real Firebase pose.json frame, scaled to left third of canvas ──
+    // Raw [x,y] → canvas: x = xn*2100−7,  y = yn*2100−432
+    // ── JUMP — real Firebase frame, scaled 0.85× centred at x=1300, elevated 46px ──
+    // Transform: new_x = round(xOrig*0.85 + 59),  new_y = round(yOrig*0.85 − 46)
+    const jumpPts = [
+      [1341, 114],  //  0 nose
+      [1335, 106],  //  1 l_eye_inner
+      [1336, 106],  //  2 l_eye
+      [1337, 106],  //  3 l_eye_outer
+      [1324, 105],  //  4 r_eye_inner
+      [1317, 105],  //  5 r_eye
+      [1311, 104],  //  6 r_eye_outer
+      [1319, 113],  //  7 l_ear
+      [1285, 110],  //  8 r_ear
+      [1340, 127],  //  9 l_mouth
+      [1328, 126],  // 10 r_mouth
+      [1330, 172],  // 11 l_shoulder
+      [1254, 159],  // 12 r_shoulder
+      [1436, 117],  // 13 l_elbow  — arm raised
+      [1403, 102],  // 14 r_elbow  — arm raised
+      [1457,  36],  // 15 l_wrist  — above head
+      [1428,  10],  // 16 r_wrist  — above head
+      [1456,  17],  // 17 l_pinky
+      [1429, -12],  // 18 r_pinky  (above canvas)
+      [1449,  12],  // 19 l_index
+      [1418, -15],  // 20 r_index  (above canvas)
+      [1448,  19],  // 21 l_thumb
+      [1419,  -8],  // 22 r_thumb  (above canvas)
+      [1338, 354],  // 23 l_hip
+      [1280, 350],  // 24 r_hip
+      [1320, 489],  // 25 l_knee
+      [1295, 501],  // 26 r_knee
+      [1271, 633],  // 27 l_ankle
+      [1249, 654],  // 28 r_ankle
+      [1234, 654],  // 29 l_heel
+      [1211, 673],  // 30 r_heel
+      [1335, 681],  // 31 l_foot_index
+      [1330, 705],  // 32 r_foot_index
+    ];
+
+    const canvas = document.getElementById('banner');
+    const ctx = canvas.getContext('2d');
+    const W = 1800, H = 900;
+
+    // ── Background ──────────────────────────────────────────────────────────
+    function drawBackground() {
+      // Base gradient
+      const bg = ctx.createLinearGradient(0, 0, W, H);
+      bg.addColorStop(0,   '#0c1f17');
+      bg.addColorStop(0.5, '#162e20');
+      bg.addColorStop(1,   '#0c1f17');
+      ctx.fillStyle = bg;
+      ctx.fillRect(0, 0, W, H);
+
+      // Subtle grid
+      ctx.save();
+      ctx.strokeStyle = 'rgba(74,222,128,0.04)';
+      ctx.lineWidth = 1;
+      for (let x = 0; x <= W; x += 60) { ctx.beginPath(); ctx.moveTo(x,0); ctx.lineTo(x,H); ctx.stroke(); }
+      for (let y = 0; y <= H; y += 60) { ctx.beginPath(); ctx.moveTo(0,y); ctx.lineTo(W,y); ctx.stroke(); }
+      ctx.restore();
+
+      // Center ambient glow
+      const cg = ctx.createRadialGradient(W/2, H/2, 0, W/2, H/2, 320);
+      cg.addColorStop(0, 'rgba(74,222,128,0.07)');
+      cg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = cg;
+      ctx.fillRect(0, 0, W, H);
+
+      // Jump figure ambient glow
+      const rg = ctx.createRadialGradient(1300, H*0.45, 0, 1300, H*0.45, 360);
+      rg.addColorStop(0, 'rgba(155,114,196,0.10)');
+      rg.addColorStop(1, 'rgba(0,0,0,0)');
+      ctx.fillStyle = rg;
+      ctx.fillRect(0, 0, W, H);
+    }
+
+    // ── Draw one skeleton figure ────────────────────────────────────────────
+    function drawFigure(pts, figureGlow) {
+      if (!pts) return;
+      ctx.save();
+
+      // Skeleton bones
+      ctx.shadowBlur = 14;
+      ctx.shadowColor = figureGlow;
+      ctx.lineCap = 'round';
+      ctx.lineJoin = 'round';
+      ctx.lineWidth = 6;
+      for (let ci = 0; ci < POSE_CONNECTIONS.length; ci++) {
+        const [a, b] = POSE_CONNECTIONS[ci];
+        const A = pts[a], B = pts[b];
+        if (!A || !B) continue;
+        ctx.strokeStyle = CONN_COLORS[ci];
+        ctx.beginPath();
+        ctx.moveTo(A[0], A[1]);
+        ctx.lineTo(B[0], B[1]);
+        ctx.stroke();
+      }
+
+      // Joint dots — body joints + key face points (nose, eyes, ears)
+      ctx.shadowBlur = 10;
+      ctx.fillStyle = '#00ff88';
+      const dotR = 5.5;
+      const dotIndices = [0,2,5,7,8,11,12,13,14,15,16,23,24,25,26,27,28,29,30,31,32];
+      for (const i of dotIndices) {
+        const p = pts[i];
+        if (!p) continue;
+        ctx.beginPath();
+        ctx.arc(p[0], p[1], dotR, 0, Math.PI*2);
+        ctx.fill();
+      }
+
+      ctx.restore();
+    }
+
+    // ── Logo + labels ───────────────────────────────────────────────────────
+    function drawLogo() {
+      ctx.save();
+      ctx.textBaseline = 'middle';
+
+      // Large "PoseTek" — split into two colours
+      ctx.font = '900 118px "Inter", Arial, sans-serif';
+      ctx.shadowBlur = 35;
+      ctx.shadowColor = 'rgba(74,222,128,0.28)';
+
+      const poseW = ctx.measureText('Pose').width;
+      const tekW  = ctx.measureText('Tek').width;
+      const logoX = W/2 - (poseW + tekW) / 2;
+      const logoY = H/2 - 68;
+
+      ctx.textAlign = 'left';
+      ctx.fillStyle = '#ffffff';
+      ctx.fillText('Pose', logoX, logoY);
+      ctx.fillStyle = '#4ade80';
+      ctx.fillText('Tek', logoX + poseW, logoY);
+
+      ctx.restore();
+    }
+
+    // ── Elevation effect — ground line + dashed vertical to chest ────────────
+    function drawElevationLine() {
+      // figure chest centre (midpoint between shoulder-mid and hip-mid)
+      const chestX = 1300;
+      const chestY = 220;
+      const groundY = 810;
+
+      ctx.save();
+      ctx.lineCap = 'round';
+
+      // Horizontal ground dash
+      ctx.strokeStyle = 'rgba(155,114,196,0.30)';
+      ctx.lineWidth = 2;
+      ctx.setLineDash([10, 7]);
+      ctx.beginPath();
+      ctx.moveTo(1160, groundY);
+      ctx.lineTo(1440, groundY);
+      ctx.stroke();
+
+      // Vertical dashed line from ground up to chest
+      ctx.strokeStyle = 'rgba(155,114,196,0.38)';
+      ctx.lineWidth = 1.5;
+      ctx.setLineDash([6, 9]);
+      ctx.beginPath();
+      ctx.moveTo(chestX, groundY);
+      ctx.lineTo(chestX, chestY);
+      ctx.stroke();
+
+      ctx.setLineDash([]);
+      ctx.restore();
+    }
+
+    // ── Render ───────────────────────────────────────────────────────────────
+    // ── Joint angle labels ────────────────────────────────────────
+    function drawAngles(pts) {
+      // [proximal_idx, joint_idx, distal_idx]
+      const joints = [
+        [11, 13, 15],   // l_elbow
+        [12, 14, 16],   // r_elbow
+        [23, 25, 27],   // l_knee
+        [24, 26, 28],   // r_knee
+      ];
+
+      ctx.save();
+      ctx.font = '700 20px "Inter", Arial, sans-serif';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+
+      for (const [ai, bi, ci] of joints) {
+        const A = pts[ai], B = pts[bi], C = pts[ci];
+        if (!A || !B || !C) continue;
+
+        const BAx = A[0]-B[0], BAy = A[1]-B[1];
+        const BCx = C[0]-B[0], BCy = C[1]-B[1];
+        const dot = BAx*BCx + BAy*BCy;
+        const mag = Math.hypot(BAx, BAy) * Math.hypot(BCx, BCy);
+        if (mag === 0) continue;
+        const deg = Math.round(Math.acos(Math.max(-1, Math.min(1, dot/mag))) * 180 / Math.PI);
+
+        // Arc spanning the joint angle
+        const r = 20;
+        const angA = Math.atan2(BAy, BAx);
+        let sweep = Math.atan2(BCy, BCx) - angA;
+        if (sweep >  Math.PI) sweep -= 2 * Math.PI;
+        if (sweep < -Math.PI) sweep += 2 * Math.PI;
+        ctx.strokeStyle = 'rgba(155,114,196,0.60)';
+        ctx.lineWidth   = 1.5;
+        ctx.beginPath();
+        ctx.arc(B[0], B[1], r, angA, angA + sweep, sweep < 0);
+        ctx.stroke();
+
+        // Label placed along bisector direction
+        const bisAngle = angA + sweep / 2;
+        const lx = B[0] + Math.cos(bisAngle) * 44;
+        const ly = B[1] + Math.sin(bisAngle) * 44;
+        ctx.shadowBlur  = 8;
+        ctx.shadowColor = 'rgba(155,114,196,0.65)';
+        ctx.fillStyle   = 'rgba(255,255,255,0.88)';
+        ctx.fillText(deg + '°', lx, ly);
+      }
+
+      ctx.restore();
+    }
+
+    function draw() {
+      ctx.scale(2, 2);
+      drawBackground();
+      drawElevationLine();
+      drawFigure(jumpPts,  'rgba(155,114,196,0.55)');
+      drawAngles(jumpPts);
+      drawLogo();
+    }
+
+    // Defer until Inter is loaded so text metrics are correct
+    if (document.fonts && document.fonts.ready) {
+      document.fonts.ready.then(draw);
+    } else {
+      window.addEventListener('load', draw);
+    }
+
+    function downloadBanner() {
+      const link = document.createElement('a');
+      link.download = 'posetek-banner-6x3.png';
+      link.href = canvas.toDataURL('image/png');
+      link.click();
+    }
+  </script>
+</body>
+</html>
