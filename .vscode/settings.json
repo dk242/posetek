@@ -1,3 +1,4 @@
 {
-    "liveServer.settings.multiRootWorkspaceName": "posetek"
+    "liveServer.settings.multiRootWorkspaceName": "posetek",
+    "liveServer.settings.port": 5501
 }

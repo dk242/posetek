@@ -1,11 +1,18 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+    <script type="text/javascript">
+        (function(c,l,a,r,i,t,y){
+            c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};
+            t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;
+            y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);
+        })(window, document, "clarity", "script", "w8lex8gzl7");
+    </script>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
     <meta name="theme-color" content="#1a3a2e">
     <link rel="icon" type="image/svg+xml" href="/images/logo.svg">
-    <title>PoseTek Beta — Train Like a D1 Athlete</title>
+    <title>Soccer performance analysis, right in your pocket.</title>
     <meta name="description" content="Beta access to PoseTek — quantify your kick, sprint, and jump. Plus 3 professional kicking analyses from PoseTek.">
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
@@ -36,7 +43,10 @@
         body {
             font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
             color: var(--text-dark);
-            background: var(--off-white);
+            background:
+                radial-gradient(circle at 18% 12%, rgba(109, 215, 160, 0.24), transparent 34rem),
+                radial-gradient(circle at 82% 0%, rgba(200, 162, 78, 0.12), transparent 28rem),
+                linear-gradient(145deg, #e9f5ef 0%, #f8fbf7 46%, #d9ecdf 100%);
             line-height: 1.55;
             overflow-x: hidden;
             min-height: 100vh;
@@ -55,10 +65,10 @@
             justify-content: space-between;
             padding: 14px 20px;
             padding-top: max(14px, env(safe-area-inset-top));
-            background: rgba(255,255,255,0.88);
+            background: rgba(237, 247, 240, 0.86);
             backdrop-filter: blur(14px);
             -webkit-backdrop-filter: blur(14px);
-            border-bottom: 1px solid rgba(26, 58, 46, 0.06);
+            border-bottom: 1px solid rgba(26, 58, 46, 0.08);
         }
 
         .logo {
@@ -109,6 +119,7 @@
         .hero {
             padding: 28px 0 20px;
             position: relative;
+            min-height: calc(100dvh - 64px);
         }
 
         .hero-kicker {
@@ -129,7 +140,7 @@
         }
 
         h1.hero-title {
-            font-size: 2.4rem;
+            font-size: 2.1rem;
             line-height: 1.02;
             font-weight: 900;
             letter-spacing: -1.5px;
@@ -139,46 +150,130 @@
 
         h1.hero-title em {
             font-style: normal;
-            background: linear-gradient(120deg, var(--green-accent), var(--green-dark));
+            background: linear-gradient(120deg,
+                var(--green-accent) 0%,
+                var(--green-dark) 40%,
+                var(--green-glow) 50%,
+                var(--green-dark) 60%,
+                var(--green-accent) 100%);
+            background-size: 220% 100%;
+            background-position: 100% 0;
             -webkit-background-clip: text;
             background-clip: text;
             color: transparent;
+            animation: titleSheen 4.5s ease-in-out 1.2s infinite;
+        }
+        @keyframes titleSheen {
+            0%, 100% { background-position: 100% 0; }
+            50% { background-position: -100% 0; }
         }
 
         .hero-sub {
             font-size: 1.02rem;
             color: var(--text-mid);
             line-height: 1.55;
+            margin-bottom: 0;
+        }
+
+        .hero-sub-slot {
+            position: relative;
+            width: 100%;
             margin-bottom: 16px;
+        }
+        .hero-sub-slot > * {
+            transition: opacity 0.32s var(--ease), transform 0.32s var(--ease), visibility 0.32s var(--ease);
+        }
+        .hero-reserve-panel {
+            position: absolute;
+            inset: 0 auto auto 0;
+            width: 100%;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(16px) scale(0.98);
+        }
+        .hero-copy.is-reserving .hero-sub {
+            position: absolute;
+            inset: 0 auto auto 0;
+            width: 100%;
+            visibility: hidden;
+            opacity: 0;
+            pointer-events: none;
+            transform: translateY(-10px);
+        }
+        .hero-copy.is-reserving .hero-reserve-panel {
+            position: relative;
+            inset: auto;
+            visibility: visible;
+            opacity: 1;
+            pointer-events: auto;
+            transform: none;
         }
 
         .how-it-works-btn {
-            display: inline-flex;
+            display: flex;
             align-items: center;
-            gap: 6px;
-            font-size: 0.82rem;
-            font-weight: 700;
-            color: var(--green-dark);
-            background: var(--white);
-            border: 1px solid rgba(26, 58, 46, 0.14);
-            padding: 9px 16px;
-            border-radius: var(--radius-pill);
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            font-size: 1.08rem;
+            font-weight: 800;
+            color: var(--white);
+            background: var(--green-dark);
+            border: none;
+            padding: 17px 24px;
+            border-radius: var(--radius-lg);
             text-decoration: none;
-            letter-spacing: 0.3px;
-            margin-bottom: 22px;
-            box-shadow: var(--shadow-sm);
-            transition: transform 0.2s var(--ease), background 0.2s var(--ease), color 0.2s var(--ease), box-shadow 0.2s var(--ease);
+            appearance: none;
+            font-family: inherit;
+            cursor: pointer;
+            letter-spacing: -0.1px;
+            margin-bottom: 14px;
+            box-shadow: 0 8px 30px rgba(26, 58, 46, 0.42), 0 2px 8px rgba(26, 58, 46, 0.22);
+            transition: transform 0.2s var(--ease), background 0.2s var(--ease), box-shadow 0.2s var(--ease);
+            position: relative;
+            overflow: hidden;
+        }
+        .how-it-works-btn::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.11) 50%, transparent 75%);
+            transform: translateX(-120%);
+            animation: ctaShimmer 3s ease-in-out 1.4s infinite;
+        }
+        @keyframes ctaShimmer {
+            0%   { transform: translateX(-120%); }
+            45%, 100% { transform: translateX(120%); }
         }
         .how-it-works-btn:hover {
-            background: var(--green-dark);
-            color: var(--white);
-            transform: translateY(-1px);
-            box-shadow: 0 10px 26px rgba(26, 58, 46, 0.28);
+            background: var(--green-mid);
+            transform: translateY(-2px);
+            box-shadow: 0 14px 44px rgba(26, 58, 46, 0.48), 0 4px 12px rgba(26, 58, 46, 0.26);
+        }
+        .how-it-works-btn:active {
+            transform: translateY(0);
+            box-shadow: 0 6px 20px rgba(26, 58, 46, 0.36);
         }
         .how-it-works-btn span {
-            transition: transform 0.25s var(--ease);
+            transition: transform 0.22s var(--ease);
+            font-size: 1.15rem;
+            line-height: 1;
         }
-        .how-it-works-btn:hover span { transform: translateY(2px); }
+        .how-it-works-btn:hover span { transform: translateX(4px); }
+        .reserve-cta-hint {
+            text-align: center;
+            font-size: 0.75rem;
+            color: var(--text-soft);
+            margin-bottom: 20px;
+            letter-spacing: 0.1px;
+        }
+        .reserve-cta-hint[hidden] {
+            display: none !important;
+        }
+        #reserveSpotBtn[hidden] {
+            display: none !important;
+        }
 
         /* ── Hero copy column (mobile: plain flow; desktop: grid cell) ── */
         .hero-copy {
@@ -188,66 +283,214 @@
             min-width: 0;
         }
 
-        /* ── Desktop pose panel (Quest leaderboard-style card) ── */
+        /* ── Desktop pose panel — iPhone trio (hidden until ≥1024px) ── */
         .hero-pose-aside {
             display: none;
         }
-        .hero-pose-aside .sheet-card {
-            background: linear-gradient(145deg, rgba(26, 58, 46, 0.96), rgba(45, 94, 74, 0.9));
-            border-radius: 14px;
-            box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18),
-                0 0 0 1px rgba(255, 255, 255, 0.06) inset;
-            border: 1px solid rgba(76, 140, 106, 0.35);
-            overflow: hidden;
-            backdrop-filter: blur(12px);
-            -webkit-backdrop-filter: blur(12px);
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-            flex: 1;
-            width: 100%;
-        }
-        .hero-pose-aside .sheet-card-header {
-            padding: 0.65rem 1rem;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            background: linear-gradient(180deg, rgba(0, 0, 0, 0.22), rgba(0, 0, 0, 0.08));
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            gap: 0.5rem;
-            flex-shrink: 0;
-        }
-        .hero-pose-aside .sheet-card-header h2 {
-            font-size: 1rem;
-            font-weight: 700;
-            color: rgba(255, 255, 255, 0.94);
-            line-height: 1.2;
-            letter-spacing: 0.01em;
-        }
-        .hero-pose-aside .sheet-card-header .sub {
-            font-size: 0.7rem;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.1em;
-            color: rgba(255, 255, 255, 0.7);
-        }
-        .hero-pose-aside .pose-card {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            min-height: 0;
-        }
-        .hero-pose-aside .pose-canvas-wrap {
+
+        .iphone-trio {
             position: relative;
+            width: 100%;
             flex: 1 1 auto;
-            min-height: 320px;
-            background: radial-gradient(ellipse at center, rgba(76, 140, 106, 0.12), rgba(0, 0, 0, 0.35) 65%);
+            min-height: 0;
+            align-self: stretch;
+            perspective: 1400px;
+            transform-style: preserve-3d;
+            animation: fadeScaleIn 1s var(--ease) 0.55s both;
+        }
+
+        /* 1.5× width × 1.25× height vs original 9/19.5 cell → 13.5 : 24.375 */
+        .iphone-slot {
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            width: calc(var(--trio-h) * 13.5 / 24.375);
+            height: var(--trio-h);
+            margin-left: calc(-0.5 * var(--trio-h) * 13.5 / 24.375);
+            margin-top: calc(-0.5 * var(--trio-h));
+            transform-origin: center center;
+            transition:
+                transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.65s ease;
+            will-change: transform, opacity;
+            cursor: pointer;
+        }
+        .iphone-slot.is-left {
+            transform: translateX(-50%) rotateY(22deg) scale(0.78) translateZ(-60px);
+            opacity: 0.45;
+            z-index: 1;
+        }
+        .iphone-slot.is-left:hover {
+            transform: translateX(-50%) rotateY(18deg) scale(0.84) translateZ(-20px);
+            opacity: 0.72;
+        }
+        .iphone-slot.is-center {
+            transform: translateX(0) rotateY(0deg) scale(1) translateZ(0);
+            opacity: 1;
+            z-index: 2;
+            transition:
+                transform 0.65s cubic-bezier(0.34, 1.56, 0.64, 1),
+                opacity 0.65s ease;
+        }
+        .iphone-slot.is-center:hover {
+            transform: translateX(0) rotateY(0deg) scale(1.045) translateZ(0);
+        }
+        .iphone-slot.is-right {
+            transform: translateX(50%) rotateY(-22deg) scale(0.78) translateZ(-60px);
+            opacity: 0.45;
+            z-index: 1;
+        }
+        .iphone-slot.is-right:hover {
+            transform: translateX(50%) rotateY(-18deg) scale(0.84) translateZ(-20px);
+            opacity: 0.72;
+        }
+
+        .iphone-slot .iphone-body {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(160deg, #2c2c2c 0%, #191919 50%, #252525 100%);
+            border-radius: 13%;
+            box-shadow:
+                inset 0 0 0 1.5px rgba(255, 255, 255, 0.1),
+                0 0 0 1.5px rgba(0, 0, 0, 0.9),
+                0 28px 72px rgba(0, 0, 0, 0.72),
+                0 8px 20px rgba(0, 0, 0, 0.5);
+            transition: box-shadow 0.35s ease, filter 0.35s ease;
+        }
+        .iphone-slot:not(.is-center):hover .iphone-body {
+            filter: brightness(1.08);
+            box-shadow:
+                inset 0 0 0 1.5px rgba(255, 255, 255, 0.14),
+                0 0 0 1.5px rgba(0, 0, 0, 0.9),
+                0 34px 86px rgba(0, 0, 0, 0.78),
+                0 0 28px rgba(140, 255, 199, 0.14),
+                0 10px 24px rgba(0, 0, 0, 0.55);
+        }
+
+        .iphone-btn {
+            position: absolute;
+            background: linear-gradient(180deg, #3a3a3a, #272727);
+            border-radius: 2px;
+        }
+        .iphone-mute  { left: -1.8%; top: 18%; width: 2%;   height: 4%;  }
+        .iphone-vol-up   { left: -1.8%; top: 27%; width: 2%;   height: 8%;  }
+        .iphone-vol-down { left: -1.8%; top: 38%; width: 2%;   height: 8%;  }
+        .iphone-power    { right: -1.8%; top: 29%; width: 2%;  height: 11%; }
+
+        .iphone-screen {
+            position: absolute;
+            inset: 2.5%;
+            border-radius: 11%;
+            overflow: hidden;
+            background: #000;
+        }
+
+        .iphone-dynamic-island {
+            position: absolute;
+            top: 3.5%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 27%;
+            height: 4%;
+            background: #000;
+            border-radius: 100px;
+            z-index: 2;
+            box-shadow: 0 0 0 1.5px rgba(255, 255, 255, 0.05);
+        }
+
+        .hero-pose-aside .pose-canvas-wrap {
+            position: absolute;
+            inset: 0;
+            background: radial-gradient(ellipse at center, rgba(76, 140, 106, 0.18), rgba(0, 0, 0, 0.5) 70%);
             overflow: hidden;
         }
         .hero-pose-aside .pose-canvas-wrap canvas {
             display: block;
             width: 100%;
             height: 100%;
+        }
+        .hero-pose-aside .phone-demo-video {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            object-position: center center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .hero-pose-aside .pose-canvas-wrap.is-video canvas {
+            opacity: 0;
+        }
+        .hero-pose-aside .pose-canvas-wrap.is-video .phone-demo-video {
+            opacity: 1;
+        }
+        /* Letterboxed fit — shows full frame, crops as little as possible vs phone mask */
+        .hero-pose-aside .pose-canvas-wrap.is-video.is-video-fit-contain {
+            background: #000;
+        }
+        .hero-pose-aside .phone-demo-video.phone-demo-video--contain {
+            object-fit: contain;
+        }
+        .hero-pose-aside .phone-demo-img {
+            position: absolute;
+            inset: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+            object-position: center center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.25s ease;
+        }
+        .hero-pose-aside .pose-canvas-wrap.is-static-img {
+            background: #000;
+        }
+        .hero-pose-aside .pose-canvas-wrap.is-static-img canvas,
+        .hero-pose-aside .pose-canvas-wrap.is-static-img .phone-demo-video {
+            opacity: 0;
+        }
+        .hero-pose-aside .pose-canvas-wrap.is-static-img .phone-demo-img {
+            opacity: 1;
+        }
+
+        .iphone-home-indicator {
+            position: absolute;
+            bottom: 3%;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 30%;
+            height: 3px;
+            background: rgba(255, 255, 255, 0.35);
+            border-radius: 100px;
+            z-index: 2;
+        }
+
+        /* Pagination dots */
+        .pose-dots {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+            min-height: 16px;
+        }
+        .pose-dot {
+            width: 7px;
+            height: 7px;
+            border: none;
+            padding: 0;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.22);
+            cursor: pointer;
+            transition: background 0.35s ease, transform 0.35s ease, box-shadow 0.35s ease;
+        }
+        .pose-dot.active {
+            background: #4ade80;
+            transform: scale(1.4);
+            box-shadow: 0 0 8px rgba(74, 222, 128, 0.65);
         }
         /* ── Spot counter ── */
         .spot-card {
@@ -262,6 +505,31 @@
             position: relative;
             overflow: hidden;
             box-shadow: var(--shadow-md);
+            cursor: pointer;
+            transition: transform 0.22s var(--ease), box-shadow 0.22s var(--ease);
+            -webkit-tap-highlight-color: transparent;
+        }
+        .spot-card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 16px 44px rgba(26, 58, 46, 0.36);
+        }
+        .spot-card:active {
+            transform: translateY(0);
+            box-shadow: var(--shadow-md);
+        }
+        .spot-card-claim {
+            font-size: 0.75rem;
+            font-weight: 700;
+            color: var(--green-glow);
+            letter-spacing: 0.4px;
+            margin-top: 5px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+            transition: gap 0.2s var(--ease);
+        }
+        .spot-card:hover .spot-card-claim {
+            gap: 7px;
         }
 
         .spot-card::before {
@@ -322,6 +590,33 @@
             margin-bottom: 24px;
         }
 
+        .hero-reserve-panel.wl-card {
+            margin-bottom: 0;
+            max-width: 540px;
+            background: rgba(255, 255, 255, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            box-shadow: 0 20px 54px rgba(26, 58, 46, 0.2);
+        }
+
+        .reserve-collapse {
+            appearance: none;
+            border: none;
+            background: transparent;
+            color: var(--green-accent);
+            font: inherit;
+            font-size: 0.78rem;
+            font-weight: 800;
+            letter-spacing: 0.7px;
+            text-transform: uppercase;
+            cursor: pointer;
+            margin-bottom: 12px;
+            padding: 0;
+        }
+        .reserve-collapse:hover {
+            color: var(--green-dark);
+        }
+
         .price-row {
             display: flex;
             align-items: baseline;
@@ -350,7 +645,30 @@
         .wl-form {
             display: flex;
             flex-direction: column;
+            gap: 12px;
+        }
+
+        .wl-field-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .wl-field-label {
+            font-size: 0.68rem;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+            color: var(--text-soft);
+        }
+        .wl-name-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
             gap: 10px;
+        }
+        @media (max-width: 380px) {
+            .wl-name-row {
+                grid-template-columns: 1fr;
+            }
         }
 
         .wl-input {
@@ -747,8 +1065,9 @@
             object-fit: cover;
             background: #000;
         }
-        /* ── Testimonials ── */
+        /* ── Testimonials ── (hidden from view; remove display:none to show) */
         .testimonials {
+            display: none;
             margin-bottom: 28px;
         }
         .testimonial-toolbar {
@@ -1068,13 +1387,161 @@
         /* ── Reveal animation ── */
         .reveal {
             opacity: 0;
-            transform: translateY(24px);
-            transition: opacity 0.7s var(--ease), transform 0.7s var(--ease);
+            transform: translateY(28px);
+            transition: opacity 0.85s var(--ease), transform 0.85s var(--ease);
         }
         .reveal.is-in {
             opacity: 1;
             transform: none;
         }
+
+        /* ── Entry keyframes ── */
+        @keyframes dropIn {
+            from { opacity: 0; transform: translateY(-100%); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(24px); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes fadeUpSoft {
+            from { opacity: 0; transform: translateY(14px); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes fadeScaleIn {
+            from { opacity: 0; transform: scale(0.94) translateY(14px); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes slideInRight {
+            from { opacity: 0; transform: translateX(36px); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes betaPillIn {
+            from { opacity: 0; transform: translateY(-6px) scale(0.9); }
+            to { opacity: 1; transform: none; }
+        }
+        @keyframes cardGlow {
+            0%, 100% {
+                box-shadow: 0 18px 48px rgba(0, 0, 0, 0.18),
+                    0 0 0 1px rgba(255, 255, 255, 0.06) inset;
+            }
+            50% {
+                box-shadow: 0 26px 64px rgba(0, 0, 0, 0.24),
+                    0 0 0 1px rgba(109, 215, 160, 0.18) inset,
+                    0 0 44px rgba(109, 215, 160, 0.12);
+            }
+        }
+        @keyframes iphoneGlow {
+            0%, 100% {
+                box-shadow:
+                    inset 0 0 0 1.5px rgba(255, 255, 255, 0.1),
+                    0 0 0 1.5px rgba(0, 0, 0, 0.9),
+                    0 28px 72px rgba(0, 0, 0, 0.72),
+                    0 8px 20px rgba(0, 0, 0, 0.5);
+            }
+            50% {
+                box-shadow:
+                    inset 0 0 0 1.5px rgba(109, 215, 160, 0.22),
+                    0 0 0 1.5px rgba(0, 0, 0, 0.9),
+                    0 36px 88px rgba(0, 0, 0, 0.8),
+                    0 0 42px rgba(109, 215, 160, 0.12),
+                    0 8px 20px rgba(0, 0, 0, 0.5);
+            }
+        }
+        @keyframes spotHalo {
+            0%, 100% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.04); opacity: 0.85; }
+        }
+
+        /* ── Topbar drop ── */
+        .topbar { animation: dropIn 0.6s var(--ease) both; }
+        .topbar .logo { animation: fadeUpSoft 0.6s var(--ease) 0.25s both; }
+        .topbar .beta-pill { animation: betaPillIn 0.6s var(--ease) 0.4s both; }
+
+        /* ── Hero staggered load ── */
+        .hero-copy > .hero-kicker { animation: fadeUp 0.7s var(--ease) 0.15s both; }
+        .hero-copy > h1.hero-title { animation: fadeUp 0.85s var(--ease) 0.28s both; }
+        .hero-copy .hero-sub { animation: fadeUp 0.8s var(--ease) 0.42s both; }
+        .hero-copy > .how-it-works-btn { animation: fadeUp 0.7s var(--ease) 0.55s both; }
+        .hero-copy > .spot-card {
+            animation: fadeUp 0.8s var(--ease) 0.68s both;
+        }
+        .hero-copy > .wl-card {
+            animation: fadeUp 0.9s var(--ease) 0.82s both;
+        }
+        .iphone-slot.is-center .iphone-body {
+            animation: iphoneGlow 6s ease-in-out 0s infinite;
+        }
+        .iphone-slot:not(.is-center) .iphone-body {
+            animation: none;
+        }
+
+        .spot-card .spot-num .spot-total { display: inline-block; }
+
+        /* ── Feature list stagger (triggered when .features gets .is-in) ── */
+        .feature-list .feature {
+            opacity: 0;
+            transform: translateY(22px);
+            transition:
+                opacity 0.7s var(--ease),
+                transform 0.7s var(--ease),
+                box-shadow 0.25s var(--ease);
+        }
+        .features.is-in .feature-list .feature {
+            opacity: 1;
+            transform: none;
+        }
+        .features.is-in .feature-list .feature:nth-child(1) { transition-delay: 0.05s; }
+        .features.is-in .feature-list .feature:nth-child(2) { transition-delay: 0.18s; }
+        .features.is-in .feature-list .feature:nth-child(3) { transition-delay: 0.28s; }
+        .features.is-in .feature-list .feature:nth-child(4) { transition-delay: 0.38s; }
+        .features.is-in .feature-list .feature:nth-child(5) { transition-delay: 0.48s; }
+        .feature:hover {
+            transition:
+                transform 0.25s var(--ease),
+                box-shadow 0.25s var(--ease);
+        }
+
+        /* ── FAQ stagger ── */
+        .faq .faq-item {
+            opacity: 0;
+            transform: translateY(14px);
+            transition:
+                opacity 0.6s var(--ease),
+                transform 0.6s var(--ease),
+                box-shadow 0.2s ease;
+        }
+        .faq.is-in .faq-item { opacity: 1; transform: none; }
+        .faq.is-in .faq-item:nth-of-type(1) { transition-delay: 0.1s; }
+        .faq.is-in .faq-item:nth-of-type(2) { transition-delay: 0.18s; }
+        .faq.is-in .faq-item:nth-of-type(3) { transition-delay: 0.26s; }
+        .faq.is-in .faq-item:nth-of-type(4) { transition-delay: 0.34s; }
+        .faq.is-in .faq-item:nth-of-type(5) { transition-delay: 0.42s; }
+
+        /* ── Testimonial card swap animation ── */
+        .testimonial-card {
+            transition: transform 0.4s var(--ease);
+        }
+        .testimonial-quote,
+        .testimonial-highlight,
+        .testimonial-name,
+        .testimonial-role,
+        .testimonial-badge,
+        .testimonial-index {
+            transition: opacity 0.35s var(--ease), transform 0.35s var(--ease);
+        }
+        .testimonial-card.is-swapping .testimonial-quote,
+        .testimonial-card.is-swapping .testimonial-highlight,
+        .testimonial-card.is-swapping .testimonial-name,
+        .testimonial-card.is-swapping .testimonial-role,
+        .testimonial-card.is-swapping .testimonial-badge,
+        .testimonial-card.is-swapping .testimonial-index {
+            opacity: 0;
+            transform: translateY(6px);
+        }
+
+        /* ── Spot number count-up effect ── */
+        .spot-num.is-counting { animation: spotHalo 0.6s var(--ease); }
 
         /* ── Wider screens ── */
         @media (min-width: 720px) and (max-width: 1023.98px) {
@@ -1082,13 +1549,15 @@
                 max-width: 640px;
                 padding: 0 32px 140px;
             }
-            h1.hero-title { font-size: 2.8rem; }
+            h1.hero-title { font-size: 2.45rem; }
             .sticky-cta { max-width: 480px; margin: 0 auto; left: 50%; transform: translate(-50%, 120%); }
             .sticky-cta.is-visible { transform: translate(-50%, 0); }
         }
 
         /* ── Desktop layout (≥1024px) ── */
         @media (min-width: 1024px) {
+            /* Mobile-only elements hidden on desktop */
+            .mobile-cta-bar { display: none !important; }
             .topbar {
                 padding: 16px 48px;
                 padding-top: max(16px, env(safe-area-inset-top));
@@ -1104,31 +1573,39 @@
             /* Hero: copy + intro under "How it works"; pose panel on the right */
             .hero {
                 display: grid;
-                grid-template-columns: minmax(0, 1.1fr) minmax(300px, 0.82fr);
+                grid-template-columns: minmax(0, 1.02fr) minmax(360px, 0.95fr);
                 grid-template-areas: "copy pose";
                 column-gap: 64px;
                 align-items: start;
-                padding: 64px 0 48px;
+                min-height: calc(100dvh - 72px);
+                padding: 42px 0 48px;
             }
             .hero-copy {
                 grid-area: copy;
+                margin-right: -24px;
+                position: relative;
+                z-index: 1;
+                transform: translateY(-12px);
             }
             .hero-copy > .hero-kicker { margin-bottom: 18px; }
             .hero-copy > h1.hero-title {
-                font-size: 4rem;
+                font-size: 3.5rem;
                 letter-spacing: -2.5px;
                 margin-bottom: 14px;
                 max-width: 620px;
             }
-            .hero-copy > .hero-sub {
+            .hero-copy .hero-sub {
                 font-size: 1.15rem;
+                max-width: 540px;
+            }
+            .hero-copy > .hero-sub-slot {
                 margin-bottom: 16px;
                 max-width: 540px;
             }
             .hero-copy > .how-it-works-btn {
-                margin-bottom: 22px;
-                padding: 11px 20px;
-                font-size: 0.88rem;
+                margin-bottom: 14px;
+                padding: 18px 28px;
+                font-size: 1.12rem;
             }
             .hero-copy > .spot-card {
                 margin-bottom: 22px;
@@ -1141,19 +1618,26 @@
                 padding: 28px;
             }
             .hero-pose-aside {
+                z-index: 2;
+                --pose-aside-h: max(400px, min(90dvh, calc(100dvh - 86px)));
+                --trio-h: calc(var(--pose-aside-h) * 0.846);
+                --hero-sticky-center-top: max(0.5rem, calc(50dvh - var(--pose-aside-h) / 2));
+                --hero-sticky-top: var(--hero-sticky-center-top);
                 display: flex;
                 flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 20px;
                 grid-area: pose;
                 position: sticky;
-                top: 80px;
+                top: var(--hero-sticky-top);
                 align-self: start;
                 min-height: 0;
                 width: 100%;
-                height: max(320px, min(78dvh, calc(100dvh - 88px)));
+                height: var(--pose-aside-h);
             }
-            .hero-pose-aside .sheet-card.pose-card {
-                height: 100%;
-                min-height: 0;
+            html.hero-sticky-shifted .hero-pose-aside {
+                --hero-sticky-top: calc(max(16px, env(safe-area-inset-top)) + 56px);
             }
             .spot-num { font-size: 2.6rem; }
             .price-val { font-size: 2.2rem; }
@@ -1241,14 +1725,239 @@
         /* Extra-wide polish */
         @media (min-width: 1440px) {
             .shell { max-width: 1280px; }
-            .hero { column-gap: 80px; padding: 80px 0 56px; }
-            .hero-copy > h1.hero-title { font-size: 4.4rem; }
+            .hero { column-gap: 80px; padding: 48px 0 56px; }
+            .hero-copy { margin-right: -32px; }
+            .hero-copy > h1.hero-title { font-size: 3.85rem; }
         }
 
         @media (prefers-reduced-motion: reduce) {
             .reveal { opacity: 1; transform: none; transition: none; }
             .sticky-cta { transition: none; }
             .beta-pill::before { animation: none; }
+            .topbar,
+            .topbar .logo,
+            .topbar .beta-pill,
+            .hero-copy > .hero-kicker,
+            .hero-copy > h1.hero-title,
+            .hero-copy .hero-sub,
+            .hero-copy > .how-it-works-btn,
+            .hero-copy > .spot-card,
+            .hero-copy > .wl-card,
+            .iphone-trio,
+            .iphone-body,
+            h1.hero-title em {
+                animation: none !important;
+                opacity: 1;
+                transform: none;
+                background-position: 0 0;
+            }
+            .iphone-trio {
+                perspective: none;
+            }
+            .iphone-slot {
+                transition: none !important;
+            }
+            .iphone-slot.is-left,
+            .iphone-slot.is-right {
+                display: none;
+            }
+            .iphone-slot.is-center {
+                position: relative;
+                left: 50%;
+                top: 0;
+                margin: 0;
+                width: min(100%, calc(var(--trio-h) * 13.5 / 24.375));
+                height: var(--trio-h);
+                margin-left: calc(-0.5 * min(100%, calc(var(--trio-h) * 13.5 / 24.375)));
+                margin-top: 0;
+                transform: none;
+                opacity: 1;
+            }
+            .iphone-slot.is-center:hover {
+                transform: none;
+            }
+            .feature-list .feature,
+            .faq .faq-item {
+                opacity: 1;
+                transform: none;
+                transition: none;
+            }
+            .testimonial-quote,
+            .testimonial-highlight,
+            .testimonial-name,
+            .testimonial-role,
+            .testimonial-badge,
+            .testimonial-index {
+                transition: none;
+            }
+        }
+
+        /* ── Mobile hero layout (< 1024px) ── */
+        @media (max-width: 1023.98px) {
+            /* Hero fills the full viewport so the features section below stays out of view */
+            .hero {
+                min-height: calc(100dvh - 50px);
+                padding: 16px 0 28px;
+                display: flex;
+                flex-direction: column;
+            }
+
+            /* hero-copy: stretch children to full width and fill remaining space */
+            .hero-copy {
+                align-items: stretch;
+                flex: 1 1 auto;
+            }
+
+            /* Elements hidden on mobile */
+            .hero-kicker        { display: none !important; }
+            .how-it-works-btn   { display: none !important; }
+            .spot-card          { display: none !important; }
+            .reserve-cta-hint   { display: none !important; }
+
+            /* Title */
+            h1.hero-title {
+                font-size: clamp(1.6rem, 5.2vw, 2.1rem);
+                letter-spacing: -1.2px;
+                margin-bottom: 14px;
+            }
+
+            /* Auto-capture blurb — visible on mobile */
+            .hero-sub {
+                font-size: 0.88rem;
+                line-height: 1.5;
+                color: var(--text-mid);
+                margin-top: 14px;
+                margin-bottom: 0;
+            }
+
+            /* Carousel: shown on mobile (JS moves it inside hero-copy) */
+            .hero-pose-aside {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: flex-start;
+                gap: 10px;
+                width: 100%;
+                --trio-h: min(78vw, 338px);
+                height: calc(var(--trio-h) + 26px);
+                position: relative;
+                overflow: visible;
+                flex-shrink: 0;
+                margin-top: 20px;
+                margin-bottom: 0;
+            }
+
+            /* Mobile reserve bar */
+            .mobile-cta-bar {
+                display: flex;
+                align-items: center;
+                gap: 10px;
+                width: 100%;
+                padding: 15px 18px;
+                background: var(--green-dark);
+                color: var(--white);
+                border: none;
+                border-radius: var(--radius-lg);
+                font-family: inherit;
+                cursor: pointer;
+                margin-top: 16px;
+                box-shadow: 0 8px 28px rgba(26, 58, 46, 0.38), 0 2px 8px rgba(26, 58, 46, 0.2);
+                transition: background 0.2s var(--ease), transform 0.18s var(--ease);
+                -webkit-tap-highlight-color: transparent;
+                text-align: left;
+                position: relative;
+                overflow: hidden;
+            }
+            .mobile-cta-bar::after {
+                content: '';
+                position: absolute;
+                inset: 0;
+                background: linear-gradient(105deg, transparent 25%, rgba(255,255,255,0.1) 50%, transparent 75%);
+                transform: translateX(-120%);
+                animation: ctaShimmer 3.2s ease-in-out 1.8s infinite;
+            }
+            .mobile-cta-bar:active { transform: scale(0.98); }
+            .mobile-cta-bar[hidden] { display: none !important; }
+            .mobile-cta-bar-count {
+                font-size: 1.3rem;
+                font-weight: 900;
+                color: var(--green-glow);
+                letter-spacing: -0.5px;
+                line-height: 1;
+                white-space: nowrap;
+                flex-shrink: 0;
+            }
+            .mobile-cta-bar-total {
+                color: rgba(255,255,255,0.45);
+                font-size: 0.82rem;
+                font-weight: 700;
+            }
+            .mobile-cta-bar-label {
+                flex: 1;
+                font-size: 0.95rem;
+                font-weight: 800;
+                letter-spacing: -0.1px;
+            }
+            .mobile-cta-bar-arrow {
+                font-size: 1rem;
+                flex-shrink: 0;
+                transition: transform 0.2s var(--ease);
+            }
+
+            /* Sub-slot pushed to end (hero-sub is hidden; only form lives here normally) */
+            .hero-sub-slot {
+                order: 10;
+            }
+
+            /* Carousel fade-out when form overlay is active */
+            .iphone-trio,
+            .pose-dots {
+                transition: opacity 0.28s var(--ease);
+            }
+            .hero-pose-aside.mobile-form-active .iphone-trio,
+            .hero-pose-aside.mobile-form-active .pose-dots {
+                opacity: 0;
+                pointer-events: none;
+            }
+
+            /* Mobile form host — absolutely covers the carousel zone */
+            .mobile-form-host {
+                position: absolute;
+                inset: 0;
+                z-index: 10;
+                overflow-y: auto;
+                border-radius: var(--radius-lg);
+                background: rgba(248, 251, 247, 0.97);
+                backdrop-filter: blur(16px);
+                -webkit-backdrop-filter: blur(16px);
+                padding: 10px 14px;
+                opacity: 0;
+                transform: translateY(10px) scale(0.98);
+                transition: opacity 0.3s var(--ease), transform 0.3s var(--ease);
+                pointer-events: none;
+            }
+            .hero-pose-aside.mobile-form-active .mobile-form-host {
+                opacity: 1;
+                transform: none;
+                pointer-events: auto;
+            }
+
+            /* wl-card when hosted inside the mobile form overlay */
+            #wlCard.mobile-form-shown {
+                position: relative !important;
+                inset: auto !important;
+                visibility: visible !important;
+                opacity: 1 !important;
+                transform: none !important;
+                pointer-events: auto !important;
+                margin-bottom: 0 !important;
+                background: transparent !important;
+                backdrop-filter: none !important;
+                -webkit-backdrop-filter: none !important;
+                box-shadow: none !important;
+                padding: 2px 0 !important;
+                max-width: none !important;
+            }
         }
     </style>
 </head>
@@ -1262,67 +1971,138 @@
         <section class="hero">
             <div class="hero-copy">
                 <span class="hero-kicker">iPhone App · Beta Access</span>
-                <h1 class="hero-title">Stop training blind. <em>Start moving like a D1 soccer player</em></h1>
-                <p class="hero-sub">With just your phone, get pro-grade feedback on how to move like a top athlete. Track your kicking power, speed and acceleration, and jump height and explosiveness, plus get three professional kicking analyses from PoseTek so you can stop guessing how to improve technique.</p>
+                <h1 class="hero-title">Soccer performance analysis, <em>right in your pocket</em>.</h1>
 
-                <a href="#howItWorks" class="how-it-works-btn">How it works <span aria-hidden="true">↓</span></a>
+                <div class="hero-sub-slot" id="reserveSlot">
+                    <p class="hero-sub">Auto-capture and measure kicking power, jumping height, and sprinting speed with nothing but your smartphone and our specialty cone. Track the results over time and check out the technical suggestions we provide to help you improve. Plus get three professional kicking analyses from PoseTek so you can stop guessing and get your shot and pass dialed.</p>
 
-                <div class="spot-card reveal">
+                    <div class="wl-card hero-reserve-panel" id="wlCard" aria-hidden="true">
+                        <button type="button" class="reserve-collapse" id="reserveCollapse">Back to intro ↓</button>
+                        <div class="price-row">
+                            <span class="price-val">$19</span>
+                            <span class="price-per">/month</span>
+                        </div>
+                        <div class="price-note">Beta pricing — locks in as long as you stay subscribed.</div>
+
+                        <div class="wl-form-wrap" id="wlFormWrap">
+                            <form class="wl-form" id="wlForm" novalidate>
+                                <div class="wl-field-group">
+                                    <div class="wl-field-label">Player</div>
+                                    <div class="wl-name-row">
+                                        <input type="text" class="wl-input" id="wlPlayerFirst" name="playerFirstName" placeholder="First name" autocomplete="section-player given-name" required aria-label="Player first name">
+                                        <input type="text" class="wl-input" id="wlPlayerLast" name="playerLastName" placeholder="Last name" autocomplete="section-player family-name" required aria-label="Player last name">
+                                    </div>
+                                </div>
+                                <div class="wl-field-group">
+                                    <div class="wl-field-label">Parent / guardian</div>
+                                    <div class="wl-name-row">
+                                        <input type="text" class="wl-input" id="wlParentFirst" name="parentFirstName" placeholder="First name" autocomplete="section-parent given-name" required aria-label="Parent first name">
+                                        <input type="text" class="wl-input" id="wlParentLast" name="parentLastName" placeholder="Last name" autocomplete="section-parent family-name" required aria-label="Parent last name">
+                                    </div>
+                                    <input type="email" class="wl-input" id="wlParentEmail" name="parentEmail" placeholder="Email" autocomplete="section-parent email" inputmode="email" required aria-label="Parent email address">
+                                </div>
+                                <button type="submit" class="wl-submit" id="wlSubmit">Hold my spot →</button>
+                            </form>
+                            <p class="wl-status" id="wlStatus" role="status" aria-live="polite"></p>
+                            <p class="wl-finep">No charge today. We'll reach out when your spot opens.</p>
+                        </div>
+
+                        <div class="wl-success" id="wlSuccess" hidden>
+                            <svg class="wl-success-icon" viewBox="0 0 64 64" aria-hidden="true">
+                                <circle cx="32" cy="32" r="30" fill="#e8f3ee" stroke="#1a3a2e" stroke-width="2"/>
+                                <path fill="none" stroke="#1a3a2e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M20 33l9 9 16-18"/>
+                            </svg>
+                            <div class="wl-success-title">You're in the queue.</div>
+                            <div class="wl-success-sub">We'll email you when your spot opens up.</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Mobile-only reserve bar (shown below the auto-capture text on mobile) -->
+                <button type="button" class="mobile-cta-bar" id="mobileCtaBar" aria-label="Reserve your beta spot">
+                    <span class="mobile-cta-bar-count"><span id="mobileSpotRemaining">36</span><span class="mobile-cta-bar-total">/50</span></span>
+                    <span class="mobile-cta-bar-label">Reserve your spot now</span>
+                    <span class="mobile-cta-bar-arrow" aria-hidden="true">→</span>
+                </button>
+
+                <button type="button" class="how-it-works-btn" id="reserveSpotBtn" aria-expanded="false" aria-controls="wlCard">Reserve your spot <span aria-hidden="true">→</span></button>
+                <p class="reserve-cta-hint" hidden>No charge today &nbsp;·&nbsp; Cancel anytime</p>
+
+                <div class="spot-card" id="spotCard" role="button" tabindex="0" aria-label="Reserve your beta spot — see sign-up form">
                     <div>
                         <div class="spot-num" id="spotNum" aria-live="polite">
-                            <span id="spotRemaining">15</span><span class="spot-total">/30</span>
+                            <span id="spotRemaining">36</span><span class="spot-total">/50</span>
                         </div>
                     </div>
                     <div class="spot-copy">
                         <div class="spot-label">Spots left</div>
-                        <div class="spot-desc">Locking in our first 30 beta athletes. Once they're gone, they're gone.</div>
-                    </div>
-                </div>
-
-                <div class="wl-card reveal" id="wlCard">
-                    <div class="price-row">
-                        <span class="price-val">$19</span>
-                        <span class="price-per">/month</span>
-                    </div>
-                    <div class="price-note">Beta pricing — locks in as long as you stay subscribed.</div>
-
-                    <div class="wl-form-wrap" id="wlFormWrap">
-                        <form class="wl-form" id="wlForm" novalidate>
-                            <input type="text" class="wl-input" id="wlName" name="name" placeholder="First name" autocomplete="given-name" required aria-label="First name">
-                            <input type="email" class="wl-input" id="wlEmail" name="email" placeholder="Email" autocomplete="email" inputmode="email" required aria-label="Email address">
-                            <button type="submit" class="wl-submit" id="wlSubmit">Hold my spot →</button>
-                        </form>
-                        <p class="wl-status" id="wlStatus" role="status" aria-live="polite"></p>
-                        <p class="wl-finep">No charge today. We'll reach out when your spot opens.</p>
-                    </div>
-
-                    <div class="wl-success" id="wlSuccess" hidden>
-                        <svg class="wl-success-icon" viewBox="0 0 64 64" aria-hidden="true">
-                            <circle cx="32" cy="32" r="30" fill="#e8f3ee" stroke="#1a3a2e" stroke-width="2"/>
-                            <path fill="none" stroke="#1a3a2e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" d="M20 33l9 9 16-18"/>
-                        </svg>
-                        <div class="wl-success-title">You're in the queue.</div>
-                        <div class="wl-success-sub">We'll email you when your spot opens up.</div>
+                        <div class="spot-desc">Locking in our first 50 beta athletes. Once they're gone, they're gone.</div>
+                        <div class="spot-card-claim">Claim yours →</div>
                     </div>
                 </div>
             </div>
 
             <aside class="hero-pose-aside" aria-label="Kick motion preview">
-                <div class="sheet-card pose-card">
-                    <div class="sheet-card-header">
-                        <h2>Live pose replay</h2>
-                        <span class="sub">Kick sequence</span>
+                <div class="iphone-trio" id="iphoneTrio">
+                    <div class="iphone-slot is-left" data-slot="0" role="button" tabindex="0" aria-label="Bring left phone preview to front">
+                        <div class="iphone-body">
+                            <div class="iphone-btn iphone-mute"></div>
+                            <div class="iphone-btn iphone-vol-up"></div>
+                            <div class="iphone-btn iphone-vol-down"></div>
+                            <div class="iphone-btn iphone-power"></div>
+                            <div class="iphone-screen">
+                                <div class="iphone-dynamic-island"></div>
+                                <div class="pose-canvas-wrap">
+                                    <canvas id="poseCanvas0" aria-hidden="true"></canvas>
+                                    <video class="phone-demo-video" muted playsinline preload="metadata" aria-label="Kick analysis video preview"></video>
+                                    <img class="phone-demo-img" alt="Player profile screen preview" width="390" height="844" decoding="async">
+                                </div>
+                                <div class="iphone-home-indicator"></div>
+                            </div>
+                        </div>
                     </div>
-                    <div class="pose-canvas-wrap">
-                        <canvas id="heroPoseCanvas"></canvas>
+                    <div class="iphone-slot is-center" data-slot="1" role="button" tabindex="0" aria-label="Front phone preview">
+                        <div class="iphone-body">
+                            <div class="iphone-btn iphone-mute"></div>
+                            <div class="iphone-btn iphone-vol-up"></div>
+                            <div class="iphone-btn iphone-vol-down"></div>
+                            <div class="iphone-btn iphone-power"></div>
+                            <div class="iphone-screen">
+                                <div class="iphone-dynamic-island"></div>
+                                <div class="pose-canvas-wrap">
+                                    <canvas id="poseCanvas1" aria-hidden="true"></canvas>
+                                    <video class="phone-demo-video" muted playsinline preload="metadata" aria-label="Kick analysis video preview"></video>
+                                    <img class="phone-demo-img" alt="Player profile screen preview" width="390" height="844" decoding="async">
+                                </div>
+                                <div class="iphone-home-indicator"></div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="iphone-slot is-right" data-slot="2" role="button" tabindex="0" aria-label="Bring right phone preview to front">
+                        <div class="iphone-body">
+                            <div class="iphone-btn iphone-mute"></div>
+                            <div class="iphone-btn iphone-vol-up"></div>
+                            <div class="iphone-btn iphone-vol-down"></div>
+                            <div class="iphone-btn iphone-power"></div>
+                            <div class="iphone-screen">
+                                <div class="iphone-dynamic-island"></div>
+                                <div class="pose-canvas-wrap">
+                                    <canvas id="poseCanvas2" aria-hidden="true"></canvas>
+                                    <video class="phone-demo-video" muted playsinline preload="metadata" aria-label="Kick analysis video preview"></video>
+                                    <img class="phone-demo-img" alt="Player profile screen preview" width="390" height="844" decoding="async">
+                                </div>
+                                <div class="iphone-home-indicator"></div>
+                            </div>
+                        </div>
                     </div>
                 </div>
+                <div class="pose-dots" id="poseDots" aria-label="Device focus"></div>
             </aside>
         </section>
 
         <section class="features reveal">
             <div class="section-heading">What's in the beta</div>
-            <h2 class="section-title">Real metrics. <em>Real feedback.</em></h2>
+            <h2 class="section-title">Real metrics. <em>Real feedback made simple.</em> </h2>
             <div class="feature-list">
                 <div class="feature feature-hero">
                     <div class="feature-preview pair">
@@ -1341,7 +2121,7 @@
                         </div>
                     </div>
                     <div class="feature-body-text">
-                        <p>Three personal kicking breakdowns every month from PoseTek. Your strike is analyzed frame-by-frame against pro benchmarks — hip rotation, plant leg, strike path, follow-through — with exact cues on what to clean up next session.</p>
+                        <p>Three personal kicking breakdowns every month from PoseTek. Your strike is analyzed frame-by-frame against pro benchmarks — hip rotation, plant leg, strike path, follow-through — with what's working, what's not, and what you can do differently to improve your technique.</p>
                     </div>
                 </div>
 
@@ -1491,7 +2271,7 @@
         </section>
 
         <div class="inline-cta reveal">
-            <h3>Spots close at 30. No exceptions.</h3>
+            <h3>Spots close at 50. No exceptions.</h3>
             <p>Discounted beta spots are capped so we can closely track results, app usage, and ensure player development.</p>
             <a href="#wlCard" class="inline-cta-btn">Get on the list →</a>
         </div>
@@ -1517,15 +2297,15 @@
                 <div class="faq-body">Anytime. Your $19/month beta rate is locked as long as you stay subscribed.</div>
             </details>
             <details class="faq-item">
-                <summary>Why only 30 spots?</summary>
-                <div class="faq-body">This beta is being offered at a discounted rate, so we are capping access at 30 athletes. Keeping the group small lets PoseTek closely monitor each user's progress and ensure players are improving from usage of the app, which helps us maintain high-quality results and improve the product faster.</div>
+                <summary>Why only 50 spots?</summary>
+                <div class="faq-body">This beta is being offered at a discounted rate, so we are capping access at 50 athletes. Keeping the group small lets PoseTek closely monitor each user's progress and ensure players are improving from usage of the app, which helps us maintain high-quality results and improve the product faster.</div>
             </details>
         </section>
     </main>
 
     <a href="#wlCard" class="sticky-cta" id="stickyCta" aria-label="Jump to waitlist form">
         <span class="sticky-cta-left">
-            <span class="sticky-cta-top"><span id="stickyRemaining">15</span>/30 spots left</span>
+            <span class="sticky-cta-top"><span id="stickyRemaining">36</span>/50 spots left</span>
             <span class="sticky-cta-bot">Beta · $19/month</span>
         </span>
         <span class="sticky-cta-right">Hold spot →</span>
@@ -1534,6 +2314,42 @@
     <footer>
         <p>&copy; 2026 PoseTek · <a href="index.html">Home</a> · <a href="privacy.html">Privacy</a></p>
     </footer>
+
+    <!-- Mobile hero DOM arrangement: move carousel inside hero-copy on mobile -->
+    <script>
+        (function mobileDomArrange() {
+            var mobileMq = window.matchMedia('(max-width: 1023.98px)');
+            var heroAside = document.querySelector('.hero-pose-aside');
+            var heroCopy  = document.querySelector('.hero-copy');
+            var heroEl    = document.querySelector('.hero');
+            if (!heroAside || !heroCopy || !heroEl) return;
+
+            // Reference point: reserveSlot (hero-sub-slot) sits after h1.
+            // We want: h1 → carousel → hero-sub (auto-capture text) → mobile-cta-bar
+            var reserveSlot = document.getElementById('reserveSlot');
+
+            function arrange() {
+                if (mobileMq.matches) {
+                    // Move aside into hero-copy right before the reserve slot
+                    if (heroAside.parentElement !== heroCopy) {
+                        if (reserveSlot) {
+                            heroCopy.insertBefore(heroAside, reserveSlot);
+                        } else {
+                            heroCopy.insertBefore(heroAside, heroCopy.firstChild);
+                        }
+                    }
+                } else {
+                    // Move aside back as last child of hero (desktop grid picks it up via grid-area)
+                    if (heroAside.parentElement !== heroEl) {
+                        heroEl.appendChild(heroAside);
+                    }
+                }
+            }
+
+            arrange();
+            mobileMq.addEventListener('change', arrange);
+        })();
+    </script>
 
     <!-- Firebase -->
     <script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app-compat.js"></script>
@@ -1552,8 +2368,8 @@
         firebase.initializeApp(firebaseConfig);
         const db = firebase.firestore();
 
-        const TOTAL_SPOTS = 30;
-        const HIDDEN_OFFSET = 15;
+        const TOTAL_SPOTS = 50;
+        const HIDDEN_OFFSET = 14;
         const FLOOR_HOLD = 2;
 
         function computeDisplayed(actualRemaining) {
@@ -1562,11 +2378,41 @@
             return Math.max(FLOOR_HOLD, r - HIDDEN_OFFSET);
         }
 
+        function animateCount(el, from, to, duration = 900) {
+            if (!el) return;
+            const start = performance.now();
+            const ease = (t) => 1 - Math.pow(1 - t, 3);
+            function step(now) {
+                const t = Math.min(1, (now - start) / duration);
+                const val = Math.round(from + (to - from) * ease(t));
+                el.textContent = val;
+                if (t < 1) requestAnimationFrame(step);
+                else el.textContent = to;
+            }
+            requestAnimationFrame(step);
+        }
+
         function updateSpotDisplay(actualRemaining) {
             const displayed = computeDisplayed(actualRemaining);
             const rem = document.getElementById('spotRemaining');
+            const mobileRem = document.getElementById('mobileSpotRemaining');
             const stickyRem = document.getElementById('stickyRemaining');
-            if (rem) rem.textContent = displayed;
+            const spotNum = document.getElementById('spotNum');
+            if (rem) {
+                const current = parseInt(rem.textContent, 10);
+                const from = Number.isFinite(current) ? current : computeDisplayed(TOTAL_SPOTS);
+                animateCount(rem, from, displayed, 1000);
+                if (spotNum && from !== displayed) {
+                    spotNum.classList.remove('is-counting');
+                    void spotNum.offsetWidth;
+                    spotNum.classList.add('is-counting');
+                }
+            }
+            if (mobileRem) {
+                const mCurrent = parseInt(mobileRem.textContent, 10);
+                const mFrom = Number.isFinite(mCurrent) ? mCurrent : computeDisplayed(TOTAL_SPOTS);
+                animateCount(mobileRem, mFrom, displayed, 1000);
+            }
             if (stickyRem) stickyRem.textContent = displayed;
         }
 
@@ -1600,25 +2446,46 @@
         }
 
         const form = document.getElementById('wlForm');
-        const nameInput = document.getElementById('wlName');
-        const emailInput = document.getElementById('wlEmail');
+        const playerFirstInput = document.getElementById('wlPlayerFirst');
+        const playerLastInput = document.getElementById('wlPlayerLast');
+        const parentFirstInput = document.getElementById('wlParentFirst');
+        const parentLastInput = document.getElementById('wlParentLast');
+        const parentEmailInput = document.getElementById('wlParentEmail');
         const submitBtn = document.getElementById('wlSubmit');
 
         form.addEventListener('submit', async (e) => {
             e.preventDefault();
             setStatus('', '');
 
-            const name = nameInput.value.trim();
-            const email = emailInput.value.trim();
+            const playerFirst = playerFirstInput.value.trim();
+            const playerLast = playerLastInput.value.trim();
+            const parentFirst = parentFirstInput.value.trim();
+            const parentLast = parentLastInput.value.trim();
+            const parentEmail = parentEmailInput.value.trim();
 
-            if (!name) {
-                setStatus('Please enter your first name.', 'error');
-                nameInput.focus();
+            if (!playerFirst) {
+                setStatus('Please enter the player’s first name.', 'error');
+                playerFirstInput.focus();
                 return;
             }
-            if (!email || !emailInput.checkValidity()) {
+            if (!playerLast) {
+                setStatus('Please enter the player’s last name.', 'error');
+                playerLastInput.focus();
+                return;
+            }
+            if (!parentFirst) {
+                setStatus('Please enter the parent’s first name.', 'error');
+                parentFirstInput.focus();
+                return;
+            }
+            if (!parentLast) {
+                setStatus('Please enter the parent’s last name.', 'error');
+                parentLastInput.focus();
+                return;
+            }
+            if (!parentEmail || !parentEmailInput.checkValidity()) {
                 setStatus('Please enter a valid email address.', 'error');
-                emailInput.focus();
+                parentEmailInput.focus();
                 return;
             }
 
@@ -1628,8 +2495,12 @@
 
             try {
                 await db.collection('subscriptionWaitlist').add({
-                    name: name,
-                    email: email,
+                    playerFirstName: playerFirst,
+                    playerLastName: playerLast,
+                    parentFirstName: parentFirst,
+                    parentLastName: parentLast,
+                    parentEmail: parentEmail,
+                    email: parentEmail,
                     source: 'hypothesis_subscriptionWaitlist',
                     submittedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
@@ -1643,11 +2514,25 @@
             }
         });
 
-        /* Desktop hero — kick pose replay (Quest-style card; same Storage paths as hypothesis_athleticismSubscription) */
+        /* Desktop hero — triple iPhone coverflow */
         (function initHeroKickPose() {
             const aside = document.querySelector('.hero-pose-aside');
-            const canvas = document.getElementById('heroPoseCanvas');
-            if (!aside || !canvas || !firebase.storage) return;
+            const trio = document.getElementById('iphoneTrio');
+            if (!aside || !trio) return;
+
+            const canvi = [0, 1, 2].map(function (i) { return document.getElementById('poseCanvas' + i); });
+            const mediaWraps = Array.from(document.querySelectorAll('.hero-pose-aside .pose-canvas-wrap'));
+            const videoEls = Array.from(document.querySelectorAll('.hero-pose-aside .phone-demo-video'));
+            const imageEls = Array.from(document.querySelectorAll('.hero-pose-aside .phone-demo-img'));
+            if (canvi.some(function (c) { return !c; }) || mediaWraps.length < 3 || videoEls.length < 3 || imageEls.length < 3) return;
+
+            var imageAdvanceTimer = null;
+            function clearImageAdvance() {
+                if (imageAdvanceTimer) {
+                    clearTimeout(imageAdvanceTimer);
+                    imageAdvanceTimer = null;
+                }
+            }
 
             const POSE_CONNECTIONS = [
                 [11, 12], [12, 24], [24, 23], [23, 11],
@@ -1659,13 +2544,29 @@
             const LIMB_COLOR = '#ffffff';
             const KEYPOINT_COLOR = '#4ade80';
             const KEYPOINT_GLOW = 'rgba(74, 222, 128, 0.85)';
-            const DEMO_UID = '1lhMLY7Efl59arkzO5Wh';
-            const KICK_PATHS = [
-                DEMO_UID + '/deadballShot/session1/kick1/pose.json',
-                DEMO_UID + '/instep/session1/kick1/pose.json',
-                DEMO_UID + '/kick/session1/kick1/pose.json',
-                DEMO_UID + '/kick/session1/pose.json'
-            ];
+            const KICK_ANALYSIS_VIDEO = {
+                type: 'video',
+                src: 'images/kick analysis video.mov',
+                objectFit: 'cover'
+            };
+            const KICK_OVERLAY_VIDEO = {
+                type: 'video',
+                src: 'images/kick overlay video.mov',
+                objectFit: 'contain'
+            };
+            const JUMP_TRACK_VIDEO = {
+                type: 'video',
+                src: 'images/jump track.mov',
+                objectFit: 'contain'
+            };
+            const PLAYER_PROFILE_SLIDE = {
+                type: 'static',
+                kind: 'image',
+                src: 'images/player profile image.png',
+                durationMs: 4000,
+                objectFit: 'contain'
+            };
+            const STAGGER_MS = [0, 800, 1600];
             const ENTER_MS = 520;
             const EXIT_MS = 420;
             const PAUSE_MS = 550;
@@ -1675,18 +2576,14 @@
             const PLAY_Y_FRAC = 0.5 - 0.1;
             const PLAY_FRAME_CAP = 150;
 
-            const ctx = canvas.getContext('2d');
             const mq = window.matchMedia('(min-width: 1024px)');
+            const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+            const allAnimSets = [];
+            const contentItems = allAnimSets;
+            let currentContentIdx = 0;
+            let centerSlotIndex = 1;
             let running = false;
             let rafId = null;
-            let frames = [];
-            let phase = 0;
-            let phaseT0 = 0;
-            let frameIdx = 0;
-            let lastAdv = 0;
-            let posXFrac = 0.5;
-            let posYFrac = 0.5;
-            let currentAnchor = { x: 0.5, y: 0.55 };
 
             const P_WAIT = 0;
             const P_ENTER = 1;
@@ -1694,7 +2591,130 @@
             const P_EXIT = 3;
             const P_IDLE = 4;
 
-            function resizeCanvas() {
+            const players = canvi.map(function (canvas) {
+                return {
+                    canvas: canvas,
+                    ctx: canvas.getContext('2d'),
+                    phase: P_WAIT,
+                    phaseT0: 0,
+                    frameIdx: 0,
+                    lastAdv: 0,
+                    posXFrac: 0.5,
+                    posYFrac: 0.5,
+                    item: null,
+                    videoStarted: false,
+                    staticHoldStarted: false,
+                    frames: [],
+                    anchor: { x: 0.5, y: 0.55 }
+                };
+            });
+
+            function isVideoItem(item) {
+                return item && item.type === 'video';
+            }
+
+            function isStaticImageItem(item) {
+                return item && item.type === 'static' && item.kind === 'image';
+            }
+
+            function syncSlotMedia(slotIndex, item) {
+                const wrap = mediaWraps[slotIndex];
+                const video = videoEls[slotIndex];
+                const img = imageEls[slotIndex];
+                const player = players[slotIndex];
+                const showVideo = isVideoItem(item);
+                const showImg = isStaticImageItem(item);
+                wrap.classList.toggle('is-video', showVideo && !showImg);
+                wrap.classList.toggle('is-static-img', showImg);
+                player.videoStarted = false;
+                player.staticHoldStarted = false;
+
+                if (showVideo) {
+                    if (video.getAttribute('src') !== item.src) {
+                        video.src = item.src;
+                        video.load();
+                    }
+                    video.pause();
+                    try { video.currentTime = 0; } catch (_e) {}
+                    var useContain = item.objectFit === 'contain';
+                    video.classList.toggle('phone-demo-video--contain', useContain);
+                    wrap.classList.toggle('is-video-fit-contain', useContain);
+                } else {
+                    video.pause();
+                    video.classList.remove('phone-demo-video--contain');
+                    wrap.classList.remove('is-video-fit-contain');
+                }
+
+                if (showImg) {
+                    if (img.getAttribute('src') !== item.src) {
+                        img.src = item.src;
+                    }
+                }
+            }
+
+            function startSlotVideo(slotIndex) {
+                const player = players[slotIndex];
+                const video = videoEls[slotIndex];
+                if (player.videoStarted) return;
+                player.videoStarted = true;
+                try { video.currentTime = 0; } catch (_e) {}
+                const play = video.play();
+                if (play && play.catch) {
+                    play.catch(function () {
+                        window.setTimeout(function () {
+                            if (slotIndex === centerSlotIndex && isVideoItem(players[slotIndex].item)) {
+                                resyncAll(performance.now());
+                            }
+                        }, 1800);
+                    });
+                }
+            }
+
+            function assignSlotContent() {
+                const N = contentItems.length;
+                if (!N) return;
+                for (var i = 0; i < 3; i++) {
+                    var offset = 0;
+                    if (i === (centerSlotIndex - 1 + 3) % 3) offset = -1;
+                    else if (i !== centerSlotIndex) offset = 1;
+                    var ci = (currentContentIdx + offset + N) % N;
+                    var item = contentItems[ci];
+                    players[i].item = item;
+                    players[i].frames = item.frames || [];
+                    players[i].anchor = item.anchor || { x: 0.5, y: 0.55 };
+                    syncSlotMedia(i, item);
+                }
+            }
+
+            function updateSlotClasses() {
+                const left = (centerSlotIndex - 1 + 3) % 3;
+                document.querySelectorAll('.iphone-slot').forEach(function (el, i) {
+                    el.classList.remove('is-left', 'is-center', 'is-right');
+                    if (i === centerSlotIndex) el.classList.add('is-center');
+                    else if (i === left) el.classList.add('is-left');
+                    else el.classList.add('is-right');
+                    el.setAttribute('aria-current', i === centerSlotIndex ? 'true' : 'false');
+                });
+            }
+
+            function getContentIndexForSlot(slotIndex) {
+                const N = contentItems.length;
+                if (!N) return 0;
+                if (slotIndex === centerSlotIndex) return currentContentIdx;
+                if (slotIndex === (centerSlotIndex - 1 + 3) % 3) {
+                    return (currentContentIdx - 1 + N) % N;
+                }
+                return (currentContentIdx + 1) % N;
+            }
+
+            function rollCarousel() {
+                if (reduceMotion) return;
+                centerSlotIndex = (centerSlotIndex - 1 + 3) % 3;
+                updateSlotClasses();
+                assignSlotContent();
+            }
+
+            function resizeOne(canvas, ctx) {
                 const dpr = Math.max(1, Math.min(2, window.devicePixelRatio || 1));
                 const rect = canvas.getBoundingClientRect();
                 const w = Math.max(1, Math.floor(rect.width));
@@ -1703,17 +2723,19 @@
                 canvas.height = Math.floor(h * dpr);
                 ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
             }
+            function resizeAll() {
+                for (var i = 0; i < 3; i++) resizeOne(players[i].canvas, players[i].ctx);
+            }
+            if (window.ResizeObserver) {
+                const ro = new ResizeObserver(resizeAll);
+                for (var r = 0; r < 3; r++) ro.observe(players[r].canvas);
+            }
+            window.addEventListener('resize', resizeAll, { passive: true });
 
-            const ro = new ResizeObserver(resizeCanvas);
-            ro.observe(canvas);
-            window.addEventListener('resize', resizeCanvas, { passive: true });
-
-            function getLayout() {
+            function getScale(canvas) {
                 const rect = canvas.getBoundingClientRect();
-                const cW = rect.width || canvas.width;
                 const cH = rect.height || canvas.height;
-                const scale = cH * 1.55;
-                return { cW, cH, scale };
+                return cH * 1.55;
             }
 
             function computeTorsoAnchor(arr) {
@@ -1722,11 +2744,9 @@
                 const idx = Math.max(0, limit - 1);
                 const frame = arr[idx];
                 if (!frame) return { x: 0.5, y: 0.55 };
-                let sx = 0;
-                let sy = 0;
-                let n = 0;
-                for (let i = 0; i < TORSO_KEYPOINTS.length; i++) {
-                    const p = frame[TORSO_KEYPOINTS[i]];
+                var sx = 0, sy = 0, n = 0;
+                for (var i = 0; i < TORSO_KEYPOINTS.length; i++) {
+                    var p = frame[TORSO_KEYPOINTS[i]];
                     if (!p) continue;
                     sx += p[0];
                     sy += p[1];
@@ -1736,26 +2756,27 @@
                 return { x: sx / n, y: sy / n };
             }
 
-            function drawFigure(pts, cxFrac, cyFrac, alpha) {
+            function drawFigure(ctx, canvas, anchor, pts, cxFrac, cyFrac, alpha) {
                 if (!pts || !pts.length) return;
-                const { cW, cH, scale } = getLayout();
-                const cx = cW * cxFrac - scale * currentAnchor.x;
-                const cy = cH * cyFrac - scale * currentAnchor.y;
-
+                const rect = canvas.getBoundingClientRect();
+                const cW = rect.width || canvas.width;
+                const cH = rect.height || canvas.height;
+                const scale = getScale(canvas);
+                const cx = cW * cxFrac - scale * anchor.x;
+                const cy = cH * cyFrac - scale * anchor.y;
                 ctx.save();
                 ctx.globalAlpha = alpha == null ? 1 : alpha;
                 ctx.lineCap = 'round';
                 ctx.lineJoin = 'round';
                 const lw = Math.max(2, scale * 0.008);
-
                 ctx.strokeStyle = LIMB_COLOR;
                 ctx.shadowColor = 'rgba(255,255,255,0.35)';
                 ctx.shadowBlur = Math.max(2, scale * 0.01);
                 ctx.lineWidth = lw;
-                for (let ci = 0; ci < POSE_CONNECTIONS.length; ci++) {
-                    const [a, b] = POSE_CONNECTIONS[ci];
-                    const A = pts[a];
-                    const B = pts[b];
+                for (var ci = 0; ci < POSE_CONNECTIONS.length; ci++) {
+                    const ab = POSE_CONNECTIONS[ci];
+                    const A = pts[ab[0]];
+                    const B = pts[ab[1]];
                     if (!A || !B) continue;
                     ctx.beginPath();
                     ctx.moveTo(A[0] * scale + cx, A[1] * scale + cy);
@@ -1763,16 +2784,15 @@
                     ctx.stroke();
                 }
                 ctx.shadowBlur = 0;
-
                 ctx.fillStyle = KEYPOINT_COLOR;
                 ctx.shadowColor = KEYPOINT_GLOW;
                 ctx.shadowBlur = Math.max(4, scale * 0.014);
                 const r = Math.max(2.5, scale * 0.009);
-                for (let i = 0; i < pts.length; i++) {
-                    const p = pts[i];
-                    if (!p) continue;
+                for (var j = 0; j < pts.length; j++) {
+                    const p2 = pts[j];
+                    if (!p2) continue;
                     ctx.beginPath();
-                    ctx.arc(p[0] * scale + cx, p[1] * scale + cy, r, 0, Math.PI * 2);
+                    ctx.arc(p2[0] * scale + cx, p2[1] * scale + cy, r, 0, Math.PI * 2);
                     ctx.fill();
                 }
                 ctx.restore();
@@ -1786,15 +2806,13 @@
                         return frame.map(function (p) {
                             if (!p) return null;
                             if (Array.isArray(p)) {
-                                const x = p[0];
-                                const y = p[1];
+                                const x = p[0], y = p[1];
                                 if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
                                 if (x < -0.4 || x > 1.4 || y < -0.4 || y > 1.9) return null;
                                 return [x, y];
                             }
                             if (typeof p === 'object') {
-                                const x = p.x;
-                                const y = p.y;
+                                const x = p.x, y = p.y;
                                 if (!Number.isFinite(x) || !Number.isFinite(y)) return null;
                                 if (x < -0.4 || x > 1.4 || y < -0.4 || y > 1.9) return null;
                                 return [x, y];
@@ -1802,150 +2820,395 @@
                             return null;
                         });
                     })
-                    .filter(function (f) {
-                        return f && f.some(Boolean);
-                    });
+                    .filter(function (f) { return f && f.some(Boolean); });
             }
 
-            const easeOut = function (t) {
-                return 1 - Math.pow(1 - t, 3);
-            };
-            const easeIn = function (t) {
-                return t * t * t;
-            };
+            const easeOut = function (t) { return 1 - Math.pow(1 - t, 3); };
+            const easeIn = function (t) { return t * t * t; };
 
-            function tick(ts) {
-                if (!running) return;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+            function resyncAll(ts) {
+                clearImageAdvance();
+                if (allAnimSets.length) {
+                    currentContentIdx = (currentContentIdx + 1) % allAnimSets.length;
+                }
+                if (!reduceMotion) rollCarousel();
+                else assignSlotContent();
+                setActiveDot(currentContentIdx);
+                for (var j = 0; j < 3; j++) {
+                    players[j].phase = P_WAIT;
+                    players[j].phaseT0 = ts + STAGGER_MS[j];
+                    players[j].frameIdx = 0;
+                    players[j].lastAdv = 0;
+                }
+            }
 
-                const enterXFrom = -0.35;
-                const enterXTo = PLAY_X_FRAC;
-                const exitXTo = 1.35;
+            function stepAndDraw(p, i, ts) {
+                const lead = i === centerSlotIndex;
+                const ctx = p.ctx, canvas = p.canvas, frames = p.frames, anchor = p.anchor;
+                const enterXFrom = -0.35, enterXTo = PLAY_X_FRAC, exitXTo = 1.35;
+                if (isStaticImageItem(p.item)) {
+                    if (lead && !p.staticHoldStarted) {
+                        p.staticHoldStarted = true;
+                        clearImageAdvance();
+                        var holdMs = p.item.durationMs || 4000;
+                        imageAdvanceTimer = window.setTimeout(function () {
+                            imageAdvanceTimer = null;
+                            resyncAll(performance.now());
+                        }, holdMs);
+                    }
+                    return;
+                }
+                if (isVideoItem(p.item)) {
+                    if (lead) startSlotVideo(i);
+                    return;
+                }
+                if (!frames || !frames.length) return;
+                const lim = Math.min(frames.length, PLAY_FRAME_CAP);
+                const finalFrame = frames[lim - 1];
+                if (!lead) {
+                    const midIdx = Math.floor(lim / 2);
+                    drawFigure(ctx, canvas, anchor, frames[midIdx], PLAY_X_FRAC, PLAY_Y_FRAC, 0.7);
+                    return;
+                }
 
-                switch (phase) {
+                switch (p.phase) {
                     case P_WAIT: {
-                        if (ts - phaseT0 >= 1500 && frames.length) {
-                            phase = P_ENTER;
-                            phaseT0 = ts;
-                            frameIdx = 0;
+                        if (ts - p.phaseT0 >= 1500) {
+                            p.phase = P_ENTER;
+                            p.phaseT0 = ts;
+                            p.frameIdx = 0;
                         }
                         break;
                     }
                     case P_ENTER: {
-                        const t = Math.min(1, (ts - phaseT0) / ENTER_MS);
-                        posXFrac = enterXFrom + (enterXTo - enterXFrom) * easeOut(t);
-                        posYFrac = PLAY_Y_FRAC;
-                        drawFigure(frames[0], posXFrac, posYFrac, Math.max(0.35, t));
+                        const t = Math.min(1, (ts - p.phaseT0) / ENTER_MS);
+                        p.posXFrac = enterXFrom + (enterXTo - enterXFrom) * easeOut(t);
+                        p.posYFrac = PLAY_Y_FRAC;
+                        drawFigure(ctx, canvas, anchor, frames[0], p.posXFrac, p.posYFrac, Math.max(0.35, t));
                         if (t >= 1) {
-                            phase = P_PLAY;
-                            phaseT0 = ts;
-                            lastAdv = ts;
-                            frameIdx = 0;
+                            p.phase = P_PLAY;
+                            p.phaseT0 = ts;
+                            p.lastAdv = ts;
+                            p.frameIdx = 0;
                         }
                         break;
                     }
                     case P_PLAY: {
                         const f = frames;
                         const limit = Math.min(f.length, PLAY_FRAME_CAP);
-                        drawFigure(f[Math.min(frameIdx, limit - 1)], enterXTo, PLAY_Y_FRAC, 1);
-                        if (ts - lastAdv >= FRAME_MS) {
-                            frameIdx++;
-                            lastAdv = ts;
-                            if (frameIdx >= limit) {
-                                phase = P_EXIT;
-                                phaseT0 = ts;
+                        drawFigure(ctx, canvas, anchor, f[Math.min(p.frameIdx, limit - 1)], enterXTo, PLAY_Y_FRAC, 1);
+                        if (ts - p.lastAdv >= FRAME_MS) {
+                            p.frameIdx++;
+                            p.lastAdv = ts;
+                            if (p.frameIdx >= limit) {
+                                p.phase = P_EXIT;
+                                p.phaseT0 = ts;
                             }
                         }
                         break;
                     }
                     case P_EXIT: {
-                        const t = Math.min(1, (ts - phaseT0) / EXIT_MS);
-                        posXFrac = enterXTo + (exitXTo - enterXTo) * easeIn(t);
-                        posYFrac = PLAY_Y_FRAC;
-                        const lim = Math.min(frames.length, PLAY_FRAME_CAP);
-                        const finalFrame = frames[lim - 1];
-                        drawFigure(finalFrame, posXFrac, posYFrac, Math.max(0, 1 - t));
+                        const t = Math.min(1, (ts - p.phaseT0) / EXIT_MS);
+                        p.posXFrac = enterXTo + (exitXTo - enterXTo) * easeIn(t);
+                        p.posYFrac = PLAY_Y_FRAC;
+                        const lim2 = Math.min(frames.length, PLAY_FRAME_CAP);
+                        const last = frames[lim2 - 1];
+                        drawFigure(ctx, canvas, anchor, last, p.posXFrac, p.posYFrac, Math.max(0, 1 - t));
                         if (t >= 1) {
-                            phase = P_IDLE;
-                            phaseT0 = ts;
+                            p.phase = P_IDLE;
+                            p.phaseT0 = ts;
                         }
                         break;
                     }
                     case P_IDLE: {
-                        if (ts - phaseT0 >= PAUSE_MS) {
-                            phase = P_ENTER;
-                            phaseT0 = ts;
-                            frameIdx = 0;
+                        if (ts - p.phaseT0 >= PAUSE_MS) {
+                            resyncAll(ts);
+                        } else {
+                            drawFigure(ctx, canvas, anchor, finalFrame, enterXTo, PLAY_Y_FRAC, 1);
                         }
-                        break;
+                        return;
                     }
-                    default:
-                        break;
+                    default: break;
+                }
+            }
+
+            function tick(ts) {
+                if (!running) return;
+                const order = [0, 1, 2].filter(function (j) { return j !== centerSlotIndex; }).concat(centerSlotIndex);
+                for (var oi = 0; oi < order.length; oi++) {
+                    var i = order[oi];
+                    var p2 = players[i];
+                    p2.ctx.clearRect(0, 0, p2.canvas.width, p2.canvas.height);
+                    stepAndDraw(players[i], i, ts);
                 }
                 rafId = requestAnimationFrame(tick);
             }
 
-            async function loadKickFrames() {
-                try {
-                    await firebase.auth().signInAnonymously();
-                } catch (err) {
-                    console.warn('[heroPose] auth failed:', err);
-                    return;
-                }
-                const storage = firebase.storage();
-                for (let i = 0; i < KICK_PATHS.length; i++) {
-                    try {
-                        const url = await storage.ref(KICK_PATHS[i]).getDownloadURL();
-                        const res = await fetch(url);
-                        if (!res.ok) continue;
-                        const json = await res.json();
-                        const parsed = parseFrames(json);
-                        if (parsed.length) {
-                            frames = parsed;
-                            currentAnchor = computeTorsoAnchor(frames);
-                            return;
-                        }
-                    } catch (_) {}
-                }
-                console.warn('[heroPose] kick pose not found');
+            function navigateToContent(idx) {
+                clearImageAdvance();
+                currentContentIdx = idx;
+                updateSlotClasses();
+                assignSlotContent();
+                setActiveDot(idx);
+                const cp = players[centerSlotIndex];
+                cp.phase = P_ENTER;
+                cp.phaseT0 = performance.now();
+                cp.frameIdx = 0;
+                cp.lastAdv = 0;
             }
 
+            function renderTrioDots() {
+                const container = document.getElementById('poseDots');
+                if (!container) return;
+                container.innerHTML = '';
+                const N = contentItems.length || 1;
+                for (var d = 0; d < N; d++) {
+                    const dot = document.createElement('button');
+                    dot.type = 'button';
+                    dot.className = 'pose-dot' + (d === currentContentIdx ? ' active' : '');
+                    dot.setAttribute('aria-label', 'View clip ' + (d + 1));
+                    (function (idx) {
+                        dot.addEventListener('click', function () { navigateToContent(idx); });
+                    })(d);
+                    container.appendChild(dot);
+                }
+            }
+
+            function setActiveDot(idx) {
+                const dots = document.querySelectorAll('#poseDots .pose-dot');
+                dots.forEach(function (d, j) { d.classList.toggle('active', j === idx); });
+            }
+
+            videoEls.forEach(function (video, slotIndex) {
+                video.addEventListener('ended', function () {
+                    if (slotIndex === centerSlotIndex && isVideoItem(players[slotIndex].item)) {
+                        resyncAll(performance.now());
+                    }
+                });
+                video.addEventListener('error', function () {
+                    if (slotIndex === centerSlotIndex && isVideoItem(players[slotIndex].item)) {
+                        window.setTimeout(function () { resyncAll(performance.now()); }, PAUSE_MS);
+                    }
+                });
+            });
+
+            function loadHeroCarouselItems() {
+                allAnimSets.push(KICK_ANALYSIS_VIDEO);
+                allAnimSets.push(KICK_OVERLAY_VIDEO);
+                allAnimSets.push(JUMP_TRACK_VIDEO);
+                allAnimSets.push(PLAYER_PROFILE_SLIDE);
+                currentContentIdx = Math.max(0, allAnimSets.length - 1);
+                centerSlotIndex = 1;
+                updateSlotClasses();
+                assignSlotContent();
+                renderTrioDots();
+                setActiveDot(currentContentIdx);
+            }
+
+            document.querySelectorAll('.iphone-slot').forEach(function (slotEl, slotIndex) {
+                function focusSlot() {
+                    if (slotIndex === centerSlotIndex || !contentItems.length) return;
+                    const targetContentIdx = getContentIndexForSlot(slotIndex);
+                    centerSlotIndex = slotIndex;
+                    navigateToContent(targetContentIdx);
+                }
+
+                slotEl.addEventListener('click', focusSlot);
+                slotEl.addEventListener('keydown', function (event) {
+                    if (event.key !== 'Enter' && event.key !== ' ') return;
+                    event.preventDefault();
+                    focusSlot();
+                });
+            });
+
             function start() {
-                if (!mq.matches || running || !frames.length) return;
+                if (running || !players[0].item) return;
                 running = true;
-                resizeCanvas();
-                phase = P_WAIT;
-                phaseT0 = performance.now();
+                clearImageAdvance();
+                resizeAll();
+                var t0 = performance.now();
+                for (var s = 0; s < 3; s++) {
+                    players[s].phase = P_WAIT;
+                    players[s].phaseT0 = t0 + STAGGER_MS[s];
+                    players[s].videoStarted = false;
+                    players[s].staticHoldStarted = false;
+                }
                 rafId = requestAnimationFrame(tick);
             }
 
             function stop() {
                 running = false;
+                clearImageAdvance();
                 if (rafId) cancelAnimationFrame(rafId);
                 rafId = null;
-                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                for (var st = 0; st < 3; st++) {
+                    const p = players[st];
+                    p.ctx.clearRect(0, 0, p.canvas.width, p.canvas.height);
+                    videoEls[st].pause();
+                }
             }
 
             function onMq() {
-                if (mq.matches) {
-                    resizeCanvas();
-                    start();
-                } else stop();
+                resizeAll();
+                start();
             }
 
             mq.addEventListener('change', onMq);
-            loadKickFrames().then(function () {
-                onMq();
+            loadHeroCarouselItems();
+            onMq();
+        })();
+
+        /* Reserve panel toggle */
+        (function initReservePanel() {
+            const heroCopy = document.querySelector('.hero-copy');
+            const heroSection = document.querySelector('.hero');
+            const heroAside = document.querySelector('.hero-pose-aside');
+            const reserveBtn = document.getElementById('reserveSpotBtn');
+            const reservePanel = document.getElementById('wlCard');
+            const collapseBtn = document.getElementById('reserveCollapse');
+            const firstFieldInput = document.getElementById('wlPlayerFirst');
+            const reserveHint = document.querySelector('.reserve-cta-hint');
+            const mobileCta = document.getElementById('mobileCtaBar');
+            const reserveSlot = document.getElementById('reserveSlot');
+            if (!heroCopy || !reservePanel) return;
+
+            const mobileMq = window.matchMedia('(max-width: 1023.98px)');
+            function isMobileLayout() { return mobileMq.matches; }
+
+            let heroLeftWhileReserving = false;
+
+            /* ── Mobile: move wlCard into carousel zone as an overlay ── */
+            function openMobileForm(focusForm) {
+                if (!heroAside) return;
+                let mobileHost = heroAside.querySelector('.mobile-form-host');
+                if (!mobileHost) {
+                    mobileHost = document.createElement('div');
+                    mobileHost.className = 'mobile-form-host';
+                    heroAside.appendChild(mobileHost);
+                }
+                mobileHost.appendChild(reservePanel);
+                reservePanel.classList.add('mobile-form-shown');
+                reservePanel.setAttribute('aria-hidden', 'false');
+                requestAnimationFrame(() => heroAside.classList.add('mobile-form-active'));
+                mobileCta && mobileCta.setAttribute('hidden', '');
+                if (focusForm && firstFieldInput) {
+                    window.setTimeout(() => firstFieldInput.focus(), 320);
+                }
+                updateSticky();
+            }
+
+            function closeMobileForm() {
+                if (!heroAside) return;
+                if (reserveSlot && reservePanel) reserveSlot.appendChild(reservePanel);
+                reservePanel.classList.remove('mobile-form-shown');
+                reservePanel.setAttribute('aria-hidden', 'true');
+                heroAside.classList.remove('mobile-form-active');
+                mobileCta && mobileCta.removeAttribute('hidden');
+                updateSticky();
+            }
+
+            /* ── Desktop: existing class-toggle approach ── */
+            function setReserveOpen(open, focusForm) {
+                if (isMobileLayout()) {
+                    open ? openMobileForm(focusForm) : closeMobileForm();
+                    return;
+                }
+                heroCopy.classList.toggle('is-reserving', open);
+                reserveBtn && reserveBtn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                reservePanel.setAttribute('aria-hidden', open ? 'false' : 'true');
+                if (reserveBtn) reserveBtn.querySelector('span').textContent = open ? '↓' : '→';
+                if (open) {
+                    reserveBtn && reserveBtn.setAttribute('hidden', '');
+                    reserveHint && reserveHint.removeAttribute('hidden');
+                    heroLeftWhileReserving = false;
+                } else {
+                    reserveBtn && reserveBtn.removeAttribute('hidden');
+                    reserveHint && reserveHint.setAttribute('hidden', '');
+                    heroLeftWhileReserving = false;
+                }
+                if (open && focusForm && firstFieldInput) {
+                    window.setTimeout(() => firstFieldInput.focus(), 180);
+                }
+                updateSticky();
+            }
+
+            function openReserve(event, focusForm) {
+                if (event) event.preventDefault();
+                setReserveOpen(true, focusForm);
+                if (!isMobileLayout()) {
+                    reservePanel.scrollIntoView({ block: 'center', behavior: 'smooth' });
+                }
+            }
+
+            /* Mobile CTA bar */
+            if (mobileCta) {
+                mobileCta.addEventListener('click', () => openReserve(null, true));
+            }
+
+            if (reserveBtn) {
+                reserveBtn.addEventListener('click', () => {
+                    const shouldOpen = reserveBtn.getAttribute('aria-expanded') !== 'true';
+                    setReserveOpen(shouldOpen, shouldOpen);
+                });
+            }
+            if (collapseBtn) {
+                collapseBtn.addEventListener('click', () => {
+                    setReserveOpen(false, false);
+                    if (!isMobileLayout() && reserveBtn) reserveBtn.focus();
+                });
+            }
+            document.querySelectorAll('a[href="#wlCard"]').forEach(link => {
+                link.addEventListener('click', event => openReserve(event, true));
             });
+
+            const spotCard = document.getElementById('spotCard');
+            if (spotCard) {
+                spotCard.addEventListener('click', () => openReserve(null, true));
+                spotCard.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openReserve(null, true); }
+                });
+            }
+
+            if (heroSection) {
+                const heroIo = new IntersectionObserver(
+                    (entries) => {
+                        const entry = entries[0];
+                        if (isMobileLayout()) return; // mobile handles its own state
+                        if (!heroCopy.classList.contains('is-reserving')) {
+                            heroLeftWhileReserving = false;
+                            return;
+                        }
+                        if (!entry.isIntersecting) {
+                            heroLeftWhileReserving = true;
+                        } else if (heroLeftWhileReserving && entry.isIntersecting) {
+                            setReserveOpen(false, false);
+                        }
+                    },
+                    { threshold: 0, root: null, rootMargin: '0px' }
+                );
+                heroIo.observe(heroSection);
+            }
         })();
 
         /* Sticky CTA reveal on scroll */
         const stickyCta = document.getElementById('stickyCta');
         const wlCard = document.getElementById('wlCard');
         let stickyShown = false;
+        const desktopMq = window.matchMedia('(min-width: 1024px)');
+
+        function updateHeroStickyLockPoint() {
+            const shouldShiftLockPoint = desktopMq.matches && (window.scrollY || window.pageYOffset || 0) > 4;
+            document.documentElement.classList.toggle('hero-sticky-shifted', shouldShiftLockPoint);
+        }
 
         function updateSticky() {
             if (!wlCard || !stickyCta) return;
+            if (wlCard.getAttribute('aria-hidden') !== 'true') {
+                stickyCta.classList.remove('is-visible');
+                stickyShown = false;
+                setTimeout(() => { if (!stickyShown) stickyCta.style.display = 'none'; }, 400);
+                return;
+            }
             const rect = wlCard.getBoundingClientRect();
             const vh = window.innerHeight || document.documentElement.clientHeight;
             const shouldShow = rect.bottom < 60 || rect.top > vh - 40;
@@ -1961,7 +3224,11 @@
         }
         window.addEventListener('scroll', updateSticky, { passive: true });
         window.addEventListener('resize', updateSticky, { passive: true });
+        window.addEventListener('scroll', updateHeroStickyLockPoint, { passive: true });
+        window.addEventListener('resize', updateHeroStickyLockPoint, { passive: true });
+        desktopMq.addEventListener('change', updateHeroStickyLockPoint);
         updateSticky();
+        updateHeroStickyLockPoint();
 
         /* Coach video — lazy load on first expand, smooth autoplay loop */
         (function initCoachVideo() {
@@ -1989,19 +3256,6 @@
                     video.pause();
                 }
             });
-        })();
-
-        /* Auto-open the How it works FAQ when jumped to */
-        (function initHowItWorksJump() {
-            const link = document.querySelector('.how-it-works-btn');
-            const target = document.getElementById('howItWorks');
-            if (!link || !target) return;
-            link.addEventListener('click', () => {
-                target.open = true;
-            });
-            if (window.location.hash === '#howItWorks') {
-                target.open = true;
-            }
         })();
 
         (function initTestimonials() {
@@ -2057,6 +3311,7 @@
             ];
 
             const filtersWrap = document.getElementById('testimonialFilters');
+            const cardEl = document.getElementById('testimonialCard');
             const badgeEl = document.getElementById('testimonialBadge');
             const indexEl = document.getElementById('testimonialIndex');
             const quoteEl = document.getElementById('testimonialQuote');
@@ -2097,24 +3352,42 @@
                 });
             }
 
+            let firstRender = true;
             function render() {
                 const items = getVisibleTestimonials();
                 if (!items.length) return;
                 if (activeIndex >= items.length) activeIndex = 0;
 
                 const item = items[activeIndex];
-                badgeEl.textContent = item.badge;
-                indexEl.textContent = (activeIndex + 1) + ' / ' + items.length;
-                quoteEl.textContent = item.quote;
-                highlightEl.textContent = item.highlight;
-                nameEl.textContent = item.name;
-                roleEl.textContent = item.role;
 
-                filtersWrap.querySelectorAll('.testimonial-filter').forEach((btn) => {
-                    btn.classList.toggle('is-active', btn.dataset.group === activeGroup);
-                });
+                const apply = () => {
+                    badgeEl.textContent = item.badge;
+                    indexEl.textContent = (activeIndex + 1) + ' / ' + items.length;
+                    quoteEl.textContent = item.quote;
+                    highlightEl.textContent = item.highlight;
+                    nameEl.textContent = item.name;
+                    roleEl.textContent = item.role;
 
-                buildDots(items);
+                    filtersWrap.querySelectorAll('.testimonial-filter').forEach((btn) => {
+                        btn.classList.toggle('is-active', btn.dataset.group === activeGroup);
+                    });
+
+                    buildDots(items);
+                };
+
+                if (firstRender || !cardEl) {
+                    firstRender = false;
+                    apply();
+                    return;
+                }
+
+                cardEl.classList.add('is-swapping');
+                setTimeout(() => {
+                    apply();
+                    requestAnimationFrame(() => {
+                        cardEl.classList.remove('is-swapping');
+                    });
+                }, 220);
             }
 
             function step(direction) {
