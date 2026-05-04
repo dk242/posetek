@@ -9,12 +9,138 @@ const db = admin.firestore();
  * stripeWebhook
  *
  * Handles verified Stripe webhooks:
- * - checkout.session.completed — premium unlock + premiumPurchases (existing flow)
- * - payment_intent.succeeded — when metadata.booking_type === performance_test,
- *   writes to performanceTestBookings (Payment Element on bookPerformanceTest.html)
+ * - checkout.session.completed — premium unlock (mode payment) OR subscription waitlist (mode subscription)
+ * - payment_intent.succeeded — performance_test bookings (bookPerformanceTest.html)
+ * - invoice.payment_succeeded / invoice.payment_failed — subscription billing (waitlist)
+ * - customer.subscription.deleted — subscription cancelled (waitlist)
  *
- * Add both event types to this endpoint in the Stripe Dashboard.
+ * Register all handled event types on this endpoint in the Stripe Dashboard.
  */
+
+async function handleSubscriptionCheckoutCompleted(session) {
+  const waitlistDocId = session.client_reference_id;
+  const subscriptionId =
+    typeof session.subscription === "string"
+      ? session.subscription
+      : session.subscription?.id;
+  if (!waitlistDocId || !subscriptionId) {
+    console.warn(
+      "Subscription checkout missing client_reference_id or subscription:",
+      session.id
+    );
+    return;
+  }
+  const stripeEmail = session.customer_details?.email || null;
+  await db.collection("subscriptionWaitlist").doc(waitlistDocId).update({
+    stripeSubscriptionId: subscriptionId,
+    stripeCustomerId: session.customer || null,
+    subscriptionStatus: "trialing",
+    stripeEmail: stripeEmail,
+    stripeCheckoutSessionId: session.id,
+    subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  console.log(`Waitlist ${waitlistDocId} subscription recorded (${subscriptionId})`);
+}
+
+async function findWaitlistDocByStripeSubscriptionId(subscriptionId) {
+  const snap = await db
+    .collection("subscriptionWaitlist")
+    .where("stripeSubscriptionId", "==", subscriptionId)
+    .limit(1)
+    .get();
+  if (snap.empty) return null;
+  return snap.docs[0];
+}
+
+async function handleInvoicePaymentSucceeded(invoice) {
+  const subId =
+    typeof invoice.subscription === "string"
+      ? invoice.subscription
+      : invoice.subscription?.id;
+  if (!subId) return;
+  // Skip $0 invoices (e.g. trial line items) — first real charge has amount_paid > 0
+  if (!invoice.amount_paid || invoice.amount_paid <= 0) {
+    console.log("Skipping zero-amount invoice for subscription", subId);
+    return;
+  }
+  const doc = await findWaitlistDocByStripeSubscriptionId(subId);
+  if (!doc) {
+    console.log("No waitlist doc for subscription invoice:", subId);
+    return;
+  }
+  await doc.ref.update({
+    subscriptionStatus: "active",
+    firstChargedAt: admin.firestore.FieldValue.serverTimestamp(),
+    subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  console.log("Waitlist marked active after payment:", subId);
+}
+
+async function handleInvoicePaymentFailed(invoice) {
+  const subId =
+    typeof invoice.subscription === "string"
+      ? invoice.subscription
+      : invoice.subscription?.id;
+  if (!subId) return;
+  const doc = await findWaitlistDocByStripeSubscriptionId(subId);
+  if (!doc) return;
+  await doc.ref.update({
+    subscriptionStatus: "past_due",
+    subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  console.log("Waitlist marked past_due:", subId);
+}
+
+async function handleSubscriptionDeleted(subscription) {
+  const subId = subscription.id;
+  if (!subId) return;
+  const doc = await findWaitlistDocByStripeSubscriptionId(subId);
+  if (!doc) return;
+  await doc.ref.update({
+    subscriptionStatus: "cancelled",
+    subscriptionUpdatedAt: admin.firestore.FieldValue.serverTimestamp(),
+  });
+  console.log("Waitlist marked cancelled:", subId);
+}
+
+async function handlePremiumPaymentCheckoutCompleted(session) {
+  const playerDocId = session.client_reference_id;
+  const customerEmail = session.customer_details?.email || null;
+  const amountPaid = session.amount_total ? session.amount_total / 100 : null;
+
+  const purchaseData = {
+    stripeSessionId: session.id,
+    playerDocId: playerDocId || null,
+    customerEmail: customerEmail,
+    amountPaid: amountPaid,
+    currency: session.currency || "usd",
+    purchasedAt: admin.firestore.FieldValue.serverTimestamp(),
+  };
+
+  try {
+    await db.collection("premiumPurchases").add(purchaseData);
+    console.log("Purchase record written:", session.id);
+  } catch (err) {
+    console.error("Failed to write purchase record:", err);
+  }
+
+  if (playerDocId) {
+    try {
+      await db.collection("players").doc(playerDocId).update({
+        premium_content_locked: false,
+        premiumPurchasedAt: admin.firestore.FieldValue.serverTimestamp(),
+        premiumStripeSessionId: session.id,
+      });
+      console.log(`Unlocked premium for player: ${playerDocId}`);
+    } catch (err) {
+      console.error(`Failed to unlock premium for player ${playerDocId}:`, err);
+      throw err;
+    }
+  } else {
+    console.log("Guest purchase (no playerDocId) — email:", customerEmail);
+  }
+}
+
 exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   // Only accept POST
   if (req.method !== "POST") {
@@ -28,7 +154,7 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
   let event;
   try {
     event = stripeClient.webhooks.constructEvent(
-      req.rawBody,          // raw buffer — required for signature verification
+      req.rawBody, // raw buffer — required for signature verification
       req.headers["stripe-signature"],
       webhookSecret
     );
@@ -59,56 +185,72 @@ exports.stripeWebhook = functions.https.onRequest(async (req, res) => {
     return res.status(200).json({ received: true });
   }
 
-  // Only handle successful checkout completions for premium flow
-  if (event.type !== "checkout.session.completed") {
-    return res.status(200).send("Ignored event type");
-  }
-
-  const session = event.data.object;
-
-  // client_reference_id is set to the player's Firestore doc ID
-  // before redirecting to Stripe (see createPremiumCheckoutSession + premiumCheckout.js)
-  const playerDocId = session.client_reference_id;
-  const customerEmail = session.customer_details?.email || null;
-  const amountPaid = session.amount_total ? session.amount_total / 100 : null;
-
-  // Write purchase record regardless of whether we have a playerDocId
-  const purchaseData = {
-    stripeSessionId: session.id,
-    playerDocId: playerDocId || null,
-    customerEmail: customerEmail,
-    amountPaid: amountPaid,
-    currency: session.currency || "usd",
-    purchasedAt: admin.firestore.FieldValue.serverTimestamp(),
-  };
-
-  try {
-    await db.collection("premiumPurchases").add(purchaseData);
-    console.log("Purchase record written:", session.id);
-  } catch (err) {
-    console.error("Failed to write purchase record:", err);
-  }
-
-  // If we have a playerDocId, unlock their premium content
-  if (playerDocId) {
+  if (event.type === "invoice.payment_succeeded") {
     try {
-      await db.collection("players").doc(playerDocId).update({
-        premium_content_locked: false,
-        premiumPurchasedAt: admin.firestore.FieldValue.serverTimestamp(),
-        premiumStripeSessionId: session.id,
-      });
-      console.log(`Unlocked premium for player: ${playerDocId}`);
+      await handleInvoicePaymentSucceeded(event.data.object);
     } catch (err) {
-      console.error(`Failed to unlock premium for player ${playerDocId}:`, err);
-      return res.status(500).send("Failed to unlock premium");
+      console.error("handleInvoicePaymentSucceeded failed:", err);
     }
-  } else {
-    // Guest purchase — no player doc to update
-    // A coach can manually unlock the player later or match by email
-    console.log("Guest purchase (no playerDocId) — email:", customerEmail);
+    return res.status(200).json({ received: true });
   }
 
-  return res.status(200).json({ received: true });
+  if (event.type === "invoice.payment_failed") {
+    try {
+      await handleInvoicePaymentFailed(event.data.object);
+    } catch (err) {
+      console.error("handleInvoicePaymentFailed failed:", err);
+    }
+    return res.status(200).json({ received: true });
+  }
+
+  if (event.type === "customer.subscription.deleted") {
+    try {
+      await handleSubscriptionDeleted(event.data.object);
+    } catch (err) {
+      console.error("handleSubscriptionDeleted failed:", err);
+    }
+    return res.status(200).json({ received: true });
+  }
+
+  if (event.type === "checkout.session.completed") {
+    const session = event.data.object;
+    if (
+      session.mode === "subscription" &&
+      session.client_reference_id &&
+      session.subscription
+    ) {
+      try {
+        await handleSubscriptionCheckoutCompleted(session);
+      } catch (err) {
+        console.error("handleSubscriptionCheckoutCompleted failed:", err);
+        return res.status(500).send("Failed to update subscription waitlist");
+      }
+      return res.status(200).json({ received: true });
+    }
+
+    // One-time premium purchase (Payment Link / createPremiumCheckoutSession)
+    if (session.mode === "payment") {
+      try {
+        await handlePremiumPaymentCheckoutCompleted(session);
+      } catch (err) {
+        console.error("handlePremiumPaymentCheckoutCompleted failed:", err);
+        const playerDocId = session.client_reference_id;
+        if (playerDocId) {
+          return res.status(500).send("Failed to unlock premium");
+        }
+      }
+      return res.status(200).json({ received: true });
+    }
+
+    console.log(
+      "checkout.session.completed ignored (mode:",
+      session.mode,
+      ")"
+    );
+    return res.status(200).json({ received: true });
+  }
+
+  return res.status(200).send("Ignored event type");
 });
 
 /**

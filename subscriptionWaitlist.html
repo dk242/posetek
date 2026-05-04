@@ -210,6 +210,67 @@
             transform: none;
         }
 
+        .hero-payment-complete-card {
+            display: none;
+            align-items: center;
+            gap: 18px;
+            padding: 24px;
+            margin-top: 18px;
+            background: rgba(255, 255, 255, 0.94);
+            border: 1px solid rgba(26, 58, 46, 0.08);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-md);
+        }
+        .hero-copy.payment-complete .hero-sub-slot,
+        .hero-copy.payment-complete .mobile-cta-bar,
+        .hero-copy.payment-complete .how-it-works-btn,
+        .hero-copy.payment-complete .reserve-cta-hint,
+        .hero-copy.payment-complete .spot-card {
+            display: none !important;
+        }
+        .hero-copy.payment-complete .hero-payment-complete-card {
+            display: flex;
+            animation: fadeUp 0.55s var(--ease) both;
+        }
+        .hero-payment-check {
+            width: 64px;
+            height: 64px;
+            flex-shrink: 0;
+            border-radius: 50%;
+            background: var(--green-dark);
+            color: var(--white);
+            box-shadow: 0 14px 32px rgba(26, 58, 46, 0.22);
+            transform: scale(0.72);
+            animation: successPop 0.62s var(--ease) 0.12s both;
+        }
+        .hero-payment-check circle {
+            fill: none;
+            stroke: rgba(255, 255, 255, 0.35);
+            stroke-width: 2;
+        }
+        .hero-payment-check path {
+            fill: none;
+            stroke: currentColor;
+            stroke-width: 4;
+            stroke-linecap: round;
+            stroke-linejoin: round;
+            stroke-dasharray: 40;
+            stroke-dashoffset: 40;
+            animation: successCheck 0.5s ease-out 0.45s forwards;
+        }
+        .hero-payment-title {
+            font-size: 1.45rem;
+            line-height: 1.1;
+            font-weight: 900;
+            color: var(--green-dark);
+            letter-spacing: -0.5px;
+        }
+        .hero-payment-sub {
+            margin-top: 5px;
+            font-size: 0.96rem;
+            color: var(--text-mid);
+        }
+
         .how-it-works-btn {
             display: flex;
             align-items: center;
@@ -619,9 +680,37 @@
 
         .price-row {
             display: flex;
+            flex-wrap: wrap;
+            align-items: baseline;
+            gap: 8px 10px;
+            margin-bottom: 4px;
+        }
+        .price-free-inline {
+            display: inline-flex;
+            align-items: baseline;
+            gap: 5px;
+            font-size: 0.76rem;
+            font-weight: 800;
+            letter-spacing: 0.08em;
+            color: var(--green-mid);
+            white-space: nowrap;
+        }
+        .price-free-inline::after {
+            content: '·';
+            margin-left: 10px;
+            color: var(--text-soft);
+            font-weight: 300;
+            opacity: 0.55;
+        }
+        .price-free-inline svg {
+            flex-shrink: 0;
+            position: relative;
+            top: 0.12em;
+        }
+        .price-amount {
+            display: inline-flex;
             align-items: baseline;
             gap: 6px;
-            margin-bottom: 4px;
         }
 
         .price-val {
@@ -1452,6 +1541,14 @@
             0%, 100% { transform: scale(1); opacity: 1; }
             50% { transform: scale(1.04); opacity: 0.85; }
         }
+        @keyframes successPop {
+            0% { opacity: 0; transform: scale(0.72); }
+            68% { opacity: 1; transform: scale(1.08); }
+            100% { opacity: 1; transform: scale(1); }
+        }
+        @keyframes successCheck {
+            to { stroke-dashoffset: 0; }
+        }
 
         /* ── Topbar drop ── */
         .topbar { animation: dropIn 0.6s var(--ease) both; }
@@ -1979,10 +2076,13 @@
                     <div class="wl-card hero-reserve-panel" id="wlCard" aria-hidden="true">
                         <button type="button" class="reserve-collapse" id="reserveCollapse">Back to intro ↓</button>
                         <div class="price-row">
-                            <span class="price-val">$19</span>
-                            <span class="price-per">/month</span>
+                            <span class="price-free-inline">
+                                <svg width="11" height="11" viewBox="0 0 11 11" fill="none" aria-hidden="true"><circle cx="5.5" cy="5.5" r="5" stroke="currentColor" stroke-width="1.4"/><path d="M3.5 5.5l1.5 1.5 2.5-3" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg>
+                                FIRST MONTH FREE
+                            </span>
+                            <span class="price-amount"><span class="price-val">$19</span><span class="price-per">/mo after</span></span>
                         </div>
-                        <div class="price-note">Beta pricing — locks in as long as you stay subscribed.</div>
+                        <div class="price-note">No charge until your free month ends &nbsp;·&nbsp; Cancel anytime</div>
 
                         <div class="wl-form-wrap" id="wlFormWrap">
                             <form class="wl-form" id="wlForm" novalidate>
@@ -2004,7 +2104,7 @@
                                 <button type="submit" class="wl-submit" id="wlSubmit">Hold my spot →</button>
                             </form>
                             <p class="wl-status" id="wlStatus" role="status" aria-live="polite"></p>
-                            <p class="wl-finep">No charge today. We'll reach out when your spot opens.</p>
+                            <p class="wl-finep">First month free &nbsp;·&nbsp; $19/mo after &nbsp;·&nbsp; Cancel anytime</p>
                         </div>
 
                         <div class="wl-success" id="wlSuccess" hidden>
@@ -2026,7 +2126,7 @@
                 </button>
 
                 <button type="button" class="how-it-works-btn" id="reserveSpotBtn" aria-expanded="false" aria-controls="wlCard">Reserve your spot <span aria-hidden="true">→</span></button>
-                <p class="reserve-cta-hint" hidden>No charge today &nbsp;·&nbsp; Cancel anytime</p>
+                <p class="reserve-cta-hint" hidden>1 month free &nbsp;·&nbsp; then $19/mo</p>
 
                 <div class="spot-card" id="spotCard" role="button" tabindex="0" aria-label="Reserve your beta spot — see sign-up form">
                     <div>
@@ -2038,6 +2138,17 @@
                         <div class="spot-label">Spots left</div>
                         <div class="spot-desc">Locking in our first 50 beta athletes. Once they're gone, they're gone.</div>
                         <div class="spot-card-claim">Claim yours →</div>
+                    </div>
+                </div>
+
+                <div class="hero-payment-complete-card" id="heroPaymentComplete" aria-live="polite">
+                    <svg class="hero-payment-check" viewBox="0 0 64 64" aria-hidden="true">
+                        <circle cx="32" cy="32" r="27"></circle>
+                        <path d="M20 33l8 8 17-19"></path>
+                    </svg>
+                    <div>
+                        <div class="hero-payment-title">You're all set</div>
+                        <div class="hero-payment-sub">Your spot is reserved. We'll email you when beta access opens.</div>
                     </div>
                 </div>
             </div>
@@ -2290,7 +2401,7 @@
             </details>
             <details class="faq-item">
                 <summary>When does billing start?</summary>
-                <div class="faq-body">Nothing today. You'll get an invite when your spot opens, and $19/month starts when you activate.</div>
+                <div class="faq-body">Nothing today. When your spot opens, your first month is free — $19/month starts only after that period ends.</div>
             </details>
             <details class="faq-item">
                 <summary>Can I cancel?</summary>
@@ -2306,7 +2417,7 @@
     <a href="#wlCard" class="sticky-cta" id="stickyCta" aria-label="Jump to waitlist form">
         <span class="sticky-cta-left">
             <span class="sticky-cta-top"><span id="stickyRemaining">36</span>/50 spots left</span>
-            <span class="sticky-cta-bot">Beta · $19/month</span>
+            <span class="sticky-cta-bot">1 month free · $19/mo after</span>
         </span>
         <span class="sticky-cta-right">Hold spot →</span>
     </a>
@@ -2429,6 +2540,52 @@
         }
         loadSpotCount();
 
+        /** Subscription waitlist Payment Link (45-day trial configured in Stripe Dashboard). */
+        var STRIPE_SUBSCRIPTION_PAYMENT_LINK =
+            'https://buy.stripe.com/9B69AScAl97A0zFdVd9Ve02';
+        var WAITLIST_RETURN_STORAGE_KEY = 'posetekSubscriptionWaitlistDocId';
+
+        function subscriptionPaymentLinkUrl(waitlistDocId, email) {
+            var base = STRIPE_SUBSCRIPTION_PAYMENT_LINK.replace(/\/$/, '');
+            var sep = base.indexOf('?') >= 0 ? '&' : '?';
+            return (
+                base +
+                sep +
+                'client_reference_id=' +
+                encodeURIComponent(String(waitlistDocId)) +
+                '&prefilled_email=' +
+                encodeURIComponent(String(email))
+            );
+        }
+
+        function isTruthyParam(value) {
+            return /^(true|1|yes)$/i.test(String(value || ''));
+        }
+
+        function getStoredWaitlistDocId() {
+            try {
+                return window.localStorage.getItem(WAITLIST_RETURN_STORAGE_KEY);
+            } catch (err) {
+                return null;
+            }
+        }
+
+        function setStoredWaitlistDocId(waitlistDocId) {
+            try {
+                window.localStorage.setItem(WAITLIST_RETURN_STORAGE_KEY, waitlistDocId);
+            } catch (err) {
+                // If storage is unavailable, the webhook will still be the source of truth.
+            }
+        }
+
+        function clearStoredWaitlistDocId() {
+            try {
+                window.localStorage.removeItem(WAITLIST_RETURN_STORAGE_KEY);
+            } catch (err) {
+                // No-op.
+            }
+        }
+
         function setStatus(msg, kind) {
             const el = document.getElementById('wlStatus');
             el.textContent = msg || '';
@@ -2443,6 +2600,44 @@
             requestAnimationFrame(() => {
                 requestAnimationFrame(() => success.classList.add('is-visible'));
             });
+        }
+
+        function showPaymentCompleteHero() {
+            const heroCopy = document.querySelector('.hero-copy');
+            if (heroCopy) heroCopy.classList.add('payment-complete');
+        }
+
+        async function markCompletedPaymentReturn() {
+            const params = new URLSearchParams(window.location.search);
+            const completedPayment =
+                isTruthyParam(params.get('completed_payment')) ||
+                isTruthyParam(params.get('payment_completed'));
+            if (!completedPayment) return;
+            showPaymentCompleteHero();
+
+            const waitlistDocId =
+                params.get('client_reference_id') ||
+                params.get('waitlistDocId') ||
+                getStoredWaitlistDocId();
+
+            if (!waitlistDocId) {
+                setStatus('Payment received. We are confirming your spot now.', 'success');
+                return;
+            }
+
+            try {
+                await db.collection('subscriptionWaitlist').doc(waitlistDocId).set({
+                    paymentCompleted: true,
+                    paymentCompletedReturnAt: firebase.firestore.FieldValue.serverTimestamp(),
+                    paymentCompletedReturnUrl: window.location.href,
+                    paymentReturnSource: 'stripe_success_redirect'
+                }, { merge: true });
+                clearStoredWaitlistDocId();
+                loadSpotCount();
+            } catch (err) {
+                console.error('Payment return update failed:', err);
+                setStatus('Payment received. We are confirming your spot now.', 'success');
+            }
         }
 
         const form = document.getElementById('wlForm');
@@ -2494,18 +2689,22 @@
             submitBtn.textContent = 'Saving…';
 
             try {
-                await db.collection('subscriptionWaitlist').add({
+                const docRef = await db.collection('subscriptionWaitlist').add({
                     playerFirstName: playerFirst,
                     playerLastName: playerLast,
                     parentFirstName: parentFirst,
                     parentLastName: parentLast,
                     parentEmail: parentEmail,
                     email: parentEmail,
+                    paymentCompleted: false,
+                    subscriptionStatus: 'pending_checkout',
                     source: 'hypothesis_subscriptionWaitlist',
                     submittedAt: firebase.firestore.FieldValue.serverTimestamp()
                 });
-                revealSuccess();
+                setStoredWaitlistDocId(docRef.id);
                 loadSpotCount();
+                submitBtn.textContent = 'Redirecting to secure checkout…';
+                window.location.href = subscriptionPaymentLinkUrl(docRef.id, parentEmail);
             } catch (err) {
                 console.error('Waitlist submit error:', err);
                 setStatus('Something went wrong. Please try again.', 'error');
@@ -2513,6 +2712,7 @@
                 submitBtn.textContent = originalText;
             }
         });
+        markCompletedPaymentReturn();
 
         /* Desktop hero — triple iPhone coverflow */
         (function initHeroKickPose() {
